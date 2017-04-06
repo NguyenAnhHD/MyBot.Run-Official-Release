@@ -26,7 +26,7 @@ Func getArmyCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 			SetError(2)
 			Return ; not open, requested to be open - error.
 		EndIf
-		If _Sleep($iDelaycheckArmyCamp5) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP5) Then Return
 	EndIf
 
 	Local $aGetArmySize[3] = ["", "", ""]
@@ -43,8 +43,8 @@ Func getArmyCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 	While $iTried < 100 ; 30 - 40 sec
 
 		$iTried += 1
-		If _Sleep($iDelaycheckArmyCamp5) Then Return ; Wait 250ms before reading again
-	    ForceCaptureRegion()
+		If _Sleep($DELAYCHECKARMYCAMP5) Then Return ; Wait 250ms before reading again
+		ForceCaptureRegion()
 		$sArmyInfo = getArmyCampCap($aArmyCampSize[0], $aArmyCampSize[1]) ; OCR read army trained and total
 		If $g_iDebugSetlogTrain = 1 Then Setlog("OCR $sArmyInfo = " & $sArmyInfo, $COLOR_DEBUG)
 		If StringInStr($sArmyInfo, "#", 0, 1) < 2 Then ContinueLoop ; In case the CC donations recieved msg are blocking, need to keep checking numbers till valid
@@ -59,7 +59,7 @@ Func getArmyCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 				$tmpCurCamp = Number($aGetArmySize[1])
 				If $g_iDebugSetlogTrain = 1 Then Setlog("$tmpCurCamp = " & $tmpCurCamp, $COLOR_DEBUG)
 				$tmpTotalCamp = Number($aGetArmySize[2])
-				If $g_iDebugSetlogTrain = 1 Then Setlog("$TotalCamp = " & $TotalCamp & ", Camp OCR = " & $tmpTotalCamp, $COLOR_DEBUG)
+				If $g_iDebugSetlogTrain = 1 Then Setlog("$g_iTotalCampSpace = " & $g_iTotalCampSpace & ", Camp OCR = " & $tmpTotalCamp, $COLOR_DEBUG)
 				If $iHoldCamp = $tmpTotalCamp Then ExitLoop ; check to make sure the OCR read value is same in 2 reads before exit
 				$iHoldCamp = $tmpTotalCamp ; Store last OCR read value
 			EndIf
@@ -68,73 +68,73 @@ Func getArmyCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 	WEnd
 
 	If $iTried <= 99 Then
-		$CurCamp = $tmpCurCamp
-		If $TotalCamp = 0 Then $TotalCamp = $tmpTotalCamp
-		If $g_iDebugSetlogTrain = 1 Then Setlog("$CurCamp = " & $CurCamp & ", $TotalCamp = " & $TotalCamp, $COLOR_DEBUG)
+		$g_CurrentCampUtilization = $tmpCurCamp
+		If $g_iTotalCampSpace = 0 Then $g_iTotalCampSpace = $tmpTotalCamp
+		If $g_iDebugSetlogTrain = 1 Then Setlog("$g_CurrentCampUtilization = " & $g_CurrentCampUtilization & ", $g_iTotalCampSpace = " & $g_iTotalCampSpace, $COLOR_DEBUG)
 	Else
 		Setlog("Army size read error, Troop numbers may not train correctly", $COLOR_ERROR) ; log if there is read error
-		$CurCamp = 0
+		$g_CurrentCampUtilization = 0
 		CheckOverviewFullArmy()
 	EndIf
 
-	If $TotalCamp = 0 Or ($TotalCamp <> $tmpTotalCamp) Then ; if Total camp size is still not set or value not same as read use forced value
+	If $g_iTotalCampSpace = 0 Or ($g_iTotalCampSpace <> $tmpTotalCamp) Then ; if Total camp size is still not set or value not same as read use forced value
 		If $g_bTotalCampForced = False Then ; check if forced camp size set in expert tab
-		    Local $proposedTotalCamp = $tmpTotalCamp
-			If $TotalCamp > $tmpTotalCamp Then $proposedTotalCamp = $TotalCamp
+			Local $proposedTotalCamp = $tmpTotalCamp
+			If $g_iTotalCampSpace > $tmpTotalCamp Then $proposedTotalCamp = $g_iTotalCampSpace
 			$sInputbox = InputBox("Question", _
-								  "Enter your total Army Camp capacity." & @CRLF & @CRLF & _
-								  "Please check it matches with total Army Camp capacity" & @CRLF & _
-								  "you see in Army Overview right now in Android Window:" & @CRLF & _
-								  $Title & @CRLF & @CRLF & _
-								  "(This window closes in 2 Minutes with value of " & $proposedTotalCamp & ")", $proposedTotalCamp, "", 330, 220, Default, Default, 120, $g_hFrmBot)
+					"Enter your total Army Camp capacity." & @CRLF & @CRLF & _
+					"Please check it matches with total Army Camp capacity" & @CRLF & _
+					"you see in Army Overview right now in Android Window:" & @CRLF & _
+					$g_sAndroidTitle & @CRLF & @CRLF & _
+					"(This window closes in 2 Minutes with value of " & $proposedTotalCamp & ")", $proposedTotalCamp, "", 330, 220, Default, Default, 120, $g_hFrmBot)
 			Local $error = @error
 			If $error = 1 Then
-			   Setlog("Army Camp User input cancelled, still using " & $TotalCamp, $COLOR_ACTION)
+				Setlog("Army Camp User input cancelled, still using " & $g_iTotalCampSpace, $COLOR_ACTION)
 			Else
-			   If $error = 2 Then
-				  ; Cancelled, using proposed value
-				  $TotalCamp = $proposedTotalCamp
-			   Else
-				  $TotalCamp = Number($sInputbox)
-			   EndIf
-			   If $error = 0 Then
-				  $g_iTotalCampForcedValue = $TotalCamp
-				  $g_bTotalCampForced = True
-				  Setlog("Army Camp User input = " & $TotalCamp, $COLOR_INFO)
-			   Else
-				  ; timeout
-				  Setlog("Army Camp proposed value = " & $TotalCamp, $COLOR_ACTION)
-			   EndIf
-			EndIF
+				If $error = 2 Then
+					; Cancelled, using proposed value
+					$g_iTotalCampSpace = $proposedTotalCamp
+				Else
+					$g_iTotalCampSpace = Number($sInputbox)
+				EndIf
+				If $error = 0 Then
+					$g_iTotalCampForcedValue = $g_iTotalCampSpace
+					$g_bTotalCampForced = True
+					Setlog("Army Camp User input = " & $g_iTotalCampSpace, $COLOR_INFO)
+				Else
+					; timeout
+					Setlog("Army Camp proposed value = " & $g_iTotalCampSpace, $COLOR_ACTION)
+				EndIf
+			EndIf
 		Else
-			$TotalCamp = Number($g_iTotalCampForcedValue)
+			$g_iTotalCampSpace = Number($g_iTotalCampForcedValue)
 		EndIf
 	EndIf
-	If _Sleep($iDelaycheckArmyCamp4) Then Return
+	If _Sleep($DELAYCHECKARMYCAMP4) Then Return
 
-	If $g_bTotalCampForced = True Then $TotalCamp = Number($g_iTotalCampForcedValue)
+	If $g_bTotalCampForced = True Then $g_iTotalCampSpace = Number($g_iTotalCampForcedValue)
 
-	If $TotalCamp > 0 Then
-		SetLog("Total Army Camp capacity: " & $CurCamp & "/" & $TotalCamp & " (" & Int($CurCamp / $TotalCamp * 100) & "%)")
-		$ArmyCapacity = Int($CurCamp / $TotalCamp * 100)
+	If $g_iTotalCampSpace > 0 Then
+		SetLog("Total Army Camp capacity: " & $g_CurrentCampUtilization & "/" & $g_iTotalCampSpace & " (" & Int($g_CurrentCampUtilization / $g_iTotalCampSpace * 100) & "%)")
+		$g_iArmyCapacity = Int($g_CurrentCampUtilization / $g_iTotalCampSpace * 100)
 	Else
-		SetLog("Total Army Camp capacity: " & $CurCamp & "/" & $TotalCamp)
-		$ArmyCapacity = 0
+		SetLog("Total Army Camp capacity: " & $g_CurrentCampUtilization & "/" & $g_iTotalCampSpace)
+		$g_iArmyCapacity = 0
 	EndIf
 
-	If ($CurCamp >= ($TotalCamp * $g_iTrainArmyFullTroopPct / 100)) Then
-		$fullArmy = True
+	If ($g_CurrentCampUtilization >= ($g_iTotalCampSpace * $g_iTrainArmyFullTroopPct / 100)) Then
+		$g_bFullArmy = True
 	Else
-		$fullArmy = False
+		$g_bFullArmy = False
 	EndIf
 
-	If $CurCamp >= $TotalCamp * $g_aiSearchCampsPct[$DB] / 100 And $g_abSearchCampsEnable[$DB] And IsSearchModeActive($DB) Then $fullArmy = True
-	If $CurCamp >= $TotalCamp * $g_aiSearchCampsPct[$LB] / 100 And $g_abSearchCampsEnable[$LB] And IsSearchModeActive($LB) Then $fullArmy = True
-	If $CurCamp >= $TotalCamp * $g_aiSearchCampsPct[$TS] / 100 And $g_abSearchCampsEnable[$TS] And IsSearchModeActive($TS) Then $fullArmy = True
+	If $g_CurrentCampUtilization >= $g_iTotalCampSpace * $g_aiSearchCampsPct[$DB] / 100 And $g_abSearchCampsEnable[$DB] And IsSearchModeActive($DB) Then $g_bFullArmy = True
+	If $g_CurrentCampUtilization >= $g_iTotalCampSpace * $g_aiSearchCampsPct[$LB] / 100 And $g_abSearchCampsEnable[$LB] And IsSearchModeActive($LB) Then $g_bFullArmy = True
+	If $g_CurrentCampUtilization >= $g_iTotalCampSpace * $g_aiSearchCampsPct[$TS] / 100 And $g_abSearchCampsEnable[$TS] And IsSearchModeActive($TS) Then $g_bFullArmy = True
 
 	If $bCloseArmyWindow = True Then
 		ClickP($aAway, 1, 0, "#0000") ;Click Away
-		If _Sleep($iDelaycheckArmyCamp4) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP4) Then Return
 	EndIf
 
 EndFunc   ;==>getArmyCapacity

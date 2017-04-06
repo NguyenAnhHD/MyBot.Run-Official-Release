@@ -1,7 +1,7 @@
 ;=================================================================================================
-; Function:			_PostMessage_ClickDrag($hWnd, $X1, $Y1, $X2, $Y2, $Button = "left")
+; Function:			_PostMessage_ClickDrag($g_hAndroidWindow, $X1, $Y1, $X2, $Y2, $Button = "left")
 ; Description:		Sends a mouse click and drag command to a specified window.
-; Parameter(s):		$hWnd - The handle or the title of the window.
+; Parameter(s):		$g_hAndroidWindow - The handle or the title of the window.
 ;					$X1, $Y1 - The x/y position to start the drag operation from.
 ;					$X2, $Y2 - The x/y position to end the drag operation at.
 ;					$Button - (optional) The button to click, "left", "right", "middle". Default is the left button.
@@ -26,15 +26,15 @@
 ;=================================================================================================
 Func _PostMessage_ClickDrag($X1, $Y1, $X2, $Y2, $Button = "left", $Delay = 50)
 
-	Local $hWin = $HWnDCtrl
+	Local $hWin = $g_hAndroidControl
 
-    $X1 = Int($X1)
+	$X1 = Int($X1)
 	$Y1 = Int($Y1)
-    $X2 = Int($X2)
+	$X2 = Int($X2)
 	$Y2 = Int($Y2)
 
 	; adjust coordinates based on Android control offset
-	If $hWin = $HWnD Then
+	If $hWin = $g_hAndroidWindow Then
 		$X1 += $g_aiBSrpos[0]
 		$Y1 += $g_aiBSrpos[1]
 		$X2 += $g_aiBSrpos[0]
@@ -43,11 +43,11 @@ Func _PostMessage_ClickDrag($X1, $Y1, $X2, $Y2, $Button = "left", $Delay = 50)
 
 	WinGetAndroidHandle()
 
-	If Not IsHWnd($HWnD) Then
+	If Not IsHWnd($g_hAndroidWindow) Then
 		Return SetError(1, "", False)
 	EndIf
 
-    Local $Pressed = 0
+	Local $Pressed = 0
 	If StringLower($Button) == "left" Then
 		$Button = $WM_LBUTTONDOWN
 		$Pressed = 1
@@ -65,7 +65,7 @@ Func _PostMessage_ClickDrag($X1, $Y1, $X2, $Y2, $Button = "left", $Delay = 50)
 
 	MoveMouseOutBS()
 
-	DllCall($User32, "bool", "PostMessage", "hwnd", $HWnD, "int", $Button, "int", "0", "long", _MakeLong($X1, $Y1))
+	DllCall($User32, "bool", "PostMessage", "hwnd", $g_hAndroidWindow, "int", $Button, "int", "0", "long", _MakeLong($X1, $Y1))
 	If @error Then
 		DllClose($User32)
 		Return SetError(5, "", False)
@@ -73,7 +73,7 @@ Func _PostMessage_ClickDrag($X1, $Y1, $X2, $Y2, $Button = "left", $Delay = 50)
 
 	If _Sleep($Delay / 2) Then Return SetError(-1, "", False)
 
-	DllCall($User32, "bool", "PostMessage", "hwnd", $HWnD, "int", $WM_MOUSEMOVE, "int", $Pressed, "long", _MakeLong($X2, $Y2))
+	DllCall($User32, "bool", "PostMessage", "hwnd", $g_hAndroidWindow, "int", $WM_MOUSEMOVE, "int", $Pressed, "long", _MakeLong($X2, $Y2))
 	If @error Then
 		DllClose($User32)
 		Return SetError(6, "", False)
@@ -81,7 +81,7 @@ Func _PostMessage_ClickDrag($X1, $Y1, $X2, $Y2, $Button = "left", $Delay = 50)
 
 	If _Sleep($Delay / 2) Then Return SetError(-1, "", False)
 
-	DllCall($User32, "bool", "PostMessage", "hwnd", $HWnD, "int", $Button + 1, "int", "0", "long", _MakeLong($X2, $Y2))
+	DllCall($User32, "bool", "PostMessage", "hwnd", $g_hAndroidWindow, "int", $Button + 1, "int", "0", "long", _MakeLong($X2, $Y2))
 	If @error Then
 		DllClose($User32)
 		Return SetError(7, "", False)

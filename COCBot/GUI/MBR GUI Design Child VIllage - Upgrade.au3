@@ -44,11 +44,11 @@ Global $g_ahPicWallsLevel[13] = [-1,-1,-1,-1,0,0,0,0,0,0,0,0,0] ; elements 0 to 
 
 
 Func CreateVillageUpgrade()
-   $g_hGUI_UPGRADE = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
+   $g_hGUI_UPGRADE = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_UPGRADE)
 
    GUISwitch($g_hGUI_UPGRADE)
-   $g_hGUI_UPGRADE_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 30, $_GUI_MAIN_HEIGHT - 255 - 30, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_UPGRADE_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
    $g_hGUI_UPGRADE_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,14,"Laboratory"))
    CreateLaboratorySubTab()
    $g_hGUI_UPGRADE_TAB_ITEM2 = GUICtrlCreateTabItem(GetTranslated(600,15,"Heroes"))
@@ -75,7 +75,7 @@ Func CreateLaboratorySubTab()
 					   GetTranslated(604, 19, "Bowlers")
 
  	Local $x = 25, $y = 45
-	GUICtrlCreateGroup(GetTranslated(614,1, "Laboratory"), $x - 20, $y - 20, 430, 334)
+	GUICtrlCreateGroup(GetTranslated(614,1, "Laboratory"), $x - 20, $y - 20, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3)
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnLaboratory, $x, $y, 64, 64)
 		$g_hChkAutoLabUpgrades = GUICtrlCreateCheckbox(GetTranslated(614,2, "Auto Laboratory Upgrades"), $x + 80, $y + 5, -1, -1)
 			_GUICtrlSetTip(-1, GetTranslated(614,3, "Check box to enable automatically starting Upgrades in laboratory"))
@@ -109,7 +109,7 @@ EndFunc
 Func CreateHeroesSubTab()
     Local $sTxtTip = ""
 	Local $x = 25, $y = 45
-	GUICtrlCreateGroup(GetTranslated(615,1, "Upgrade Heroes Continuously"), $x - 20, $y - 20, 430, 334)
+	GUICtrlCreateGroup(GetTranslated(615,1, "Upgrade Heroes Continuously"), $x - 20, $y - 20, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3)
 		GUICtrlCreateLabel(GetTranslated(615,2, "Auto upgrading of your Heroes"), $x - 10, $y, -1, -1)
 
 		$y += 20
@@ -168,7 +168,7 @@ Func CreateBuildingsSubTab()
    Local $sTxtAfterUsing = GetTranslated(616,28, "after using Locate Upgrades button")
 
    Local $x = 25, $y = 45
-	GUICtrlCreateGroup(GetTranslated(616,1, "Buildings or Heroes"), $x - 20, $y - 20, 430, 30 + ($g_iUpgradeSlots * 22))
+	GUICtrlCreateGroup(GetTranslated(616,1, "Buildings or Heroes"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 30 + ($g_iUpgradeSlots * 22))
 	$x -= 7
    ; table header
 	$y -= 7
@@ -253,7 +253,7 @@ EndFunc
 
 Func CreateWallsSubTab()
    Local $x = 25, $y = 45
-   GUICtrlCreateGroup(GetTranslated(617,1, "Walls"), $x - 20, $y - 20, 430, 120)
+   GUICtrlCreateGroup(GetTranslated(617,1, "Walls"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 120)
 		GUICtrlCreateIcon ($g_sLibIconPath, $eIcnWall, $x - 12, $y - 6, 24, 24)
 		$g_hChkWalls = GUICtrlCreateCheckbox(GetTranslated(617,2, "Auto Wall Upgrade"), $x + 18, $y-2, -1, -1)
 			_GUICtrlSetTip(-1, GetTranslated(617,3, "Check this to upgrade Walls if there are enough resources."))
@@ -321,7 +321,7 @@ Func CreateWallsSubTab()
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
 	Local $x = 25, $y = 170
-	GUICtrlCreateGroup(Gettranslated(617,29, "Walls counter"), $x - 20, $y - 20, 430, 100)
+	GUICtrlCreateGroup(Gettranslated(617,29, "Walls counter"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 100)
 		$x -= 3
 		$g_ahWallsCurrentCount[4] = GUICtrlCreateInput("0", $x - 10, $y , 25, 19, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 			_GUICtrlSetTip(-1, GetTranslated(617,30, "Input number of Walls level")&" 4 "&GetTranslated(617,31, "you have."))

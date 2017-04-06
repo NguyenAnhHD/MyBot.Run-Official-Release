@@ -24,18 +24,18 @@ Func CreateLogTab()
 
    Local $activeHWnD = WinGetHandle("") ; RichEdit Controls tamper with active window
 
-   $g_hGUI_LOG = GUICreate("", $_GUI_MAIN_WIDTH - 20, $_GUI_MAIN_HEIGHT - 255, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, 0), -1, $g_hFrmBotEx)
+   $g_hGUI_LOG = _GUICreate("", $g_iSizeWGrpTab1, $g_iSizeHGrpTab1, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, 0), -1, $g_hFrmBotEx)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_LOG)
 
-   $g_hTxtLog = _GUICtrlRichEdit_Create($g_hGUI_LOG, _PadStringCenter(" " & GetTranslated(601,2, "BOT LOG") & " ", 71, "="), 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, 8908), $WS_EX_STATICEDGE)
-	   _GUICtrlRichEdit_SetFont($g_hTxtLog, 6, "Lucida Console")
-	   _GUICtrlRichEdit_AppendTextColor($g_hTxtLog, "" & @CRLF, _ColorConvert($Color_Black))
+   $g_hTxtLog = _GUICtrlRichEdit_Create($g_hGUI_LOG, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, $WS_HSCROLL, $ES_UPPERCASE, $ES_AUTOHSCROLL, $ES_AUTOVSCROLL, $ES_NUMBER, 0x200), $WS_EX_STATICEDGE)
+	   ; Enable word wrap in log file, nice, but better keep warp disabled
+	   ; DllCall($g_hLibUser32DLL, "lresult", "SendMessageW", "hwnd", $g_hTxtLog, "uint", $EM_SETTARGETDEVICE, "wparam", 0, "lparam", False) ; lparam = True for enable again
 
    $g_hDivider = GUICtrlCreateLabel("", 0, 0, 20, 20, $SS_SUNKEN + $SS_BLACKRECT)
 	   GUICtrlSetCursor(-1, 11)
 	   ;GUICtrlSetResizing(-1, $GUI_DOCKTOP + $GUI_DOCKBOTTOM + $GUI_DOCKWIDTH + $GUI_DOCKLEFT)
 
-   $g_hTxtAtkLog = _GUICtrlRichEdit_Create($g_hGUI_LOG, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, 8908), $WS_EX_STATICEDGE)
+   $g_hTxtAtkLog = _GUICtrlRichEdit_Create($g_hGUI_LOG, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, 8908), $WS_EX_STATICEDGE) ; 8909 = $ES_NUMBER, $ES_AUTOHSCROLL, $ES_AUTOVSCROLL, $ES_MULTILINE, $ES_UPPERCASE, 0x200
 
    WinActivate($activeHWnD) ; restore current active window
 

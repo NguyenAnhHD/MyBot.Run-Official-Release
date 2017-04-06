@@ -102,27 +102,27 @@ Func chkLab()
 		GUICtrlSetState($g_hLblNextUpgrade, $GUI_ENABLE)
 		GUICtrlSetState($g_hCmbLaboratory, $GUI_ENABLE)
 		;GUICtrlSetState($g_hBtnLocateLaboratory, $GUI_SHOW)
-		GUICtrlSetImage($g_hPicLabUpgrade, $g_sLibIconPath, $aLabTroops[$g_iCmbLaboratory][4])
+		GUICtrlSetImage($g_hPicLabUpgrade, $g_sLibIconPath, $g_avLabTroops[$g_iCmbLaboratory][4])
 	Else
 		$g_bAutoLabUpgradeEnable = False
 		GUICtrlSetState($g_hPicLabUpgrade, $GUI_HIDE)
 		GUICtrlSetState($g_hLblNextUpgrade, $GUI_DISABLE)
 		GUICtrlSetState($g_hCmbLaboratory, $GUI_DISABLE)
 		;GUICtrlSetState($g_hBtnLocateLaboratory, $GUI_HIDE)
-		GUICtrlSetImage($g_hPicLabUpgrade, $g_sLibIconPath, $aLabTroops[0][4])
+		GUICtrlSetImage($g_hPicLabUpgrade, $g_sLibIconPath, $g_avLabTroops[0][4])
 	EndIf
 	LabStatusGUIUpdate()
 EndFunc   ;==>chkLab
 
 Func LabStatusGUIUpdate()
-	If _DateIsValid($sLabUpgradeTime) Then
+	If _DateIsValid($g_sLabUpgradeTime) Then
 		_GUICtrlSetTip($g_hBtnResetLabUpgradeTime, GetTranslated(614, 8, "Visible Red button means that laboratory upgrade in process") & @CRLF & _
 				GetTranslated(614, 9, "This will automatically disappear when near time for upgrade to be completed.") & @CRLF & _
 				GetTranslated(614, 10, "If upgrade has been manually finished with gems before normal end time,") & @CRLF & _
 				GetTranslated(614, 11, "Click red button to reset internal upgrade timer BEFORE STARTING NEW UPGRADE") & @CRLF & _
 				GetTranslated(614, 12, "Caution - Unnecessary timer reset will force constant checks for lab status") & @CRLF & @CRLF & _
 				GetTranslated(614, 19, "Troop Upgrade started") & ", " & _
-				GetTranslated(614, 20, "Will begin to check completion at:") & " " & $sLabUpgradeTime & @CRLF & " ")
+				GetTranslated(614, 20, "Will begin to check completion at:") & " " & $g_sLabUpgradeTime & @CRLF & " ")
 		GUICtrlSetState($g_hBtnResetLabUpgradeTime, $GUI_SHOW)
 		GUICtrlSetState($g_hBtnResetLabUpgradeTime, $GUI_ENABLE)
 	Else
@@ -133,7 +133,7 @@ EndFunc   ;==>LabStatusGUIUpdate
 
 Func cmbLab()
 	$g_iCmbLaboratory = _GUICtrlComboBox_GetCurSel($g_hCmbLaboratory)
-	GUICtrlSetImage($g_hPicLabUpgrade, $g_sLibIconPath, $aLabTroops[$g_iCmbLaboratory][4])
+	GUICtrlSetImage($g_hPicLabUpgrade, $g_sLibIconPath, $g_avLabTroops[$g_iCmbLaboratory][4])
 EndFunc   ;==>cmbLab
 
 Func ResetLabUpgradeTime()
@@ -145,14 +145,14 @@ Func ResetLabUpgradeTime()
 							   GetTranslated(614, 18, "Reset laboratory upgrade timer?"), $stext, 120, $g_hFrmBot)
 	If $g_iDebugSetlog = 1 Then Setlog("$MsgBox= " & $MsgBox, $COLOR_DEBUG)
 	If $MsgBox = 1 Then
-		$sLabUpgradeTime = ""
+		$g_sLabUpgradeTime = ""
 		_GUICtrlSetTip($g_hBtnResetLabUpgradeTime, GetTranslated(614, 8, "Visible Red button means that laboratory upgrade in process") & @CRLF & _
 				GetTranslated(614, 9, "This will automatically disappear when near time for upgrade to be completed.") & @CRLF & _
 				GetTranslated(614, 10, "If upgrade has been manually finished with gems before normal end time,") & @CRLF & _
 				GetTranslated(614, 11, "Click red button to reset internal upgrade timer BEFORE STARTING NEW UPGRADE") & @CRLF & _
 				GetTranslated(614, 12, "Caution - Unnecessary timer reset will force constant checks for lab status"))
 	EndIf
-	If _DateIsValid($sLabUpgradeTime) Then
+	If _DateIsValid($g_sLabUpgradeTime) Then
 		GUICtrlSetState($g_hBtnResetLabUpgradeTime, $GUI_SHOW)
 		GUICtrlSetState($g_hBtnResetLabUpgradeTime, $GUI_ENABLE)
 	Else
@@ -162,7 +162,7 @@ Func ResetLabUpgradeTime()
 EndFunc   ;==>ResetLabUpgradeTime
 
 Func chkUpgradeKing()
-	If $iTownHallLevel > 6 Or $iTownHallLevel = 0 Then ; Must be TH7 or above to have King
+	If $g_iTownHallLevel > 6 Or $g_iTownHallLevel = 0 Then ; Must be TH7 or above to have King
 		GUICtrlSetState($g_hChkUpgradeKing, $GUI_ENABLE)
 		If GUICtrlRead($g_hChkUpgradeKing) = $GUI_CHECKED Then
 			$g_bUpgradeKingEnable = True
@@ -191,7 +191,7 @@ Func chkUpgradeKing()
 EndFunc   ;==>chkUpgradeKing
 
 Func chkUpgradeQueen()
-	If $iTownHallLevel > 8 Or $iTownHallLevel = 0 Then ; Must be TH9 or above to have Queen
+	If $g_iTownHallLevel > 8 Or $g_iTownHallLevel = 0 Then ; Must be TH9 or above to have Queen
 		GUICtrlSetState($g_hChkUpgradeQueen, $GUI_ENABLE)
 		If GUICtrlRead($g_hChkUpgradeQueen) = $GUI_CHECKED Then
 			$g_bUpgradeQueenEnable = True
@@ -220,7 +220,7 @@ Func chkUpgradeQueen()
 EndFunc   ;==>chkUpgradeQueen
 
 Func chkUpgradeWarden()
-	If $iTownHallLevel > 10 Or $iTownHallLevel = 0 Then ; Must be TH11 to have warden
+	If $g_iTownHallLevel > 10 Or $g_iTownHallLevel = 0 Then ; Must be TH11 to have warden
 		GUICtrlSetState($g_hChkUpgradeWarden, $GUI_ENABLE)
 		If GUICtrlRead($g_hChkUpgradeWarden) = $GUI_CHECKED Then
 			$g_bUpgradeWardenEnable = True
@@ -283,7 +283,7 @@ EndFunc   ;==>chkSaveWallBldr
 
 Func cmbWalls()
 	$g_iCmbUpgradeWallsLevel = _GUICtrlComboBox_GetCurSel($g_hCmbWalls)
-	$g_iWallCost = $g_iaWallCost[$g_iCmbUpgradeWallsLevel]
+	$g_iWallCost = $g_aiWallCost[$g_iCmbUpgradeWallsLevel]
 	GUICtrlSetData($g_hLblWallCost, _NumberFormat($g_iWallCost))
 
    For $i = 4 To $g_iCmbUpgradeWallsLevel+5

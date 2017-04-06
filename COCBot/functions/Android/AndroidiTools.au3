@@ -4,7 +4,7 @@
 ; Syntax ........:
 ; Parameters ....: None
 ; Return values .: None
-; Author ........: Cosote (2016-11)
+; Author ........: Cosote (11-2016)
 ; Modified ......:
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
@@ -38,23 +38,23 @@ Func OpeniTools($bRestart = False)
 	EndIf
 
 	SetLog("Please wait while " & $g_sAndroidEmulator & " and CoC start...", $COLOR_SUCCESS)
-	$hTimer = TimerInit()
+	$hTimer = __TimerInit()
 
 	; Test ADB is connected
 	$connected_to = ConnectAndroidAdb(False, 60 * 1000)
 	If Not $g_bRunState Then Return False
 
-	; Wair for finishing boot
-	If WaitForAndroidBootCompleted($g_iAndroidLaunchWaitSec - TimerDiff($hTimer) / 1000, $hTimer) Then Return False
+	; Wait for boot completed
+	If WaitForAndroidBootCompleted($g_iAndroidLaunchWaitSec - __TimerDiff($hTimer) / 1000, $hTimer) Then Return False
 
-	If TimerDiff($hTimer) >= $g_iAndroidLaunchWaitSec * 1000 Then ; if it took 4 minutes, Android/PC has major issue so exit
+	If __TimerDiff($hTimer) >= $g_iAndroidLaunchWaitSec * 1000 Then ; if it took 4 minutes, Android/PC has major issue so exit
 		SetLog("Serious error has occurred, please restart PC and try again", $COLOR_ERROR)
-		SetLog($g_sAndroidEmulator & " refuses to load, waited " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds for window", $COLOR_ERROR)
+		SetLog($g_sAndroidEmulator & " refuses to load, waited " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds for window", $COLOR_ERROR)
 		SetError(1, @extended, False)
 		Return False
 	EndIf
 
-	SetLog($g_sAndroidEmulator & " Loaded, took " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds to begin.", $COLOR_SUCCESS)
+	SetLog($g_sAndroidEmulator & " Loaded, took " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds to begin.", $COLOR_SUCCESS)
 
 	Return True
 
@@ -358,11 +358,11 @@ Func EmbediTools($bEmbed = Default)
 EndFunc   ;==>EmbediTools
 
 #cs
-Func iToolsBotStartEvent()
+	Func iToolsBotStartEvent()
 	Return AndroidCloseSystemBar()
-EndFunc   ;==>iToolsBotStartEvent
+	EndFunc   ;==>iToolsBotStartEvent
 
-Func iToolsBotStopEvent()
+	Func iToolsBotStopEvent()
 	Return AndroidOpenSystemBar()
-EndFunc   ;==>iToolsBotStopEvent
+	EndFunc   ;==>iToolsBotStopEvent
 #ce

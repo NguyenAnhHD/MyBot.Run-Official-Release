@@ -19,13 +19,16 @@ Global $g_hGUI_BULLY = 0
 Global $g_hTxtATBullyMode = 0, $g_hCmbBullyMaxTH = 0, $g_hRadBullyUseDBAttack = 0, $g_hRadBullyUseLBAttack = 0
 Global $g_hGrpBullyAtkCombo = 0, $g_hLblBullyMode = 0, $g_hLblATBullyMode = 0
 
+Global $g_ahPicBullyMaxTH[12]
+
 Func CreateAttackSearchBully()
-   $g_hGUI_BULLY = GUICreate("", $_GUI_MAIN_WIDTH - 30 - 10, $_GUI_MAIN_HEIGHT - 255 - 30 - 30, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_SEARCH)
+	Local $sTxtTip = ""
+   $g_hGUI_BULLY = _GUICreate("", $g_iSizeWGrpTab3, $g_iSizeHGrpTab3, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_SEARCH)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_BULLY)
    GUISwitch($g_hGUI_BULLY)
 
    Local $x = 20, $y = 130 - 105
-	   $g_hGrpBullyAtkCombo = GUICtrlCreateGroup(GetTranslated(629,1, "Bully Attack Combo"), $x - 20, $y - 20, 430, 330)
+	   $g_hGrpBullyAtkCombo = GUICtrlCreateGroup(GetTranslated(629,1, "Bully Attack Combo"), $x - 20, $y - 20, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3 - 6)
 		   $y -= 5
 		   $x -= 10
 			$g_hLblBullyMode = GUICtrlCreateLabel(GetTranslated(629,2, "In Bully Mode, ALL bases that meet the TH level requirement below will be attacked.") , $x - 5, $y + 3, 209, 30, $SS_LEFT)
@@ -39,9 +42,29 @@ Func CreateAttackSearchBully()
 
 		   $y +=25
 		   $g_hLblATBullyMode = GUICtrlCreateLabel(GetTranslated(629,6, "Max TH level") & ":", $x - 5, $y + 3, 90, -1, $SS_RIGHT)
-		   $g_hCmbBullyMaxTH = GUICtrlCreateCombo("", $x + 95, $y, 50, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
-			   _GUICtrlSetTip(-1, GetTranslated(629,7, "TH Bully: Max. Townhall level to bully."))
+		   $g_hCmbBullyMaxTH = GUICtrlCreateCombo("", $x + 85, $y, 50, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
+			   $sTxtTip = GetTranslated(629,7, "TH Bully: Max. Townhall level to bully.")
+			   _GUICtrlSetTip(-1, $sTxtTip)
 			   GUICtrlSetData(-1, "4-6|7|8|9|10|11", "4-6")
+			GUICtrlSetOnEvent(-1, "CmbBullyMaxTH")
+		$g_ahPicBullyMaxTH[6] = GUICtrlCreateIcon($g_sLibIconPath, $eHdV06, $x + 137, $y - 3, 24, 24)
+			_GUICtrlSetTip(-1, $sTxtTip)
+			GUICtrlSetState (-1, $GUI_SHOW)
+		$g_ahPicBullyMaxTH[7] = GUICtrlCreateIcon($g_sLibIconPath, $eHdV07, $x + 137, $y - 3, 24, 24)
+			_GUICtrlSetTip(-1, $sTxtTip)
+			GUICtrlSetState (-1, $GUI_HIDE)
+		$g_ahPicBullyMaxTH[8] = GUICtrlCreateIcon($g_sLibIconPath, $eHdV08, $x + 137, $y - 3, 24, 24)
+			_GUICtrlSetTip(-1, $sTxtTip)
+			GUICtrlSetState (-1, $GUI_HIDE)
+		$g_ahPicBullyMaxTH[9] = GUICtrlCreateIcon($g_sLibIconPath, $eHdV09, $x + 137, $y - 3, 24, 24)
+			_GUICtrlSetTip(-1, $sTxtTip)
+			GUICtrlSetState (-1, $GUI_HIDE)
+		$g_ahPicBullyMaxTH[10] = GUICtrlCreateIcon($g_sLibIconPath, $eHdV10, $x + 137, $y - 3, 24, 24)
+			_GUICtrlSetTip(-1, $sTxtTip)
+			GUICtrlSetState (-1, $GUI_HIDE)
+		$g_ahPicBullyMaxTH[11] = GUICtrlCreateIcon($g_sLibIconPath, $eHdV11, $x + 137, $y - 3, 24, 24)
+			_GUICtrlSetTip(-1, $sTxtTip)
+			GUICtrlSetState (-1, $GUI_HIDE)
 
 		   $y += 24
 		   GUICtrlCreateLabel(GetTranslated(629,8, "When found, Attack with settings from")&":", $x + 10, $y, -1, -1, $SS_RIGHT)

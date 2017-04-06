@@ -6,7 +6,7 @@
 ; Return values .:None
 ; Author ........: Sardo (2016)
 ; Modified ......:
-; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2016
+; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
@@ -19,11 +19,11 @@ Func MilkingDebug()
 	$g_iDebugSetlog = 1
 	Setlog("1 - Zoom out")
 	CheckZoomOut()
-	Local $TimeCheckMilkingAttack = TimerInit()
+	Local $TimeCheckMilkingAttack = __TimerInit()
 	Setlog("2 - Detect Elixir Collectors")
 	Setlog("  2.1 Detect RedArea")
 	MilkingDetectRedArea()
-	$MilkFarmObjectivesSTR = ""
+	$g_sMilkFarmObjectivesSTR = ""
 ;~ 	Setlog("  2.2 Detect Elixir Extractors")
 ;~ 	$MilkingExtractorsMatch = MilkingDetectElixirExtractors()
 
@@ -33,11 +33,11 @@ Func MilkingDebug()
 	Setlog("  2.3 Detect Mine Extractors")
 	$MilkingExtractorsMatch += MilkingDetectMineExtractors()
 	Setlog("  2.4 Detect Dark Elixir Extractors")
-	Local $TimeCheckMilkingAttackSeconds = Round(TimerDiff($TimeCheckMilkingAttack) / 1000, 2)
+	Local $TimeCheckMilkingAttackSeconds = Round(__TimerDiff($TimeCheckMilkingAttack) / 1000, 2)
 	Setlog("Computing Time Milking Attack : " & $TimeCheckMilkingAttackSeconds & " seconds", $COLOR_INFO)
 	$g_iDebugSetlog = $debugselogLocal
 	Setlog("Make DebugImage")
-	MilkFarmObjectivesDebugImage($MilkFarmObjectivesSTR, 0)
+	MilkFarmObjectivesDebugImage($g_sMilkFarmObjectivesSTR, 0)
 
 EndFunc   ;==>MilkingDebug
 
@@ -45,38 +45,21 @@ EndFunc   ;==>MilkingDebug
 
 ;::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-;~ Global $newGoldADV[0]
-;~ Global $newElixADV[0]
-;~ Global $newDEADV[0]
-;~ Global $g_iDebugDeadBaseImage = 0
-; Is in Diamond
-;Global $DefaultCocDiamond = "430,70|787,335|430,605|67,333" ; DEFAULT No Grass just the village field
-;Global $ExtendedCocDiamond = "430,25|840,335|430,645|15,333" ; With Grass
-; Reducing the Search Area (x,y,w,h)
-;Global $DefaultCocSearchArea = "70|70|720|540" ; Deafault
-;Global $ExtendedCocSearchArea = "15|25|825|625" ; Extended
-;~ Global $statChkMilk = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\stats_chkMilk.INI"
-;~ Global $RedLineTile = @ScriptDir & "\images\RedLine\REDLINE.bmp"
-
-
-
-
 Func CheckMilkingBaseTest()
 
 	Local $MilkingElixirImages = _FileListToArray(@ScriptDir & "\images\Milking\Elixir", "*.*")
-        If @error = 1 Then
-            MsgBox(0, "", "Folder" &  @ScriptDir & "\images\Milking\Elixir" & " not Found.")
-        EndIf
-        If @error = 4 Then
-            MsgBox(0, "", "No Files in folder " &@ScriptDir & "\images\Milking\Elixir" )
-        EndIf
-	Setlog("Locate Elixir..." )
-	; Local $hTimer = TimerInit()
+	If @error = 1 Then
+		MsgBox(0, "", "Folder" & @ScriptDir & "\images\Milking\Elixir" & " not Found.")
+	EndIf
+	If @error = 4 Then
+		MsgBox(0, "", "No Files in folder " & @ScriptDir & "\images\Milking\Elixir")
+	EndIf
+	Setlog("Locate Elixir...")
+	; Local $hTimer = __TimerInit()
 
 	_CaptureRegion2()
 	_CaptureRegion()
-	;$sendHBitmap = _GDIPlus_BitmapCreateHBITMAPFromBitmap($hBitmap)
+	;$sendHBitmap = _GDIPlus_BitmapCreateHBITMAPFromBitmap($g_hBitmap)
 
 	Local $MilkFarmAtkPixelListSTR = ""
 	Local $ElixirVect = StringSplit(GetLocationElixirWithLevel(), "~", 2) ; ["6#527-209" , "6#421-227" , "6#600-264" , "6#299-331" , "6#511-404" , "6#511-453"]
@@ -86,25 +69,25 @@ Func CheckMilkingBaseTest()
 	For $i = 0 To UBound($ElixirVect) - 1
 
 
-	;	If $g_iDebugSetlog = 1 Then Setlog($i & " : " & $ElixirVect[$i]) ;[15:51:30] 0 : 2#405-325 -> level 6
+		;	If $g_iDebugSetlog = 1 Then Setlog($i & " : " & $ElixirVect[$i]) ;[15:51:30] 0 : 2#405-325 -> level 6
 
-			;03.02 check isinsidediamond
-			Local $temp = StringSplit($ElixirVect[$i], "#", 2) ;TEMP ["2", "404-325"]
-			If UBound($temp) = 2 Then
+		;03.02 check isinsidediamond
+		Local $temp = StringSplit($ElixirVect[$i], "#", 2) ;TEMP ["2", "404-325"]
+		If UBound($temp) = 2 Then
 
-				Setlog("examine elixir vector #" & $i & " placed in " & $ElixirVect[$i],$COLOR_ERROR)
-				Local $pixelTemp = StringSplit($ElixirVect[$i],"-",2)
-				$pixelTemp[0] += 0
-				$pixelTemp[1] += 10
-				Local $arrPixelsCloser = _FindPixelCloser($PixelRedArea, $pixelTemp, 1)
-				Setlog("pixelcloser=" & $arrPixelsCloser & "ubound = " & Ubound($arrPixelsCloser))
-				For $t=0 to Ubound($arrPixelsCloser) -1
-					Local $temp = $arrPixelsCloser[$t]
+			Setlog("examine elixir vector #" & $i & " placed in " & $ElixirVect[$i], $COLOR_ERROR)
+			Local $pixelTemp = StringSplit($ElixirVect[$i], "-", 2)
+			$pixelTemp[0] += 0
+			$pixelTemp[1] += 10
+			Local $arrPixelsCloser = _FindPixelCloser($g_aiPixelRedArea, $pixelTemp, 1)
+			Setlog("pixelcloser=" & $arrPixelsCloser & "ubound = " & UBound($arrPixelsCloser))
+			For $t = 0 To UBound($arrPixelsCloser) - 1
+				Local $temp = $arrPixelsCloser[$t]
 
-					Setlog("$arrPixelsCloser " & $arrPixelsCloser[$t] & " ubound = " & Ubound($temp) & " " & $temp[0] & "-" & $temp[1])
-				Next
+				Setlog("$arrPixelsCloser " & $arrPixelsCloser[$t] & " ubound = " & UBound($temp) & " " & $temp[0] & "-" & $temp[1])
+			Next
 
-					If UBound($arrPixelsCloser) > 1 Then
+			If UBound($arrPixelsCloser) > 1 Then
 ;~ 						For $m = 1 To UBound($arrPixelsCloser) - 1 Step 2
 ;~ 							Setlog( $arrPixelsCloser[$m],$COLOR_DEBUG1)
 ;~ 							If $m+1 < Ubound($arrPixelsCloser) Then
@@ -117,7 +100,7 @@ Func CheckMilkingBaseTest()
 ;~ 								EndIf
 ;~ 							EndIf
 ;~ 						Next
-					EndIf
+			EndIf
 
 ;~ 					$DistancePixeltoPixCLoser = Sqrt(($tmpPixelCloser2x-$pixelTemp[0])^2 + ($tmpPixelCloser2y - $pixelTemp[1])^2)
 ;~ 					SetLog("Distance = " & Int($DistancePixeltoPixCLoser) & "; Collector (" & $pixelTemp[0] & "," & $pixelTemp[1] & "); RedLine Pixel Closer (" & $tmpPixelCloser2x & "," & $tmpPixelCloser2y & ")", $COLOR_INFO)
@@ -162,14 +145,14 @@ Func CheckMilkingBaseTest()
 ;~ 	;~ 					If $tmpDist > 0 And $tmpDist < Number($NbPixelmaxExposed) Then
 ;~ 	;~ 						Local $tmpArrayOfPixel[1]
 ;~ 	;~ 						$tmpArrayOfPixel[0] = $pixelTemp
-;~ 	;~ 						_ArrayAdd($PixelElixirToAttack, $tmpArrayOfPixel)
+;~ 	;~ 						_ArrayAdd($g_aiPixelElixirToAttack, $tmpArrayOfPixel)
 ;~ 	;~ 					EndIf
 ;~ 				EndIf
 
-			Else
-				If $g_iDebugSetlog = 1 Then Setlog(" - discard #1 no valid point", $COLOR_DEBUG)
-				$elixirdiscard += 1
-			EndIf
+		Else
+			If $g_iDebugSetlog = 1 Then Setlog(" - discard #1 no valid point", $COLOR_DEBUG)
+			$elixirdiscard += 1
+		EndIf
 		Setlog("............ next ..........")
 	Next
 ;~ 	If StringLen($MilkFarmAtkPixelListSTR) > 1 Then
@@ -183,8 +166,8 @@ Func CheckMilkingBaseTest()
 
 
 
-;~ 		For $i = 0 to ubound($PixelElixirToAttack)-1
-;~ 			Local $pixelTemp = $PixelElixirToAttack[$i]
+;~ 		For $i = 0 to ubound($g_aiPixelElixirToAttack)-1
+;~ 			Local $pixelTemp = $g_aiPixelElixirToAttack[$i]
 ;~ 	;		setlog("$pixelTemp[0] $pixelTemp[1] " & $pixelTemp[0] & " " & $pixelTemp[1])
 ;~ 			Local $CocSearchArea = string($pixelTemp[0] - 20) & "|" & string($pixelTemp[1] - 20) & "|" & string($pixelTemp[0] + 20) & "|" & string($pixelTemp[1] + 20)
 ;~ 			Local $CocDiamond = string($pixelTemp[0]) & "," & string($pixelTemp[1] - 20) & "|" & string($pixelTemp[0]-20) & "," & string($pixelTemp[1]) & "|" &  string($pixelTemp[0]) & "," & string($pixelTemp[1] + 20) & "|" & string($pixelTemp[0] + 20) & "," & string($pixelTemp[1])
@@ -213,7 +196,7 @@ Func CheckMilkingBaseTest()
 ;~ 										_GDIPlus_GraphicsDrawRect($hGraphic, $ElixirLocationx - 5, $ElixirLocationy - 5, 10, 10, $hPen)
 ;~ 										_GDIPlus_GraphicsDrawString($hGraphic, $ImageInfo, $ElixirLocationx , $ElixirLocationy - 30, "Arial", 15)
 ;~ 									EndIf
-;~ 									_ArrayAdd($PixelNearCollector, $expRet)
+;~ 									_ArrayAdd($g_aiPixelNearCollector, $expRet)
 ;~ 									Local $batsav = $newElixADV[$t]
 ;~ 									addstatmilk("Elixir", $batsav)
 ;~ 									setlog("file = " & $newElixADV[$t])
@@ -234,11 +217,11 @@ Func CheckMilkingBaseTest()
 ;~ 			Next
 ;~ 		Next
 
-;~ 	;		_WinAPI_DeleteObject($hBitmap)
-;~ 			setlog ("Found " & $ZombieFoundEli & " collectors ready to attack in: " & Round((TimerDiff($hTimer) / 1000)) & " seconds")
-;~ 	SetLog("[" & UBound($PixelElixirToAttack) & "] Elixir Collectors near red lines")
+;~ 	;		_WinAPI_DeleteObject($g_hBitmap)
+;~ 			setlog ("Found " & $ZombieFoundEli & " collectors ready to attack in: " & Round((__TimerDiff($hTimer) / 1000)) & " seconds")
+;~ 	SetLog("[" & UBound($g_aiPixelElixirToAttack) & "] Elixir Collectors near red lines")
 ;~
 ;~
 
-EndFunc
+EndFunc   ;==>CheckMilkingBaseTest
 

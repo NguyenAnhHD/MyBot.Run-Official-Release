@@ -32,11 +32,11 @@ GLobal $g_hLblNotifyhours[12] = [0,0,0,0,0,0,0,0,0,0,0,0]
 Global $g_hLblNotifyWeekdays[7] = [0,0,0,0,0,0,0], $g_ahLblNotifyWeekdaysE = 0, $g_ahChkNotifyWeekdaysE = 0
 
 Func CreateVillageNotify()
-   $g_hGUI_NOTIFY = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
+   $g_hGUI_NOTIFY = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_NOTIFY)
 
    GUISwitch($g_hGUI_NOTIFY)
-   $g_hGUI_NOTIFY_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 30, $_GUI_MAIN_HEIGHT - 255 - 30, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_NOTIFY_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
    $g_hGUI_NOTIFY_TAB_ITEM2 = GUICtrlCreateTabItem(GetTranslated(600,18,"PushBullet/Telegram"))
    CreatePushBulletTelegramSubTab()
    $g_hGUI_NOTIFY_TAB_ITEM6 = GUICtrlCreateTabItem(GetTranslated(619,51,"Notify Schedule"))
@@ -47,7 +47,7 @@ EndFunc
 Func CreatePushBulletTelegramSubTab()
    Local $sTxtTip = ""
    Local $x = 25, $y = 45
-   $g_hGrpNotify = GUICtrlCreateGroup(GetTranslated(619,1, "PushBullet/Telegram Notify") & " " & $g_sNotifyVersion, $x - 20, $y - 20, 430, 320)
+   $g_hGrpNotify = GUICtrlCreateGroup(GetTranslated(619,1, "PushBullet/Telegram Notify") & " " & $g_sNotifyVersion, $x - 20, $y - 20, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3)
 
 		$x -= 10
 		GUICtrlCreateIcon ($g_sLibIconPath, $eIcnNotify, $x + 3, $y, 32, 32)
@@ -159,7 +159,7 @@ Func CreatePushBulletTelegramSubTab()
 		$g_hChkNotifyBOTUpdate = GUICtrlCreateCheckbox(GetTranslated(619,49, "BOT Update"), $x + 210, $y, -1, -1)
 			_GUICtrlSetTip(-1, GetTranslated(619,50, "Send an Alert when there is a new version of the bot."))
 			GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(GetTranslated(619,69,"Help ?"), $x + 200, $y + 60, 220, 24, $SS_RIGHT)
+		GUICtrlCreateLabel(GetTranslated(619,69,"Help ?"), $x + 197, $y + 93, 220, 24, $SS_RIGHT)
 			GUICtrlSetOnEvent(-1, "NotifyHelp")
 			GUICtrlSetCursor(-1, 0)
 			GUICtrlSetFont(-1, 8.5, $FW_BOLD)
@@ -173,7 +173,7 @@ Func CreateNotifyScheduleSubTab()
 	Local $y = 150 - 105
 	Local $sTxtTip = ""
 
-	GUICtrlCreateGroup(GetTranslated(619,51, "Notify Schedule"), $x - 20, $y - 20, 430, 334)
+	GUICtrlCreateGroup(GetTranslated(619,51, "Notify Schedule"), $x - 20, $y - 20, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3)
 	$x += 10
 	$y += 10
 	GUICtrlCreateIcon($g_sLibIconPath, $eIcnPBNotify, $x - 5, $y, 64, 64, $BS_ICON)

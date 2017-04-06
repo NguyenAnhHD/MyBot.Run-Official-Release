@@ -25,11 +25,11 @@ Func CreateAttackSearchDeadBaseCollectors()
    Local $g_hTxtFull = GetTranslated(626,30, "Full")
    Local $sTxtTip = ""
 
-   GUICtrlCreateGroup(GetTranslated(626,1,"Collectors"), $x - 5, $y - 20, 420, 305)
+   GUICtrlCreateGroup(GetTranslated(626,1,"Collectors"), $x - 5, $y - 20, $g_iSizeWGrpTab4, $g_iSizeHGrpTab4)
 		GUICtrlCreateLabel(GetTranslated(626,2, "Choose which collectors to search for while looking for a dead base. Also, choose how full they must be."), $x, $y, 250, 28)
 		$g_hChkDBDisableCollectorsFilter = GUICtrlCreateCheckbox(GetTranslated(626,32,"Disable Collector Filter"), $x+250, $y+60, 150, 18)
 			GUICtrlSetState(-1, $GUI_UNCHECKED)
-			_GUICtrlSetTip(-1, GetTranslated(626,33, "Excluding Collector Filter the bot consider DeadBase as ActiveBase"))
+			_GUICtrlSetTip(-1, GetTranslated(626,33, "Disable Collector Filter CHANGES DeadBase into another ActiveBase search"))
 
 		$y+=40
 		$g_ahChkDBCollectorLevel[6] = GUICtrlCreateCheckbox("", $x, $y, 18, 18)

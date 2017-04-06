@@ -10,7 +10,7 @@
 ;                  $edge2               - [optional] an unknown value. Default is -1.
 ;                  $x                   - [optional] an unknown value. Default is -1.
 ; Return values .: None
-; Author ........: Your Name
+; Author ........:
 ; Modified ......:
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
@@ -23,16 +23,16 @@ Func DropOnEdge($troop, $edge, $number, $slotsPerEdge = 0, $edge2 = -1, $x = -1)
 
 	If isProblemAffect(True) Then Return
 	If $number = 0 Then Return
-	If _SleepAttack($iDelayDropOnEdge1) Then Return
+	If _SleepAttack($DELAYDROPONEDGE1) Then Return
 	SelectDropTroop($troop) ;Select Troop
-	If _SleepAttack($iDelayDropOnEdge2) Then Return
+	If _SleepAttack($DELAYDROPONEDGE2) Then Return
 	If $slotsPerEdge = 0 Or $number < $slotsPerEdge Then $slotsPerEdge = $number
 	If $number = 1 Or $slotsPerEdge = 1 Then ; Drop on a single point per edge => on the middle
 		If $edge2 = -1 Then
-			AttackClick($edge[2][0], $edge[2][1], $number, $iDelayDropOnEdge1, $iDelayDropOnEdge3, "#0102")
-	    Else
-			AttackClick($edge[2][0], $edge[2][1], $number, $iDelayDropOnEdge1, 0, "#0102")
-			AttackClick($edge2[2][0], $edge2[2][1], $number, $iDelayDropOnEdge1, $iDelayDropOnEdge3, "#0103")
+			AttackClick($edge[2][0], $edge[2][1], $number, $DELAYDROPONEDGE1, $DELAYDROPONEDGE3, "#0102")
+		Else
+			AttackClick($edge[2][0], $edge[2][1], $number, $DELAYDROPONEDGE1, 0, "#0102")
+			AttackClick($edge2[2][0], $edge2[2][1], $number, $DELAYDROPONEDGE1, $DELAYDROPONEDGE3, "#0103")
 		EndIf
 	ElseIf $slotsPerEdge = 2 Then ; Drop on 2 points per edge
 		Local $half = Ceiling($number / 2)

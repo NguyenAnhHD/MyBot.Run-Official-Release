@@ -4,7 +4,7 @@
 ; Syntax ........: CloseDroid4X()
 ; Parameters ....: None
 ; Return values .: None
-; Author ........: cosote
+; Author ........: cosote (12-2015)
 ; Modified ......:
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
@@ -14,7 +14,5 @@
 ; ===============================================================================================================================
 
 Func CloseDroid4X()
-
 	Return CloseVboxAndroidSvc()
-
 EndFunc   ;==>CloseDroid4X

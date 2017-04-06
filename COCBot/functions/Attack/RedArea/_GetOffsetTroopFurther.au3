@@ -8,7 +8,7 @@
 ;                  $offset              - an object.
 ; Return values .: None
 ; Author ........: didipe
-; Modified ......: ProMac (Dec - 2016)
+; Modified ......: ProMac (12-2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:

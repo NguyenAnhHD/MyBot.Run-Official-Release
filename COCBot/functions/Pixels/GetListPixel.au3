@@ -68,14 +68,14 @@ EndFunc   ;==>GetPixelListDistance
 
 Func GetLocationItem($functionName)
 	If $g_iDebugSetlog = 1 Or $g_iDebugBuildingPos = 1 Then
-		Local $hTimer = TimerInit()
+		Local $hTimer = __TimerInit()
 		Setlog("GetLocationItem(" & $functionName & ")", $COLOR_DEBUG)
 	EndIf
-	Local $resultHere = DllCall($g_hLibFunctions, "str", $functionName, "ptr", $hHBitmap2)
+	Local $resultHere = DllCall($g_hLibMyBot, "str", $functionName, "ptr", $g_hHBitmap2)
 	If UBound($resultHere) > 0 Then
-		If $g_iDebugBuildingPos = 1 Then Setlog("#*# " & $functionName & ": " & $resultHere[0] & "calc in " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
+		If $g_iDebugBuildingPos = 1 Then Setlog("#*# " & $functionName & ": " & $resultHere[0] & "calc in " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
 		Return GetListPixel($resultHere[0])
 	Else
-		If $g_iDebugBuildingPos = 1 Then Setlog("#*# " & $functionName & ": NONE calc in " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
+		If $g_iDebugBuildingPos = 1 Then Setlog("#*# " & $functionName & ": NONE calc in " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
 	EndIf
 EndFunc   ;==>GetLocationItem

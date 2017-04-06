@@ -4,8 +4,8 @@
 ; Syntax ........: isProblemAffect($bNeedCaptureRegion), False is default.
 ; Parameters ....: $bNeedCaptureRegion = True will make a new 2x2 screencapture to identify the pixels to test, False will assume there is a full screen capture to use.
 ; Return values .: True if screen is blocked by an error message from CoC or BlueStacks
-; Author ........: HungLe (may-2015)
-; Modified ......: HungLe (may-2015), Hervidero (may-2015)
+; Author ........: HungLe (05-2015)
+; Modified ......: Hervidero (05-2015)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......: Click

@@ -14,7 +14,7 @@
 ; ===============================================================================================================================
 
 Func AcquireMutex($mutexName, $scope = Default, $timeout = Default)
-	Local $timer = TimerInit()
+	Local $timer = __TimerInit()
 	Local $g_hMutex_MyBot = 0
 	If $scope = Default Then
 		$scope = @AutoItPID & "/"
@@ -22,11 +22,11 @@ Func AcquireMutex($mutexName, $scope = Default, $timeout = Default)
 		$scope &= "/"
 	EndIf
 	If $timeout = Default Then $timeout = 30000
-	While $g_hMutex_MyBot = 0 And ($timeout = 0 Or TimerDiff($timer) < $timeout)
+	While $g_hMutex_MyBot = 0 And ($timeout = 0 Or __TimerDiff($timer) < $timeout)
 		$g_hMutex_MyBot = _Singleton("MyBot.run/" & $scope & $mutexName, 1)
 		If $g_hMutex_MyBot <> 0 Then ExitLoop
 		If $timeout = 0 Then ExitLoop
-		Sleep($iDelaySleep)
+		Sleep($DELAYSLEEP)
 	WEnd
 	Return $g_hMutex_MyBot
 EndFunc   ;==>AcquireMutex
@@ -47,7 +47,8 @@ Func WaitForSemaphore($sSemaphore, $iInitial = 4096, $iMaximum = 4096, $tSecurit
 			_WinAPI_CloseHandle($hSemaphore)
 			ExitLoop
 		EndIf
-		_Sleep($iDelaySleep, True, False)
+		;_Sleep($DELAYSLEEP, True, False)
+		Sleep($DELAYSLEEP)
 	WEnd
 EndFunc   ;==>WaitForSemaphore
 
@@ -62,7 +63,8 @@ Func LockSemaphore($sSemaphore)
 		EndIf
 		_WinAPI_ReleaseSemaphore($hSemaphore)
 		_WinAPI_CloseHandle($hSemaphore)
-		_Sleep($iDelaySleep, True, False)
+		;_Sleep($DELAYSLEEP, True, False)
+		Sleep($DELAYSLEEP)
 	WEnd
 EndFunc   ;==>LockSemaphore
 

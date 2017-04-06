@@ -5,7 +5,7 @@
 ; Syntax ........: SelectDropTroop($Troop)
 ; Parameters ....: $Troop               - an unknown value.
 ; Return values .: None
-; Author ........: Your Name
+; Author ........:
 ; Modified ......:
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL

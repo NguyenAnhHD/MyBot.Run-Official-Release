@@ -21,7 +21,7 @@ Global $g_hLblUnbreakableHelp = 0, $g_hLblUnbreakableLink = 0
 Func CreateVillageAchievements()
    Local $x = 25
    Local $y = 45
-   GUICtrlCreateGroup(GetTranslated(618,1, "Defense Farming"), $x - 20, $y - 20, 440, 150)
+   GUICtrlCreateGroup(GetTranslated(618,1, "Defense Farming"), $x - 20, $y - 20, $g_iSizeWGrpTab2, 150)
 	  $y +=10
 	  $g_hChkUnbreakable = GUICtrlCreateCheckbox(GetTranslated(618,2, "Enable Unbreakable"), $x - 10, $y, -1, -1)
 	  _GUICtrlSetTip(-1, GetTranslated(618,3, "Enable farming Defense Wins for Unbreakable achievement.")) ;& @CRLF & "TIP: Set your trophy range on the Misc Tab to '600 - 800' for best results. WARNING: Doing so will DROP you Trophies!"
@@ -82,7 +82,7 @@ Func CreateVillageAchievements()
 
    $x = 25
    $y = 200
-   GUICtrlCreateGroup(GetTranslated(618,21,"How to use Unbreakable Mode"), $x - 20, $y - 20, 440, 200)
+   GUICtrlCreateGroup(GetTranslated(618,21,"How to use Unbreakable Mode"), $x - 20, $y - 20, $g_iSizeWGrpTab2, 200)
 	  Local $txtHelp = GetTranslated(618,22,"Unbreakable mode will help you gain defense wins and the ""Unbreakable"" achievement.") & _
 		 @CRLF & GetTranslated(618,23,"Set ""Wait Time"" to how long you want the bot to wait for defenses." ) & _
 		 @CRLF & GetTranslated(618,24,"Farm Min is how many resources the bot must have before attacking." ) & _
@@ -90,7 +90,7 @@ Func CreateVillageAchievements()
 		 @CRLF & GetTranslated(618,26,"Click the below link for more information:" )
 	  $g_hLblUnbreakableHelp = GUICtrlCreateLabel($txtHelp, $x - 10, $y, 430, 125)
 	  $g_hLblUnbreakableLink = GUICtrlCreateLabel(GetTranslated(618,27,"More Info"), $x - 10, $y + 100, 100,20)
-		 _GUIToolTip_AddTool($hToolTip, 0, "https://mybot.run/forums/index.php?/topic/2964-guide-how-to-use-mybot-unbreakable-mode-updated/", GUICtrlGetHandle($g_hLblUnbreakableLink))
+		 _GUIToolTip_AddTool($g_hToolTip, 0, "https://mybot.run/forums/index.php?/topic/2964-guide-how-to-use-mybot-unbreakable-mode-updated/", GUICtrlGetHandle($g_hLblUnbreakableLink))
 		 GUICtrlSetFont(-1, 8.5, $FW_BOLD, $GUI_FONTUNDER)
 		 GUICtrlSetColor(-1, $COLOR_INFO)
 	  GUICtrlCreateGroup("", -99, -99, 1, 1)

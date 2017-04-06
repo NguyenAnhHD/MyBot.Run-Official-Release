@@ -26,7 +26,7 @@ Global $g_hGUI_VILLAGE_TAB = 0, $g_hGUI_VILLAGE_TAB_ITEM1 = 0, $g_hGUI_VILLAGE_T
 	   $g_hGUI_VILLAGE_TAB_ITEM4 = 0, $g_hGUI_VILLAGE_TAB_ITEM5 = 0
 
 Func CreateVillageTab()
-   $g_hGUI_VILLAGE = GUICreate("", $_GUI_MAIN_WIDTH - 20, $_GUI_MAIN_HEIGHT - 255, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hFrmBotEx)
+   $g_hGUI_VILLAGE = _GUICreate("", $g_iSizeWGrpTab1, $g_iSizeHGrpTab1, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hFrmBotEx)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_VILLAGE)
 
    CreateVillageDonate()
@@ -34,7 +34,7 @@ Func CreateVillageTab()
    CreateVillageNotify()
 
    GUISwitch($g_hGUI_VILLAGE)
-   $g_hGUI_VILLAGE_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 20, $_GUI_MAIN_HEIGHT - 255, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_VILLAGE_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab1, $g_iSizeHGrpTab1, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
    $g_hGUI_VILLAGE_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,6,"Misc"))
    CreateVillageMisc()
    $g_hGUI_VILLAGE_TAB_ITEM2 = GUICtrlCreateTabItem(GetTranslated(600,7,"Req. && Donate"))

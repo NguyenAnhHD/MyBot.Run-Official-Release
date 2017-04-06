@@ -26,7 +26,7 @@ Global $g_hGUI_ACTIVEBASE_TAB = 0, $g_hGUI_ACTIVEBASE_TAB_ITEM1 = 0, $g_hGUI_ACT
 
 Func CreateAttackSearchActiveBase()
 
-   $g_hGUI_ACTIVEBASE = GUICreate("", $_GUI_MAIN_WIDTH - 40, $_GUI_MAIN_HEIGHT - 315, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_SEARCH)
+   $g_hGUI_ACTIVEBASE = _GUICreate("", $g_iSizeWGrpTab3, $g_iSizeHGrpTab3, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_SEARCH)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_ACTIVEBASE)
 
    ;creating subchilds first!
@@ -34,7 +34,7 @@ Func CreateAttackSearchActiveBase()
    CreateAttackSearchActiveBaseScripted()
    GUISwitch($g_hGUI_ACTIVEBASE)
 
-   $g_hGUI_ACTIVEBASE_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 40, $_GUI_MAIN_HEIGHT - 315, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_ACTIVEBASE_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
    $g_hGUI_ACTIVEBASE_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,28,"Search"))
    CreateAttackSearchActiveBaseSearch()
 

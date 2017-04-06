@@ -524,7 +524,7 @@ Func _ExtMsgBox($vIcon, $vButton, $sTitle, $sText, $iTimeOut = 0, $hWin = $g_hFr
 	If BitAND($g_aEMB_Settings[0], 2) Then $iExtStyle = -1
 
 	; Create GUI with $WS_POPUPWINDOW, $WS_CAPTION style and required extended style
-	Local $hMsgGUI = GUICreate($sTitle, $iDialog_Width, $iMsg_Height, $iHpos, $iVPos, BitOR(0x80880000, 0x00C00000), $iExtStyle, $iParent_Win)
+	Local $hMsgGUI = _GUICreate($sTitle, $iDialog_Width, $iMsg_Height, $iHpos, $iVPos, BitOR(0x80880000, 0x00C00000), $iExtStyle, $iParent_Win)
 	If @error Then
 		Return SetError(7, 0, -1)
 	EndIf
@@ -643,7 +643,7 @@ Func _ExtMsgBox($vIcon, $vButton, $sTitle, $sText, $iTimeOut = 0, $hWin = $g_hFr
 	GUISetState(@SW_SHOW, $hMsgGUI)
 
 	; Begin timeout counter
-	Local $iTimeout_Begin = TimerInit()
+	Local $iTimeout_Begin = __TimerInit()
 	Local $iCounter = 0
 
 	; Declare GUIGetMsg return array here and not in loop
@@ -679,14 +679,14 @@ Func _ExtMsgBox($vIcon, $vButton, $sTitle, $sText, $iTimeOut = 0, $hWin = $g_hFr
 		EndIf
 
 		; Timeout if required
-		If TimerDiff($iTimeout_Begin) / 1000 >= $iTimeOut And $iTimeOut > 0 Then
+		If __TimerDiff($iTimeout_Begin) / 1000 >= $iTimeOut And $iTimeOut > 0 Then
 			$iRet_Value = 9
 			ExitLoop
 		EndIf
 
 		; Show countdown if required
 		If $fCountdown = True Then
-			Local $iTimeRun = Int(TimerDiff($iTimeout_Begin) / 1000)
+			Local $iTimeRun = Int(__TimerDiff($iTimeout_Begin) / 1000)
 			If $iTimeRun <> $iCounter Then
 				$iCounter = $iTimeRun
 				GUICtrlSetData($cCountdown_Label, StringFormat("%2s", $iTimeOut - $iCounter))

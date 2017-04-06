@@ -4,7 +4,7 @@
 ; Syntax ........:
 ; Parameters ....: None
 ; Return values .: None
-; Author ........: Cosote (2016-07)
+; Author ........: Cosote (07-2016)
 ; Modified ......:
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
@@ -38,23 +38,23 @@ Func OpenLeapDroid($bRestart = False)
 	EndIf
 
 	SetLog("Please wait while " & $g_sAndroidEmulator & " and CoC start...", $COLOR_SUCCESS)
-	$hTimer = TimerInit()
+	$hTimer = __TimerInit()
 
 	; Test ADB is connected
 	$connected_to = ConnectAndroidAdb(False, 60 * 1000)
 	If Not $g_bRunState Then Return False
 
 	; Wair for finishing boot
-	If WaitForAndroidBootCompleted($g_iAndroidLaunchWaitSec - TimerDiff($hTimer) / 1000, $hTimer) Then Return False
+	If WaitForAndroidBootCompleted($g_iAndroidLaunchWaitSec - __TimerDiff($hTimer) / 1000, $hTimer) Then Return False
 
-	If TimerDiff($hTimer) >= $g_iAndroidLaunchWaitSec * 1000 Then ; if it took 4 minutes, Android/PC has major issue so exit
+	If __TimerDiff($hTimer) >= $g_iAndroidLaunchWaitSec * 1000 Then ; if it took 4 minutes, Android/PC has major issue so exit
 		SetLog("Serious error has occurred, please restart PC and try again", $COLOR_ERROR)
-		SetLog($g_sAndroidEmulator & " refuses to load, waited " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds for window", $COLOR_ERROR)
+		SetLog($g_sAndroidEmulator & " refuses to load, waited " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds for window", $COLOR_ERROR)
 		SetError(1, @extended, False)
 		Return False
 	EndIf
 
-	SetLog($g_sAndroidEmulator & " Loaded, took " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds to begin.", $COLOR_SUCCESS)
+	SetLog($g_sAndroidEmulator & " Loaded, took " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds to begin.", $COLOR_SUCCESS)
 
 	Return True
 
@@ -250,7 +250,7 @@ Func SetScreenLeapDroid()
 	Local $f, $p, $h
 
 	; Set width and height
-	For $f in $files
+	For $f In $files
 		$p = StringMid($f, 1, StringInStr($f, "\", 0, -1))
 		If FileExists($p) Then
 			If FileExists($f) = 0 Then
@@ -288,12 +288,12 @@ Func SetScreenLeapDroid()
 	Next
 
 	#cs
-	$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " resolution_width " & $g_iAndroidClientWidth, $process_killed)
-	$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " resolution_height " & $g_iAndroidClientHeight, $process_killed)
-	$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " is_full_screen 0", $process_killed)
-	$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " is_customed_resolution 1", $process_killed)
-	; Set dpi
-	$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " vbox_dpi 160", $process_killed)
+		$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " resolution_width " & $g_iAndroidClientWidth, $process_killed)
+		$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " resolution_height " & $g_iAndroidClientHeight, $process_killed)
+		$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " is_full_screen 0", $process_killed)
+		$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " is_customed_resolution 1", $process_killed)
+		; Set dpi
+		$cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $g_sAndroidInstance & " vbox_dpi 160", $process_killed)
 	#ce
 	Return True
 
@@ -316,34 +316,34 @@ Func CheckScreenLeapDroid($bSetLog = True)
 	If Not InitAndroid() Then Return False
 
 	#cs
-	Local $aValues[4][2] = [ _
-			["is_full_screen", "0"], _
-			["vbox_dpi", "160"], _
-			["resolution_height", $g_iAndroidClientHeight], _
-			["resolution_width", $g_iAndroidClientWidth] _
-			]
-	Local $i, $Value, $iErrCnt = 0, $process_killed, $aRegExResult
+		Local $aValues[4][2] = [ _
+		["is_full_screen", "0"], _
+		["vbox_dpi", "160"], _
+		["resolution_height", $g_iAndroidClientHeight], _
+		["resolution_width", $g_iAndroidClientWidth] _
+		]
+		Local $i, $Value, $iErrCnt = 0, $process_killed, $aRegExResult
 
-	For $i = 0 To UBound($aValues) - 1
+		For $i = 0 To UBound($aValues) - 1
 		$aRegExResult = StringRegExp($__VBoxGuestProperties, "Name: " & $aValues[$i][0] & ", value: (.+), timestamp:", $STR_REGEXPARRAYMATCH)
 		If @error = 0 Then $Value = $aRegExResult[0]
 		If $Value <> $aValues[$i][1] Then
-			If $iErrCnt = 0 Then
-				If $bSetLog Then
-					SetLog("MyBot doesn't work with " & $g_sAndroidEmulator & " screen configuration!", $COLOR_ERROR)
-				Else
-					SetDebugLog("MyBot doesn't work with " & $g_sAndroidEmulator & " screen configuration!", $COLOR_ERROR)
-				EndIf
-			EndIf
-			If $bSetLog Then
-				SetLog("Setting of " & $aValues[$i][0] & " is " & $Value & " and will be changed to " & $aValues[$i][1], $COLOR_ERROR)
-			Else
-				SetDebugLog("Setting of " & $aValues[$i][0] & " is " & $Value & " and will be changed to " & $aValues[$i][1], $COLOR_ERROR)
-			EndIf
-			$iErrCnt += 1
+		If $iErrCnt = 0 Then
+		If $bSetLog Then
+		SetLog("MyBot doesn't work with " & $g_sAndroidEmulator & " screen configuration!", $COLOR_ERROR)
+		Else
+		SetDebugLog("MyBot doesn't work with " & $g_sAndroidEmulator & " screen configuration!", $COLOR_ERROR)
 		EndIf
-	Next
-	If $iErrCnt > 0 Then Return False
+		EndIf
+		If $bSetLog Then
+		SetLog("Setting of " & $aValues[$i][0] & " is " & $Value & " and will be changed to " & $aValues[$i][1], $COLOR_ERROR)
+		Else
+		SetDebugLog("Setting of " & $aValues[$i][0] & " is " & $Value & " and will be changed to " & $aValues[$i][1], $COLOR_ERROR)
+		EndIf
+		$iErrCnt += 1
+		EndIf
+		Next
+		If $iErrCnt > 0 Then Return False
 	#ce
 	Return True
 
@@ -383,11 +383,11 @@ Func EmbedLeapDroid($bEmbed = Default)
 EndFunc   ;==>EmbedLeapDroid
 
 Func LeapDroidBotStartEvent()
-   ; it's required to close the system bar as Android System messages are otherwise some pixels more top and bot doesn't detect correctly
-   Return AndroidCloseSystemBar()
+	; it's required to close the system bar as Android System messages are otherwise some pixels more top and bot doesn't detect correctly
+	Return AndroidCloseSystemBar()
 EndFunc   ;==>LeapDroidBotStartEvent
 
 Func LeapDroidBotStopEvent()
-   ;Zygote restart causes CoC restart :( that's why it not used and normal opensysbar started to crash in 1.8.0 in Dec 2016... so disabled for now
-   ;Return AndroidOpenSystemBar(True)
+	;Zygote restart causes CoC restart :( that's why it not used and normal opensysbar started to crash in 1.8.0 in Dec 2016... so disabled for now
+	;Return AndroidOpenSystemBar(True)
 EndFunc   ;==>LeapDroidBotStopEvent

@@ -26,7 +26,7 @@ Func _PadStringCenter($String = "", $Width = 50, $PadChar = "=")
 		$Pad &= $PadChar
 	Next
 
-    Local $Out = ""
+	Local $Out = ""
 	If $Odd Then
 		$Out = $Pad & $String & $Pad & $PadChar ; Odd
 	Else

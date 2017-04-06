@@ -5,7 +5,7 @@
 ; Parameters ....: None
 ; Return values .: None
 ; Author ........: AtoZ (2015)
-; Modified ......: Barracoda (July 2015), TheMaster 2015-10
+; Modified ......: Barracoda (07-2015), TheMaster1st (10-2015)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -14,8 +14,8 @@
 ; ================================================================
 
 Func SwitchAttackTHType()
-	$THusedKing = 0
-	$THusedQueen = 0
+	$g_bTHSnipeUsedKing = False
+	$g_bTHSnipeUsedQueen = False
 	AttackTHParseCSV()
 EndFunc   ;==>SwitchAttackTHType
 
@@ -30,7 +30,7 @@ Func AttackTHParseCSV($test = False)
 		Case $LB
 			$attackCSVtoUse = $g_iTHSnipeBeforeScript[$LB]
 		Case $DB
-			If $duringMilkingAttack = 1 Then
+			If $g_bDuringMilkingAttack = True Then
 				$attackCSVtoUse = $g_sMilkFarmAlgorithmTh
 			Else
 				$attackCSVtoUse = $g_iTHSnipeBeforeScript[$DB]
@@ -41,7 +41,7 @@ Func AttackTHParseCSV($test = False)
 
 	If FileExists($g_sTHSnipeAttacksPath & "\" & $attackCSVtoUse & ".csv") Then
 		$f = FileOpen($g_sTHSnipeAttacksPath & "\" & $attackCSVtoUse & ".csv", 0)
-		If $g_iDebugSetlog=1 Then Setlog("Use algorithm " & $attackCSVtoUse &".csv",$COLOR_DEBUG)
+		If $g_iDebugSetlog = 1 Then Setlog("Use algorithm " & $attackCSVtoUse & ".csv", $COLOR_DEBUG)
 		; Read in lines of text until the EOF is reached
 		While 1
 			$line = FileReadLine($f)
@@ -102,9 +102,9 @@ Func AttackTHParseCSV($test = False)
 						SpellTHGrid(Eval("e" & $command))
 
 					Case StringInStr(StringUpper("-LSpell-"), "-" & $command & "-") > 0
-						If $g_iDebugSetlog = 1 Then Setlog(">> CastSpell($e" & $command & ",$THx, $THy)")
+						If $g_iDebugSetlog = 1 Then Setlog(">> CastSpell($e" & $command & ",$g_iTHx, $g_iTHy)")
 
-						CastSpell(Eval("e" & $command), $THx, $THy)
+						CastSpell(Eval("e" & $command), $g_iTHx, $g_iTHy)
 
 					Case Else
 						Setlog("attack row bad, discard: " & $line, $COLOR_ERROR)

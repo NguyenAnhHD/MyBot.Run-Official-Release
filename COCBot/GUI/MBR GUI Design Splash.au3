@@ -31,7 +31,7 @@ Func CreateSplashScreen()
    Local $iT = 20 ; Top of logo (additional space)
    Local $iB = 10 ; Bottom of logo (additional space)
 
-   If $ichkDisableSplash = 0 Then
+   If $g_bDisableSplash = False Then
 
 	   Local $hSplashImg = _GDIPlus_BitmapCreateFromFile($sSplashImg)
 	   ; Determine dimensions of splash image
@@ -39,12 +39,12 @@ Func CreateSplashScreen()
 	   $iY = _GDIPlus_ImageGetHeight($hSplashImg)
 
 	   ; Create Splash container
-	   $g_hSplash = GUICreate("", $iX, $iY + $iT + $iB + 60, -1, -1, BitOR($WS_POPUP, $WS_BORDER), BitOR($WS_EX_TOPMOST, $WS_EX_WINDOWEDGE, $WS_EX_TOOLWINDOW))
+	   $g_hSplash = _GUICreate("", $iX, $iY + $iT + $iB + 60, -1, -1, BitOR($WS_POPUP, $WS_BORDER), BitOR($WS_EX_TOPMOST, $WS_EX_WINDOWEDGE, $WS_EX_TOOLWINDOW))
 	   GUISetBkColor($COLOR_WHITE, $g_hSplash)
 	   _GUICtrlCreatePic($hSplashImg, 0, $iT) ; Splash Image
 	   $g_lSplashTitle = GUICtrlCreateLabel($g_sBotTitle, 15, $iY + $iT + $iB + 3, $iX - 30, 15, $SS_CENTER) ; Splash Title
 	   $g_hSplashProgress = GUICtrlCreateProgress(15, $iY + $iT + $iB + 20, $iX - 30, 10, $PBS_SMOOTH, BitOR($WS_EX_TOPMOST, $WS_EX_WINDOWEDGE, $WS_EX_TOOLWINDOW)) ; Splash Progress
-	   $g_lSplashStatus = GUICtrlCreateLabel("", 15, $iY + $iT + $iB + 38, $iX - 30, 15, $SS_CENTER) ; Splash Title
+	   $g_lSplashStatus = GUICtrlCreateLabel(GetTranslated(500, 19, "Loading..."), 15, $iY + $iT + $iB + 38, $iX - 30, 15, $SS_CENTER) ; Splash Title
 
 	   ; Cleanup GDI resources
 	   _GDIPlus_BitmapDispose($hSplashImg)
@@ -52,7 +52,7 @@ Func CreateSplashScreen()
 	   ; Show Splash
 	   GUISetState(@SW_SHOWNOACTIVATE, $g_hSplash)
 
-	   $g_hSplashTimer = TimerInit()
+	   $g_hSplashTimer = __TimerInit()
 	EndIf
 
 EndFunc

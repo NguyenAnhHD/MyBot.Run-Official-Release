@@ -22,13 +22,13 @@ Global $g_hCmbPresetList = 0, $g_hTxtPresetMessage = 0, $g_hLblLoadPresetMessage
 
 Func CreateAttackStrategies()
 
-   $g_hGUI_STRATEGIES = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ATTACK)
+   $g_hGUI_STRATEGIES = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ATTACK)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_STRATEGIES)
 
    GUISwitch($g_hGUI_STRATEGIES)
 
    Local $xStart = 5, $yStart = 25
-   $g_hGUI_STRATEGIES_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 30, $_GUI_MAIN_HEIGHT - 255 - 30, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_STRATEGIES_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
    $g_hGUI_STRATEGIES_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,33,"Load Strategy"))
 		 Local $x = $xStart, $y = $yStart
 

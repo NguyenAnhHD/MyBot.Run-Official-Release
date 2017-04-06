@@ -6,7 +6,7 @@
 ;                  $GoldChangeCheck     - [optional] an unknown value. Default is True.
 ; Return values .: None
 ; Author ........:
-; Modified ......: KnowJack (Jun/Aug2015), MonkeyHunter (2106-01), CodeSlinger69 (2017)
+; Modified ......: KnowJack (07-2015), MonkeyHunter (01-2016), CodeSlinger69 (01-2017), MonkeyHunter (03-2017)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -19,7 +19,7 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 	Local $hBitmap_Scaled
 	Local $i, $j
 
-	If $g_bDESideDisableOther And $g_iMatchMode = $LB And $g_aiAttackStdDropSides[$LB] = 4 And $g_bDESideEndEnable And ($dropQueen Or $dropKing) Then
+	If $g_bDESideDisableOther And $g_iMatchMode = $LB And $g_aiAttackStdDropSides[$LB] = 4 And $g_bDESideEndEnable And ($g_bDropQueen Or $g_bDropKing) Then
 		SaveandDisableEBO()
 		SetLog("Disabling Normal End Battle Options", $COLOR_SUCCESS)
 	EndIf
@@ -28,24 +28,24 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 		If Not (IsReturnHomeBattlePage(True, False)) Then ; if already in return home battle page do not wait and try to activate Hero Ability and close battle
 			SetLog("Checking if the battle has finished", $COLOR_INFO)
 			While GoldElixirChangeEBO()
-				If _Sleep($iDelayReturnHome1) Then Return
+				If _Sleep($DELAYRETURNHOME1) Then Return
 			WEnd
-			If IsAttackPage() Then smartZap(); Check to see if we should zap the DE Drills
+			If IsAttackPage() Then smartZap() ; Check to see if we should zap the DE Drills
 			;If Heroes were not activated: Hero Ability activation before End of Battle to restore health
-			If ($checkKPower = True Or $checkQPower = True Or $checkWPower = True) And $iActivateKQCondition = "Auto" Then
+			If ($g_bCheckKingPower = True Or $g_bCheckQueenPower = True Or $g_bCheckWardenPower = True) And $g_iActivateKQCondition = "Auto" Then
 				;_CaptureRegion()
 				If _ColorCheck(_GetPixelColor($aRtnHomeCheck1[0], $aRtnHomeCheck1[1], True), Hex($aRtnHomeCheck1[2], 6), $aRtnHomeCheck1[3]) = False And _ColorCheck(_GetPixelColor($aRtnHomeCheck2[0], $aRtnHomeCheck2[1], True), Hex($aRtnHomeCheck2[2], 6), $aRtnHomeCheck2[3]) = False Then ; If not already at Return Homescreen
-					If $checkKPower = True Then
+					If $g_bCheckKingPower = True Then
 						SetLog("Activating King's power to restore some health before EndBattle", $COLOR_INFO)
-						If IsAttackPage() Then SelectDropTroop($King) ;If King was not activated: Boost King before EndBattle to restore some health
+						If IsAttackPage() Then SelectDropTroop($g_iKingSlot) ;If King was not activated: Boost King before EndBattle to restore some health
 					EndIf
-					If $checkQPower = True Then
+					If $g_bCheckQueenPower = True Then
 						SetLog("Activating Queen's power to restore some health before EndBattle", $COLOR_INFO)
-						If IsAttackPage() Then SelectDropTroop($Queen) ;If Queen was not activated: Boost Queen before EndBattle to restore some health
+						If IsAttackPage() Then SelectDropTroop($g_iQueenSlot) ;If Queen was not activated: Boost Queen before EndBattle to restore some health
 					EndIf
-					If $checkWPower = True Then
+					If $g_bCheckWardenPower = True Then
 						SetLog("Activating Warden's power to restore some health before EndBattle", $COLOR_INFO)
-						If IsAttackPage() Then SelectDropTroop($Warden) ;If Queen was not activated: Boost Queen before EndBattle to restore some health
+						If IsAttackPage() Then SelectDropTroop($g_iWardenSlot) ;If Queen was not activated: Boost Queen before EndBattle to restore some health
 					EndIf
 				EndIf
 			EndIf
@@ -54,13 +54,17 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 		EndIf
 	EndIf
 
-	If $g_bDESideDisableOther And $g_iMatchMode = $LB And $g_aiAttackStdDropSides[$LB] = 4 And $g_bDESideEndEnable And ($dropQueen Or $dropKing) Then
+	If $g_bDESideDisableOther And $g_iMatchMode = $LB And $g_aiAttackStdDropSides[$LB] = 4 And $g_bDESideEndEnable And ($g_bDropQueen Or $g_bDropKing) Then
 		RevertEBO()
 	EndIf
 
-	$checkKPower = False
-	$checkQPower = False
-	$checkWPower = False
+	; Reset hero variables
+	$g_bCheckKingPower = False
+	$g_bCheckQueenPower = False
+	$g_bCheckWardenPower = False
+	$g_aHeroesTimerActivation[$eHeroBarbarianKing] = 0
+	$g_aHeroesTimerActivation[$eHeroArcherQueen] = 0
+	$g_aHeroesTimerActivation[$eHeroGrandWarden] = 0
 
 	If $g_abAttackTypeEnable[$TS] = 1 And $g_iMatchMode = $TS Then $g_bFirstStart = True ;reset barracks upon return when TH sniping w/custom army
 
@@ -86,7 +90,7 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 						EndIf
 						If ReturnHomeMainPage() Then Return
 						If $j > 10 Then ExitLoop ; if Okay button not found in 10*(200)ms or 2 seconds, then give up.
-						If _Sleep($iDelayReturnHome5) Then Return
+						If _Sleep($DELAYRETURNHOME5) Then Return
 					WEnd
 				Else
 					$i += 1
@@ -96,12 +100,12 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 			EndIf
 			If ReturnHomeMainPage() Then Return
 			If $i > 5 Then ExitLoop ; if end battle or surrender button are not found in 5*(200)ms + 10*(200)ms or 3 seconds, then give up.
-			If _Sleep($iDelayReturnHome5) Then Return
+			If _Sleep($DELAYRETURNHOME5) Then Return
 		WEnd
 	Else
 		If $g_iDebugSetlog = 1 Then Setlog("Battle already over.", $COLOR_DEBUG)
 	EndIf
-	If _Sleep($iDelayReturnHome2) Then Return ; short wait for return to main
+	If _Sleep($DELAYRETURNHOME2) Then Return ; short wait for return to main
 
 	TrayTip($g_sBotTitle, "", BitOR($TIP_ICONASTERISK, $TIP_NOSOUND)) ; clear village search match found message
 
@@ -112,12 +116,12 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 			$counter = 0
 			While _ColorCheck(_GetPixelColor($aRtnHomeCheck1[0], $aRtnHomeCheck1[1], True), Hex($aRtnHomeCheck1[2], 6), $aRtnHomeCheck1[3]) = False And _ColorCheck(_GetPixelColor($aRtnHomeCheck2[0], $aRtnHomeCheck2[1], True), Hex($aRtnHomeCheck2[2], 6), $aRtnHomeCheck2[3]) = False ; test for Return Home Button
 				If $g_iDebugSetlog = 1 Then SetDebugLog("Wait for Return Home Button to appear #" & $counter)
-				If _Sleep($iDelayReturnHome2) Then ExitLoop
+				If _Sleep($DELAYRETURNHOME2) Then ExitLoop
 				$counter += 1
 				If $counter > 40 Then ExitLoop
 			WEnd
 		EndIf
-		If _Sleep($iDelayReturnHome3) Then Return ; wait for all report details
+		If _Sleep($DELAYRETURNHOME3) Then Return ; wait for all report details
 		_CaptureRegion()
 		AttackReport()
 	EndIf
@@ -126,15 +130,15 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 		Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
 		Local $Time = @HOUR & "." & @MIN
 		_CaptureRegion()
-		$hBitmap_Scaled = _GDIPlus_ImageResize($hBitmap, _GDIPlus_ImageGetWidth($hBitmap) / 2, _GDIPlus_ImageGetHeight($hBitmap) / 2) ;resize image
+		$hBitmap_Scaled = _GDIPlus_ImageResize($g_hBitmap, _GDIPlus_ImageGetWidth($g_hBitmap) / 2, _GDIPlus_ImageGetHeight($g_hBitmap) / 2) ;resize image
 		; screenshot filename according with new options around filenames
-		If $ScreenshotLootInfo = 1 Then
-			$LootFileName = $Date & "_" & $Time & " G" & $g_iStatsLastAttack[$eLootGold] & " E" & $g_iStatsLastAttack[$eLootElixir] & " DE" & _
-						    $g_iStatsLastAttack[$eLootDarkElixir] & " T" & $g_iStatsLastAttack[$eLootTrophy] & " S" & StringFormat("%3s", $SearchCount) & ".jpg"
+		If $g_bScreenshotLootInfo Then
+			$g_sLootFileName = $Date & "_" & $Time & " G" & $g_iStatsLastAttack[$eLootGold] & " E" & $g_iStatsLastAttack[$eLootElixir] & " DE" & _
+					$g_iStatsLastAttack[$eLootDarkElixir] & " T" & $g_iStatsLastAttack[$eLootTrophy] & " S" & StringFormat("%3s", $g_iSearchCount) & ".jpg"
 		Else
-			$LootFileName = $Date & "_" & $Time & ".jpg"
+			$g_sLootFileName = $Date & "_" & $Time & ".jpg"
 		EndIf
-		_GDIPlus_ImageSaveToFile($hBitmap_Scaled, $g_sProfileLootsPath & $LootFileName)
+		_GDIPlus_ImageSaveToFile($hBitmap_Scaled, $g_sProfileLootsPath & $g_sLootFileName)
 		_GDIPlus_ImageDispose($hBitmap_Scaled)
 	EndIf
 
@@ -153,14 +157,14 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 			$i += 1
 		EndIf
 		If $i > 10 Then ExitLoop ; if end battle window is not found in 10*200mms or 2 seconds, then give up.
-		If _Sleep($iDelayReturnHome5) Then Return
+		If _Sleep($DELAYRETURNHOME5) Then Return
 	WEnd
-	If _Sleep($iDelayReturnHome2) Then Return ; short wait for screen to close
+	If _Sleep($DELAYRETURNHOME2) Then Return ; short wait for screen to close
 
 	$counter = 0
 	While 1
 		If $g_iDebugSetlog = 1 Then SetDebugLog("Wait for End Fight Scene to appear #" & $counter)
-		If _Sleep($iDelayReturnHome4) Then Return
+		If _Sleep($DELAYRETURNHOME4) Then Return
 		If StarBonus() = True Then Setlog("Star Bonus window closed chief!", $COLOR_INFO) ; Check for Star Bonus window to fill treasury (2016-01) update
 		If ReturnHomeMainPage() Then Return
 		$counter += 1
@@ -174,9 +178,7 @@ EndFunc   ;==>ReturnHome
 
 Func ReturnHomeMainPage()
 	If IsMainPage(1) Then
-		_GUICtrlEdit_SetText($g_hTxtLog, _PadStringCenter(" BOT LOG ", 71, "="))
-		_GUICtrlRichEdit_SetFont($g_hTxtLog, 6, "Lucida Console")
-		_GUICtrlRichEdit_AppendTextColor($g_hTxtLog, "" & @CRLF, _ColorConvert($Color_Black))
+		SetLogCentered(" BOT LOG ", Default, Default, True)
 		Return True
 	EndIf
 	Return False

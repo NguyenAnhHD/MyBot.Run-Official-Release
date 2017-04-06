@@ -26,13 +26,13 @@ Func _SleepStatus($iDelay, $iSleep = True, $bDirection = True, $CheckRunState = 
 	Local $iDayCalc = 0, $iHourCalc = 0, $iMinCalc = 0, $iSecCalc = 0
 	Local $sTimeWait, $sTimeLeftLapse = ",  Time Lapse = "
 
-	$iBegin = TimerInit()
+	$iBegin = __TimerInit()
 	_TicksToDay($iDelay, $iDay, $iHour, $iMin, $iSec)
 
-	While TimerDiff($iBegin) < $iDelay
+	While __TimerDiff($iBegin) < $iDelay
 		If $g_bRunState = False And $CheckRunState = True Then Return True
 		If $bUpdate Then
-			$iCurTime = TimerDiff($iBegin)
+			$iCurTime = __TimerDiff($iBegin)
 			$iTime = $iCurTime ; display count up timer ; avoid flicker
 			If $bDirection = True Then
 				$iTime = $iDelay - $iCurTime ; display countdown timer
@@ -56,11 +56,11 @@ Func _SleepStatus($iDelay, $iSleep = True, $bDirection = True, $CheckRunState = 
 					$sTimeLeftLapse &= StringFormat("%02u:%02u", $iMinCalc, $iSecCalc)
 			EndSelect
 
-			$hLastUpdate = TimerInit()
+			$hLastUpdate = __TimerInit()
 			_GUICtrlStatusBar_SetText($g_hStatusBar, " Status: " & $sTimeWait & $sTimeLeftLapse)
 		EndIf
-		_Sleep($iDelaySleep)
-		$bUpdate = TimerDiff($hLastUpdate) > 750
+		_Sleep($DELAYSLEEP)
+		$bUpdate = __TimerDiff($hLastUpdate) > 750
 	WEnd
 	If $g_bRunState = False And $CheckRunState = True Then Return True
 	Return False

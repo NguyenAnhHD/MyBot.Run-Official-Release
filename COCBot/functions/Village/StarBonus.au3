@@ -20,15 +20,15 @@ Func StarBonus()
 	If _CheckPixel($aIsMainGrayed, $g_bCapturePixel) = False Then Return ; Star bonus window opens on main base view, and grays page.
 
 	If $g_iDebugSetlog = 1 Then Setlog("StarBonusWindowChk #1: " & _GetPixelColor(640, 185 + $g_iMidOffsetY, $g_bCapturePixel) & ", #2: " & _GetPixelColor(650, 462 + $g_iBottomOffsetY, $g_bCapturePixel), $COLOR_DEBUG)
-	If _Sleep($iDelayStarBonus100) Then Return
+	If _Sleep($DELAYSTARBONUS100) Then Return
 
 	; Verify actual star bonus window open
-	If _ColorCheck(_GetPixelColor(640, 185 + $g_iMidOffsetY, $g_bCapturePixel), Hex(0xC00F15, 6), 10) And _  ; Check for Red below X for window close
+	If _ColorCheck(_GetPixelColor(640, 185 + $g_iMidOffsetY, $g_bCapturePixel), Hex(0xC00F15, 6), 10) And _ ; Check for Red below X for window close
 			_ColorCheck(_GetPixelColor(650, 462 + $g_iBottomOffsetY, $g_bCapturePixel), Hex(0xE8E8E0, 6), 10) Then ; and White pixel on top trees where it does not belong
 
 		; Find and Click Okay button
 		Local $offColors[3][3] = [[0x000000, 143, 0], [0xFFFFFF, 53, 17], [0xFFFFFF, 53, 29]] ; 2nd Black opposite button, 3rd pixel white "O" center top, 4th pixel White "0" bottom center
-		Global $ButtonPixel = _MultiPixelSearch(353, 440 + $g_iMidOffsetY, 502, 474 + $g_iMidOffsetY, 1, 1, Hex(0x000000, 6), $offColors, 20) ; first vertical black pixel of Okay
+		Local $ButtonPixel = _MultiPixelSearch(353, 440 + $g_iMidOffsetY, 502, 474 + $g_iMidOffsetY, 1, 1, Hex(0x000000, 6), $offColors, 20) ; first vertical black pixel of Okay
 		If $g_iDebugSetlog = 1 Then Setlog("Bonus Okay btn chk-#1: " & _GetPixelColor(355, 441 + $g_iMidOffsetY, $g_bCapturePixel) & ", #2: " & _GetPixelColor(355 + 143, 441 + $g_iMidOffsetY, $g_bCapturePixel) & ", #3: " & _GetPixelColor(355 + 53, 441 + 17 + $g_iMidOffsetY, $g_bCapturePixel) & ", #4: " & _GetPixelColor(355 + 53, 441 + 29 + $g_iMidOffsetY, $g_bCapturePixel), $COLOR_DEBUG)
 		If IsArray($ButtonPixel) Then
 			If $g_iDebugSetlog = 1 Then
@@ -36,7 +36,7 @@ Func StarBonus()
 				Setlog("Bonus Okay Pixel color found #1: " & _GetPixelColor($ButtonPixel[0], $ButtonPixel[1], $g_bCapturePixel) & ", #2: " & _GetPixelColor($ButtonPixel[0] + 143, $ButtonPixel[1], $g_bCapturePixel) & ", #3: " & _GetPixelColor($ButtonPixel[0] + 53, $ButtonPixel[1] + 17, $g_bCapturePixel) & ", #4: " & _GetPixelColor($ButtonPixel[0] + 53, $ButtonPixel[1] + 29, $g_bCapturePixel), $COLOR_DEBUG)
 			EndIf
 			Click($ButtonPixel[0] + 75, $ButtonPixel[1] + 25, 1, 0, "#0000") ; Click Okay Button
-			If _Sleep($iDelayStarBonus500) Then Return
+			If _Sleep($DELAYSTARBONUS500) Then Return
 			Return True
 		EndIf
 

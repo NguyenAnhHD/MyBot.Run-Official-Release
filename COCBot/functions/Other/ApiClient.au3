@@ -11,7 +11,7 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-Global $aManagedMyBotHosts[0] ; Contains array of registered MyBot.run host Window Handle and TimerHandle of last communication
+Global $g_ahManagedMyBotHosts[0] ; Contains array of registered MyBot.run host Window Handle and TimerHandle of last communication
 GUIRegisterMsg($WM_MYBOTRUN_API_1_0, "WM_MYBOTRUN_API_1_0_CLIENT")
 
 Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
@@ -40,7 +40,7 @@ Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 			$lParam = $g_hFrmBot
 			$wParam = DllStructGetPtr($tBotState)
 			DllStructSetData($tBotState, "frmBot", $g_hFrmBot)
-			DllStructSetData($tBotState, "HWnD", $HWnD)
+			DllStructSetData($tBotState, "HWnD", $g_hAndroidWindow)
 			DllStructSetData($tBotState, "RunState", $g_bRunState)
 			DllStructSetData($tBotState, "TPaused", $g_bBotPaused)
 
@@ -103,7 +103,7 @@ Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 
 	If $hWind <> 0 Then
 		Local $a = GetManagedMyBotHost($hWind)
-		$a[1] = TimerInit()
+		$a[1] = __TimerInit()
 		_WinAPI_PostMessage($hWind, $iMsg, $wParam, $lParam)
 	EndIf
 
@@ -114,20 +114,20 @@ EndFunc   ;==>WM_MYBOTRUN_API_1_0_CLIENT
 Func GetManagedMyBotHost($hFrmHost = Default)
 
 	If $hFrmHost = Default Then
-		Return $aManagedMyBotHosts
+		Return $g_ahManagedMyBotHosts
 	EndIf
 
 	If IsHWnd($hFrmHost) = 0 Then Return -1
 
-	For $i = 0 To UBound($aManagedMyBotHosts) - 1
-		Local $a = $aManagedMyBotHosts[$i]
+	For $i = 0 To UBound($g_ahManagedMyBotHosts) - 1
+		Local $a = $g_ahManagedMyBotHosts[$i]
 		If $a[0] = $hFrmHost Then Return $a
 	Next
 
-	ReDim $aManagedMyBotHosts[UBound($aManagedMyBotHosts) + 1]
+	ReDim $g_ahManagedMyBotHosts[UBound($g_ahManagedMyBotHosts) + 1]
 	Local $a[2]
 	$a[0] = $hFrmHost
-	$aManagedMyBotHosts[$i] = $a
+	$g_ahManagedMyBotHosts[$i] = $a
 	SetDebugLog("New Bot Host Window Handle registered: " & $hFrmHost)
 	Return $a
 EndFunc   ;==>GetManagedMyBotHost
@@ -156,11 +156,11 @@ Func LaunchWatchdog()
 EndFunc   ;==>LaunchWatchdog
 
 Func UnregisterManagedMyBotHost()
-	For $i = 0 To UBound($aManagedMyBotHosts) - 1
-		Local $a = $aManagedMyBotHosts[$i]
+	For $i = 0 To UBound($g_ahManagedMyBotHosts) - 1
+		Local $a = $g_ahManagedMyBotHosts[$i]
 		Local $hFrmHost = $a[0]
 		$a[0] = 0
-		$aManagedMyBotHosts[$i] = $a
+		$g_ahManagedMyBotHosts[$i] = $a
 		If IsHWnd($hFrmHost) Then
 			Local $hWind = $hFrmHost
 			Local $iMsg = $WM_MYBOTRUN_API_1_0

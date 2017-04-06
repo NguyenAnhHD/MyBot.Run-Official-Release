@@ -16,14 +16,14 @@
 
 Func WindowsArrange($position, $offsetX = 0, $offsetY = 0)
 	WinGetAndroidHandle()
-	Local $AndroidPos = WinGetPos($HWnD)
+	Local $AndroidPos = WinGetPos($g_hAndroidWindow)
 	Local $BotPos = WinGetPos($g_hFrmBot)
 	If IsArray($AndroidPos) And IsArray($BotPos) Then
-		Local $hTimer = TimerInit()
-		WinSetState($HWnD, "", @SW_RESTORE)
-		While IsArray($AndroidPos) And TimerDiff($hTimer) < 3000 And $AndroidPos[0] < -30000 And $AndroidPos[1] < -30000
-			$AndroidPos = WinGetPos($HWnD)
-			If _Sleep($iDelaySleep) Then Return False
+		Local $hTimer = __TimerInit()
+		WinSetState($g_hAndroidWindow, "", @SW_RESTORE)
+		While IsArray($AndroidPos) And __TimerDiff($hTimer) < 3000 And $AndroidPos[0] < -30000 And $AndroidPos[1] < -30000
+			$AndroidPos = WinGetPos($g_hAndroidWindow)
+			If _Sleep($DELAYSLEEP) Then Return False
 		WEnd
 		Local $x = $offsetX
 		Local $y = $offsetY
@@ -63,8 +63,8 @@ Func WindowsArrange($position, $offsetX = 0, $offsetY = 0)
 						EndIf
 						$bAdjusted = $AndroidX <> $x Or $AndroidY <> $y
 						If $bAdjusted Then
-							WinMove2($HWnD, "", $x, $y)
-							_Sleep($iDelayWindowsArrange1, True, False)
+							WinMove2($g_hAndroidWindow, "", $x, $y)
+							_Sleep($DELAYWINDOWSARRANGE1, True, False)
 						EndIf
 						$bAdjusted = $bAdjusted = True Or $BotX <> $AndroidW + $offsetX * 2 Or $BotY <> $y
 						If $bAdjusted Then WinMove2($g_hFrmBot, "", $x + $AndroidW + $offsetX, $y)
@@ -80,10 +80,10 @@ Func WindowsArrange($position, $offsetX = 0, $offsetY = 0)
 						$bAdjusted = $BotX <> $x Or $BotY <> $y
 						If $bAdjusted Then
 							WinMove2($g_hFrmBot, "", $x, $y)
-							_Sleep($iDelayWindowsArrange1, True, False)
+							_Sleep($DELAYWINDOWSARRANGE1, True, False)
 						EndIf
 						$bAdjusted = $bAdjusted Or $AndroidX <> $x + $BotW + $offsetX Or $AndroidY <> $y
-						If $bAdjusted Then WinMove2($HWnD, "", $x + $BotW + $offsetX, $y)
+						If $bAdjusted Then WinMove2($g_hAndroidWindow, "", $x + $BotW + $offsetX, $y)
 					Case "SNAP-TR" ; position BOT top right of Android, do not move Android
 						If $offsetX == "" Then $offsetX = 0
 						If $offsetY == "" Then $offsetY = 0
@@ -108,7 +108,7 @@ Func WindowsArrange($position, $offsetX = 0, $offsetY = 0)
 			EndIf
 			If $bAdjusted = True Then
 				SetDebugLog("WindowsArrange: " & $position & ", offsetX=" & $offsetX & ", offsetY=" & $offsetY & ", X=" & $x & ", Y=" & $y)
-				_Sleep($iDelayWindowsArrange1, True, False)
+				_Sleep($DELAYWINDOWSARRANGE1, True, False)
 			EndIf
 		EndIf
 	EndIf
@@ -121,27 +121,28 @@ Func DisposeWindows()
 	Local $aPos = WinGetPos($g_hFrmBot)
 	If IsArray($aPos) Then
 		If _CheckWindowVisibility($g_hFrmBot, $aPos) Then
-			SetDebugLog("Bot Window '" & $Title & "' not visible, moving to position: " & $aPos[0] & ", " & $aPos[1])
+			SetDebugLog("Bot Window '" & $g_sAndroidTitle & "' not visible, moving to position: " & $aPos[0] & ", " & $aPos[1])
 			WinMove2($g_hFrmBot, "", $aPos[0], $aPos[1])
 		EndIf
 	EndIf
 
-	If $iDisposeWindows = 1 Then
-		Switch $icmbDisposeWindowsPos
+	CheckDpiAwareness() ; check if DPI is ok
+	If $g_bAutoAlignEnable Then
+		Switch $g_iAutoAlignPosition
 			Case 0
-				WindowsArrange("BS-BOT", $iWAOffsetX, $iWAOffsetY)
+				WindowsArrange("BS-BOT", $g_iAutoAlignOffsetX, $g_iAutoAlignOffsetY)
 			Case 1
-				WindowsArrange("BOT-BS", $iWAOffsetX, $iWAOffsetY)
+				WindowsArrange("BOT-BS", $g_iAutoAlignOffsetX, $g_iAutoAlignOffsetY)
 			Case 2
-				WindowsArrange("SNAP-TR", $iWAOffsetX, $iWAOffsetY)
+				WindowsArrange("SNAP-TR", $g_iAutoAlignOffsetX, $g_iAutoAlignOffsetY)
 			Case 3
-				WindowsArrange("SNAP-TL", $iWAOffsetX, $iWAOffsetY)
+				WindowsArrange("SNAP-TL", $g_iAutoAlignOffsetX, $g_iAutoAlignOffsetY)
 			Case 4
-				WindowsArrange("SNAP-BR", $iWAOffsetX, $iWAOffsetY)
+				WindowsArrange("SNAP-BR", $g_iAutoAlignOffsetX, $g_iAutoAlignOffsetY)
 			Case 5
-				WindowsArrange("SNAP-BL", $iWAOffsetX, $iWAOffsetY)
+				WindowsArrange("SNAP-BL", $g_iAutoAlignOffsetX, $g_iAutoAlignOffsetY)
 			Case 6
-				WindowsArrange("EMBED", $iWAOffsetX, $iWAOffsetY)
+				WindowsArrange("EMBED", $g_iAutoAlignOffsetX, $g_iAutoAlignOffsetY)
 		EndSwitch
 	EndIf
 EndFunc   ;==>DisposeWindows
@@ -165,7 +166,7 @@ Func WinMove2($WinTitle, $WinText, $x = -1, $y = -1, $w = -1, $h = -1, $hAfter =
 		SetError(1, @extended, -1)
 		Return 0
 	EndIf
-	Local $aPPos = WinGetClientPos(_WinAPI_GetParent($hWin))
+	Local $aPPos = WinGetClientPos(__WinAPI_GetParent($hWin))
 	If IsArray($aPPos) Then
 		; convert to relative
 		$aPos[0] -= $aPPos[0]
@@ -185,7 +186,7 @@ Func WinMove2($WinTitle, $WinText, $x = -1, $y = -1, $w = -1, $h = -1, $hAfter =
 	$NoResize = $NoResize Or ($w = $aPos[2] And $h = $aPos[3])
 
 	;If $g_iDebugSetlog = 1 Then SetLog("Window " & $WinTitle & "(" & $hWin & "): " & ($NoResize ? "no resize" : "resize to " & $w & " x " & $h) & ($NoMove ? ", no move" : ", move to " & $x & "," & $y), $COLOR_INFO);
-	_WinAPI_SetWindowPos($hWin, $hAfter, $x, $y, $w, $h, BitOR(($NoMove ? BitOR($SWP_NOMOVE, $SWP_NOREPOSITION) : 0), $SWP_NOACTIVATE, $SWP_NOSENDCHANGING, $NOZORDER, $iFlags)) ; resize window without sending changing message to window
+	_WinAPI_SetWindowPos($hWin, $hAfter, $x, $y, $w, $h, BitOR(($NoMove ? BitOR($SWP_NOMOVE, $SWP_NOREPOSITION) : 0), $SWP_NOACTIVATE, $SWP_NOSENDCHANGING, $NOZORDER, $iFlags, $SWP_ASYNCWINDOWPOS)) ; resize window without sending changing message to window
 
 	; check width and height if it got changed...
 	If $bCheckAfterPos Then
@@ -194,7 +195,7 @@ Func WinMove2($WinTitle, $WinText, $x = -1, $y = -1, $w = -1, $h = -1, $hAfter =
 			SetError(1, @extended, -1)
 			Return 0
 		EndIf
-		Local $aPPos = WinGetClientPos(_WinAPI_GetParent($hWin))
+		Local $aPPos = WinGetClientPos(__WinAPI_GetParent($hWin))
 		If IsArray($aPPos) Then
 			; convert to relative
 			$aPos[0] -= $aPPos[0]
@@ -246,7 +247,7 @@ Func ControlGetRelativePos($title, $text,  $controlID)
 	If UBound($a) < 4 Then Return SetError(1)
 	Local $hCtrl = ((IsHWnd($controlID)) ? ($controlID) : (GUICtrlGetHandle($controlID)))
 	;SetDebugLog("ControlGetRelativePos ControlID " & $controlID & " handle " & $hCtrl & ": " & $a[0] & ", " & $a[1] & ", " & $a[2] & ", " & $a[3])
-	Local $hWinParent = _WinAPI_GetParent($hCtrl)
+	Local $hWinParent = __WinAPI_GetParent($hCtrl)
 	Local $aParent = ControlGetPos($title, "", $hWinParent)
 	;SetDebugLog("ControlGetRelativePos Parent handle " & $hWinParent & ": " & $aParent[0] & ", " & $aParent[1] & ", " & $aParent[2] & ", " & $aParent[3])
 	If IsArray($aParent) = 1 Then

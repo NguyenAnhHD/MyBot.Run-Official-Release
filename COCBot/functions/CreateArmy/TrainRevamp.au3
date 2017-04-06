@@ -4,8 +4,8 @@
 ; Syntax ........:
 ; Parameters ....: None
 ; Return values .: None
-; Author ........: Mr.Viper & ProMac OCT 2016, CodeSlinger69 (Jan 2017)
-; Modified ......: ProMac (NOV 2016), Boju (11-2016), MR.ViPER (15-12-2016), CodeSlinger69 (Jan 2017)
+; Author ........: Mr.Viper(10-2016), ProMac(10-2016), CodeSlinger69 (01-2017)
+; Modified ......: ProMac (11-2016), Boju (11-2016), MR.ViPER (12-2016), CodeSlinger69 (01-2017)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -14,10 +14,14 @@
 ; ===============================================================================================================================
 #include-once
 
-Global $IsFullArmywithHeroesAndSpells = False
-
 Func TrainRevamp()
-	$g_iTimeBeforeTrain = 0
+
+	If $g_bTrainEnabled = False Then ; check for training disabled in halt mode
+		If $g_iDebugSetlogTrain = 1 Then Setlog("Halt mode - training disabled", $COLOR_DEBUG)
+		Return
+	EndIf
+
+	$g_sTimeBeforeTrain = _NowCalc()
 	StartGainCost()
 
 	If $g_bQuickTrainEnable = False Then
@@ -34,7 +38,7 @@ Func TrainRevamp()
 	CheckArmySpellCastel()
 
 	;Test for Train/Donate Only and Fullarmy
-	If ($g_iCommandStop = 3 Or $g_iCommandStop = 0) And $fullarmy Then
+	If ($g_iCommandStop = 3 Or $g_iCommandStop = 0) And $g_bFullArmy Then
 		SetLog("You are in halt attack mode and your Army is prepared!", $COLOR_DEBUG) ;Debug
 		If $g_bFirstStart Then $g_bFirstStart = False
 		Return
@@ -43,14 +47,13 @@ Func TrainRevamp()
 	;Load Troop and Spell counts in "Cur"
 	;CheckExistentArmy("Troops") ; routine on checkArmyCamp
 	;CheckExistentArmy("Spells") ; routine on checkArmyCamp
-	$aCurTotalSpell = GetCurTotalSpells() ; needed value for spell donate
 
 	If $g_bRunState = False Then Return
 
-	If ($IsFullArmywithHeroesAndSpells = True) Or ($CurCamp = 0 And $g_bFirstStart) Then
+	If ($g_bIsFullArmywithHeroesAndSpells = True) Or ($g_CurrentCampUtilization = 0 And $g_bFirstStart) Then
 
-		If $IsFullArmywithHeroesAndSpells Then Setlog(" - Your Army is Full, let's make troops before Attack!", $COLOR_BLUE)
-		If ($CurCamp = 0 And $g_bFirstStart) Then
+		If $g_bIsFullArmywithHeroesAndSpells Then Setlog(" - Your Army is Full, let's make troops before Attack!", $COLOR_BLUE)
+		If ($g_CurrentCampUtilization = 0 And $g_bFirstStart) Then
 			Setlog(" - Your Army is Empty, let's make troops before Attack!", $COLOR_ACTION1)
 			Setlog(" - Go to TrainRevamp Tab and select your Quick Army position!", $COLOR_ACTION1)
 		EndIf
@@ -69,7 +72,7 @@ Func TrainRevamp()
 		If _Sleep(700) Then Return
 	Else
 
-		If $bDonationEnabled And $g_bChkDonate Then MakingDonatedTroops()
+		If $g_bDonationEnabled And $g_bChkDonate Then MakingDonatedTroops()
 
 		CheckIsFullQueuedAndNotFullArmy()
 		If $g_bRunState = False Then Return
@@ -84,7 +87,7 @@ Func TrainRevamp()
 
 	EndGainCost("Train")
 
-	checkAttackDisable($iTaBChkIdle) ; Check for Take-A-Break after opening train page
+	checkAttackDisable($g_iTaBChkIdle) ; Check for Take-A-Break after opening train page
 
 EndFunc   ;==>TrainRevamp
 
@@ -138,12 +141,12 @@ Func TrainRevampOldStyle()
 	If $g_iDebugSetlogTrain = 1 Then Setlog(" - Initial Custom train Function")
 
 	;If $bDonateTrain = -1 Then SetbDonateTrain()
-	If $bActiveDonate = -1 Then PrepareDonateCC()
+	If $g_iActiveDonate = -1 Then PrepareDonateCC()
 
 	CheckArmySpellCastel()
 
 	;Test for Train/Donate Only and Fullarmy
-	If ($g_iCommandStop = 3 Or $g_iCommandStop = 0) And $fullarmy Then
+	If ($g_iCommandStop = 3 Or $g_iCommandStop = 0) And $g_bFullArmy Then
 		SetLog("You are in halt attack mode and your Army is prepared!", $COLOR_DEBUG) ;Debug
 		If $g_bFirstStart Then $g_bFirstStart = False
 		Return
@@ -159,7 +162,7 @@ Func TrainRevampOldStyle()
 		CheckArmySpellCastel()
 
 		;Test for Train/Donate Only and Fullarmy
-		If ($g_iCommandStop = 3 Or $g_iCommandStop = 0) And $fullarmy Then
+		If ($g_iCommandStop = 3 Or $g_iCommandStop = 0) And $g_bFullArmy Then
 			SetLog("You are in halt attack mode and your Army is prepared!", $COLOR_DEBUG) ;Debug
 			If $g_bFirstStart Then $g_bFirstStart = False
 			Return
@@ -171,7 +174,7 @@ Func TrainRevampOldStyle()
 
 	If $rRemoveExtraTroops = 2 Then
 		$rWhatToTrain = WhatToTrain(False, False)
-		If Not IsArmyWindow(False, $TrainTroopsTAB) Then OpenTrainTabNumber($TrainTroopsTAB, "TrainRevampOldStyle()")
+		If Not ISArmyWindow(False, $TrainTroopsTAB) Then OpenTrainTabNumber($TrainTroopsTAB, "TrainRevampOldStyle()")
 		TrainUsingWhatToTrain($rWhatToTrain)
 	EndIf
 
@@ -179,15 +182,15 @@ Func TrainRevampOldStyle()
 
 	If IsQueueEmpty($TrainTroopsTAB) Then
 		If $g_bRunState = False Then Return
-		If Not IsArmyWindow(False, $ArmyTAB) Then OpenTrainTabNumber($ArmyTAB, "TrainRevampOldStyle()")
+		If Not ISArmyWindow(False, $ArmyTAB) Then OpenTrainTabNumber($ArmyTAB, "TrainRevampOldStyle()")
 		$rWhatToTrain = WhatToTrain(False, False)
-		If Not IsArmyWindow(False, $TrainTroopsTAB) Then OpenTrainTabNumber($TrainTroopsTAB, "TrainRevampOldStyle()")
+		If Not ISArmyWindow(False, $TrainTroopsTAB) Then OpenTrainTabNumber($TrainTroopsTAB, "TrainRevampOldStyle()")
 		TrainUsingWhatToTrain($rWhatToTrain)
 	Else
 		If $g_bRunState = False Then Return
-		If Not IsArmyWindow(False, $ArmyTAB) Then OpenTrainTabNumber($ArmyTAB, "TrainRevampOldStyle()")
+		If Not ISArmyWindow(False, $ArmyTAB) Then OpenTrainTabNumber($ArmyTAB, "TrainRevampOldStyle()")
 		; Local $TimeRemainTroops =  getRemainTrainTimer(756, 169) ;Get time via OCR.
-		; $aTimeTrain[0]  = ConvertOCRTime("Troops", $TimeRemainTroops)  ; update global array
+		; $g_aiTimeTrain[0]  = ConvertOCRTime("Troops", $TimeRemainTroops)  ; update global array
 	EndIf
 
 	$rWhatToTrain = WhatToTrain(False, False)
@@ -195,9 +198,9 @@ Func TrainRevampOldStyle()
 		If IsQueueEmpty($BrewSpellsTAB) Then
 			TrainUsingWhatToTrain($rWhatToTrain, True)
 		Else
-			If Not IsArmyWindow(False, $ArmyTAB) Then OpenTrainTabNumber($ArmyTAB, "TrainRevampOldStyle()")
+			If Not ISArmyWindow(False, $ArmyTAB) Then OpenTrainTabNumber($ArmyTAB, "TrainRevampOldStyle()")
 			; Local $TimeRemainSpells = getRemainTrainTimer(495, 315) ;Get time via OCR.
-			; $aTimeTrain[1] = ConvertOCRTime("Spells", $TimeRemainSpells)  ; update global array
+			; $g_aiTimeTrain[1] = ConvertOCRTime("Spells", $TimeRemainSpells)  ; update global array
 		EndIf
 	EndIf
 
@@ -208,7 +211,7 @@ Func TrainRevampOldStyle()
 
 	EndGainCost("Train")
 
-	checkAttackDisable($iTaBChkIdle) ; Check for Take-A-Break after opening train page
+	checkAttackDisable($g_iTaBChkIdle) ; Check for Take-A-Break after opening train page
 EndFunc   ;==>TrainRevampOldStyle
 
 Func CheckArmySpellCastel()
@@ -234,10 +237,10 @@ Func CheckArmySpellCastel()
 	If $g_iDebugSetlogTrain = 1 Then Setlog(" - $scastle : " & $scastle)
 	If $g_iDebugSetlogTrain = 1 Then $g_iDebugOcr = 0
 
-	If $g_iDebugSetlogTrain = 1 Then Setlog(" - $CurCamp : " & $CurCamp)
-	If $g_iDebugSetlogTrain = 1 Then Setlog(" - $TotalCamp : " & $TotalCamp)
+	If $g_iDebugSetlogTrain = 1 Then Setlog(" - $g_CurrentCampUtilization : " & $g_CurrentCampUtilization)
+	If $g_iDebugSetlogTrain = 1 Then Setlog(" - $g_iTotalCampSpace : " & $g_iTotalCampSpace)
 
-	$bFullArmySpells = False
+	$g_bFullArmySpells = False
 	; Local Variable to check the occupied space by the Spells to Brew ... can be different of the Spells Factory Capacity ( $g_iTotalSpellValue )
 	Local $totalCapacitySpellsToBrew = 0
 	For $i = 0 To $eSpellCount - 1
@@ -246,18 +249,18 @@ Func CheckArmySpellCastel()
 
 	If UBound($aGetSpellsSize) = 2 Then
 		If $aGetSpellsSize[0] = $aGetSpellsSize[1] Or $aGetSpellsSize[0] >= $g_iTotalSpellValue Or $aGetSpellsSize[0] >= $totalCapacitySpellsToBrew Then
-			$bFullArmySpells = True
+			$g_bFullArmySpells = True
 		EndIf
 	Else
-		If $iTownHallLevel > 4 And $g_iTotalSpellValue > 0 Then
+		If $g_iTownHallLevel > 4 And $g_iTotalSpellValue > 0 Then
 			SetLog("Error reading spells size!", $COLOR_RED)
 			Return
 		Else
-			$bFullArmySpells = True
+			$g_bFullArmySpells = True
 		EndIf
 	EndIf
 
-	$checkSpells = checkspells()
+	$g_bCheckSpells = checkspells()
 	If $g_bRunState = False Then Return
 	$fullcastlespells = IsFullCastleSpells()
 	If $g_bRunState = False Then Return
@@ -265,43 +268,50 @@ Func CheckArmySpellCastel()
 
 	If UBound($aGetCastleSize) <> 2 Then
 		SetLog("Error reading Castle size")
-		Return
+	Else
+		;Setlog(" - Army Camp: " & $g_CurrentCampUtilization & "/" & $g_iTotalCampSpace, $COLOR_GREEN) ; coc-ms
+		;If $aGetSpellsSize[0] <> "" And $aGetSpellsSize[1] <> "" Then Setlog(" - Spells: " & $aGetSpellsSize[0] & "/" & $aGetSpellsSize[1], $COLOR_GREEN) ; coc-ms
+		If $aGetCastleSize[0] <> "" And $aGetCastleSize[1] <> "" Then Setlog("Total Clan Castle: " & $aGetCastleSize[0] & "/" & $aGetCastleSize[1]) ; coc-ms
 	EndIf
 
-	;Setlog(" - Army Camp: " & $CurCamp & "/" & $TotalCamp, $COLOR_GREEN) ; coc-ms
-	;If $aGetSpellsSize[0] <> "" And $aGetSpellsSize[1] <> "" Then Setlog(" - Spells: " & $aGetSpellsSize[0] & "/" & $aGetSpellsSize[1], $COLOR_GREEN) ; coc-ms
-	If $aGetCastleSize[0] <> "" And $aGetCastleSize[1] <> "" Then Setlog("Total Clan Castle: " & $aGetCastleSize[0] & "/" & $aGetCastleSize[1]) ; coc-ms
-
-	; If Drop Trophy with Heroes is checked and a Hero is Available or under the trophies range, then set $bFullArmyHero to True
-	If IsWaitforHeroesActive() = False And $iChkTrophyHeroes = 0 Then $bFullArmyHero = True
-	If IsWaitforHeroesActive() = False And $iChkTrophyHeroes = 1 And $bFullArmyHero = False Then
-		If $iHeroAvailable > 0 Or Number($iTrophyCurrent) <= Number($iTxtMaxTrophy) Then
-			$bFullArmyHero = True
+	; If Drop Trophy with Heroes is checked and a Hero is Available or under the trophies range, then set $g_bFullArmyHero to True
+	If IsWaitforHeroesActive() = False And $g_bDropTrophyUseHeroes = True Then $g_bFullArmyHero = True
+	If IsWaitforHeroesActive() = False And $g_bDropTrophyUseHeroes = False And $g_bFullArmyHero = False Then
+		If $g_iHeroAvailable > 0 Or Number($g_aiCurrentLoot[$eLootTrophy]) <= Number($g_iDropTrophyMax) Then
+			$g_bFullArmyHero = True
 		Else
 			Setlog("Waiting for Heroes to drop trophies!", $COLOR_ACTION)
 		EndIf
 	EndIf
 
 	If (IsSearchModeActive($DB) And checkCollectors(True, False)) Or IsSearchModeActive($LB) Or IsSearchModeActive($TS) Then
-		If $fullarmy And $checkSpells And $bFullArmyHero And $fullcastlespells And $fullcastletroops Then
-			$IsFullArmywithHeroesAndSpells = True
+		If $g_bFullArmy And $g_bCheckSpells And $g_bFullArmyHero And $fullcastlespells And $fullcastletroops Then
+			$g_bIsFullArmywithHeroesAndSpells = True
 			If $g_bFirstStart Then $g_bFirstStart = False
 		Else
-			$IsFullArmywithHeroesAndSpells = False
+			If $g_iDebugSetlog = 1 Then
+				SetLog(" $g_bFullArmy: " & String($g_bFullArmy), $COLOR_DEBUG)
+				SetLog(" $g_bCheckSpells: " & String($g_bCheckSpells), $COLOR_DEBUG)
+				SetLog(" $g_bFullArmyHero: " & String($g_bFullArmyHero), $COLOR_DEBUG)
+				SetLog(" $fullcastlespells: " & String($fullcastlespells), $COLOR_DEBUG)
+				SetLog(" $fullcastletroops: " & String($fullcastletroops), $COLOR_DEBUG)
+			EndIf
+			$g_bIsFullArmywithHeroesAndSpells = False
 		EndIf
 	Else
-		$IsFullArmywithHeroesAndSpells = False
+		If $g_iDebugSetlog = 1 Then SetLog(" Army not ready: IsSearchModeActive($DB)=" & IsSearchModeActive($DB) & ", checkCollectors(True, False)=" & checkCollectors(True, False) & ", IsSearchModeActive($LB)=" & IsSearchModeActive($LB) & ", IsSearchModeActive($TS)=" & IsSearchModeActive($TS), $COLOR_DEBUG)
+		$g_bIsFullArmywithHeroesAndSpells = False
 	EndIf
 
 	Local $text = ""
-	If $fullarmy = False Then $text &= " Troops,"
-	If $checkSpells = False Then $text &= " Spells,"
-	If $bFullArmyHero = False Then $text &= " Heroes,"
-	If $fullcastlespells = False Then $text &= " CC Spells,"
-	If $fullcastletroops = False Then $text &= " CC Troops,"
+	If Not $g_bFullArmy Then $text &= " Troops,"
+	If Not $g_bCheckSpells Then $text &= " Spells,"
+	If Not $g_bFullArmyHero Then $text &= " Heroes,"
+	If Not $fullcastlespells Then $text &= " CC Spells,"
+	If Not $fullcastletroops Then $text &= " CC Troops,"
 	If StringRight($text, 1) = "," Then $text = StringTrimRight($text, 1) ; Remove last "," as it is not needed
 
-	If $IsFullArmywithHeroesAndSpells = True Then
+	If $g_bIsFullArmywithHeroesAndSpells = True Then
 		If (($g_bNotifyPBEnable = True Or $g_bNotifyTGEnable = True) And $g_bNotifyAlertCampFull = True) Then PushMsg("CampFull")
 		Setlog("Chief, is your Army ready for battle? Yes, it is!", $COLOR_GREEN)
 	Else
@@ -310,12 +320,8 @@ Func CheckArmySpellCastel()
 	EndIf
 
 	If $g_iDebugSetlog = 1 Then
-		SetLog(" $fullarmy: " & String($fullarmy), $COLOR_DEBUG)
-		SetLog(" $bFullArmyHero: " & String($bFullArmyHero), $COLOR_DEBUG)
-		SetLog(" $fullcastlespells: " & String($fullcastlespells), $COLOR_DEBUG)
-		SetLog(" $fullcastletroops: " & String($fullcastletroops), $COLOR_DEBUG)
-		SetLog(" $IsFullArmywithHeroesAndSpells: " & String($IsFullArmywithHeroesAndSpells), $COLOR_DEBUG)
-		SetLog(" $iTownHallLevel: " & Number($iTownHallLevel), $COLOR_DEBUG)
+		SetLog(" $g_bIsFullArmywithHeroesAndSpells: " & String($g_bIsFullArmywithHeroesAndSpells), $COLOR_DEBUG)
+		SetLog(" $g_iTownHallLevel: " & Number($g_iTownHallLevel), $COLOR_DEBUG)
 	EndIf
 
 EndFunc   ;==>CheckArmySpellCastel
@@ -326,26 +332,26 @@ Func IsFullArmy($log = False) ;Go in Troop Tab
 
 	Local Const $rColorCheck = _ColorCheck(_GetPixelColor(28, 176, True), Hex(0xFFFFFF, 6), 20) And _ColorCheck(_GetPixelColor(24, 168, True), Hex(0x92C232, 6), 20)
 
-	If $rColorCheck = True Then $fullarmy = True
+	If $rColorCheck = True Then $g_bFullArmy = True
 
 	Local $sArmyCamp = getArmyCampCap(110, 166) ; OCR read army trained and total
 	Local $aGetArmySize = StringSplit($sArmyCamp, "#", $STR_NOCOUNT)
 	If UBound($aGetArmySize) >= 2 Then
 		If $log Then SetLog("Troops: " & $aGetArmySize[0] & "/" & $aGetArmySize[1], $COLOR_GREEN)
 		;Test for Full Army
-		$fullarmy = False
-		$CurCamp = 0
+		$g_bFullArmy = False
+		$g_CurrentCampUtilization = 0
 		If $g_bTotalCampForced = False Then
-			$CurCamp = $aGetArmySize[0]
-			$TotalCamp = $aGetArmySize[1]
+			$g_CurrentCampUtilization = $aGetArmySize[0]
+			$g_iTotalCampSpace = $aGetArmySize[1]
 		Else
-			$CurCamp = $aGetArmySize[0]
-			$TotalCamp = Number($g_iTotalCampForcedValue)
+			$g_CurrentCampUtilization = $aGetArmySize[0]
+			$g_iTotalCampSpace = Number($g_iTotalCampForcedValue)
 		EndIf
-		Local $thePercent = Number(($CurCamp / $TotalCamp) * 100, 1)
-		If $thePercent >= $g_iTrainArmyFullTroopPct Then $fullarmy = True
+		Local $thePercent = Number(($g_CurrentCampUtilization / $g_iTotalCampSpace) * 100, 1)
+		If $thePercent >= $g_iTrainArmyFullTroopPct Then $g_bFullArmy = True
 	EndIf
-	Return $fullarmy
+	Return $g_bFullArmy
 EndFunc   ;==>IsFullArmy
 
 Func IsFullSpells($log = False) ;Go in Spell Tab
@@ -355,11 +361,11 @@ Func IsFullSpells($log = False) ;Go in Spell Tab
 	Local $sSpells = getArmyCampCap(99, 313) ; OCR read Spells trained and total
 	Local $aGetSpellsSize = StringSplit($sSpells, "#", $STR_NOCOUNT)
 
-	$bFullArmySpells = False
+	$g_bFullArmySpells = False
 	If UBound($aGetSpellsSize) = 2 Then
 		If $log Then SetLog("Spells: " & $aGetSpellsSize[0] & "/" & $aGetSpellsSize[1], $COLOR_GREEN)
 		If $aGetSpellsSize[0] = $aGetSpellsSize[1] Or $aGetSpellsSize[0] >= $g_iTotalSpellValue Or $aGetSpellsSize[0] >= TotalSpellsToBrewInGUI() Then
-			$bFullArmySpells = True
+			$g_bFullArmySpells = True
 			Return True
 		EndIf
 	Else
@@ -368,23 +374,23 @@ Func IsFullSpells($log = False) ;Go in Spell Tab
 	EndIf
 
 	If $aGetSpellsSize[0] = $g_iTotalSpellValue Then
-		$bFullArmySpells = True
+		$g_bFullArmySpells = True
 		Return True
 	EndIf
 
-	Return $bFullArmySpells
+	Return $g_bFullArmySpells
 EndFunc   ;==>IsFullSpells
 
 Func checkspells()
 	Local $ToReturn = False
 	If $g_bRunState = False Then Return
 
-	If ($g_abSearchSpellsWaitEnable[$DB] = False And $g_abSearchSpellsWaitEnable[$LB] = False) Or ($bFullArmySpells And ($g_abSearchSpellsWaitEnable[$DB] Or $g_abSearchSpellsWaitEnable[$LB])) Then
+	If ($g_abSearchSpellsWaitEnable[$DB] = False And $g_abSearchSpellsWaitEnable[$LB] = False) Or ($g_bFullArmySpells And ($g_abSearchSpellsWaitEnable[$DB] Or $g_abSearchSpellsWaitEnable[$LB])) Then
 		$ToReturn = True
 		Return $ToReturn
 	EndIf
 
-	$ToReturn = (IIf($g_abAttackTypeEnable[$DB], IIf($g_abSearchSpellsWaitEnable[$DB], $bFullArmySpells, True), 1) And IIf($g_abAttackTypeEnable[$LB], IIf($g_abSearchSpellsWaitEnable[$LB], $bFullArmySpells, True), 1))
+	$ToReturn = (IIf($g_abAttackTypeEnable[$DB], IIf($g_abSearchSpellsWaitEnable[$DB], $g_bFullArmySpells, True), 1) And IIf($g_abAttackTypeEnable[$LB], IIf($g_abSearchSpellsWaitEnable[$LB], $g_bFullArmySpells, True), 1))
 
 	Return $ToReturn
 EndFunc   ;==>checkspells
@@ -452,10 +458,10 @@ Func IsFullCastleSpells($returnOnly = False)
 
 		; Debug
 		If $iMaxCCSpell > 1 Then
-			If $g_iDebugSetlogTrain Then Setlog(" » Slot 1 to remove: " & $aShouldRemove[0])
-			If $g_iDebugSetlogTrain Then Setlog(" » Slot 2 to remove: " & $aShouldRemove[1])
+			If $g_iDebugSetlogTrain Then Setlog(" ?? Slot 1 to remove: " & $aShouldRemove[0])
+			If $g_iDebugSetlogTrain Then Setlog(" ?? Slot 2 to remove: " & $aShouldRemove[1])
 		Else
-			If $g_iDebugSetlogTrain Then Setlog(" » Slot 1 to remove: " & $aShouldRemove[0])
+			If $g_iDebugSetlogTrain Then Setlog(" ?? Slot 1 to remove: " & $aShouldRemove[0])
 		EndIf
 
 		If $aShouldRemove[0] > 0 Or $aShouldRemove[1] > 0 Then
@@ -463,11 +469,11 @@ Func IsFullCastleSpells($returnOnly = False)
 			RemoveCastleSpell($aShouldRemove)
 			If _Sleep(1000) Then Return
 			; Check the Request Clan troops & Spells buttom
-			$canRequestCC = _ColorCheck(_GetPixelColor($aRequestTroopsAO[0], $aRequestTroopsAO[1], True), Hex($aRequestTroopsAO[2], 6), $aRequestTroopsAO[5])
+			$g_bCanRequestCC = _ColorCheck(_GetPixelColor($aRequestTroopsAO[0], $aRequestTroopsAO[1], True), Hex($aRequestTroopsAO[2], 6), $aRequestTroopsAO[5])
 			; Debug
-			If $g_iDebugSetlogTrain Then Setlog(" » Clans Castle button available? " & $canRequestCC)
-			; Let´s request Troops & Spells
-			If $canRequestCC = True Then
+			If $g_iDebugSetlogTrain Then Setlog(" ?? Clans Castle button available? " & $g_bCanRequestCC)
+			; Let??s request Troops & Spells
+			If $g_bCanRequestCC = True Then
 				$rColCheckFullCCTroops = _ColorCheck(_GetPixelColor(24, 470, True), Hex(0x93C230, 6), 30)
 				If $rColCheckFullCCTroops = True Then SetLog("Clan Castle Spell is empty, Requesting for...")
 				If $returnOnly = False Then
@@ -480,8 +486,8 @@ Func IsFullCastleSpells($returnOnly = False)
 			$ToReturn = False
 		EndIf
 	Else
-		$canRequestCC = _ColorCheck(_GetPixelColor($aRequestTroopsAO[0], $aRequestTroopsAO[1], True), Hex($aRequestTroopsAO[2], 6), $aRequestTroopsAO[5])
-		If $canRequestCC = True Then
+		$g_bCanRequestCC = _ColorCheck(_GetPixelColor($aRequestTroopsAO[0], $aRequestTroopsAO[1], True), Hex($aRequestTroopsAO[2], 6), $aRequestTroopsAO[5])
+		If $g_bCanRequestCC = True Then
 			$rColCheckFullCCTroops = _ColorCheck(_GetPixelColor(24, 470, True), Hex(0x93C230, 6), 30)
 			If $rColCheckFullCCTroops = True Then SetLog("Clan Castle Spell is empty, Requesting for...")
 			If $returnOnly = False Then
@@ -639,7 +645,7 @@ Func CompareCCSpellWithGUI($CCSpell1, $CCSpell2, $CastleCapacity)
 			If ($sCCSpell = $CCSpell1[0][0] Or $sCCSpell = "Any") And $CCSpell1[0][3] = 1 Then
 				; Is not to remove [0,0] Slot 1
 				$aShouldRemove[0] = 0
-			ElseIf ($sCCSpell = $CCSpell1[0][0] Or $sCCSpell = "Any") And $CCSpell1[0][3] = 2 And ($CCSpell1[0][0] <> $CCSpell2[0][0] or $CCSpell2[0][0] <> "Any") then
+			ElseIf ($sCCSpell = $CCSpell1[0][0] Or $sCCSpell = "Any") And $CCSpell1[0][3] = 2 And ($CCSpell1[0][0] <> $CCSpell2[0][0] Or $CCSpell2[0][0] <> "Any") Then
 				; Spell is the correct BUT exist 2 and doesn't match with Slot 2
 				; Remove one Spell from Slot 1
 				$aShouldRemove[0] = 1
@@ -707,7 +713,7 @@ Func GetCurCCSpell($SpellNr)
 	Local $res = SearchArmy($directory, $x1, $y1, $x2, $y2, "CCSpells", True)
 	If ValidateSearchArmyResult($res) Then
 		For $i = 0 To UBound($res) - 1
-			Setlog(" - " & $g_asSpellNames[TroopIndexLookup($res[$i][0]) - $eLSpell], $COLOR_GREEN)
+			Setlog(" - " & $g_asSpellNames[TroopIndexLookup($res[$i][0], "GetCurCCSpell") - $eLSpell], $COLOR_GREEN)
 		Next
 		Return $res
 	EndIf
@@ -743,7 +749,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 	EndIf
 	; Loop through needed troops to Train
 	Select
-		Case $IsFullArmywithHeroesAndSpells = False
+		Case $g_bIsFullArmywithHeroesAndSpells = False
 			For $i = 0 To (UBound($rWTT) - 1)
 				If $g_bRunState = False Then Return
 				If $rWTT[$i][1] > 0 Then ; If Count to Train Was Higher Than ZERO
@@ -761,7 +767,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 							Return False
 						EndIf
 
-						Local $iTroopIndex = TroopIndexLookup($rWTT[$i][0])
+						Local $iTroopIndex = TroopIndexLookup($rWTT[$i][0], "TrainUsingWhatToTrain#1")
 
 						Local $sTroopName = ($rWTT[$i][1] > 1 ? $g_asTroopNamesPlural[$iTroopIndex] : $g_asTroopNames[$iTroopIndex])
 						If CheckValuesCost($rWTT[$i][0], $rWTT[$i][1]) Then
@@ -769,7 +775,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 							TrainIt($iTroopIndex, $rWTT[$i][1], $g_iTrainClickDelay)
 						Else
 							SetLog("No resources to Train " & $rWTT[$i][1] & "x " & $sTroopName, $COLOR_ORANGE)
-							$OutOfElixir = 1
+							$g_bOutOfElixir = True
 						EndIf
 					Else ; If Needed Space was Higher Than Left Space
 						Local $CountToTrain = 0
@@ -788,7 +794,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 							EndIf
 						EndIf
 
-						Local $iTroopIndex = TroopIndexLookup($rWTT[$i][0])
+						Local $iTroopIndex = TroopIndexLookup($rWTT[$i][0], "TrainUsingWhatToTrain#2")
 
 						Local $sTroopName = ($CountToTrain > 1 ? $g_asTroopNamesPlural[$iTroopIndex] : $g_asTroopNames[$iTroopIndex])
 						If CheckValuesCost($rWTT[$i][0], $CountToTrain) Then
@@ -796,12 +802,12 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 							TrainIt($iTroopIndex, $CountToTrain, $g_iTrainClickDelay)
 						Else
 							SetLog("No resources to Train " & $CountToTrain & "x " & $sTroopName, $COLOR_ORANGE)
-							$OutOfElixir = 1
+							$g_bOutOfElixir = True
 						EndIf
 					EndIf
 				EndIf
 			Next
-		Case $IsFullArmywithHeroesAndSpells = True
+		Case $g_bIsFullArmywithHeroesAndSpells = True
 			For $i = 0 To (UBound($rWTT) - 1)
 				If $g_bRunState = False Then Return
 				If $rWTT[$i][1] > 0 Then ; If Count to Train Was Higher Than ZERO
@@ -820,7 +826,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 							Return False
 						EndIf
 
-						Local $iTroopIndex = TroopIndexLookup($rWTT[$i][0])
+						Local $iTroopIndex = TroopIndexLookup($rWTT[$i][0], "TrainUsingWhatToTrain#3")
 
 						Local $sTroopName = ($rWTT[$i][1] > 1 ? $g_asTroopNamesPlural[$iTroopIndex] : $g_asTroopNames[$iTroopIndex])
 						If CheckValuesCost($rWTT[$i][0], $rWTT[$i][1]) Then
@@ -828,7 +834,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 							TrainIt($iTroopIndex, $rWTT[$i][1], $g_iTrainClickDelay)
 						Else
 							SetLog("No resources to Train " & $rWTT[$i][1] & "x " & $sTroopName, $COLOR_ORANGE)
-							$OutOfElixir = 1
+							$g_bOutOfElixir = True
 						EndIf
 					Else ; If Needed Space was Higher Than Left Space
 						Local $CountToTrain = 0
@@ -847,7 +853,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 							EndIf
 						EndIf
 
-						Local $iTroopIndex = TroopIndexLookup($rWTT[$i][0])
+						Local $iTroopIndex = TroopIndexLookup($rWTT[$i][0], "TrainUsingWhatToTrain#4")
 
 						Local $sTroopName = ($CountToTrain > 1 ? $g_asTroopNamesPlural[$iTroopIndex] : $g_asTroopNames[$iTroopIndex])
 						If CheckValuesCost($rWTT[$i][0], $CountToTrain) Then
@@ -855,7 +861,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 							TrainIt($iTroopIndex, $CountToTrain, $g_iTrainClickDelay)
 						Else
 							SetLog("No resources to Train " & $CountToTrain & "x " & $sTroopName, $COLOR_ORANGE)
-							$OutOfElixir = 1
+							$g_bOutOfElixir = True
 						EndIf
 					EndIf
 				EndIf
@@ -866,7 +872,7 @@ Func TrainUsingWhatToTrain($rWTT, $SpellsOnly = False)
 EndFunc   ;==>TrainUsingWhatToTrain
 
 Func BrewUsingWhatToTrain($Spell, $Quantity) ; it's job is a bit different with 'TrainUsingWhatToTrain' Function, It's being called by TrainusingWhatToTrain Func
-	Local $iSpellIndex = TroopIndexLookup($Spell)
+	Local $iSpellIndex = TroopIndexLookup($Spell, "BrewUsingWhatToTrain")
 	Local $sSpellName = $g_asSpellNames[$iSpellIndex - $eLSpell]
 
 	If $Quantity <= 0 Then Return False
@@ -881,7 +887,7 @@ Func BrewUsingWhatToTrain($Spell, $Quantity) ; it's job is a bit different with 
 
 	;If IsQueueEmpty(-1, True) = False Then Return True
 	Select
-		Case $IsFullArmywithHeroesAndSpells = False
+		Case $g_bIsFullArmywithHeroesAndSpells = False
 			If _ColorCheck(_GetPixelColor(230, 208, True), Hex(0x677CB5, 6), 30) = False Then RemoveExtraTroopsQueue()
 			Local $NeededSpace = CalcNeededSpace($Spell, $Quantity)
 			Local $LeftSpace = LeftSpace()
@@ -892,11 +898,11 @@ Func BrewUsingWhatToTrain($Spell, $Quantity) ; it's job is a bit different with 
 					TrainIt($iSpellIndex, $Quantity, $g_iTrainClickDelay)
 				Else
 					SetLog("No resources to Brew " & $Quantity & "x " & $sSpellName & ($Quantity > 1 ? " Spells" : " Spell"), $COLOR_ORANGE)
-					$OutOfElixir = 1
+					$g_bOutOfElixir = True
 				EndIf
 
 			EndIf
-		Case $IsFullArmywithHeroesAndSpells = True
+		Case $g_bIsFullArmywithHeroesAndSpells = True
 			Local $NeededSpace = CalcNeededSpace($Spell, $Quantity)
 			Local $LeftSpace = LeftSpace(True)
 			If $g_bRunState = False Then Return
@@ -907,7 +913,7 @@ Func BrewUsingWhatToTrain($Spell, $Quantity) ; it's job is a bit different with 
 					TrainIt($iSpellIndex, $Quantity, $g_iTrainClickDelay)
 				Else
 					SetLog("No resources to Brew " & $Quantity & "x " & $sSpellName & ($Quantity > 1 ? " Spells" : " Spell"), $COLOR_ORANGE)
-					$OutOfElixir = 1
+					$g_bOutOfElixir = True
 				EndIf
 			EndIf
 	EndSelect
@@ -998,7 +1004,7 @@ Func IsGUICheckedForSpell($Spell, $Mode)
 	Local $aVal = 0
 
 	If $g_bRunState = False Then Return
-	Switch TroopIndexLookup($Spell)
+	Switch TroopIndexLookup($Spell, "IsGUICheckedForSpell")
 		Case $eLSpell
 			$sSpell = "Light"
 			$aVal = $g_abAttackUseLightSpell
@@ -1059,7 +1065,7 @@ Func DragIfNeeded($Troop)
 			EndIf
 		Next
 	EndIf
-	SetLog("Failed to Verify Troop " & $g_asTroopNames[TroopIndexLookup($Troop)] & " Position or Failed to Drag Successfully", $COLOR_RED)
+	SetLog("Failed to Verify Troop " & $g_asTroopNames[TroopIndexLookup($Troop, "DragIfNeeded")] & " Position or Failed to Drag Successfully", $COLOR_RED)
 	Return False
 EndFunc   ;==>DragIfNeeded
 
@@ -1074,48 +1080,48 @@ Func DoWhatToTrainContainSpell($rWTT)
 EndFunc   ;==>DoWhatToTrainContainSpell
 
 Func IsElixirTroop($Troop)
- Local $iIndex = TroopIndexLookup($Troop)
- If $iIndex >= $eBarb And $iIndex <= $eMine Then Return True
- Return False
+	Local $iIndex = TroopIndexLookup($Troop, "IsElixirTroop")
+	If $iIndex >= $eBarb And $iIndex <= $eMine Then Return True
+	Return False
 EndFunc   ;==>IsElixirTroop
 
 Func IsDarkTroop($Troop)
- Local $iIndex = TroopIndexLookup($Troop)
- If $iIndex >= $eMini And $iIndex <= $eBowl Then Return True
- Return False
+	Local $iIndex = TroopIndexLookup($Troop, "IsDarkTroop")
+	If $iIndex >= $eMini And $iIndex <= $eBowl Then Return True
+	Return False
 EndFunc   ;==>IsDarkTroop
 
 Func IsElixirSpell($Spell)
-    Local $iIndex = TroopIndexLookup($Spell)
-    If $iIndex >= $eLSpell And $iIndex <= $eCSpell Then Return True
+	Local $iIndex = TroopIndexLookup($Spell, "IsElixirSpell")
+	If $iIndex >= $eLSpell And $iIndex <= $eCSpell Then Return True
 	Return False
 EndFunc   ;==>IsElixirSpell
 
 Func IsDarkSpell($Spell)
-    Local $iIndex = TroopIndexLookup($Spell)
-    If $iIndex >= $ePSpell And $iIndex <= $eSkSpell Then Return True
+	Local $iIndex = TroopIndexLookup($Spell, "IsDarkSpell")
+	If $iIndex >= $ePSpell And $iIndex <= $eSkSpell Then Return True
 	Return False
 EndFunc   ;==>IsDarkSpell
 
 Func IsSpellToBrew($sName)
-    Local $iIndex = TroopIndexLookup($sName)
-    If $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then Return True
-    Return False
+	Local $iIndex = TroopIndexLookup($sName, "IsSpellToBrew")
+	If $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then Return True
+	Return False
 EndFunc   ;==>IsSpellToBrew
 
 Func CalcNeededSpace($Troop, $Quantity)
 	If $g_bRunState = False Then Return -1
 
-    Local $iIndex = TroopIndexLookup($Troop)
+	Local $iIndex = TroopIndexLookup($Troop, "CalcNeededSpace")
 	If $iIndex = -1 Then Return -1
 
-    If $iIndex >= $eBarb And $iIndex <= $eBowl Then
-	   Return Number($g_aiTroopSpace[$iIndex] * $Quantity)
-    EndIf
+	If $iIndex >= $eBarb And $iIndex <= $eBowl Then
+		Return Number($g_aiTroopSpace[$iIndex] * $Quantity)
+	EndIf
 
 	If $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then
-	   Return Number($g_aiSpellSpace[$iIndex-$eLSpell] * $Quantity)
-    EndIf
+		Return Number($g_aiSpellSpace[$iIndex - $eLSpell] * $Quantity)
+	EndIf
 
 	Return -1
 EndFunc   ;==>CalcNeededSpace
@@ -1134,8 +1140,8 @@ Func RemoveExtraTroops($toRemove)
 		Return $ToReturn
 	EndIf
 
-	;If $IsFullArmywithHeroesAndSpells = True Or $fullarmy = True Or ($g_iCommandStop = 3 Or $g_iCommandStop = 0) = True And Not $bDonateTrain Then
-	If $IsFullArmywithHeroesAndSpells = True Or $fullarmy = True Or ($g_iCommandStop = 3 Or $g_iCommandStop = 0) = True And Not $bActiveDonate Then
+	;If $g_bIsFullArmywithHeroesAndSpells = True Or $g_bFullArmy = True Or ($g_iCommandStop = 3 Or $g_iCommandStop = 0) = True And Not $bDonateTrain Then
+	If $g_bIsFullArmywithHeroesAndSpells = True Or $g_bFullArmy = True Or ($g_iCommandStop = 3 Or $g_iCommandStop = 0) = True And Not $g_iActiveDonate Then
 		$ToReturn = 3
 		Return $ToReturn
 	EndIf
@@ -1270,23 +1276,25 @@ Func DeleteInvalidTroopInArray(ByRef $Array)
 			Local $2DBound = UBound($Array, 2)
 			Local $Counter = 0
 			For $i = 0 To (UBound($Array) - 1)
-				If TroopIndexLookup($Array[$i][0]) = -1 Or $Array[$i][0] = "" Then
-					$canKeep = False
-				Else
-					$canKeep = True
-				EndIf
-				If $canKeep = True Then
-					For $j = 0 To (UBound($Array, 2) - 1)
-						$Array[$Counter][$j] = $Array[$i][$j]
-					Next
-					$Counter += 1
+				If $Array[$i][0] Then
+					If TroopIndexLookup($Array[$i][0], "DeleteInvalidTroopInArray#1") = -1 Or $Array[$i][0] = "" Then
+						$canKeep = False
+					Else
+						$canKeep = True
+					EndIf
+					If $canKeep = True Then
+						For $j = 0 To (UBound($Array, 2) - 1)
+							$Array[$Counter][$j] = $Array[$i][$j]
+						Next
+						$Counter += 1
+					EndIf
 				EndIf
 			Next
 			ReDim $Array[$Counter][$2DBound]
 		Case Else
 			Local $Counter = 0
 			For $i = 0 To (UBound($Array) - 1)
-				If TroopIndexLookup($Array[$i]) = -1 Or $Array[$i] = "" Then
+				If TroopIndexLookup($Array[$i], "DeleteInvalidTroopInArray#2") = -1 Or $Array[$i] = "" Then
 					$Array[$Counter] = $Array[$i]
 					$Counter += 1
 				EndIf
@@ -1298,7 +1306,7 @@ EndFunc   ;==>DeleteInvalidTroopInArray
 Func RemoveExtraTroopsQueue() ; Will remove All Extra troops in queue If there's a Low Opacity red color on them
 	;Local Const $DecreaseBy = 70
 	;Local $x = 834
-	If $IsFullArmywithHeroesAndSpells = True Then Return True
+	If $g_bIsFullArmywithHeroesAndSpells = True Then Return True
 
 	Local Const $y = 259, $yRemoveBtn = 200, $xDecreaseRemoveBtn = 10
 	Local $rColCheck = ""
@@ -1350,11 +1358,11 @@ Func IsQueueEmpty($Tab = -1, $bSkipTabCheck = False, $removeExtraTroopsQueue = T
 
 	If $g_bRunState = False Then Return
 
-	If $Tab = $TrainTroopsTAB Or $Tab = -1  Then
-		$iArrowX = $aGreenArrowTrainTroops[0]  ; aada82  170 218 130    | y + 3 = 6ab320 106 179 32
+	If $Tab = $TrainTroopsTAB Or $Tab = -1 Then
+		$iArrowX = $aGreenArrowTrainTroops[0] ; aada82  170 218 130    | y + 3 = 6ab320 106 179 32
 		$iArrowY = $aGreenArrowTrainTroops[1]
 	ElseIf $Tab = $BrewSpellsTAB Then
-		$iArrowX = $aGreenArrowBrewSpells[0]   ; a0d077  160 208 119    | y + 3 = 74be2c 116 190 44
+		$iArrowX = $aGreenArrowBrewSpells[0] ; a0d077  160 208 119    | y + 3 = 74be2c 116 190 44
 		$iArrowY = $aGreenArrowBrewSpells[1]
 	EndIf
 
@@ -1369,7 +1377,7 @@ Func IsQueueEmpty($Tab = -1, $bSkipTabCheck = False, $removeExtraTroopsQueue = T
 		If ISArmyWindow(False, $Tab) = False Then OpenTrainTabNumber($Tab, "IsQueueEmpty()")
 	EndIf
 
-	If $IsFullArmywithHeroesAndSpells = False Then
+	If $g_bIsFullArmywithHeroesAndSpells = False Then
 		If $removeExtraTroopsQueue Then
 			If _ColorCheck(_GetPixelColor(230, 208, True), Hex(0x677CB5, 6), 30) = False Then RemoveExtraTroopsQueue()
 		EndIf
@@ -1419,7 +1427,7 @@ Func GetSlotNumber($Spells = False)
 				If $g_bRunState = False Then Return
 				If $g_aiCurrentTroops[$i] > 0 Then
 					For $j = 0 To (UBound($Orders) - 1)
-						If TroopIndexLookup($g_asTroopShortNames[$i]) = $Orders[$j] Then
+						If TroopIndexLookup($g_asTroopShortNames[$i], "GetSlotNumber#1") = $Orders[$j] Then
 							$allCurTroops[$j] = $g_asTroopShortNames[$i]
 						EndIf
 					Next
@@ -1441,7 +1449,7 @@ Func GetSlotNumber($Spells = False)
 				If $g_bRunState = False Then Return
 				If $g_aiCurrentSpells[$i] > 0 Then
 					For $j = 0 To (UBound($SpellsOrders) - 1)
-						If TroopIndexLookup($g_asSpellShortNames[$i]) = $SpellsOrders[$j] Then
+						If TroopIndexLookup($g_asSpellShortNames[$i], "GetSlotNumber#2") = $SpellsOrders[$j] Then
 							$allCurSpells[$j] = $g_asSpellShortNames[$i]
 						EndIf
 					Next
@@ -1458,7 +1466,7 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 	If ISArmyWindow(False, $ArmyTAB) = False Then OpenTrainTabNumber($ArmyTAB, "WhatToTrain()")
 	Local $ToReturn[1][2] = [["Arch", 0]]
 
-	If $IsFullArmywithHeroesAndSpells And $ReturnExtraTroopsOnly = False Then
+	If $g_bIsFullArmywithHeroesAndSpells And $ReturnExtraTroopsOnly = False Then
 		If $g_iCommandStop = 3 Or $g_iCommandStop = 0 Then
 			If $g_bFirstStart Then $g_bFirstStart = False
 			Return $ToReturn
@@ -1466,7 +1474,7 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 		Setlog(" - Your Army is Full, let's make troops before Attack!")
 		; Elixir Troops
 		For $ii = 0 To $eTroopCount - 1
-		    Local $troopIndex = $g_aiTrainOrder[$ii]
+			Local $troopIndex = $g_aiTrainOrder[$ii]
 			;SetDebugLog($ii & ": " & $troopIndex & " " & $g_aiCurrentTroops[$troopIndex] & " " & $g_asTroopShortNames[$troopIndex] & " " & $g_aiArmyCompTroops[$troopIndex])
 			If $g_aiArmyCompTroops[$troopIndex] > 0 Then
 				$ToReturn[UBound($ToReturn) - 1][0] = $g_asTroopShortNames[$troopIndex]
@@ -1509,8 +1517,8 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 		Case False
 			; Check Elixir Troops needed quantity to Train
 			For $ii = 0 To $eTroopCount - 1
-			    Local $troopIndex = $g_aiTrainOrder[$ii]
-			    ;SetDebugLog($ii & ": " & $troopIndex & " " & $g_aiCurrentTroops[$troopIndex] & " " & $g_asTroopShortNames[$troopIndex] & " " & $g_aiArmyCompTroops[$troopIndex])
+				Local $troopIndex = $g_aiTrainOrder[$ii]
+				;SetDebugLog($ii & ": " & $troopIndex & " " & $g_aiCurrentTroops[$troopIndex] & " " & $g_asTroopShortNames[$troopIndex] & " " & $g_aiArmyCompTroops[$troopIndex])
 				If $g_bRunState = False Then Return
 				If $g_aiArmyCompTroops[$troopIndex] > 0 Then
 					$ToReturn[UBound($ToReturn) - 1][0] = $g_asTroopShortNames[$troopIndex]
@@ -1532,9 +1540,9 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 		Case Else
 			; Check Elixir Troops Extra Quantity
 			For $ii = 0 To $eTroopCount - 1
-			    Local $troopIndex = $g_aiTrainOrder[$ii]
+				Local $troopIndex = $g_aiTrainOrder[$ii]
 				If $g_bRunState = False Then Return
-			    ;SetDebugLog($ii & ": " & $troopIndex & " " & $g_aiCurrentTroops[$troopIndex] & " " & $g_asTroopShortNames[$troopIndex] & " " & $g_aiArmyCompTroops[$troopIndex])
+				;SetDebugLog($ii & ": " & $troopIndex & " " & $g_aiCurrentTroops[$troopIndex] & " " & $g_asTroopShortNames[$troopIndex] & " " & $g_aiArmyCompTroops[$troopIndex])
 				If $g_aiCurrentTroops[$troopIndex] > 0 Then
 					If $g_aiArmyCompTroops[$troopIndex] - $g_aiCurrentTroops[$troopIndex] < 0 Then
 						$ToReturn[UBound($ToReturn) - 1][0] = $g_asTroopShortNames[$troopIndex]
@@ -1566,7 +1574,7 @@ Func TestTroopsCoords()
 	$g_bRunState = True
 	For $i = 0 To $eTroopCount - 1
 		DragIfNeeded($g_asTroopShortNames[$i])
-		TrainIt(TroopIndexLookup($g_asTroopShortNames[$i]), $iCount, $g_iTrainClickDelay)
+		TrainIt(TroopIndexLookup($g_asTroopShortNames[$i], "TestTroopsCoords"), $iCount, $g_iTrainClickDelay)
 	Next
 	#CS
 		TrainIt($eDrag, $iCount, 300)
@@ -1629,7 +1637,7 @@ Func OpenArmyWindow()
 
 	ClickP($aAway, 2, 0, "#0346") ;Click Away
 	If $g_bRunState = False Then Return
-	If _Sleep($iDelayRunBot3) Then Return ; wait for window to open
+	If _Sleep($DELAYRUNBOT3) Then Return ; wait for window to open
 	If IsMainPage() = False Then ; check for main page, avoid random troop drop
 		SetLog("Can not open Army Overview window", $COLOR_RED)
 		SetError(1)
@@ -1637,25 +1645,25 @@ Func OpenArmyWindow()
 	EndIf
 
 	If WaitforPixel(31, 515 + $g_iBottomOffsetY, 33, 517 + $g_iBottomOffsetY, Hex(0xF8F0E0, 6), 10, 20) Then
-		If _Sleep($iDelayTrain4) Then Return ; wait before click
+		If _Sleep($DELAYTRAIN4) Then Return ; wait before click
 		If $g_iDebugSetlogTrain = 1 Then SetLog("Click $aArmyTrainButton", $COLOR_GREEN)
-		If $iUseRandomClick = 0 Then
+		If $g_bUseRandomClick = False Then
 			Click($aArmyTrainButton[0], $aArmyTrainButton[1], 1, 0, "#0293") ; Button Army Overview
 		Else
 			ClickR($aArmyTrainButtonRND, $aArmyTrainButton[0], $aArmyTrainButton[1], 1, 0)
 		EndIf
 	EndIf
 
-	If _Sleep($iDelayTrain4) Then Return ; wait for window to open
+	If _Sleep($DELAYTRAIN4) Then Return ; wait for window to open
 
 	Local $x = 0
 	While ISArmyWindow(False, $ArmyTAB) = False
-		If _sleep($iDelayTrain4) Then Return
+		If _sleep($DELAYTRAIN4) Then Return
 		$x += 1
 		If $x = 5 And IsMainPage() Then
-			If _Sleep($iDelayTrain4) Then Return ; wait before click
+			If _Sleep($DELAYTRAIN4) Then Return ; wait before click
 			If $g_iDebugSetlogTrain = 1 Then SetLog("Click $aArmyTrainButton", $COLOR_GREEN)
-			If $iUseRandomClick = 0 Then
+			If $g_bUseRandomClick = False Then
 				Click($aArmyTrainButton[0], $aArmyTrainButton[1], 1, 0, "#0293") ; Button Army Overview
 			Else
 				ClickR($aArmyTrainButtonRND, $aArmyTrainButton[0], $aArmyTrainButton[1], 1, 0)
@@ -1685,7 +1693,7 @@ Func ISArmyWindow($writelogs = False, $TabNumber = 0)
 	While $i < 30
 		If $g_bRunState = False Then Return
 		If _CheckPixel($_aIsTrainPgChk1, True) And _CheckPixel($_aIsTrainPgChk2, True) And _CheckPixel($CheckIT, True) Then ExitLoop
-		If _Sleep($iDelayIsTrainPage1) Then ExitLoop
+		If _Sleep($DELAYISTRAINPAGE1) Then ExitLoop
 		$i += 1
 	WEnd
 
@@ -1707,7 +1715,7 @@ Func CheckExistentArmy($txt = "", $showlog = True)
 		If _Sleep(1500) Then Return
 	EndIf
 
-	;$iHeroAvailable = $eHeroNone ; Reset hero available data
+	;$g_iHeroAvailable = $eHeroNone ; Reset hero available data
 
 	If $txt = "Troops" Then
 		ResetVariables("Troops")
@@ -1737,7 +1745,7 @@ Func CheckExistentArmy($txt = "", $showlog = True)
 					$result[$i][0] = StringTrimRight($result[$i][0], 6)
 					;[&i][0] = Troops name | [&i][1] = X coordinate | [&i][2] = Y coordinate | [&i][3] = Quantities
 					If $txt = "Troops" Then
-						Local $iTroopIndex = TroopIndexLookup($result[$i][0])
+						Local $iTroopIndex = TroopIndexLookup($result[$i][0], "CheckExistentArmy#1")
 
 						If $showlog = True Then
 							Local $sTroopName = ($Plural ? $g_asTroopNamesPlural[$iTroopIndex] : $g_asTroopNames[$iTroopIndex])
@@ -1751,7 +1759,7 @@ Func CheckExistentArmy($txt = "", $showlog = True)
 						If $result[$i][3] = 0 Then
 							If $showlog = True Then SetLog(" - No Spells are Brewed", $COLOR_BLUE)
 						Else
-							Local $iSpellIndex = TroopIndexLookup($result[$i][0])
+							Local $iSpellIndex = TroopIndexLookup($result[$i][0], "CheckExistentArmy#2")
 
 							If $showlog = True Then Setlog(" - " & $result[$i][3] & " " & $g_asSpellNames[$iSpellIndex - $eLSpell] & ($Plural ? " Spells" : " Spell") & " Brewed", $COLOR_BLUE)
 							$g_aiCurrentSpells[$iSpellIndex - $eLSpell] += $result[$i][3]
@@ -1759,16 +1767,16 @@ Func CheckExistentArmy($txt = "", $showlog = True)
 					EndIf
 
 					If $txt = "Heroes" Then
-						Local $iHeroIndex = TroopIndexLookup($result[$i][0])
+						Local $iHeroIndex = TroopIndexLookup($result[$i][0], "CheckExistentArmy#3")
 						If ArmyHeroStatus($iHeroIndex) = "heal" Then Setlog("  " & $g_asHeroNames[$iHeroIndex - $eKing] & " Recovering, Remain of " & $result[$i][3], $COLOR_BLUE)
 					EndIf
 				Else
 					If $txt = "Heroes" Then
-						If $showlog = True Then Setlog(" - " & $g_asHeroNames[TroopIndexLookup($result[$i][0]) - $eKing] & " Recovered", $COLOR_GREEN)
+						If $showlog = True Then Setlog(" - " & $g_asHeroNames[TroopIndexLookup($result[$i][0], "CheckExistentArmy#4") - $eKing] & " Recovered", $COLOR_GREEN)
 
 					ElseIf $txt = "Troops" Then
 						;ResetDropTrophiesVariable()
-						Local $iTroopIndex = TroopIndexLookup($result[$i][0])
+						Local $iTroopIndex = TroopIndexLookup($result[$i][0], "CheckExistentArmy#5")
 
 						If $showlog = True Then
 							Local $sTroopName = ($Plural ? $g_asTroopNamesPlural[$iTroopIndex] : $g_asTroopNames[$iTroopIndex])
@@ -1782,7 +1790,7 @@ Func CheckExistentArmy($txt = "", $showlog = True)
 						If $result[$i][3] = 0 Then
 							If $showlog = True Then SetLog(" - No Spells are Brewed", $COLOR_GREEN)
 						Else
-							Local $iSpellIndex = TroopIndexLookup($result[$i][0])
+							Local $iSpellIndex = TroopIndexLookup($result[$i][0], "CheckExistentArmy#6")
 
 							If $showlog = True Then Setlog(" - " & $result[$i][3] & " " & $g_asSpellNames[$iSpellIndex - $eLSpell] & ($Plural ? " Spells" : " Spell") & " Brewed", $COLOR_GREEN)
 							$g_aiCurrentSpells[$iSpellIndex - $eLSpell] += $result[$i][3]
@@ -1792,50 +1800,45 @@ Func CheckExistentArmy($txt = "", $showlog = True)
 			EndIf
 		Next
 	EndIf
-
-	If $txt = "Spells" Then
-		$aCurTotalSpell = GetCurTotalSpells()
-	EndIf
-
 EndFunc   ;==>CheckExistentArmy
 
 Func CanBeUsedToDropTrophies($eTroop, $Quantity)
 	;SetLog("CanBeUsedToDrop|$eTroop = " & $eTroop & @CRLF & "Quantity = " & $Quantity)
 	If $eTroop = $eBarb Then
-		$aDTtroopsToBeUsed[0][1] = $Quantity
+		$g_avDTtroopsToBeUsed[0][1] = $Quantity
 
 	ElseIf $eTroop = $eArch Then
-		$aDTtroopsToBeUsed[1][1] = $Quantity
+		$g_avDTtroopsToBeUsed[1][1] = $Quantity
 
 	ElseIf $eTroop = $eGiant Then
-		$aDTtroopsToBeUsed[2][1] = $Quantity
+		$g_avDTtroopsToBeUsed[2][1] = $Quantity
 
 	ElseIf $eTroop = $eGobl Then
-		$aDTtroopsToBeUsed[4][1] = $Quantity
+		$g_avDTtroopsToBeUsed[4][1] = $Quantity
 
 	ElseIf $eTroop = $eWall Then
-		$aDTtroopsToBeUsed[3][1] = $Quantity
+		$g_avDTtroopsToBeUsed[3][1] = $Quantity
 
 	ElseIf $eTroop = $eMini Then
-		$aDTtroopsToBeUsed[5][1] = $Quantity
+		$g_avDTtroopsToBeUsed[5][1] = $Quantity
 	EndIf
 
 EndFunc   ;==>CanBeUsedToDropTrophies
 
 Func ResetDropTrophiesVariable()
-	For $i = 0 To (UBound($aDTtroopsToBeUsed, 1) - 1) ; Reset the variables
-		$aDTtroopsToBeUsed[$i][1] = 0
+	For $i = 0 To (UBound($g_avDTtroopsToBeUsed, 1) - 1) ; Reset the variables
+		$g_avDTtroopsToBeUsed[$i][1] = 0
 	Next
 EndFunc   ;==>ResetDropTrophiesVariable
 
 Func CheckQueueTroops($getQuantity = True, $showlog = True)
 	Local $res[1] = [""]
-	;$hTimer = TimerInit()
+	;$hTimer = __TimerInit()
 	If $showlog Then SetLog("Checking Troops Queue...", $COLOR_BLUE)
 	Local $directory = "trainwindow-TrainTroops-bundle"
 	Local $result = SearchArmy($directory, 18, 182, 839, 261)
 	ReDim $res[UBound($result)]
-	;SetLog("btnGrayCheckc Done Within " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds.", $COLOR_BLUE)
+	;SetLog("btnGrayCheckc Done Within " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds.", $COLOR_BLUE)
 	For $i = 0 To (UBound($result) - 1)
 		If $g_bRunState = False Then Return
 		$res[$i] = $result[$i][0]
@@ -1845,7 +1848,7 @@ Func CheckQueueTroops($getQuantity = True, $showlog = True)
 		Local $Quantities = GetQueueQuantity($res)
 		If $showlog Then
 			For $i = 0 To (UBound($Quantities) - 1)
-				SetLog("  - " & $g_asTroopNames[TroopIndexLookup($Quantities[$i][0])] & ": " & $Quantities[$i][1] & "x", $COLOR_GREEN)
+				SetLog("  - " & $g_asTroopNames[TroopIndexLookup($Quantities[$i][0], "CheckQueueTroops")] & ": " & $Quantities[$i][1] & "x", $COLOR_GREEN)
 			Next
 		EndIf
 	EndIf
@@ -1855,12 +1858,12 @@ EndFunc   ;==>CheckQueueTroops
 
 Func CheckQueueSpells($getQuantity = True, $showlog = True)
 	Local $res[1] = [""]
-	;$hTimer = TimerInit()
+	;$hTimer = __TimerInit()
 	If $showlog Then SetLog("Checking Spells Queue...", $COLOR_BLUE)
 	Local $directory = "trainwindow-SpellsInQueue-bundle"
 	Local $result = SearchArmy($directory, 18, 182, 839, 261)
 	ReDim $res[UBound($result)]
-	;SetLog("btnGrayCheckc Done Within " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds.", $COLOR_BLUE)
+	;SetLog("btnGrayCheckc Done Within " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds.", $COLOR_BLUE)
 	For $i = 0 To (UBound($result) - 1)
 		If $g_bRunState = False Then Return
 		$res[$i] = $result[$i][0]
@@ -1871,7 +1874,7 @@ Func CheckQueueSpells($getQuantity = True, $showlog = True)
 		If $showlog Then
 			For $i = 0 To (UBound($Quantities) - 1)
 				If $g_bRunState = False Then Return
-				SetLog("  - " & $g_asSpellNames[TroopIndexLookup($Quantities[$i][0]) - $eLSpell] & ": " & $Quantities[$i][1] & "x", $COLOR_GREEN)
+				SetLog("  - " & $g_asSpellNames[TroopIndexLookup($Quantities[$i][0], "CheckQueueSpells") - $eLSpell] & ": " & $Quantities[$i][1] & "x", $COLOR_GREEN)
 			Next
 		EndIf
 	EndIf
@@ -1883,7 +1886,7 @@ Func GetQueueQuantity($AvailableTroops)
 	If IsArray($AvailableTroops) Then
 		If $AvailableTroops[0] = "" Or StringLen($AvailableTroops[0]) = 0 Then _ArrayDelete($AvailableTroops, 0)
 		If $AvailableTroops[UBound($AvailableTroops) - 1] = "" Or StringLen($AvailableTroops[UBound($AvailableTroops) - 1]) = 0 Then _ArrayDelete($AvailableTroops, Number(UBound($AvailableTroops) - 1))
-		;$hTimer = TimerInit()
+		;$hTimer = __TimerInit()
 		Local $result[UBound($AvailableTroops)][2] = [["", 0]]
 		Local $x = 770, $y = 189
 		_CaptureRegion2()
@@ -1895,7 +1898,7 @@ Func GetQueueQuantity($AvailableTroops)
 			; At end, update Coords to next troop
 			$x -= 70
 		Next
-		;SetLog("GetQueueQuantity Done Within " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds at #" & $i & " Loop.", $COLOR_BLUE)
+		;SetLog("GetQueueQuantity Done Within " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds at #" & $i & " Loop.", $COLOR_BLUE)
 		Return $result
 	EndIf
 	Return False
@@ -1912,7 +1915,7 @@ Func SearchArmy($directory = "", $x = 0, $y = 0, $x1 = 0, $y1 = 0, $txt = "", $s
 		If getReceivedTroops(162, 200, $skipReceivedTroopsCheck) = False Then
 			; Perform the search
 			_CaptureRegion2($x, $y, $x1, $y1)
-			Local $res = DllCall($g_hLibImgLoc, "str", "SearchMultipleTilesBetweenLevels", "handle", $hHBitmap2, "str", $directory, "str", "FV", "Int", 0, "str", $Redlines, "Int", 0, "Int", 1000)
+			Local $res = DllCall($g_hLibImgLoc, "str", "SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $directory, "str", "FV", "Int", 0, "str", $Redlines, "Int", 0, "Int", 1000)
 
 			If $res[0] <> "" Then
 				; Get the keys for the dictionary item.
@@ -1945,7 +1948,7 @@ Func SearchArmy($directory = "", $x = 0, $y = 0, $x1 = 0, $y1 = 0, $txt = "", $s
 			ExitLoop
 		Else
 			If $waiting = 1 Then Setlog("You have received castle troops! Wait 5's...")
-			If _Sleep($iDelayTrain8) Then Return $aResult
+			If _Sleep($DELAYTRAIN8) Then Return $aResult
 		EndIf
 	Next
 
@@ -1990,21 +1993,21 @@ Func ResetVariables($txt = "")
 		For $i = 0 To $eTroopCount - 1
 			If $g_bRunState = False Then Return
 			$g_aiCurrentTroops[$i] = 0
-			If _Sleep($iDelayTrain6) Then Return ; '20' just to Pause action
+			If _Sleep($DELAYTRAIN6) Then Return ; '20' just to Pause action
 		Next
 	EndIf
 	If $txt = "Spells" Or $txt = "all" Then
 		For $i = 0 To $eSpellCount - 1
 			If $g_bRunState = False Then Return
 			$g_aiCurrentSpells[$i] = 0
-			If _Sleep($iDelayTrain6) Then Return ; '20' just to Pause action
+			If _Sleep($DELAYTRAIN6) Then Return ; '20' just to Pause action
 		Next
 	EndIf
 	If $txt = "donated" Or $txt = "all" Then
 		For $i = 0 To $eTroopCount - 1
 			If $g_bRunState = False Then Return
 			$g_aiDonateTroops[$i] = 0
-			If _Sleep($iDelayTrain6) Then Return ; '20' just to Pause action
+			If _Sleep($DELAYTRAIN6) Then Return ; '20' just to Pause action
 		Next
 	EndIf
 
@@ -2124,14 +2127,14 @@ Func Slot($x = 0, $txt = "")
 EndFunc   ;==>Slot
 
 Func MakingDonatedTroops()
-   ; notes $avDefaultTroopGroup[19][0] = TroopName | [1] = TroopNamePosition | [2] = TroopHeight | [3] = Times | [4] = qty | [5] = marker for DarkTroop or ElixerTroop]
-   Local $avDefaultTroopGroup[19][6] = [ _
-	  ["Arch", 1, 1, 25, 0, "e"], ["Giant", 2, 5, 120, 0, "e"], ["Wall", 4, 2, 60, 0, "e"], ["Barb", 0, 1, 20, 0, "e"], ["Gobl", 3, 1, 30, 0, "e"], ["Heal", 7, 14, 600, 0, "e"], _
-	  ["Pekk", 9, 25, 900, 0, "e"], ["Ball", 5, 5, 300, 0, "e"], ["Wiza", 6, 4, 300, 0, "e"], ["Drag", 8, 20, 900, 0, "e"], ["BabyD", 10, 10, 600, 0, "e"],["Mine", 11, 5, 300, 0, "e"], _
-	  ["Mini", 0, 2, 45, 0, "d"], ["Hogs", 1, 5, 120, 0, "d"], ["Valk", 2, 8, 300, 0, "d"], ["Gole", 3, 30, 900, 0, "d"], ["Witc", 4, 12, 600, 0, "d"], ["Lava", 5, 30, 900, 0, "d"], _
-	  ["Bowl", 6, 6, 300, 0, "d"]]
+	; notes $avDefaultTroopGroup[19][0] = TroopName | [1] = TroopNamePosition | [2] = TroopHeight | [3] = Times | [4] = qty | [5] = marker for DarkTroop or ElixerTroop]
+	Local $avDefaultTroopGroup[19][6] = [ _
+			["Arch", 1, 1, 25, 0, "e"], ["Giant", 2, 5, 120, 0, "e"], ["Wall", 4, 2, 60, 0, "e"], ["Barb", 0, 1, 20, 0, "e"], ["Gobl", 3, 1, 30, 0, "e"], ["Heal", 7, 14, 600, 0, "e"], _
+			["Pekk", 9, 25, 900, 0, "e"], ["Ball", 5, 5, 300, 0, "e"], ["Wiza", 6, 4, 300, 0, "e"], ["Drag", 8, 20, 900, 0, "e"], ["BabyD", 10, 10, 600, 0, "e"], ["Mine", 11, 5, 300, 0, "e"], _
+			["Mini", 0, 2, 45, 0, "d"], ["Hogs", 1, 5, 120, 0, "d"], ["Valk", 2, 8, 300, 0, "d"], ["Gole", 3, 30, 900, 0, "d"], ["Witc", 4, 12, 600, 0, "d"], ["Lava", 5, 30, 900, 0, "d"], _
+			["Bowl", 6, 6, 300, 0, "d"]]
 
-   ; notes $avDefaultTroopGroup[19][5]
+	; notes $avDefaultTroopGroup[19][5]
 	; notes $avDefaultTroopGroup[19][0] = TroopName | [1] = TroopNamePosition | [2] = TroopHeight | [3] = Times | [4] = qty | [5] = marker for DarkTroop or ElixerTroop]
 	; notes ClickDrag(616, 445 + $g_iMidOffsetY, 400, 445 + $g_iMidOffsetY, 2000) ; Click drag for dark Troops
 	; notes	ClickDrag(400, 445 + $g_iMidOffsetY, 616, 445 + $g_iMidOffsetY, 2000) ; Click drag for Elixer Troops
@@ -2184,7 +2187,7 @@ Func MakingDonatedTroops()
 					ExitLoop
 				EndIf
 
-				Local $iTroopIndex = TroopIndexLookup($avDefaultTroopGroup[$i][0])
+				Local $iTroopIndex = TroopIndexLookup($avDefaultTroopGroup[$i][0], "MakingDonatedTroops")
 
 				If $avDefaultTroopGroup[$i][2] * $avDefaultTroopGroup[$i][4] <= $RemainTrainSpace[2] Then ; Troopheight x donate troop qty <= avaible train space
 					;Local $pos = GetTrainPos(TroopIndexLookup($avDefaultTroopGroup[$i][0]))
@@ -2376,11 +2379,11 @@ Func TestTrainRevamp2()
 	$g_iDebugOcr = 1
 	Setlog("Start......OpenArmy Window.....")
 
-	Local $timer = TimerInit()
+	Local $timer = __TimerInit()
 
 	CheckExistentArmy("Troops")
 
-	Setlog("Imgloc Troops Time: " & Round(TimerDiff($timer) / 1000, 2) & "'s")
+	Setlog("Imgloc Troops Time: " & Round(__TimerDiff($timer) / 1000, 2) & "'s")
 
 	Setlog("End......OpenArmy Window.....")
 	$g_iDebugOcr = 0
@@ -2419,38 +2422,38 @@ Func CheckValuesCost($Troop = "Arch", $troopQuantity = 1, $DebugLogs = 0)
 
 	; Local Variables
 	Local $TempColorToCheck = ""
-	Local $nElixirCurrent = 0 , $nDarkCurrent = 0 , $bLocalDebugOCR = 0
+	Local $nElixirCurrent = 0, $nDarkCurrent = 0, $bLocalDebugOCR = 0
 
 	If _sleep(1000) Then Return ; small delay
-	If $g_bRunState = False then Return
+	If $g_bRunState = False Then Return
 
 	; 	DEBUG
 	If $g_iDebugSetlogTrain = 1 Or $DebugLogs Then
 		$bLocalDebugOCR = $g_iDebugOcr
-		$g_iDebugOcr = 1; enable the OCR debug
+		$g_iDebugOcr = 1 ; enable the OCR debug
 		$TempColorToCheck = _GetPixelColor(223, 594, True)
 		Setlog("CheckValuesCost|ColorToCheck: " & $TempColorToCheck)
 	EndIf
 
-	; Let´s UPDATE the current Elixir and Dark elixir each Troop train on 'Bottom train Window Page'
+	; Let??s UPDATE the current Elixir and Dark elixir each Troop train on 'Bottom train Window Page'
 	If _ColorCheck(_GetPixelColor(223, 594, True), Hex(0xE8E8E0, 6), 20) Then ; Gray background window color
 		; Village without Dark Elixir
-		If ISArmyWindow(False, $TrainTroopsTAB) OR ISArmyWindow(False, $BrewSpellsTAB) Then $nElixirCurrent = getResourcesValueTrainPage(315, 594)  ; ELIXIR
+		If ISArmyWindow(False, $TrainTroopsTAB) Or ISArmyWindow(False, $BrewSpellsTAB) Then $nElixirCurrent = getResourcesValueTrainPage(315, 594) ; ELIXIR
 	Else
 		; Village with Elixir and Dark Elixir
-		If ISArmyWindow(False, $TrainTroopsTAB) OR ISArmyWindow(False, $BrewSpellsTAB) Then $nElixirCurrent = getResourcesValueTrainPage(230, 594)  ; ELIXIR
-		If ISArmyWindow(False, $TrainTroopsTAB) OR ISArmyWindow(False, $BrewSpellsTAB) Then $nDarkCurrent = getResourcesValueTrainPage(382, 594) 	; DARK ELIXIR
+		If ISArmyWindow(False, $TrainTroopsTAB) Or ISArmyWindow(False, $BrewSpellsTAB) Then $nElixirCurrent = getResourcesValueTrainPage(230, 594) ; ELIXIR
+		If ISArmyWindow(False, $TrainTroopsTAB) Or ISArmyWindow(False, $BrewSpellsTAB) Then $nDarkCurrent = getResourcesValueTrainPage(382, 594) ; DARK ELIXIR
 	EndIf
 
 	; 	DEBUG
 	If $g_iDebugSetlogTrain = 1 Or $DebugLogs Then
-		Setlog(" » Current resources:")
+		Setlog(" ?? Current resources:")
 		Setlog(" - Elixir: " & _NumberFormat($nElixirCurrent) & " / Dark Elixir: " & _NumberFormat($nDarkCurrent), $COLOR_INFO)
 		$g_iDebugOcr = $bLocalDebugOCR ; disable the OCR debug
 	EndIf
 
 	Local $troopCost = 0
-	Local $iTroopIndex = TroopIndexLookup($Troop)
+	Local $iTroopIndex = TroopIndexLookup($Troop, "CheckValuesCost")
 
 	; Return the Cost of Troops or Spells
 	If $iTroopIndex >= $eBarb And $iTroopIndex <= $eBowl Then
@@ -2505,7 +2508,7 @@ Func ThSnipesSkiptrain()
 	Local $Temp = 0
 	; Check if the User will use TH snipes
 
-	If IsSearchModeActive($TS) And $IsFullArmywithHeroesAndSpells Then
+	If IsSearchModeActive($TS) And $g_bIsFullArmywithHeroesAndSpells Then
 		For $i = 0 To $eTroopCount - 1
 			If $g_aiArmyCompTroops[$i] > 0 Then $Temp += 1
 		Next

@@ -94,11 +94,11 @@ Func donateCCWBLUserImageCollect($x, $y)
 					Local $xfound = Int(StringSplit($reshidden, ",", 2)[0])
 					Local $yfound = Int(StringSplit($reshidden, ",", 2)[1])
 					If $g_iDebugSetlog = 1 Then
-					   SetLog("ChatDivider hidden found (" & $xfound & "," & $yfound & ")", $COLOR_SUCCESS)
+						SetLog("ChatDivider hidden found (" & $xfound & "," & $yfound & ")", $COLOR_SUCCESS)
 					EndIf
 
 					; now crop image to have only request village name and put in $hClone
-					Local $oBitmap = _GDIPlus_BitmapCreateFromHBITMAP($hHBitmap2)
+					Local $oBitmap = _GDIPlus_BitmapCreateFromHBITMAP($g_hHBitmap2)
 					Local $hClone = _GDIPlus_BitmapCloneArea($oBitmap, 31, $yfound + 14, 100, 11, $GDIP_PXF24RGB)
 					;save image
 					Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
@@ -119,11 +119,11 @@ Func donateCCWBLUserImageCollect($x, $y)
 				Local $xfound = Int(StringSplit($res, ",", 2)[0])
 				Local $yfound = Int(StringSplit($res, ",", 2)[1])
 				If $g_iDebugSetlog = 1 Then
-				   SetLog("ChatDivider found (" & $xfound & "," & $yfound & ")", $COLOR_SUCCESS)
-			    EndIf
+					SetLog("ChatDivider found (" & $xfound & "," & $yfound & ")", $COLOR_SUCCESS)
+				EndIf
 
 				; now crop image to have only request village name and put in $hClone
-				Local $oBitmap = _GDIPlus_BitmapCreateFromHBITMAP($hHBitmap2)
+				Local $oBitmap = _GDIPlus_BitmapCreateFromHBITMAP($g_hHBitmap2)
 				Local $hClone = _GDIPlus_BitmapCloneArea($oBitmap, 31, $yfound + 14, 100, 11, $GDIP_PXF24RGB)
 				;save image
 				Local $Date = @YEAR & "-" & @MON & "-" & @MDAY

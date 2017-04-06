@@ -26,7 +26,7 @@ Global $g_hGrpDBEndBattle = 0, $g_hLblStopAtkDBNoLoot1a = 0, $g_hLblStopAtkDBNoL
 Func CreateAttackSearchDeadBaseEndBattle()
    Local $sTxtTip = ""
    Local $x = 10, $y = 45
-	   $g_hGrpDBEndBattle = GUICtrlCreateGroup(GetTranslated(606,1, "Exit Battle"),  $x - 5, $y - 20, 420, 345)
+	   $g_hGrpDBEndBattle = GUICtrlCreateGroup(GetTranslated(606,1, "Exit Battle"),  $x - 5, $y - 20, $g_iSizeWGrpTab4, $g_iSizeHGrpTab4)
 	   $y -=5
 		   $g_hChkStopAtkDBNoLoot1 = GUICtrlCreateCheckbox(GetTranslated(606,2, "When no New loot") ,$x, $y, -1, -1)
 			   $sTxtTip = GetTranslated(606,3, "End Battle if there is no extra loot raided within this No. of seconds.") & @CRLF & _

@@ -20,7 +20,7 @@
 ;			Sort each sides
 ;			Add each sides in one array (not use, but it can help to get closer pixel of all the red area)
 
-Func _GetRedArea($iMode = $REDLINE_IMGLOC, $iMaxAllowedPixelDistance = 25)
+Func _GetRedArea($iMode = $REDLINE_IMGLOC, $iMaxAllowedPixelDistance = 25, $fMinSideLengthFactor = 0.65)
 	Local $nameFunc = "[_GetRedArea] "
 	debugRedArea($nameFunc & " IN")
 
@@ -29,11 +29,11 @@ Func _GetRedArea($iMode = $REDLINE_IMGLOC, $iMaxAllowedPixelDistance = 25)
 	Local $ySkip = 5
 	Local $result = 0
 
-    If $g_iMatchMode = $LB And $g_aiAttackAlgorithm[$LB] = 0 And $g_aiAttackStdDropSides[$LB] = 4 Then ; Used for DES Side Attack (need to know the side the DES is on)
-		$result = DllCall($g_hLibFunctions, "str", "getRedAreaSideBuilding", "ptr", $hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation, "int", $eSideBuildingDES)
+	If $g_iMatchMode = $LB And $g_aiAttackAlgorithm[$LB] = 0 And $g_aiAttackStdDropSides[$LB] = 4 Then ; Used for DES Side Attack (need to know the side the DES is on)
+		$result = DllCall($g_hLibMyBot, "str", "getRedAreaSideBuilding", "ptr", $g_hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation, "int", $eSideBuildingDES)
 		If $g_iDebugSetlog Then Setlog("Debug: Redline with DES Side chosen")
-    ElseIf $g_iMatchMode = $LB And $g_aiAttackAlgorithm[$LB] = 0 And $g_aiAttackStdDropSides[$LB] = 5 Then ; Used for TH Side Attack (need to know the side the TH is on)
-		$result = DllCall($g_hLibFunctions, "str", "getRedAreaSideBuilding", "ptr", $hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation, "int", $eSideBuildingTH)
+	ElseIf $g_iMatchMode = $LB And $g_aiAttackAlgorithm[$LB] = 0 And $g_aiAttackStdDropSides[$LB] = 5 Then ; Used for TH Side Attack (need to know the side the TH is on)
+		$result = DllCall($g_hLibMyBot, "str", "getRedAreaSideBuilding", "ptr", $g_hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation, "int", $eSideBuildingTH)
 		If $g_iDebugSetlog Then Setlog("Debug: Redline with TH Side chosen")
 	Else ; Normal getRedArea
 
@@ -50,14 +50,14 @@ Func _GetRedArea($iMode = $REDLINE_IMGLOC, $iMaxAllowedPixelDistance = 25)
 				Local $dropPoints = GetOffSetRedline("TL") & "|" & GetOffSetRedline("BL") & "|" & GetOffSetRedline("BR") & "|" & GetOffSetRedline("TR")
 				Local $listPixelBySide = getRedAreaSideBuilding($dropPoints)
 				#cs
-					$PixelTopLeft = _SortRedline(GetOffSetRedline("TL"))
-					$PixelBottomLeft =  _SortRedline(GetOffSetRedline("BL"))
-					$PixelBottomRight = _SortRedline(GetOffSetRedline("BR"))
-					$PixelTopRight =  _SortRedline(GetOffSetRedline("TR"))
-					Local $listPixelBySide = ["ImgLoc", $PixelTopLeft, $PixelBottomLeft, $PixelBottomRight, $PixelTopRight]
+					$g_aiPixelTopLeft = _SortRedline(GetOffSetRedline("TL"))
+					$g_aiPixelBottomLeft =  _SortRedline(GetOffSetRedline("BL"))
+					$g_aiPixelBottomRight = _SortRedline(GetOffSetRedline("BR"))
+					$g_aiPixelTopRight =  _SortRedline(GetOffSetRedline("TR"))
+					Local $listPixelBySide = ["ImgLoc", $g_aiPixelTopLeft, $g_aiPixelBottomLeft, $g_aiPixelBottomRight, $g_aiPixelTopRight]
 				#ce
 			Case $REDLINE_ORIGINAL ; Original red line routine
-				Local $result = DllCall($g_hLibFunctions, "str", "getRedArea", "ptr", $hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation)
+				Local $result = DllCall($g_hLibMyBot, "str", "getRedArea", "ptr", $g_hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation)
 		EndSwitch
 		If $g_iDebugSetlog Then Setlog("Debug: Redline chosen")
 	EndIf
@@ -65,22 +65,22 @@ Func _GetRedArea($iMode = $REDLINE_IMGLOC, $iMaxAllowedPixelDistance = 25)
 	If IsArray($result) Then
 		Local $listPixelBySide = StringSplit($result[0], "#")
 	EndIf
-	$PixelTopLeft = GetPixelSide($listPixelBySide, 1)
-	$PixelBottomLeft = GetPixelSide($listPixelBySide, 2)
-	$PixelBottomRight = GetPixelSide($listPixelBySide, 3)
-	$PixelTopRight = GetPixelSide($listPixelBySide, 4)
+	$g_aiPixelTopLeft = GetPixelSide($listPixelBySide, 1)
+	$g_aiPixelBottomLeft = GetPixelSide($listPixelBySide, 2)
+	$g_aiPixelBottomRight = GetPixelSide($listPixelBySide, 3)
+	$g_aiPixelTopRight = GetPixelSide($listPixelBySide, 4)
 
-		;02.02  - CLEAN REDAREA BAD POINTS -----------------------------------------------------------------------------------------------------------------------
-	CleanRedArea($PixelTopLeft)
-	CleanRedArea($PixelTopRight)
-	CleanRedArea($PixelBottomLeft)
-	CleanRedArea($PixelBottomRight)
+	;02.02  - CLEAN REDAREA BAD POINTS -----------------------------------------------------------------------------------------------------------------------
+	CleanRedArea($g_aiPixelTopLeft)
+	CleanRedArea($g_aiPixelTopRight)
+	CleanRedArea($g_aiPixelBottomLeft)
+	CleanRedArea($g_aiPixelBottomRight)
 	debugAttackCSV("RedArea cleaned")
-	debugAttackCSV("	[" & UBound($PixelTopLeft) & "] pixels TopLeft")
-	debugAttackCSV("	[" & UBound($PixelTopRight) & "] pixels TopRight")
-	debugAttackCSV("	[" & UBound($PixelBottomLeft) & "] pixels BottomLeft")
-	debugAttackCSV("	[" & UBound($PixelBottomRight) & "] pixels BottomRight")
-	If _Sleep($iDelayRespond) Then Return
+	debugAttackCSV("	[" & UBound($g_aiPixelTopLeft) & "] pixels TopLeft")
+	debugAttackCSV("	[" & UBound($g_aiPixelTopRight) & "] pixels TopRight")
+	debugAttackCSV("	[" & UBound($g_aiPixelBottomLeft) & "] pixels BottomLeft")
+	debugAttackCSV("	[" & UBound($g_aiPixelBottomRight) & "] pixels BottomRight")
+	If _Sleep($DELAYRESPOND) Then Return
 
 	;02.03 - MAKE FULL DROP LINE EDGE--------------------------------------------------------------------------------------------------------------------------
 	; default inner area edges
@@ -89,31 +89,31 @@ Func _GetRedArea($iMode = $REDLINE_IMGLOC, $iMaxAllowedPixelDistance = 25)
 	Local $coordRight = [$ExternalArea[1][0], $ExternalArea[1][1]]
 	Local $coordBottom = [$ExternalArea[3][0], $ExternalArea[3][1]]
 	Switch $g_aiAttackScrDroplineEdge[$g_iMatchMode]
-	Case $DROPLINE_EDGE_FIXED, $DROPLINE_FULL_EDGE_FIXED ; default inner area edges
-		; nothing to do here
-	Case $DROPLINE_EDGE_FIRST, $DROPLINE_FULL_EDGE_FIRST ; use first red point
-		Local $newAxis
-		; left
-		Local $aPoint1 = GetMaxPoint($PixelTopLeft, 1)
-		Local $aPoint2 = GetMinPoint($PixelBottomLeft, 1)
-		$newAxis = (($aPoint1[0] < $aPoint2[0]) ? ($aPoint1[0]) : ($aPoint2[0]))
-		If Abs($newAxis) < 9999 Then $coordLeft[0] = $newAxis
-		; top
-		Local $aPoint1 = GetMaxPoint($PixelTopLeft, 0)
-		Local $aPoint2 = GetMinPoint($PixelTopRight, 0)
-		$newAxis = (($aPoint1[1] < $aPoint2[1]) ? ($aPoint1[1]) : ($aPoint2[1]))
-		If Abs($newAxis) < 9999 Then $coordTop[1] = $newAxis
-		; right
+		Case $DROPLINE_EDGE_FIXED, $DROPLINE_FULL_EDGE_FIXED ; default inner area edges
+			; nothing to do here
+		Case $DROPLINE_EDGE_FIRST, $DROPLINE_FULL_EDGE_FIRST ; use first red point
+			Local $newAxis
+			; left
+			Local $aPoint1 = GetMaxPoint($g_aiPixelTopLeft, 1)
+			Local $aPoint2 = GetMinPoint($g_aiPixelBottomLeft, 1)
+			$newAxis = (($aPoint1[0] < $aPoint2[0]) ? ($aPoint1[0]) : ($aPoint2[0]))
+			If Abs($newAxis) < 9999 Then $coordLeft[0] = $newAxis
+			; top
+			Local $aPoint1 = GetMaxPoint($g_aiPixelTopLeft, 0)
+			Local $aPoint2 = GetMinPoint($g_aiPixelTopRight, 0)
+			$newAxis = (($aPoint1[1] < $aPoint2[1]) ? ($aPoint1[1]) : ($aPoint2[1]))
+			If Abs($newAxis) < 9999 Then $coordTop[1] = $newAxis
+			; right
 
-		Local $aPoint1 = GetMaxPoint($PixelTopRight, 1)
-		Local $aPoint2 = GetMinPoint($PixelBottomRight, 1)
-		$newAxis = (($aPoint1[0] > $aPoint2[0]) ? ($aPoint1[0]) : ($aPoint2[0]))
-		If Abs($newAxis) < 9999 Then $coordRight[0] = $newAxis
-		; bottom
-		Local $aPoint1 = GetMaxPoint($PixelBottomLeft, 0)
-		Local $aPoint2 = GetMinPoint($PixelBottomRight, 0)
-		$newAxis = (($aPoint1[1] > $aPoint2[1]) ? ($aPoint1[1]) : ($aPoint2[1]))
-		If Abs($newAxis) < 9999 Then $coordBottom[1] = $newAxis
+			Local $aPoint1 = GetMaxPoint($g_aiPixelTopRight, 1)
+			Local $aPoint2 = GetMinPoint($g_aiPixelBottomRight, 1)
+			$newAxis = (($aPoint1[0] > $aPoint2[0]) ? ($aPoint1[0]) : ($aPoint2[0]))
+			If Abs($newAxis) < 9999 Then $coordRight[0] = $newAxis
+			; bottom
+			Local $aPoint1 = GetMaxPoint($g_aiPixelBottomLeft, 0)
+			Local $aPoint2 = GetMinPoint($g_aiPixelBottomRight, 0)
+			$newAxis = (($aPoint1[1] > $aPoint2[1]) ? ($aPoint1[1]) : ($aPoint2[1]))
+			If Abs($newAxis) < 9999 Then $coordBottom[1] = $newAxis
 	EndSwitch
 
 	Local $StartEndTopLeft = [$coordLeft, $coordTop]
@@ -130,131 +130,160 @@ Func _GetRedArea($iMode = $REDLINE_IMGLOC, $iMaxAllowedPixelDistance = 25)
 	Local $totalInvalid = 0
 	$startPoint = $StartEndTopLeft[0]
 	$endPoint = $StartEndTopLeft[1]
-	Local $PixelTopLeft1 = SortByDistance($PixelTopLeft, $startPoint, $endPoint, $invalid1)
+	Local $g_aiPixelTopLeft1 = SortByDistance($g_aiPixelTopLeft, $startPoint, $endPoint, $invalid1)
 	$startPoint = $StartEndTopLeft[1]
 	$endPoint = $StartEndTopLeft[0]
-	Local $PixelTopLeft2 = SortByDistance($PixelTopLeft, $startPoint, $endPoint, $invalid2)
+	Local $g_aiPixelTopLeft2 = SortByDistance($g_aiPixelTopLeft, $startPoint, $endPoint, $invalid2)
 	$totalInvalid += (($invalid1 <= $invalid2) ? ($invalid1) : ($invalid2))
-	$PixelTopLeft = SortByDistance((($invalid1 <= $invalid2) ? ($PixelTopLeft1) : ($PixelTopLeft2)), $StartEndTopLeft[0], $StartEndTopLeft[1], $invalid1)
+	$g_aiPixelTopLeft = SortByDistance((($invalid1 <= $invalid2) ? ($g_aiPixelTopLeft1) : ($g_aiPixelTopLeft2)), $StartEndTopLeft[0], $StartEndTopLeft[1], $invalid1)
 	$startPoint = $StartEndTopRight[0]
 	$endPoint = $StartEndTopRight[1]
-	Local $PixelTopRight1 = SortByDistance($PixelTopRight, $startPoint, $endPoint, $invalid1)
+	Local $g_aiPixelTopRight1 = SortByDistance($g_aiPixelTopRight, $startPoint, $endPoint, $invalid1)
 	$startPoint = $StartEndTopRight[1]
 	$endPoint = $StartEndTopRight[0]
-	Local $PixelTopRight2 = SortByDistance($PixelTopRight, $startPoint, $endPoint, $invalid2)
+	Local $g_aiPixelTopRight2 = SortByDistance($g_aiPixelTopRight, $startPoint, $endPoint, $invalid2)
 	$totalInvalid += (($invalid1 <= $invalid2) ? ($invalid1) : ($invalid2))
-	$PixelTopRight = SortByDistance((($invalid1 <= $invalid2) ? ($PixelTopRight1) : ($PixelTopRight2)), $StartEndTopRight[0], $StartEndTopRight[1], $invalid1)
+	$g_aiPixelTopRight = SortByDistance((($invalid1 <= $invalid2) ? ($g_aiPixelTopRight1) : ($g_aiPixelTopRight2)), $StartEndTopRight[0], $StartEndTopRight[1], $invalid1)
 	$startPoint = $StartEndBottomLeft[0]
 	$endPoint = $StartEndBottomLeft[1]
-	Local $PixelBottomLeft1 = SortByDistance($PixelBottomLeft, $startPoint, $endPoint, $invalid1)
+	Local $g_aiPixelBottomLeft1 = SortByDistance($g_aiPixelBottomLeft, $startPoint, $endPoint, $invalid1)
 	$startPoint = $StartEndBottomLeft[1]
 	$endPoint = $StartEndBottomLeft[0]
-	Local $PixelBottomLeft2 = SortByDistance($PixelBottomLeft, $startPoint, $endPoint, $invalid2)
+	Local $g_aiPixelBottomLeft2 = SortByDistance($g_aiPixelBottomLeft, $startPoint, $endPoint, $invalid2)
 	$totalInvalid += (($invalid1 <= $invalid2) ? ($invalid1) : ($invalid2))
-	$PixelBottomLeft = SortByDistance((($invalid1 <= $invalid2) ? ($PixelBottomLeft1) : ($PixelBottomLeft2)), $StartEndBottomLeft[0], $StartEndBottomLeft[1], $invalid1)
+	$g_aiPixelBottomLeft = SortByDistance((($invalid1 <= $invalid2) ? ($g_aiPixelBottomLeft1) : ($g_aiPixelBottomLeft2)), $StartEndBottomLeft[0], $StartEndBottomLeft[1], $invalid1)
 	$startPoint = $StartEndBottomRight[0]
 	$endPoint = $StartEndBottomRight[1]
-	Local $PixelBottomRight1 = SortByDistance($PixelBottomRight, $startPoint, $endPoint, $invalid1)
+	Local $g_aiPixelBottomRight1 = SortByDistance($g_aiPixelBottomRight, $startPoint, $endPoint, $invalid1)
 	$startPoint = $StartEndBottomRight[1]
 	$endPoint = $StartEndBottomRight[0]
-	Local $PixelBottomRight2 = SortByDistance($PixelBottomRight, $startPoint, $endPoint, $invalid2)
+	Local $g_aiPixelBottomRight2 = SortByDistance($g_aiPixelBottomRight, $startPoint, $endPoint, $invalid2)
 	$totalInvalid += (($invalid1 <= $invalid2) ? ($invalid1) : ($invalid2))
-	$PixelBottomRight = SortByDistance((($invalid1 <= $invalid2) ? ($PixelBottomRight1) : ($PixelBottomRight2)), $StartEndBottomRight[0], $StartEndBottomRight[1], $invalid1)
+	$g_aiPixelBottomRight = SortByDistance((($invalid1 <= $invalid2) ? ($g_aiPixelBottomRight1) : ($g_aiPixelBottomRight2)), $StartEndBottomRight[0], $StartEndBottomRight[1], $invalid1)
 
 	; Pixel further calc
 
 	Local $offsetArcher = 15
 
-	ReDim $PixelRedArea[UBound($PixelTopLeft) + UBound($PixelBottomLeft) + UBound($PixelTopRight) + UBound($PixelBottomRight)]
-	ReDim $PixelRedAreaFurther[UBound($PixelRedArea)]
+	ReDim $g_aiPixelRedArea[UBound($g_aiPixelTopLeft) + UBound($g_aiPixelBottomLeft) + UBound($g_aiPixelTopRight) + UBound($g_aiPixelBottomRight)]
+	ReDim $g_aiPixelRedAreaFurther[UBound($g_aiPixelRedArea)]
 
 	;If Milking Attack ($g_aiAttackAlgorithm[$DB] = 2) or AttackCSV skip calc of troops further offset (archers drop points for standard attack)
 	; but need complete calc if use standard attack after milking attack ($MilkAttackAfterStandardAtk =1) and use redarea ($g_abAttackStdSmartAttack[$MA] = True)
 	;If $g_iDebugSetlog = 1 Then Setlog("REDAREA matchmode " & $g_iMatchMode & " atkalgorithm[0] = " & $g_aiAttackAlgorithm[$DB] & " $g_bMilkAttackAfterScriptedAtkEnable = " & $g_bMilkAttackAfterScriptedAtkEnable , $COLOR_DEBUG1)
 	Local $a
-	If ($g_iMatchMode = $DB And $g_aiAttackAlgorithm[$DB] = 2) Or ($g_iMatchMode = $DB And $ichkUseAttackDBCSV = 1) Or ($g_iMatchMode = $LB And $ichkUseAttackABCSV = 1) Then
+	If $g_iMatchMode = $DB And $g_aiAttackAlgorithm[$DB] = 2 Then
 		If $g_iDebugSetlog = 1 Then setlog("redarea no calc pixel further (quick)", $COLOR_DEBUG)
 		Local $count = 0
-		ReDim $PixelTopLeftFurther[UBound($PixelTopLeft)]
-		For $i = 0 To UBound($PixelTopLeft) - 1
-			$a = $PixelTopLeft[$i]
-			$PixelTopLeftFurther[$i] = $a
-			$PixelRedArea[$count] = $a
-			$PixelRedAreaFurther[$count] = $PixelTopLeftFurther[$i]
+		ReDim $g_aiPixelTopLeftFurther[UBound($g_aiPixelTopLeft)]
+		For $i = 0 To UBound($g_aiPixelTopLeft) - 1
+			$a = $g_aiPixelTopLeft[$i]
+			$g_aiPixelTopLeftFurther[$i] = $a
+			$g_aiPixelRedArea[$count] = $a
+			$g_aiPixelRedAreaFurther[$count] = $g_aiPixelTopLeftFurther[$i]
 			$count += 1
 		Next
-		ReDim $PixelBottomLeftFurther[UBound($PixelBottomLeft)]
-		For $i = 0 To UBound($PixelBottomLeft) - 1
-			$PixelBottomLeftFurther[$i] = $PixelBottomLeft[$i]
-			$PixelRedArea[$count] = $PixelBottomLeft[$i]
-			$PixelRedAreaFurther[$count] = $PixelBottomLeftFurther[$i]
+		ReDim $g_aiPixelBottomLeftFurther[UBound($g_aiPixelBottomLeft)]
+		For $i = 0 To UBound($g_aiPixelBottomLeft) - 1
+			$g_aiPixelBottomLeftFurther[$i] = $g_aiPixelBottomLeft[$i]
+			$g_aiPixelRedArea[$count] = $g_aiPixelBottomLeft[$i]
+			$g_aiPixelRedAreaFurther[$count] = $g_aiPixelBottomLeftFurther[$i]
 			$count += 1
 		Next
-		ReDim $PixelTopRightFurther[UBound($PixelTopRight)]
-		For $i = 0 To UBound($PixelTopRight) - 1
-			$PixelTopRightFurther[$i] = $PixelTopRight[$i]
-			$PixelRedArea[$count] = $PixelTopRight[$i]
-			$PixelRedAreaFurther[$count] = $PixelTopRightFurther[$i]
+		ReDim $g_aiPixelTopRightFurther[UBound($g_aiPixelTopRight)]
+		For $i = 0 To UBound($g_aiPixelTopRight) - 1
+			$g_aiPixelTopRightFurther[$i] = $g_aiPixelTopRight[$i]
+			$g_aiPixelRedArea[$count] = $g_aiPixelTopRight[$i]
+			$g_aiPixelRedAreaFurther[$count] = $g_aiPixelTopRightFurther[$i]
 			$count += 1
 		Next
-		ReDim $PixelBottomRightFurther[UBound($PixelBottomRight)]
-		For $i = 0 To UBound($PixelBottomRight) - 1
-			$PixelBottomRightFurther[$i] = $PixelBottomRight[$i]
-			$PixelRedArea[$count] = $PixelBottomRight[$i]
-			$PixelRedAreaFurther[$count] = $PixelBottomRightFurther[$i]
+		ReDim $g_aiPixelBottomRightFurther[UBound($g_aiPixelBottomRight)]
+		For $i = 0 To UBound($g_aiPixelBottomRight) - 1
+			$g_aiPixelBottomRightFurther[$i] = $g_aiPixelBottomRight[$i]
+			$g_aiPixelRedArea[$count] = $g_aiPixelBottomRight[$i]
+			$g_aiPixelRedAreaFurther[$count] = $g_aiPixelBottomRightFurther[$i]
 			$count += 1
 		Next
 	Else
 		If $g_iDebugSetlog = 1 Then setlog("redarea calc pixel further", $COLOR_DEBUG)
 		Local $count = 0
-		ReDim $PixelTopLeftFurther[UBound($PixelTopLeft)]
-		For $i = 0 To UBound($PixelTopLeft) - 1
-			$PixelTopLeftFurther[$i] = _GetOffsetTroopFurther($PixelTopLeft[$i], $eVectorLeftTop, $offsetArcher)
-			$PixelRedArea[$count] = $PixelTopLeft[$i]
-			$PixelRedAreaFurther[$count] = $PixelTopLeftFurther[$i]
+		ReDim $g_aiPixelTopLeftFurther[UBound($g_aiPixelTopLeft)]
+		For $i = 0 To UBound($g_aiPixelTopLeft) - 1
+			$g_aiPixelTopLeftFurther[$i] = _GetOffsetTroopFurther($g_aiPixelTopLeft[$i], $eVectorLeftTop, $offsetArcher)
+			$g_aiPixelRedArea[$count] = $g_aiPixelTopLeft[$i]
+			$g_aiPixelRedAreaFurther[$count] = $g_aiPixelTopLeftFurther[$i]
 			$count += 1
 		Next
-		ReDim $PixelBottomLeftFurther[UBound($PixelBottomLeft)]
-		For $i = 0 To UBound($PixelBottomLeft) - 1
-			$PixelBottomLeftFurther[$i] = _GetOffsetTroopFurther($PixelBottomLeft[$i], $eVectorLeftBottom, $offsetArcher)
-			$PixelRedArea[$count] = $PixelBottomLeft[$i]
-			$PixelRedAreaFurther[$count] = $PixelBottomLeftFurther[$i]
+		ReDim $g_aiPixelBottomLeftFurther[UBound($g_aiPixelBottomLeft)]
+		For $i = 0 To UBound($g_aiPixelBottomLeft) - 1
+			$g_aiPixelBottomLeftFurther[$i] = _GetOffsetTroopFurther($g_aiPixelBottomLeft[$i], $eVectorLeftBottom, $offsetArcher)
+			$g_aiPixelRedArea[$count] = $g_aiPixelBottomLeft[$i]
+			$g_aiPixelRedAreaFurther[$count] = $g_aiPixelBottomLeftFurther[$i]
 			$count += 1
 		Next
-		ReDim $PixelTopRightFurther[UBound($PixelTopRight)]
-		For $i = 0 To UBound($PixelTopRight) - 1
-			$PixelTopRightFurther[$i] = _GetOffsetTroopFurther($PixelTopRight[$i], $eVectorRightTop, $offsetArcher)
-			$PixelRedArea[$count] = $PixelTopRight[$i]
-			$PixelRedAreaFurther[$count] = $PixelTopRightFurther[$i]
+		ReDim $g_aiPixelTopRightFurther[UBound($g_aiPixelTopRight)]
+		For $i = 0 To UBound($g_aiPixelTopRight) - 1
+			$g_aiPixelTopRightFurther[$i] = _GetOffsetTroopFurther($g_aiPixelTopRight[$i], $eVectorRightTop, $offsetArcher)
+			$g_aiPixelRedArea[$count] = $g_aiPixelTopRight[$i]
+			$g_aiPixelRedAreaFurther[$count] = $g_aiPixelTopRightFurther[$i]
 			$count += 1
 		Next
-		ReDim $PixelBottomRightFurther[UBound($PixelBottomRight)]
-		For $i = 0 To UBound($PixelBottomRight) - 1
-			$PixelBottomRightFurther[$i] = _GetOffsetTroopFurther($PixelBottomRight[$i], $eVectorRightBottom, $offsetArcher)
-			$PixelRedArea[$count] = $PixelBottomRight[$i]
-			$PixelRedAreaFurther[$count] = $PixelBottomRightFurther[$i]
+		ReDim $g_aiPixelBottomRightFurther[UBound($g_aiPixelBottomRight)]
+		For $i = 0 To UBound($g_aiPixelBottomRight) - 1
+			$g_aiPixelBottomRightFurther[$i] = _GetOffsetTroopFurther($g_aiPixelBottomRight[$i], $eVectorRightBottom, $offsetArcher)
+			$g_aiPixelRedArea[$count] = $g_aiPixelBottomRight[$i]
+			$g_aiPixelRedAreaFurther[$count] = $g_aiPixelBottomRightFurther[$i]
 			$count += 1
 		Next
 	EndIf
 
-	If UBound($PixelTopLeft) < 10 Or GetPixelListDistance($PixelTopLeft, $iMaxAllowedPixelDistance) * 2 < GetPixelDistance($coordTop, $coordLeft) Then
-		$PixelTopLeft = _GetVectorOutZone($eVectorLeftTop)
-		$PixelTopLeftFurther = $PixelTopLeft
+	; calculate average side length
+	Local $aSideLength[4]
+	$aSideLength[0] = ((UBound($g_aiPixelTopLeft) >= 10) ? (GetPixelDistance($g_aiPixelTopLeft[0], $g_aiPixelTopLeft[UBound($g_aiPixelTopLeft) - 1])) : (0))
+	$aSideLength[1] = ((UBound($g_aiPixelBottomLeft) >= 10) ? (GetPixelDistance($g_aiPixelBottomLeft[0], $g_aiPixelBottomLeft[UBound($g_aiPixelBottomLeft) - 1])) : (0))
+	$aSideLength[2] = ((UBound($g_aiPixelTopRight) >= 10) ? (GetPixelDistance($g_aiPixelTopRight[0], $g_aiPixelTopRight[UBound($g_aiPixelTopRight) - 1])) : (0))
+	$aSideLength[3] = ((UBound($g_aiPixelBottomRight) >= 10) ? (GetPixelDistance($g_aiPixelBottomRight[0], $g_aiPixelBottomRight[UBound($g_aiPixelBottomRight) - 1])) : (0))
+	Local $iAvgSideLength = 0
+	Local $iAvgSideCount = 0
+	For $i = 0 To 3
+		$iAvgSideLength += $aSideLength[$i]
+		If $aSideLength[$i] > 0 Then $iAvgSideCount += 1
+	Next
+	$iAvgSideLength = Round($iAvgSideLength / $iAvgSideCount, 0)
+	SetDebugLog("Average side length: " & $iAvgSideLength)
+
+	; validate if read line side have enough points and red line is long enough (covers enough space for attack)... otherwise fall back to outer green side
+	Local $bNotEnoughPoints, $iSideLength
+	$bNotEnoughPoints = UBound($g_aiPixelTopLeft) < 10
+	$iSideLength = Round(GetPixelListDistance($g_aiPixelTopLeft, $iMaxAllowedPixelDistance), 0)
+	If $bNotEnoughPoints Or $iSideLength / $fMinSideLengthFactor < $iAvgSideLength Then ; * 2 < GetPixelDistance($coordTop, $coordLeft) Then
+		SetDebugLog("Attack side top-left: fall back to outer green (" & (($bNotEnoughPoints) ? ("not enougth points") : ("side length " & $iSideLength & " / " & $fMinSideLengthFactor & " < " & $iAvgSideLength)) & ")")
+		$g_aiPixelTopLeft = _GetVectorOutZone($eVectorLeftTop)
+		$g_aiPixelTopLeftFurther = $g_aiPixelTopLeft
 	EndIf
-	If UBound($PixelBottomLeft) < 10 Or GetPixelListDistance($PixelBottomLeft, $iMaxAllowedPixelDistance) * 2 < GetPixelDistance($coordBottom, $coordLeft)  Then
-		$PixelBottomLeft = _GetVectorOutZone($eVectorLeftBottom)
-		$PixelBottomLeftFurther = $PixelBottomLeft
+	$bNotEnoughPoints = UBound($g_aiPixelBottomLeft) < 10
+	$iSideLength = Round(GetPixelListDistance($g_aiPixelBottomLeft, $iMaxAllowedPixelDistance), 0)
+	If $bNotEnoughPoints Or $iSideLength / $fMinSideLengthFactor < $iAvgSideLength Then ; * 2 < GetPixelDistance($coordBottom, $coordLeft) Then
+		SetDebugLog("Attack side bottom-left: fall back to outer green (" & (($bNotEnoughPoints) ? ("not enougth points") : ("side length " & $iSideLength & " / " & $fMinSideLengthFactor & " < " & $iAvgSideLength)) & ")")
+		$g_aiPixelBottomLeft = _GetVectorOutZone($eVectorLeftBottom)
+		$g_aiPixelBottomLeftFurther = $g_aiPixelBottomLeft
 	EndIf
-	If UBound($PixelTopRight) < 10 Or GetPixelListDistance($PixelTopRight, $iMaxAllowedPixelDistance) * 2 < GetPixelDistance($coordTop, $coordRight)  Then
-		$PixelTopRight = _GetVectorOutZone($eVectorRightTop)
-		$PixelTopRightFurther = $PixelTopRight
+	$bNotEnoughPoints = UBound($g_aiPixelTopRight) < 10
+	$iSideLength = Round(GetPixelListDistance($g_aiPixelTopRight, $iMaxAllowedPixelDistance), 0)
+	If $bNotEnoughPoints Or $iSideLength / $fMinSideLengthFactor < $iAvgSideLength Then ; * 2 < GetPixelDistance($coordTop, $coordRight) Then
+		SetDebugLog("Attack side top-right: fall back to outer green (" & (($bNotEnoughPoints) ? ("not enougth points") : ("side length " & $iSideLength & " / " & $fMinSideLengthFactor & " < " & $iAvgSideLength)) & ")")
+		$g_aiPixelTopRight = _GetVectorOutZone($eVectorRightTop)
+		$g_aiPixelTopRightFurther = $g_aiPixelTopRight
 	EndIf
-	If UBound($PixelBottomRight) < 10 Or GetPixelListDistance($PixelBottomRight, $iMaxAllowedPixelDistance) * 2 < GetPixelDistance($coordBottom, $coordRight)  Then
-		$PixelBottomRight = _GetVectorOutZone($eVectorRightBottom)
-		$PixelBottomRightFurther = $PixelBottomRight
+	$bNotEnoughPoints = UBound($g_aiPixelBottomRight) < 10
+	$iSideLength = Round(GetPixelListDistance($g_aiPixelBottomRight, $iMaxAllowedPixelDistance), 0)
+	If $bNotEnoughPoints Or $iSideLength / $fMinSideLengthFactor < $iAvgSideLength Then ; * 2 < GetPixelDistance($coordBottom, $coordRight) Then
+		SetDebugLog("Attack side bottom-right: fall back to outer green (" & (($bNotEnoughPoints) ? ("not enougth points") : ("side length " & $iSideLength & " / " & $fMinSideLengthFactor & " < " & $iAvgSideLength)) & ")")
+		$g_aiPixelBottomRight = _GetVectorOutZone($eVectorRightBottom)
+		$g_aiPixelBottomRightFurther = $g_aiPixelBottomRight
 	EndIf
 
-	debugRedArea($nameFunc & "  Size of arr pixel for TopLeft [" & UBound($PixelTopLeft) & "] /  BottomLeft [" & UBound($PixelBottomLeft) & "] /  TopRight [" & UBound($PixelTopRight) & "] /  BottomRight [" & UBound($PixelBottomRight) & "] ")
+	debugRedArea($nameFunc & "  Size of arr pixel for TopLeft [" & UBound($g_aiPixelTopLeft) & "] /  BottomLeft [" & UBound($g_aiPixelBottomLeft) & "] /  TopRight [" & UBound($g_aiPixelTopRight) & "] /  BottomRight [" & UBound($g_aiPixelBottomRight) & "] ")
 
 	debugRedArea($nameFunc & " OUT ")
 EndFunc   ;==>_GetRedArea
@@ -390,7 +419,7 @@ Func getRedAreaSideBuildingString(ByRef $aSide)
 	Return $s
 EndFunc   ;==>getRedAreaSideBuildingString
 
-Func getRedAreaSideBuilding($redline = $IMGLOCREDLINE)
+Func getRedAreaSideBuilding($redline = $g_sImglocRedline)
 	;SetDebugLog("getRedAreaSideBuilding: " & $redline)
 	Local $c = 0
 	Local $a[5]

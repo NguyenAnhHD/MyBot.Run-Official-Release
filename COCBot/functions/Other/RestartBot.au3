@@ -18,7 +18,7 @@ Func RestartBot($bCloseAndroid = True, $bAutostart = True)
 	Local $sCmdLine = ProcessGetCommandLine(@AutoItPID)
 	If @error <> 0 Then
 		SetLog("Cannot prepare to restart " & $g_sBotTitle & ", error code " & @error, $COLOR_RED)
-		Return SetError(1, 0, 0)
+		Return SetError(1, 0, False)
 	EndIf
 
 	If $bAutostart = True Then
@@ -35,14 +35,15 @@ Func RestartBot($bCloseAndroid = True, $bAutostart = True)
 		_Sleep(1000)
 	EndIf
 	; Restart My Bot
-	Local $pid = Run("cmd.exe /c start """" " & $sCmdLine, $g_sWorkingDir, @SW_HIDE) ; cmd.exe only used to support launched like "..\AutoIt3\autoit3.exe" from console
+	Local $pid = Run("cmd.exe /c start """" " & $sCmdLine, $g_sWorkingDir, @SW_HIDE) ; cmd.exe only used to support launch like "..\AutoIt3\autoit3.exe" from console
 	If @error = 0 Then
 		SetLog("Restarting " & $g_sBotTitle)
 		; Wait 1 Minute to get closed
 		_SleepStatus(60 * 1000)
+		Return True
 	Else
 		SetLog("Cannot restart " & $g_sBotTitle, $COLOR_RED)
 	EndIf
 
-	Return SetError(2, 0, 0)
+	Return SetError(2, 0, False)
 EndFunc   ;==>_Restart

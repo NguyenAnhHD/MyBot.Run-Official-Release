@@ -43,7 +43,7 @@ EndFunc   ;==>_ImageSearch
 ; Example .......: No
 ; ===============================================================================================================================
 Func _ImageSearchArea($findImage, $resultPosition, $x1, $y1, $right, $bottom, ByRef $x, ByRef $y, $Tolerance)
-	Global $HBMP = $hHBitmap
+	Local $HBMP = $g_hHBitmap
 	If $g_bChkBackgroundMode = False Then
 		$HBMP = 0
 		$x1 += $g_aiBSpos[0]
@@ -85,23 +85,23 @@ Func _ImageSearchArea($findImage, $resultPosition, $x1, $y1, $right, $bottom, By
 			$x = $x + Int(Number($array[4]) / 2)
 			$y = $y + Int(Number($array[5]) / 2)
 		EndIf
-		;If $Hide = False Then
-			$x -= $x1
-			$y -= $y1
+		;If $g_bIsHidden = False Then
+		$x -= $x1
+		$y -= $y1
 		;EndIf
 		Return 1
 	EndIf
 EndFunc   ;==>_ImageSearchArea
 
-Func _ImageSearchAreaImgLoc($findImage, $resultPosition, $x1, $y1, $right, $bottom, ByRef $x, ByRef $y, $hHBMP = $hHBitmap)
+Func _ImageSearchAreaImgLoc($findImage, $resultPosition, $x1, $y1, $right, $bottom, ByRef $x, ByRef $y, $hHBMP = $g_hHBitmap)
 
 	Local $sArea = Int($x1) & "," & Int($y1) & "|" & Int($right) & "," & Int($y1) & "|" & Int($right) & "," & Int($bottom) & "|" & Int($x1) & "," & Int($bottom)
 	Local $MaxReturnPoints = 1
 
-	Local $res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $hHBMP, "str", $findImage,  "str", $sArea, "Int", $MaxReturnPoints)
+	Local $res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $hHBMP, "str", $findImage, "str", $sArea, "Int", $MaxReturnPoints)
 	If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 	If IsArray($res) Then
-		;If $g_iDebugSetlog = 1 Then SetLog("_ImageSearchAreaImgLoc " & $findImage & " succeeded " & $res[0] & ",$sArea=" & $sArea & ",$ToleranceImgLoc=" & $ToleranceImgLoc , $COLOR_ERROR)
+		;If $g_iDebugSetlog = 1 Then SetLog("_ImageSearchAreaImgLoc " & $findImage & " succeeded " & $res[0] & ",$sArea=" & $sArea & ",$g_fToleranceImgLoc=" & $g_fToleranceImgLoc , $COLOR_ERROR)
 		If $res[0] = "0" Or $res[0] = "" Then
 			;SetLog($findImage & " not found", $COLOR_GREEN)
 		ElseIf StringLeft($res[0], 2) = "-1" Then

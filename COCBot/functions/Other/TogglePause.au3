@@ -32,7 +32,7 @@ Func TogglePauseImpl($Source)
 EndFunc   ;==>TogglePauseImpl
 
 Func TogglePauseUpdateState($Source)
-	$actual_train_skip = 0
+	$g_iActualTrainSkip = 0
 
 	$g_bTogglePauseUpdateState = False
 
@@ -41,8 +41,8 @@ Func TogglePauseUpdateState($Source)
 		TrayTip($g_sBotTitle, "", 1)
 		TrayTip($g_sBotTitle, "was Paused!", 1, $TIP_ICONEXCLAMATION)
 		Setlog("Bot was Paused!", $COLOR_ERROR)
-		If Not $bSearchMode Then
-			$g_iTimePassed += Int(TimerDiff($g_hTimerSinceStarted))
+		If Not $g_bSearchMode Then
+			$g_iTimePassed += Int(__TimerDiff($g_hTimerSinceStarted))
 			;AdlibUnRegister("SetTime")
 		EndIf
 		PushMsg("Pause", $Source)
@@ -54,8 +54,8 @@ Func TogglePauseUpdateState($Source)
 		TrayTip($g_sBotTitle, "", 1)
 		TrayTip($g_sBotTitle, "was Resumed.", 1, $TIP_ICONASTERISK)
 		Setlog("Bot was Resumed.", $COLOR_SUCCESS)
-		If Not $bSearchMode Then
-			$g_hTimerSinceStarted = TimerInit()
+		If Not $g_bSearchMode Then
+			$g_hTimerSinceStarted = __TimerInit()
 			;AdlibRegister("SetTime", 1000)
 		EndIf
 		PushMsg("Resume", $Source)
@@ -69,11 +69,11 @@ EndFunc	  ;==>TogglePauseUpdateState
 
 Func TogglePauseSleep()
 	Local $counter = 0
-	Local $hTimerAutoResume = TimerInit()
+	Local $hTimerAutoResume = __TimerInit()
 	While $g_bBotPaused ; Actual Pause loop
-		If _Sleep($iDelayTogglePause1, True, True, False) Then ExitLoop
-		If $iChkAutoResume = 1 And TimerDiff($hTimerAutoResume) >= ($iAutoResumeTime * 60000) Then
-			SetLog("Auto resume bot after " & $iAutoResumeTime & " minutes of waiting", $COLOR_INFO)
+		If _Sleep($DELAYTOGGLEPAUSE1, True, True, False) Then ExitLoop
+		If $g_bAutoResumeEnable And __TimerDiff($hTimerAutoResume) >= ($g_iAutoResumeTime * 60000) Then
+			SetLog("Auto resume bot after " & $g_iAutoResumeTime & " minutes of waiting", $COLOR_INFO)
 			TogglePause()
 		EndIf
 		$counter = $counter + 1
@@ -85,5 +85,5 @@ Func TogglePauseSleep()
 	; everything below this WEnd is executed when unpaused!
 	$g_bSkipFirstZoomout = False
 	;ZoomOut() ; moved to resume
-	If _Sleep($iDelayTogglePause2, True, True, False) Then Return
+	If _Sleep($DELAYTOGGLEPAUSE2, True, True, False) Then Return
 EndFunc	  ;==>TogglePauseSleep

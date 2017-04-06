@@ -13,13 +13,6 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-; Enum for Weak Base Defense Types
-Global Enum $eWeakEagle = 1, $eWeakInferno, $eWeakXBow, $eWeakWizard, $eWeakMortar, $eWeakAirDefense
-
-; Weak Base Defense Building Information
-Global $weakDefenseNames = ["None", "Eagle Artillery", "Inferno Tower", "XBow", "Wizard Tower", "Mortar", "Air Defense"]
-Global $weakDefenseMaxLevels = [0, 2, 4, 4, 9, 9, 8]
-
 Func createWeakBaseStats()
 	; Get the directory file contents as keys for the stats file
 	Local $aKeys = _FileListToArrayRec(@ScriptDir & "\imgxml\WeakBase", "*.xml", $FLTAR_FILES, $FLTAR_RECUR, $FLTAR_SORT, $FLTAR_NOPATH)
@@ -64,30 +57,16 @@ Func readWeakBaseStats()
 	Return $return
 EndFunc   ;==>readWeakBaseStats
 
-Func saveWeakBaseStats()
-	; Handle to hold the file handle
-	Local $hFile = FileOpen($g_sProfileWeakBasePath, $FO_OVERWRITE)
-
-	; Loop through the current stats
-	For $j = 0 To UBound($aWeakBaseStats) - 1
-		; Write the new value to the stats file
-		IniWrite($g_sProfileWeakBasePath, "WeakBase", $aWeakBaseStats[$j][0], $aWeakBaseStats[$j][1])
-	Next
-
-	; Don't forget to close the file handle now that we are finished with it
-	FileClose($hFile)
-EndFunc   ;==>saveWeakBaseStats
-
 Func updateWeakBaseStats($aResult)
 	If IsArray($aResult) Then
 		; Loop through the found tiles
 		For $i = 1 To UBound($aResult) - 1
 			; Loop through the current stats
-			For $j = 0 To UBound($aWeakBaseStats) - 1
+			For $j = 0 To UBound($g_aiWeakBaseStats) - 1
 				; Check to see if the current stat is for the found tile
-				If $aWeakBaseStats[$j][0] = $aResult[$i][0] Then
+				If $g_aiWeakBaseStats[$j][0] = $aResult[$i][0] Then
 					; Update the counter
-					$aWeakBaseStats[$j][1] = Number($aWeakBaseStats[$j][1]) + 1
+					$g_aiWeakBaseStats[$j][1] = Number($g_aiWeakBaseStats[$j][1]) + 1
 				EndIf
 			Next
 		Next
@@ -153,15 +132,15 @@ Func getMaxUISetting($settingArray, $defenseType)
 
 	If IsArray($settingArray) Then
 		; Check if dead base search is active and dead base weak base detection is active, use setting if active, 0 if not active
-        $maxDB = (IsWeakBaseActive($DB)) ? $settingArray[$DB] : 0
+		$maxDB = (IsWeakBaseActive($DB)) ? $settingArray[$DB] : 0
 		; Check if live base search is active and live base weak base detection is active, use setting if active, 0 if not active
-        $maxLB = (IsWeakBaseActive($LB)) ? $settingArray[$LB] : 0
+		$maxLB = (IsWeakBaseActive($LB)) ? $settingArray[$LB] : 0
 
 		; Get the value that is highest
 		$result = _Max(Number($maxDB), Number($maxLB))
 	EndIf
 
-	If $g_iDebugSetlog = 1 Then SetLog("Max " & $weakDefenseNames[$defenseType] & " Level: " & $result, $COLOR_INFO)
+	If $g_iDebugSetlog = 1 Then SetLog("Max " & $g_aWeakDefenseNames[$defenseType] & " Level: " & $result, $COLOR_INFO)
 	Return $result
 EndFunc   ;==>getMaxUISetting
 
@@ -171,15 +150,15 @@ Func getMinUISetting($settingArray, $defenseType)
 
 	If IsArray($settingArray) Then
 		; Check if dead base search is active and dead base weak base detection is active, use setting if active, 0 if not active
-        $minDB = (IsWeakBaseActive($DB)) ? $settingArray[$DB] : 0
+		$minDB = (IsWeakBaseActive($DB)) ? $settingArray[$DB] : 0
 		; Check if live base search is active and live base weak base detection is active, use setting if active, 0 if not active
-        $minLB = (IsWeakBaseActive($LB)) ? $settingArray[$LB] : 0
+		$minLB = (IsWeakBaseActive($LB)) ? $settingArray[$LB] : 0
 
 		; Get the value that is highest
 		$result = _Min(Number($minDB), Number($minLB))
 	EndIf
 
-	If $g_iDebugSetlog = 1 Then SetLog("Min " & $weakDefenseNames[$defenseType] & " Level: " & $result, $COLOR_INFO)
+	If $g_iDebugSetlog = 1 Then SetLog("Min " & $g_aWeakDefenseNames[$defenseType] & " Level: " & $result, $COLOR_INFO)
 	Return $result
 EndFunc   ;==>getMinUISetting
 
@@ -192,7 +171,7 @@ Func getIsWeak($aResults, $searchType)
 EndFunc   ;==>getIsWeak
 
 Func IsWeakBaseActive($type)
-    Return ($g_abFilterMaxEagleEnable[$type] Or $g_abFilterMaxInfernoEnable[$type] Or $g_abFilterMaxXBowEnable[$type] Or $g_abFilterMaxWizTowerEnable[$type] Or _
+	Return ($g_abFilterMaxEagleEnable[$type] Or $g_abFilterMaxInfernoEnable[$type] Or $g_abFilterMaxXBowEnable[$type] Or $g_abFilterMaxWizTowerEnable[$type] Or _
 			$g_abFilterMaxMortarEnable[$type] Or $g_abFilterMaxAirDefenseEnable[$type]) And IsSearchModeActive($type, False, True)
 EndFunc   ;==>IsWeakBaseActive
 
@@ -201,33 +180,33 @@ Func defenseSearch(ByRef $aResult, $directory, $townHallLevel, $settingArray, $d
 	Local $defaultCoords[1][2] = [[0, 0]]
 
 	; Setup Empty Results in case to avoid errors, levels are set to max level of each type
-	Local $aDefenseResult[7] = ["Skipped", "Skipped", $weakDefenseMaxLevels[$defenseType], 0, 0, $defaultCoords, ""]
+	Local $aDefenseResult[7] = ["Skipped", "Skipped", $g_aWeakDefenseMaxLevels[$defenseType], 0, 0, $defaultCoords, ""]
 	; Results when search is not necessary because of levels
 	Local $aNotNecessary[7] = ["None", "None", 0, 0, 0, $defaultCoords, ""]
 
 	; Setup search limitations
 	Local $minSearchLevel = getMinUISetting($settingArray, $defenseType) + 1
 	Local $maxSearchLevel = getTHDefenseMax($townHallLevel, $defenseType)
-    Local $guiCheckDefense = IsArray($guiEnabledArray) And ((IsSearchModeActive($DB, False, True) And $guiEnabledArray[$DB]) Or (IsSearchModeActive($LB, False, True) And $guiEnabledArray[$LB]))
+	Local $guiCheckDefense = IsArray($guiEnabledArray) And ((IsSearchModeActive($DB, False, True) And $guiEnabledArray[$DB]) Or (IsSearchModeActive($LB, False, True) And $guiEnabledArray[$LB]))
 
 	; Only do the search if its required
 	If $performSearch Then
 		; Start the timer for individual defense searches
-		Local $defenseTimer = TimerInit()
+		Local $defenseTimer = __TimerInit()
 
 		If $guiCheckDefense And $maxSearchLevel >= $minSearchLevel Then
 			; Check the defense.
-			Local $sDefenseName = StringSplit($directory ,"\",$STR_NOCOUNT)
-			If $g_iDebugSetlog Then SetLog("checkDefense :" & $sDefenseName[ubound($sDefenseName)-1] & " > " & $minSearchLevel & " < "& $maxSearchLevel & " For TH:" & $townHallLevel, $COLOR_ORANGE)
+			Local $sDefenseName = StringSplit($directory, "\", $STR_NOCOUNT)
+			If $g_iDebugSetlog Then SetLog("checkDefense :" & $sDefenseName[UBound($sDefenseName) - 1] & " > " & $minSearchLevel & " < " & $maxSearchLevel & " For TH:" & $townHallLevel, $COLOR_ORANGE)
 			$aDefenseResult = returnHighestLevelSingleMatch($directory, $aResult[0][0], $g_sProfileWeakBasePath, $minSearchLevel, $maxSearchLevel, $forceCaptureRegion)
 			; Store the redlines retrieved for use in the later searches, if you don't currently have redlines saved.
 			If $aResult[0][0] = "" Then $aResult[0][0] = $aDefenseResult[6]
 			; Check to see if further searches are required, $performSearch is passed ByRef, so this will update the value in the calling function
 			If Number($aDefenseResult[2]) > getMaxUISetting($settingArray, $defenseType) Then $performSearch = False
-			If $g_iDebugSetlog = 1 Then SetLog("checkDefense: " & $weakDefenseNames[$defenseType] & " - " & Round(TimerDiff($defenseTimer) / 1000, 2) & " seconds")
+			If $g_iDebugSetlog = 1 Then SetLog("checkDefense: " & $g_aWeakDefenseNames[$defenseType] & " - " & Round(__TimerDiff($defenseTimer) / 1000, 2) & " seconds")
 		Else
 			$aDefenseResult = $aNotNecessary
-			If $g_iDebugSetlog = 1 Then SetLog("checkDefense: " & $weakDefenseNames[$defenseType] & " not necessary!")
+			If $g_iDebugSetlog = 1 Then SetLog("checkDefense: " & $g_aWeakDefenseNames[$defenseType] & " not necessary!")
 		EndIf
 	EndIf
 
@@ -249,13 +228,13 @@ Func weakBaseCheck($townHallLevel = 11, $redlines = "", $forceCaptureRegion = Tr
 	Local $aEagleResults, $aInfernoResults, $aMortarResults, $aWizardTowerResults, $aXBowResults, $aAirDefenseResults
 	Local $performSearch = True
 	; Start the timer for overall weak base search
-	Local $hWeakTimer = TimerInit()
+	Local $hWeakTimer = __TimerInit()
 
 	; Check Eagle Artillery first as there is less images to process, mortars may not be needed.
 	$aEagleResults = defenseSearch($aResult, @ScriptDir & "\imgxml\WeakBase\Eagle", $townHallLevel, $g_aiFilterMaxEagleLevel, $eWeakEagle, $performSearch, $g_abFilterMaxEagleEnable, $forceCaptureRegion)
 	$aInfernoResults = defenseSearch($aResult, @ScriptDir & "\imgxml\WeakBase\Infernos", $townHallLevel, $g_aiFilterMaxInfernoLevel, $eWeakInferno, $performSearch, $g_abFilterMaxInfernoEnable, $forceCaptureRegion)
 	$aXBowResults = defenseSearch($aResult, @ScriptDir & "\imgxml\WeakBase\Xbow", $townHallLevel, $g_aiFilterMaxXBowLevel, $eWeakXBow, $performSearch, $g_abFilterMaxXBowEnable, $forceCaptureRegion)
-	If  $iDetectedImageType = 1 then
+	If $g_iDetectedImageType = 1 Then
 		$aWizardTowerResults = defenseSearch($aResult, @ScriptDir & "\imgxml\WeakBase\WTower_Snow", $townHallLevel, $g_aiFilterMaxWizTowerLevel, $eWeakWizard, $performSearch, $g_abFilterMaxWizTowerEnable, $forceCaptureRegion)
 	Else
 		$aWizardTowerResults = defenseSearch($aResult, @ScriptDir & "\imgxml\WeakBase\WTower", $townHallLevel, $g_aiFilterMaxWizTowerLevel, $eWeakWizard, $performSearch, $g_abFilterMaxWizTowerEnable, $forceCaptureRegion)
@@ -287,7 +266,7 @@ Func weakBaseCheck($townHallLevel = 11, $redlines = "", $forceCaptureRegion = Tr
 	Next
 
 	; Extra return results
-	$aResult[0][2] = Round(TimerDiff($hWeakTimer) / 1000, 2) ; Time taken
+	$aResult[0][2] = Round(__TimerDiff($hWeakTimer) / 1000, 2) ; Time taken
 	$aResult[0][3] = "Seconds" ; Measurement unit
 
 	Return $aResult

@@ -16,38 +16,38 @@
 
 Func FindTownHall($check = True, $forceCaptureRegion = True)
 	Local $THString = ""
-	$searchTH = "-"
-	$THx=0
-	$THy=0;if not check, find     TH Snipe and bully mode, always find				if deadbase enabled, and TH lvl or Outside checked, find          same with ActiveBase
+	$g_iSearchTH = "-"
+	$g_iTHx = 0
+	$g_iTHy = 0 ;if not check, find     TH Snipe and bully mode, always find				if deadbase enabled, and TH lvl or Outside checked, find          same with ActiveBase
 
 	If $check = True Or _
-		 IsSearchModeActive($TS)  Or _
-		($isModeActive[$DB] And ($g_abFilterMeetTH[$DB] Or $g_abFilterMeetTHOutsideEnable[$DB])) Or _
-		($isModeActive[$LB] And ($g_abFilterMeetTH[$LB] Or $g_abFilterMeetTHOutsideEnable[$LB])) Then
+			IsSearchModeActive($TS) Or _
+			($isModeActive[$DB] And ($g_abFilterMeetTH[$DB] Or $g_abFilterMeetTHOutsideEnable[$DB])) Or _
+			($isModeActive[$LB] And ($g_abFilterMeetTH[$LB] Or $g_abFilterMeetTHOutsideEnable[$LB])) Then
 
-		$searchTH = imgloccheckTownHallADV2(0, 0, $forceCaptureRegion)
+		$g_iSearchTH = imgloccheckTownHallADV2(0, 0, $forceCaptureRegion)
 
 		;2nd attempt - NOT NEEDED AHS IMGLOC TRIES 2 TIMES
-		;If $searchTH = "-" Then ; retry with autoit search after $iDelayVillageSearch5 seconds
-		;	If _Sleep($iDelayGetResources5) Then Return
+		;If $g_iSearchTH = "-" Then ; retry with autoit search after $DELAYVILLAGESEARCH5 seconds
+		;	If _Sleep($DELAYGETRESOURCES5) Then Return
 		;	If $g_iDebugSetlog=1 Then SetLog("2nd attempt to detect the TownHall!", $COLOR_ERROR)
-		;	$searchTH = THSearch()
+		;	$g_iSearchTH = THSearch()
 		;EndIf
 
-		If $searchTH <> "-"  And SearchTownHallLoc() = False Then
-			$THLoc = "In"
-		ElseIf $searchTH <> "-" Then
-			$THLoc = "Out"
+		If $g_iSearchTH <> "-" And SearchTownHallLoc() = False Then
+			$g_sTHLoc = "In"
+		ElseIf $g_iSearchTH <> "-" Then
+			$g_sTHLoc = "Out"
 		Else
-			$THLoc = $searchTH
-			$THx = 0
-			$THy = 0
+			$g_sTHLoc = $g_iSearchTH
+			$g_iTHx = 0
+			$g_iTHy = 0
 		EndIf
 		;EndIf
-		Return " [TH]:" & StringFormat("%2s", $searchTH) & ", " & $THLoc
+		Return " [TH]:" & StringFormat("%2s", $g_iSearchTH) & ", " & $g_sTHLoc
 	EndIf
-	$THLoc = $searchTH
-	$THx = 0
-	$THy = 0
+	$g_sTHLoc = $g_iSearchTH
+	$g_iTHx = 0
+	$g_iTHy = 0
 	Return ""
-EndFunc
+EndFunc   ;==>FindTownHall

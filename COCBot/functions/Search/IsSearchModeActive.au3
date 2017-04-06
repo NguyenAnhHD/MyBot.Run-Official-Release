@@ -15,35 +15,35 @@
 ; ===============================================================================================================================
 
 Func IsSearchModeActive($g_iMatchMode, $nocheckHeroes = False, $bNoLog = False)
-	Local $currentSearch = $SearchCount + 1
-	Local $currentTropies = $iTrophyCurrent
-	Local $currentArmyCamps = Int($CurCamp / $TotalCamp * 100)
+	Local $currentSearch = $g_iSearchCount + 1
+	Local $currentTropies = $g_aiCurrentLoot[$eLootTrophy]
+	Local $currentArmyCamps = Int($g_CurrentCampUtilization / $g_iTotalCampSpace * 100)
 	Local $bMatchModeEnabled = False
 
 	Local $checkSearches = Int($currentSearch) >= Int($g_aiSearchSearchesMin[$g_iMatchMode]) And Int($currentSearch) <= Int($g_aiSearchSearchesMax[$g_iMatchMode]) And $g_abSearchSearchesEnable[$g_iMatchMode]
 	Local $checkTropies = Int($currentTropies) >= Int($g_aiSearchTrophiesMin[$g_iMatchMode]) And Int($currentTropies) <= Int($g_aiSearchTrophiesMax[$g_iMatchMode]) And $g_abSearchTropiesEnable[$g_iMatchMode]
 	Local $checkArmyCamps = Int($currentArmyCamps) >= Int($g_aiSearchCampsPct[$g_iMatchMode]) And $g_abSearchCampsEnable[$g_iMatchMode]
-	Local $checkHeroes = Not ($g_aiSearchHeroWaitEnable[$g_iMatchMode] > $eHeroNone And (BitAND($g_aiAttackUseHeroes[$g_iMatchMode], $g_aiSearchHeroWaitEnable[$g_iMatchMode], $iHeroAvailable) = $g_aiSearchHeroWaitEnable[$g_iMatchMode]) = False) Or $nocheckHeroes
+	Local $checkHeroes = Not ($g_aiSearchHeroWaitEnable[$g_iMatchMode] > $eHeroNone And (BitAND($g_aiAttackUseHeroes[$g_iMatchMode], $g_aiSearchHeroWaitEnable[$g_iMatchMode], $g_iHeroAvailable) = $g_aiSearchHeroWaitEnable[$g_iMatchMode]) = False) Or $nocheckHeroes
 
 	If $checkHeroes = False Then
-		If abs($g_aiSearchHeroWaitEnable[$g_iMatchMode] - $iHeroUpgradingBit) <= $eHeroNone Then $checkHeroes = True
+		If Abs($g_aiSearchHeroWaitEnable[$g_iMatchMode] - $g_iHeroUpgradingBit) <= $eHeroNone Then $checkHeroes = True
 	EndIf
 
-	Local $checkSpells = ($bFullArmySpells And $g_abSearchSpellsWaitEnable[$g_iMatchMode]) Or $g_abSearchSpellsWaitEnable[$g_iMatchMode] = False
+	Local $g_bCheckSpells = ($g_bFullArmySpells And $g_abSearchSpellsWaitEnable[$g_iMatchMode]) Or $g_abSearchSpellsWaitEnable[$g_iMatchMode] = False
 	Local $totalSpellsToBrew = 0
 	;--- To Brew
 	For $i = 0 To $eSpellCount - 1
-	   $totalSpellsToBrew += $g_aiArmyCompSpells[$i]
-    Next
+		$totalSpellsToBrew += $g_aiArmyCompSpells[$i]
+	Next
 
 	If GetCurTotalSpell() = $totalSpellsToBrew And $g_abSearchSpellsWaitEnable[$g_iMatchMode] Then
-		$checkSpells = True
-	ElseIf $bFullArmySpells = True And $g_abSearchSpellsWaitEnable[$g_iMatchMode] Then
-		$checkSpells = True
+		$g_bCheckSpells = True
+	ElseIf $g_bFullArmySpells = True And $g_abSearchSpellsWaitEnable[$g_iMatchMode] Then
+		$g_bCheckSpells = True
 	ElseIf $g_abSearchSpellsWaitEnable[$g_iMatchMode] = False Then
-		$checkSpells = True
+		$g_bCheckSpells = True
 	Else
-		$checkSpells = False
+		$g_bCheckSpells = False
 	EndIf
 
 	Switch $g_iMatchMode
@@ -59,53 +59,53 @@ Func IsSearchModeActive($g_iMatchMode, $nocheckHeroes = False, $bNoLog = False)
 
 	If $bMatchModeEnabled = False Then Return False ; exit if no DB, LB, TS mode enabled
 
-#CS	If $g_iDebugSetlog = 1 Then
+	#CS	If $g_iDebugSetlog = 1 Then
 		Setlog("====== DEBUG IsSearchModeActive ======" )
 		Setlog("$g_aiSearchHeroWaitEnable["& $g_iMatchMode &"]: " & $g_aiSearchHeroWaitEnable[$g_iMatchMode])
 		Setlog("$g_aiAttackUseHeroes["& $g_iMatchMode &"]: " & $g_aiAttackUseHeroes[$g_iMatchMode])
-		Setlog("$iHeroUpgradingBit: " & $iHeroUpgradingBit)
-		Setlog("$iHeroAvailable: " & $iHeroAvailable)
+		Setlog("$g_iHeroUpgradingBit: " & $g_iHeroUpgradingBit)
+		Setlog("$g_iHeroAvailable: " & $g_iHeroAvailable)
 		Setlog("$checkHeroes: " & $checkHeroes)
 		Setlog("======================================" )
-	EndIf
-#CE
+		EndIf
+	#CE
 
-	If $checkHeroes And $checkSpells Then ;If $checkHeroes Then
-        If ($checkSearches Or $g_abSearchSearchesEnable[$g_iMatchMode] = False) And ($checkTropies Or $g_abSearchTropiesEnable[$g_iMatchMode] = False) And ($checkArmyCamps Or $g_abSearchCampsEnable[$g_iMatchMode] = False) Then
-            If $g_iDebugSetlog = 1 And $bNoLog = False Then Setlog($g_asModeText[$g_iMatchMode] & " active! ($checkSearches=" & $checkSearches & ",$checkTropies=" & $checkTropies & ",$checkArmyCamps=" & $checkArmyCamps & ",$checkHeroes=" & $checkHeroes & ",$checkSpells=" & $checkSpells & ")", $COLOR_INFO) ;If $g_iDebugSetlog = 1 Then Setlog($g_asModeText[$g_iMatchMode] & " active! ($checkSearches=" & $checkSearches & ",$checkTropies=" & $checkTropies &",$checkArmyCamps=" & $checkArmyCamps & ",$checkHeroes=" & $checkHeroes & ")" , $COLOR_INFO)
+	If $checkHeroes And $g_bCheckSpells Then ;If $checkHeroes Then
+		If ($checkSearches Or $g_abSearchSearchesEnable[$g_iMatchMode] = False) And ($checkTropies Or $g_abSearchTropiesEnable[$g_iMatchMode] = False) And ($checkArmyCamps Or $g_abSearchCampsEnable[$g_iMatchMode] = False) Then
+			If $g_iDebugSetlog = 1 And $bNoLog = False Then Setlog($g_asModeText[$g_iMatchMode] & " active! ($checkSearches=" & $checkSearches & ",$checkTropies=" & $checkTropies & ",$checkArmyCamps=" & $checkArmyCamps & ",$checkHeroes=" & $checkHeroes & ",$g_bCheckSpells=" & $g_bCheckSpells & ")", $COLOR_INFO) ;If $g_iDebugSetlog = 1 Then Setlog($g_asModeText[$g_iMatchMode] & " active! ($checkSearches=" & $checkSearches & ",$checkTropies=" & $checkTropies &",$checkArmyCamps=" & $checkArmyCamps & ",$checkHeroes=" & $checkHeroes & ")" , $COLOR_INFO)
 			Return True
 		Else
-            If $g_iDebugSetlog = 1 And $bNoLog = False  Then
+			If $g_iDebugSetlog = 1 And $bNoLog = False Then
 				Setlog($g_asModeText[$g_iMatchMode] & " not active!", $COLOR_INFO)
-					Local $txtsearches = "Fail"
-					If $checkSearches Then $txtsearches = "Success"
-					Local $txttropies = "Fail"
-					If $checkTropies Then $txttropies = "Success"
-					Local $txtArmyCamp = "Fail"
-					If $checkArmyCamps Then $txtArmyCamp = "Success"
-					Local $txtHeroes = "Fail"
-					If $checkHeroes Then $txtHeroes = "Success"
-					If $g_abSearchSearchesEnable[$g_iMatchMode] Then Setlog("searches range: " & $g_aiSearchSearchesMin[$g_iMatchMode] & "-" & $g_aiSearchSearchesMax[$g_iMatchMode] & "  actual value: " & $currentSearch & " - " & $txtsearches, $COLOR_INFO)
-					If $g_abSearchTropiesEnable[$g_iMatchMode] Then Setlog("tropies range: " & $g_aiSearchTrophiesMin[$g_iMatchMode] & "-" & $g_aiSearchTrophiesMax[$g_iMatchMode] & "  actual value: " & $currentTropies & " | " & $txttropies, $COLOR_INFO)
-					If $g_abSearchCampsEnable[$g_iMatchMode] Then Setlog("Army camps % range >=: " & $g_aiSearchCampsPct[$g_iMatchMode] & " actual value: " & $currentArmyCamps & " | " & $txtArmyCamp, $COLOR_INFO)
-					If $g_aiSearchHeroWaitEnable[$g_iMatchMode] > $eHeroNone Then SetLog("Hero status " & BitAND($g_aiAttackUseHeroes[$g_iMatchMode], $g_aiSearchHeroWaitEnable[$g_iMatchMode], $iHeroAvailable) & " " & $iHeroAvailable & " | " & $txtHeroes, $COLOR_INFO)
-					Local $txtSpells = "Fail"
-					If $checkSpells Then $txtSpells = "Success"
-					If $g_abSearchSpellsWaitEnable[$g_iMatchMode] Then SetLog("Full spell status: " & $bFullArmySpells & " | " & $txtSpells, $COLOR_INFO)
+				Local $txtsearches = "Fail"
+				If $checkSearches Then $txtsearches = "Success"
+				Local $txttropies = "Fail"
+				If $checkTropies Then $txttropies = "Success"
+				Local $txtArmyCamp = "Fail"
+				If $checkArmyCamps Then $txtArmyCamp = "Success"
+				Local $txtHeroes = "Fail"
+				If $checkHeroes Then $txtHeroes = "Success"
+				If $g_abSearchSearchesEnable[$g_iMatchMode] Then Setlog("searches range: " & $g_aiSearchSearchesMin[$g_iMatchMode] & "-" & $g_aiSearchSearchesMax[$g_iMatchMode] & "  actual value: " & $currentSearch & " - " & $txtsearches, $COLOR_INFO)
+				If $g_abSearchTropiesEnable[$g_iMatchMode] Then Setlog("tropies range: " & $g_aiSearchTrophiesMin[$g_iMatchMode] & "-" & $g_aiSearchTrophiesMax[$g_iMatchMode] & "  actual value: " & $currentTropies & " | " & $txttropies, $COLOR_INFO)
+				If $g_abSearchCampsEnable[$g_iMatchMode] Then Setlog("Army camps % range >=: " & $g_aiSearchCampsPct[$g_iMatchMode] & " actual value: " & $currentArmyCamps & " | " & $txtArmyCamp, $COLOR_INFO)
+				If $g_aiSearchHeroWaitEnable[$g_iMatchMode] > $eHeroNone Then SetLog("Hero status " & BitAND($g_aiAttackUseHeroes[$g_iMatchMode], $g_aiSearchHeroWaitEnable[$g_iMatchMode], $g_iHeroAvailable) & " " & $g_iHeroAvailable & " | " & $txtHeroes, $COLOR_INFO)
+				Local $txtSpells = "Fail"
+				If $g_bCheckSpells Then $txtSpells = "Success"
+				If $g_abSearchSpellsWaitEnable[$g_iMatchMode] Then SetLog("Full spell status: " & $g_bFullArmySpells & " | " & $txtSpells, $COLOR_INFO)
 			EndIf
 			Return False
 		EndIf
 	ElseIf $checkHeroes = 0 Then
-        If $g_iDebugSetlog = 1 And $bNoLog = False  Then Setlog("Heroes not ready", $COLOR_DEBUG)
+		If $g_iDebugSetlog = 1 And $bNoLog = False Then Setlog("Heroes not ready", $COLOR_DEBUG)
 		Return False
 	Else
-        If $g_iDebugSetlog = 1 And $bNoLog = False  Then Setlog("Spells not ready", $COLOR_DEBUG)
+		If $g_iDebugSetlog = 1 And $bNoLog = False Then Setlog("Spells not ready", $COLOR_DEBUG)
 		Return False
 	EndIf
 EndFunc   ;==>IsSearchModeActive
 
 Func IsSearchModeActiveMini(Const $iMatchMode)
-    Return $g_abAttackTypeEnable[$DB] Or $g_abAttackTypeEnable[$LB] Or $g_abAttackTypeEnable[$TS]
+	Return $g_abAttackTypeEnable[$DB] Or $g_abAttackTypeEnable[$LB] Or $g_abAttackTypeEnable[$TS]
 EndFunc   ;==>IsSearchModeActiveMini
 
 ; #FUNCTION# ====================================================================================================================
@@ -149,7 +149,7 @@ EndFunc   ;==>IsWaitforSpellsActive
 ; ===============================================================================================================================
 Func IsWaitforHeroesActive()
 	For $i = $DB To $g_iModeCount - 1
-		If $g_abAttackTypeEnable[$i] And ($g_aiSearchHeroWaitEnable[$i] > $eHeroNone And (BitAND($g_aiAttackUseHeroes[$i], $g_aiSearchHeroWaitEnable[$i]) = $g_aiSearchHeroWaitEnable[$i]) And (abs($g_aiSearchHeroWaitEnable[$i] - $iHeroUpgradingBit) > $eHeroNone)) Then
+		If $g_abAttackTypeEnable[$i] And ($g_aiSearchHeroWaitEnable[$i] > $eHeroNone And (BitAND($g_aiAttackUseHeroes[$i], $g_aiSearchHeroWaitEnable[$i]) = $g_aiSearchHeroWaitEnable[$i]) And (Abs($g_aiSearchHeroWaitEnable[$i] - $g_iHeroUpgradingBit) > $eHeroNone)) Then
 			If $g_iDebugSetlogTrain = 1 Or $g_iDebugSetlog = 1 Then Setlog("IsWaitforHeroesActive = True", $COLOR_DEBUG)
 			Return True
 		EndIf

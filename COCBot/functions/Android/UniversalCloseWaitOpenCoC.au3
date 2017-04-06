@@ -59,7 +59,7 @@ Func UniversalCloseWaitOpenCoC($iWaitTime = 0, $sSource = "RudeUnknownProgrammer
 			SetLog("Code Monkey provided bad stop emulator flag value", $COLOR_ERROR)
 	EndSelect
 	If $g_iDebugSetlog = 1 Then Setlog("Stop Android flag : Input flag " & $StopAndroidFlag & " : " & $StopEmulator, $COLOR_DEBUG)
-	If _Sleep($iDelayRespond) Then Return False
+	If _Sleep($DELAYRESPOND) Then Return False
 
 	Switch $StopAndroidFlag
 		Case 0 ; Do nothing while waiting, Let app time out
@@ -67,9 +67,9 @@ Func UniversalCloseWaitOpenCoC($iWaitTime = 0, $sSource = "RudeUnknownProgrammer
 				SetLog("Going idle for " & $sWaitTime & "before starting CoC", $COLOR_SUCCESS)
 				If _SleepStatus($iWaitTime) Then Return False
 			Else
-				If _SleepStatus($iDelayWaitnOpenCoC10000) Then Return False ; if waittime = 0 then only wait 10 seconds before restart
+				If _SleepStatus($DELAYWAITNOPENCOC10000) Then Return False ; if waittime = 0 then only wait 10 seconds before restart
 			EndIf
-			If _Sleep($iDelayRespond) Then Return False
+			If _Sleep($DELAYRESPOND) Then Return False
 			OpenCoC()
 		Case 1 ; close CoC app only
 			PoliteCloseCoC($sSource)
@@ -84,9 +84,9 @@ Func UniversalCloseWaitOpenCoC($iWaitTime = 0, $sSource = "RudeUnknownProgrammer
 				AndroidShieldForceDown(False)
 				If $g_bRunState = False Then Return False
 			Else
-				WaitnOpenCoC($iDelayWaitnOpenCoC10000, $bFullRestart) ; if waittime = 0 then only wait 10 seconds before restart
+				WaitnOpenCoC($DELAYWAITNOPENCOC10000, $bFullRestart) ; if waittime = 0 then only wait 10 seconds before restart
 			EndIf
-			If _Sleep($iDelayRespond) Then Return False
+			If _Sleep($DELAYRESPOND) Then Return False
 			If $iWaitTime > 30000 Then
 				; ensure possible changes are populated
 				SaveConfig()
@@ -114,8 +114,8 @@ Func UniversalCloseWaitOpenCoC($iWaitTime = 0, $sSource = "RudeUnknownProgrammer
 					DisableGuiControls()
 				EndIf
 			Else
-				If _SleepStatus($iDelayWaitnOpenCoC10000) Then Return False
-				EndIf
+				If _SleepStatus($DELAYWAITNOPENCOC10000) Then Return False
+			EndIf
 			StartAndroidCoC()
 		Case Else
 			SetLog("Code Monkey is drinking banana liqueur again!", $COLOR_ERROR)

@@ -26,7 +26,7 @@ Global $g_hLblDELowEndMin = 0, $g_hLblDEEndAq = 0, $g_hLblABPercentHigher = 0, $
 Func CreateAttackSearchActiveBaseEndBattle()
    Local $sTxtTip = ""
    Local $x = 10, $y = 45
-	$g_hGrpABEndBattle = GUICtrlCreateGroup(GetTranslated(606,1, -1),  $x - 5, $y - 20, 155, 345)
+	$g_hGrpABEndBattle = GUICtrlCreateGroup(GetTranslated(606,1, -1),  $x - 5, $y - 20, 155, $g_iSizeHGrpTab4)
 	$y -=5
 		$g_hChkStopAtkABNoLoot1 = GUICtrlCreateCheckbox(GetTranslated(606,2, -1) ,$x, $y, -1, -1)
 			$sTxtTip = GetTranslated(606,3, -1) & @CRLF & GetTranslated(606,4, -1)
@@ -125,7 +125,7 @@ Func CreateAttackSearchActiveBaseEndBattle()
 		GUICtrlCreateGroup("", -99, -99, 1, 1)
 
    Local $x = 185, $y = 45
-   GUICtrlCreateGroup(GetTranslated(606,15,"DE side End Battle options"), $x - 20, $y - 20, 259, 305)
+   GUICtrlCreateGroup(GetTranslated(606,15,"DE side End Battle options"), $x - 20, $y - 20, 259, $g_iSizeHGrpTab4)
 		 GUICtrlCreateLabel(GetTranslated(606,16, "Attack Dark Elixir Side, End Battle Options") & ":", $x - 10, $y , -1, -1)
 			 _GUICtrlSetTip(-1, GetTranslated(606,17, "Enabled by selecting DE side attack in ActiveBase Deploy - Attack On: options"))
 

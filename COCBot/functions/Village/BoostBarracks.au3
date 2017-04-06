@@ -13,10 +13,10 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-Global $DebugBarrackBoost = 0
+Global Const $g_bDebugBarrackBoost = False
 
 Func BoostBarracks()
-	If $bTrainEnabled = False Then Return
+	If $g_bTrainEnabled = False Then Return
 	If $g_iCmbBoostBarracks = 0 Then Return
 	If $g_iCmbBoostBarracks >= 1 Then
 		Local $hour = StringSplit(_NowTime(4), ":", $STR_NOCOUNT)
@@ -44,13 +44,13 @@ Func BoostBarracks()
 		ClickP($aAway, 1, 0, "#0161")
 		PureClickP($aAway, 1, 0, "#0140")
 	EndIf
-	_Sleep($iDelayBoostBarracks5 + 1000)
+	_Sleep($DELAYBOOSTBARRACKS5 + 1000)
 	checkMainScreen(False) ; Check for errors during function
 	Return True
 EndFunc   ;==>BoostBarracks
 
 Func BoostSpellFactory()
-	If $bTrainEnabled = False Then Return
+	If $g_bTrainEnabled = False Then Return
 	If $g_iCmbBoostSpellFactory >= 1 Then
 		SetLog("Boosting Spell Factory...", $COLOR_BLUE)
 
@@ -72,21 +72,21 @@ Func BoostSpellFactory()
 			ClickP($aAway, 1, 0, "#0161")
 			PureClickP($aAway, 1, 0, "#0140")
 		EndIf
-		_Sleep($iDelayBoostBarracks5 + 1000)
+		_Sleep($DELAYBOOSTBARRACKS5 + 1000)
 		checkMainScreen(False) ; Check for errors during function
 		Return True
 	EndIf
 EndFunc   ;==>BoostSpellFactory
 
 Func ClickOnBoostArmyWindow()
-	If $DebugBarrackBoost = 1 Then SetLog("Func ClickOnBoostArmyWindow()", $COLOR_DEBUG) ;Debug
-	_Sleep($iDelayBoostBarracks2)
+	If $g_bDebugBarrackBoost Then SetLog("Func ClickOnBoostArmyWindow()", $COLOR_DEBUG) ;Debug
+	_Sleep($DELAYBOOSTBARRACKS2)
 	Local $ClockColor = _GetPixelColor(780, 312 + $g_iMidOffsetY, True)
 	Local $ResColCheck = _ColorCheck($ClockColor, Hex(0x65AF20, 6), 40)
 	If $ResColCheck = True Then
 		SetLog("Boost Button is Available, Clicking On...", $COLOR_BLUE)
 		Click(770, 325)
-		_Sleep($iDelayBoostBarracks2)
+		_Sleep($DELAYBOOSTBARRACKS2)
 		Return True
 	Else
 		If _ColorCheck(_GetPixelColor(718, 285 + $g_iMidOffsetY, True), Hex(0xEEF470, 6), 40) Then
@@ -99,24 +99,24 @@ Func ClickOnBoostArmyWindow()
 EndFunc   ;==>ClickOnBoostArmyWindow
 
 Func IsGemWindowOpen($AcceptGem = False)
-	If $DebugBarrackBoost = 1 Then SetLog("Func IsGemWindowOpen(" & $AcceptGem & ")", $COLOR_DEBUG) ;Debug
-	_Sleep($iDelayisGemOpen1)
+	If $g_bDebugBarrackBoost Then SetLog("Func IsGemWindowOpen(" & $AcceptGem & ")", $COLOR_DEBUG) ;Debug
+	_Sleep($DELAYISGEMOPEN1)
 	If _ColorCheck(_GetPixelColor(590, 235 + $g_iMidOffsetY, True), Hex(0xD80408, 6), 20) Then
 		If _ColorCheck(_GetPixelColor(375, 383 + $g_iMidOffsetY, True), Hex(0x222322, 6), 20) Then
-			If $g_iDebugSetlog = 1 Or $DebugBarrackBoost = 1 Then Setlog("DETECTED, GEM Window Is OPEN", $COLOR_DEBUG) ;Debug
+			If $g_iDebugSetlog = 1 Or $g_bDebugBarrackBoost Then Setlog("DETECTED, GEM Window Is OPEN", $COLOR_DEBUG) ;Debug
 			If $AcceptGem = True Then
 				Click(435, 445)
-				_Sleep($iDelayBoostBarracks2)
+				_Sleep($DELAYBOOSTBARRACKS2)
 				SetLog('Boost was Successful.', $COLOR_GREEN)
 			Else
 				PureClickP($aAway, 1, 0, "#0140") ; click away to close gem window
 			EndIf
-			_Sleep($iDelayBoostSpellFactory3)
+			_Sleep($DELAYBOOSTSPELLFACTORY3)
 			ClickP($aAway, 1, 0, "#0161")
-			If $DebugBarrackBoost = 1 Then SetLog("Func IsGemWindowOpen(" & $AcceptGem & ") = TRUE", $COLOR_GREEN)
+			If $g_bDebugBarrackBoost Then SetLog("Func IsGemWindowOpen(" & $AcceptGem & ") = TRUE", $COLOR_GREEN)
 			Return True
 		EndIf
 	EndIf
-	If $DebugBarrackBoost = 1 Then SetLog("Func IsGemWindowOpen(" & $AcceptGem & ") = FALSE", $COLOR_GREEN)
+	If $g_bDebugBarrackBoost Then SetLog("Func IsGemWindowOpen(" & $AcceptGem & ") = FALSE", $COLOR_GREEN)
 	Return False
 EndFunc   ;==>IsGemWindowOpen

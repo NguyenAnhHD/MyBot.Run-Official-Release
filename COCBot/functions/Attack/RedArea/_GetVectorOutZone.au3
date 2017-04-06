@@ -39,16 +39,16 @@ Func _GetVectorOutZone($eVectorType)
 		$yMin = $ExternalArea[3][1] - 2
 		$xMax = $ExternalArea[1][0] - 2
 		$yMax = $ExternalArea[1][1]
-	 EndIf
+	EndIf
 
-    ; CS69 these step variables are not needed, since the $x and $y below are not referenced
+	; CS69 these step variables are not needed, since the $x and $y below are not referenced
 	; $xStep = ($xMax - $xMin) / $iSteps
 	; $yStep = ($yMax - $yMin) / $iSteps
 
 	For $i = 0 To $iSteps
 		Local $pixel = [Round($xMin + (($xMax - $xMin) * $i) / $iSteps), Round($yMin + (($yMax - $yMin) * $i) / $iSteps)]
 		ReDim $vectorOutZone[UBound($vectorOutZone) + 1]
-		If $pixel[1] >  555 + $g_iBottomOffsetY Then
+		If $pixel[1] > 555 + $g_iBottomOffsetY Then
 			$pixel[1] = 555 + $g_iBottomOffsetY
 		EndIf
 		$vectorOutZone[UBound($vectorOutZone) - 1] = $pixel

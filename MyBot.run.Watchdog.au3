@@ -25,8 +25,9 @@
 #pragma compile(LegalCopyright, © https://mybot.run)
 #pragma compile(Out, MyBot.run.Watchdog.exe) ; Required
 
-;#include <WindowsConstants.au3>
-;#include <WinAPI.au3>
+; Enforce variable declarations
+Opt("MustDeclareVars", 1)
+
 #include <WinAPIProc.au3>
 #include <WinAPISys.au3>
 #include <Misc.au3>
@@ -55,7 +56,7 @@ Global $hTimeoutAutoClose = 0 ; Timer Handle for $iTimeoutAutoClose
 
 Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
-Global $iDelaySleep = 500
+Global $DELAYSLEEP = 500
 Global $g_iDebugSetlog = 0
 
 Func SetLog($String, $Color = $COLOR_BLACK, $LogPrefix = "L ")
@@ -74,8 +75,8 @@ EndFunc   ;==>_Sleep
 Func _SleepMicro($iMicroSec)
 	;Local $hStruct_SleepMicro = DllStructCreate("int64 time;")
 	;Local $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
-    DllStructSetData($hStruct_SleepMicro, "time", $iMicroSec * -10)
-    DllCall($hNtDll, "dword", "ZwDelayExecution", "int", 0, "ptr", $pStruct_SleepMicro)
+	DllStructSetData($hStruct_SleepMicro, "time", $iMicroSec * -10)
+	DllCall($hNtDll, "dword", "ZwDelayExecution", "int", 0, "ptr", $pStruct_SleepMicro)
 	;$hStruct_SleepMicro = 0
 EndFunc   ;==>_SleepMicro
 
@@ -83,24 +84,13 @@ Func _SleepMilli($iMilliSec)
 	_SleepMicro(Int($iMilliSec * 1000))
 EndFunc   ;==>_SleepMilli
 
-If @AutoItX64 = 1 Then
-	MsgBox(0, "", "Don't Run/Compile the Script as (x64)! try to Run/Compile the Script as (x86) to get the bot to work." & @CRLF & _
-			"If this message still appears, try to re-install AutoIt.")
-	Exit
-EndIf
-
-If Not FileExists(@ScriptDir & "\License.txt") Then
-	$license = InetGet("http://www.gnu.org/licenses/gpl-3.0.txt", @ScriptDir & "\License.txt")
-EndIf
-
-$sBotVersion = "v7.0" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
-$sBotTitle = "My Bot Watchdog " & $sBotVersion & " " ;~ Don't use any non file name supported characters like \ / : * ? " < > |
+Global $sBotVersion = "v7.0" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
+Global $sBotTitle = "My Bot Watchdog " & $sBotVersion & " " ;~ Don't use any non file name supported characters like \ / : * ? " < > |
 
 Opt("WinTitleMatchMode", 3) ; Window Title exact match mode
 
 #include "COCBot\functions\Other\Api.au3"
 #include "COCBot\functions\Other\ApiHost.au3"
-#include "COCBot\functions\Other\Synchronization.au3"
 #include "COCBot\functions\Other\LaunchConsole.au3"
 #include "COCBot\functions\Other\Time.au3"
 
@@ -112,7 +102,7 @@ EndIf
 
 ; create dummy form for Window Messsaging
 $frmBot = GUICreate($sBotTitle, 32, 32)
-$hStarted = TimerInit() ; Timer handle watchdog started
+$hStarted = __TimerInit() ; Timer handle watchdog started
 $hTimeoutAutoClose = $hStarted
 
 Local $iExitCode = 0
@@ -120,14 +110,14 @@ While 1
 	SetDebugLog("Broadcast query bot state, registered bots: " & UBound(GetManagedMyBotDetails()))
 	_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API_1_0, 0, $frmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
 
-	Local $hLoopTimer = TimerInit()
-	Local $hCheckTimer = TimerInit()
-	While TimerDiff($hLoopTimer) < $iTimeoutBroadcast
-		_Sleep($iDelaySleep)
-		If TimerDiff($hCheckTimer) >= $iTimeoutCheckBot Then
+	Local $hLoopTimer = __TimerInit()
+	Local $hCheckTimer = __TimerInit()
+	While __TimerDiff($hLoopTimer) < $iTimeoutBroadcast
+		_Sleep($DELAYSLEEP)
+		If __TimerDiff($hCheckTimer) >= $iTimeoutCheckBot Then
 			; check if bot not responding anymore and restart if so
 			CheckManagedMyBot($iTimeoutRestartBot)
-			$hCheckTimer = TimerInit()
+			$hCheckTimer = __TimerInit()
 		EndIf
 	WEnd
 
@@ -135,15 +125,15 @@ While 1
 	SetDebugLog("Active bots: " & GetActiveMyBotCount($iTimeoutBroadcast + 3000))
 
 	; automatically close watchdog when no bot available
-	If $iTimeoutAutoClose > -1 And TimerDiff($hTimeoutAutoClose) > $iTimeoutAutoClose Then
+	If $iTimeoutAutoClose > -1 And __TimerDiff($hTimeoutAutoClose) > $iTimeoutAutoClose Then
 		If UBound(GetManagedMyBotDetails()) = 0 Then
 			SetLog("Closing " & $sBotTitle & "as no running bot found")
 			$iExitCode = 1
 		EndIf
-		$hTimeoutAutoClose = TimerInit() ; timeout starts again
+		$hTimeoutAutoClose = __TimerInit() ; timeout starts again
 	EndIf
 
 WEnd
 
 DllClose("ntdll.dll")
-Exit($iExitCode)
+Exit ($iExitCode)

@@ -27,12 +27,12 @@ Func CheckDisplay()
 	If $iDPIRatio <> 1 Then
 		ShowDPIHelp($iDPIRatio * 100)
 	Else
-		If $g_iDebugSetlog = 1 Then SetLog(_PadStringCenter("  Display DPI setting = " & $iDPIRatio & "  ", 53, "+"), $COLOR_INFO)
+		If $g_iDebugSetlog = 1 Then SetLogCentered("  Display DPI setting = " & $iDPIRatio & "  ", "+", $COLOR_INFO)
 		ConsoleWrite('DPI= ' & $iDPIRatio & @CRLF)
 		$bDisplayDPI = True ; DPI OK
 	EndIf
 
-	Local $hMonitor = _WinAPI_MonitorFromWindow($HWnD) ; Get display handle with Android Emulator window
+	Local $hMonitor = _WinAPI_MonitorFromWindow($g_hAndroidWindow) ; Get display handle with Android Emulator window
 	ConsoleWrite('Handle: ' & $hMonitor & @CRLF) ; debug handle data
 
 	Local $aMonitorData = _WinAPI_EnumDisplayMonitors() ; Get data for all displays in system
@@ -54,15 +54,15 @@ Func CheckDisplay()
 				$sBSDisplaySize = $aMonitorData[$i][3] & "x" & $aMonitorData[$i][4]
 				ConsoleWrite("DisplaySizeFound: " & $sBSDisplaySize & @CRLF)
 				If ($aMonitorData[$i][3] < $iDisplaySizeMin) Or ($aMonitorData[$i][4] < $iDisplaySizeMin) Then
-					SetLog(_PadStringCenter(" Warning!! Display size smaller than recommended = " & $sBSDisplaySize & " ", 53, "+"), $COLOR_ERROR)
-					SetLog(_PadStringCenter(" MBR will attempt to auto adjust Emulator size ", 53, "+"), $COLOR_ERROR)
-					SetLog(_PadStringCenter(" Make sure task bar isn't covering Emulator ", 53, "+"), $COLOR_ERROR)
-					SetLog(_PadStringCenter(" Search MyBot.run forums if any problems ", 53, "+"), $COLOR_ERROR)
-					SetLog(_PadStringCenter(" Click ""Start Bot"" to proceed ", 53, "+"), $COLOR_ERROR)
+					SetLogCentered(" Warning!! Display size smaller than recommended = " & $sBSDisplaySize & " ", "+", $COLOR_ERROR)
+					SetLogCentered(" MBR will attempt to auto adjust Emulator size ", "+", $COLOR_ERROR)
+					SetLogCentered(" Make sure task bar isn't covering Emulator ", "+", $COLOR_ERROR)
+					SetLogCentered(" Search MyBot.run forums if any problems ", "+", $COLOR_ERROR)
+					SetLogCentered(" Click ""Start Bot"" to proceed ", "+", $COLOR_ERROR)
 					Setlog(" ")
 				Else
 					ConsoleWrite("Display Check Pass!" & @CRLF)
-					If $g_iDebugSetlog = 1 Then SetLog(_PadStringCenter(" Display size= " & $sBSDisplaySize & " ", 50, "+"), $COLOR_INFO)
+					If $g_iDebugSetlog = 1 Then SetLogCentered(" Display size= " & $sBSDisplaySize & " ", "+", $COLOR_INFO)
 					ExitLoop
 				EndIf
 			EndIf
@@ -78,11 +78,11 @@ Func CheckDisplay()
 
 EndFunc   ;==>CheckDisplay
 Func ShowDPIHelp($currentDPI)
-	Local $text = GetTranslated(640,4,"Your DPI is incorrect. It is set to") & " " & $currentDPI & GetTranslated(640,5,"%. You must set it to 100% for this bot to work.") & @CRLF & _
-			GetTranslated(640,6,"When you have changed the DPI to the correct value, reboot your computer and run the bot again.") & @CRLF & _
-			GetTranslated(640,7,"You won't be able to use the bot until you make this change.") & @CRLF & @CRLF & _
-			GetTranslated(640,8,"Click OK to view instructions on how to change DPI")
-	Local $button = MsgBox($MB_OKCANCEL + $MB_ICONWARNING, GetTranslated(640,3,"DPI incorrect"), $text)
+	Local $text = GetTranslated(640, 4, "Your DPI is incorrect. It is set to") & " " & $currentDPI & GetTranslated(640, 5, "%. You must set it to 100% for this bot to work.") & @CRLF & _
+			GetTranslated(640, 6, "When you have changed the DPI to the correct value, reboot your computer and run the bot again.") & @CRLF & _
+			GetTranslated(640, 7, "You won't be able to use the bot until you make this change.") & @CRLF & @CRLF & _
+			GetTranslated(640, 8, "Click OK to view instructions on how to change DPI")
+	Local $button = MsgBox($MB_OKCANCEL + $MB_ICONWARNING, GetTranslated(640, 3, "DPI incorrect"), $text)
 	If $button = $IDOK Then
 		Switch @OSVersion
 			Case "WIN_10"
@@ -96,7 +96,7 @@ Func ShowDPIHelp($currentDPI)
 			Case "WIN_2012"
 				ShellExecute("https://mybot.run/forums/index.php?/topic/15137-change-dpi-to-100/#comment-141160")
 			Case Else
-				MsgBox($MB_OK, GetTranslated(640,9,"Unsupported"), GetTranslated(640,10,"Sorry, your operating system isn't supported by the bot."))
+				MsgBox($MB_OK, GetTranslated(640, 9, "Unsupported"), GetTranslated(640, 10, "Sorry, your operating system isn't supported by the bot."))
 		EndSwitch
 	EndIf
 	btnStop()

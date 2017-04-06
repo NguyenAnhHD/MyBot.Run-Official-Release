@@ -18,7 +18,7 @@ Global $g_hCmbCOCDistributors
 
 Func CreateBotAndroid()
    Local $x = 25, $y = 45
-   GUICtrlCreateGroup(GetTranslated(643,1, "Distributors"), $x - 20, $y - 20, 210, 47)
+   GUICtrlCreateGroup(GetTranslated(643,1, "Distributors"), $x - 20, $y - 20, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2)
 	   $y -=2
 	   $g_hCmbCOCDistributors = GUICtrlCreateCombo("", $x - 8 , $y, 185, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
 	   _GUICtrlSetTip(-1, GetTranslated(643,2, "Allow bot to launch COC based on the distribution chosen"))

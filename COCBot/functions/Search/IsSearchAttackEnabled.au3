@@ -18,21 +18,21 @@ Func IsSearchAttackEnabled()
 
 	If $g_iDebugSetlog = 1 Then Setlog("Begin IsSearchAttackScheduled:", $COLOR_DEBUG1)
 
-	If $ichkAttackPlannerEnable = 0 Then Return True ; return true if attack planner is not enabled
+	If $g_bAttackPlannerEnable = False Then Return True ; return true if attack planner is not enabled
 
 	Local $sStartTime = "", $sEndTime = ""
 	Local $aNoAttackTimes[2] = [$sStartTime, $sEndTime] ; array to hold start/end time for when attacking is disabled.
 	Local $iWaitTime = 0
 
-	Local $bCloseGame = $ichkAttackPlannerCloseCoC = 1 Or $ichkAttackPlannerCloseAll = 1 ; flag summary for closing game from GUI values
+	Local $bCloseGame = $g_bAttackPlannerCloseCoC = True Or $g_bAttackPlannerCloseAll = True ; flag summary for closing game from GUI values
 	If $g_iDebugSetlog = 1 Then Setlog("$bCloseGame:" & $bCloseGame, $COLOR_DEBUG)
 
-	If $ichkAttackPlannerDayLimit = 1 And _OverAttackLimit() Then  ; check daily attack limit before checking schedule
+	If $g_bAttackPlannerDayLimit = True And _OverAttackLimit() Then ; check daily attack limit before checking schedule
 		Setlog("Daily attack limit reached, skip attacks till new day starts!", $COLOR_INFO)
-		If _Sleep($iDelayRespond) Then Return True
+		If _Sleep($DELAYRESPOND) Then Return True
 		If $bCloseGame Then
 			$iWaitTime = _getTimeRemainTimeToday() ; get seconds left in day till Midnight
-			UniversalCloseWaitOpenCoC($iWaitTime * 1000, "IsSearchAttackScheduled_", $ichkAttackPlannerCloseAll, True) ; Close and Wait for attacking to start
+			UniversalCloseWaitOpenCoC($iWaitTime * 1000, "IsSearchAttackScheduled_", $g_bAttackPlannerCloseAll, True) ; Close and Wait for attacking to start
 			$g_bRestart = True
 			Return
 		Else
@@ -40,15 +40,15 @@ Func IsSearchAttackEnabled()
 		EndIf
 	EndIf
 
-	If $ichkAttackPlannerRandom = 1 Then ; random attack start/stop selected
-		$aNoAttackTimes = _getDailyRandomStartEnd($icmbAttackPlannerRandom) ; determine hours to start/end attack today
+	If $g_bAttackPlannerRandomEnable = True Then ; random attack start/stop selected
+		$aNoAttackTimes = _getDailyRandomStartEnd($g_iAttackPlannerRandomTime) ; determine hours to start/end attack today
 		If @error Then ; log extended error message and return false to keep attacking if something strange happens
 			Setlog(@extended, $COLOR_ERROR)
 			Return True
 		EndIf
 		If _IsTimeInRange($aNoAttackTimes[0], $aNoAttackTimes[1]) Then ; returns true if time now is between start/end time
 			Setlog("Attack schedule random skip time found....", $COLOR_INFO)
-			If _Sleep($iDelayRespond) Then Return True
+			If _Sleep($DELAYRESPOND) Then Return True
 			If $bCloseGame Then
 				$iWaitTime = _DateDiff("s", $aNoAttackTimes[1], _NowCalc()) ; find time to stop attacking in seconds
 				If @error Then
@@ -56,7 +56,7 @@ Func IsSearchAttackEnabled()
 					SetError(1, "Can not find NoAttack wait time", True)
 					Return True
 				EndIf
-				UniversalCloseWaitOpenCoC($iWaitTime * 1000, "IsSearchAttackScheduled_", $ichkAttackPlannerCloseAll, True) ; Close and Wait for attacking to start
+				UniversalCloseWaitOpenCoC($iWaitTime * 1000, "IsSearchAttackScheduled_", $g_bAttackPlannerCloseAll, True) ; Close and Wait for attacking to start
 				$g_bRestart = True
 				Return
 			Else
@@ -68,30 +68,30 @@ Func IsSearchAttackEnabled()
 	Else ; if not random stop attack time, use attack planner times set in GUI
 		If IsPlannedTimeNow() = False Then
 			Setlog("Attack schedule planned skip time found...", $COLOR_INFO)
-			If _Sleep($iDelayRespond) Then Return True
+			If _Sleep($DELAYRESPOND) Then Return True
 			If $bCloseGame Then
 				; determine how long to close CoC or emulator if selected
-				If $iPlannedAttackWeekDays[@WDAY - 1] = 0 Then
+				If $g_abPlannedAttackWeekDays[@WDAY - 1] = False Then
 					$iWaitTime = _getTimeRemainTimeToday() ; get number of seconds remaining till Midnight today
 					For $i = @WDAY To 6
-						If $iPlannedAttackWeekDays[$i] = 0 Then $iWaitTime += 86400 ; add 1 day of seconds to wait time
-						If $iPlannedAttackWeekDays[$i] = 1 Then ExitLoop ; stop adding days when find attack planner enabled
+						If $g_abPlannedAttackWeekDays[$i] = False Then $iWaitTime += 86400 ; add 1 day of seconds to wait time
+						If $g_abPlannedAttackWeekDays[$i] = True Then ExitLoop ; stop adding days when find attack planner enabled
 						If $g_iDebugSetlog = 1 Then Setlog("Subtotal wait time= " & $iWaitTime & " Seconds", $COLOR_DEBUG)
 					Next
 				EndIf
 				If $iWaitTime = 0 Then ; if days are not set then compute wait time from hours
-					If $iPlannedAttackWeekDays[@WDAY - 1] = 1 And $iPlannedattackHours[@HOUR] = 0 Then
+					If $g_abPlannedAttackWeekDays[@WDAY - 1] = True And $g_abPlannedattackHours[@HOUR] = False Then
 						$iWaitTime += (59 - @MIN) * 60 ; compute seconds left this hour
 						For $i = @HOUR + 1 To 23
-							If $iPlannedattackHours[$i] = 0 Then $iWaitTime += 3600 ; add 1 hour of seconds to wait time
-							If $iPlannedattackHours[$i] = 1 Then ExitLoop ; stop adding hours when find attack planner enabled
+							If $g_abPlannedattackHours[$i] = False Then $iWaitTime += 3600 ; add 1 hour of seconds to wait time
+							If $g_abPlannedattackHours[$i] = True Then ExitLoop ; stop adding hours when find attack planner enabled
 							If $g_iDebugSetlog = 1 Then Setlog("Subtotal wait time= " & $iWaitTime & " Seconds", $COLOR_DEBUG)
 						Next
 					EndIf
 				EndIf
 				If $g_iDebugSetlog = 1 Then Setlog("Stop attack wait time= " & $iWaitTime & " Seconds", $COLOR_DEBUG)
 				; close emulator as directed
-				UniversalCloseWaitOpenCoC($iWaitTime * 1000, "IsSearchAttackScheduled_", $ichkAttackPlannerCloseAll, True) ; Close and Wait for attacking to start
+				UniversalCloseWaitOpenCoC($iWaitTime * 1000, "IsSearchAttackScheduled_", $g_bAttackPlannerCloseAll, True) ; Close and Wait for attacking to start
 				$g_bRestart = True
 				Return
 			Else
@@ -205,39 +205,39 @@ EndFunc   ;==>_getDailyRandom
 
 Func IsPlannedTimeNow()
 	Local $hour, $hourloot
-	If $iPlannedAttackWeekDays[@WDAY - 1] = 1 Then
+	If $g_abPlannedAttackWeekDays[@WDAY - 1] = True Then
 		$hour = StringSplit(_NowTime(4), ":", $STR_NOCOUNT)
 		$hourloot = $hour[0]
-		If $iPlannedattackHours[$hourloot] = 1 Then
+		If $g_abPlannedattackHours[$hourloot] = True Then
 			If $g_iDebugSetlog = 1 Then SetLog("Attack plan enabled for now..", $COLOR_DEBUG)
 			Return True
 		Else
 			SetLog("Attack plan enabled today, but not this hour", $COLOR_INFO)
-			If _Sleep($iDelayRespond) Then Return False
+			If _Sleep($DELAYRESPOND) Then Return False
 			Return False
 		EndIf
 	Else
 		SetLog("Attack plan not enabled today", $COLOR_INFO)
-		If _Sleep($iDelayRespond) Then Return False
+		If _Sleep($DELAYRESPOND) Then Return False
 		Return False
 	EndIf
 EndFunc   ;==>IsPlannedTimeNow
 
 Func _OverAttackLimit()
 	Local Static $iAttackCountToday = 0 ; Store daily count locally
-	Local Static $iTotalAttackCount = $iAttackedCount ; Store previous total count locally
+	Local Static $iTotalAttackCount = $g_aiAttackedCount ; Store previous total count locally
 	Local Static $iNowDay = @YDAY ; record numeric value for today
 	If $iNowDay <> @YDAY Then ; if 1 day or more has passed since last time, update daily attack limit
 		$iAttackCountToday = 0 ; reset daily count
 		$iNowDay = @YDAY ; set new year day value
-		$iTotalAttackCount = $iAttackedCount ; total count updated to Stats updated count since bot start
+		$iTotalAttackCount = $g_aiAttackedCount ; total count updated to Stats updated count since bot start
 	Else
-		$iAttackCountToday = $iAttackedCount - $iTotalAttackCount ; subtract old total attack count from current attack count to update Today count
+		$iAttackCountToday = $g_aiAttackedCount - $iTotalAttackCount ; subtract old total attack count from current attack count to update Today count
 	EndIf
-	If $g_iDebugSetlog = 1 Then Setlog("AttackCountToday: " & $iAttackCountToday & ", AttackedCount: " & $iAttackedCount & "TotalAttackCount: " & $iTotalAttackCount, $COLOR_DEBUG)
+	If $g_iDebugSetlog = 1 Then Setlog("AttackCountToday: " & $iAttackCountToday & ", AttackedCount: " & $g_aiAttackedCount & "TotalAttackCount: " & $iTotalAttackCount, $COLOR_DEBUG)
 	; Need to get attack limits from GUI variables and use randomization
-	Local $iRandomAttackCountToday = Ceiling(Int($icmbAttackPlannerDayMin) + (_getDailyRandom() * (Int($icmbAttackPlannerDayMax) - Int($icmbAttackPlannerDayMin))))
-	If $iRandomAttackCountToday > Int($icmbAttackPlannerDayMax) Then $iRandomAttackCountToday = Int($icmbAttackPlannerDayMax)
+	Local $iRandomAttackCountToday = Ceiling(Int($g_iAttackPlannerDayMin) + (_getDailyRandom() * (Int($g_iAttackPlannerDayMax) - Int($g_iAttackPlannerDayMin))))
+	If $iRandomAttackCountToday > Int($g_iAttackPlannerDayMax) Then $iRandomAttackCountToday = Int($g_iAttackPlannerDayMax)
 	If $g_iDebugSetlog = 1 Then Setlog("RandomAttackCountToday: " & $iRandomAttackCountToday, $COLOR_DEBUG)
 	If $iAttackCountToday > $iRandomAttackCountToday Then Return True
 	Return False

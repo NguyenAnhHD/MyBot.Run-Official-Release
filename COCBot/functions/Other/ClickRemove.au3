@@ -18,7 +18,7 @@ Func ClickRemove($FeatureName = "Remove")
 		Local $i = 0
 		While 1 ; wait window with remove button
 			Local $offColors[3][3] = [[0x111111, 109, 0], [0xFFFFFF, 65, 10], [0xC00000, 55, 20]] ; 2nd Black opposite button, 3rd pixel white "O" center top, 4th pixel Red in bottom center
-			Global $ButtonPixel = _MultiPixelSearch(472, 251, 588, 278, 1, 1, Hex(0x090908, 6), $offColors, 20) ; first vertical black pixel of Remove, used 860x780, need to check 860x720?
+			Local $ButtonPixel = _MultiPixelSearch(472, 251, 588, 278, 1, 1, Hex(0x090908, 6), $offColors, 20) ; first vertical black pixel of Remove, used 860x780, need to check 860x720?
 			If $g_iDebugSetlog = 1 Then Setlog($FeatureName & " btn chk-#1: " & _GetPixelColor(475, 255, True) & ", #2: " & _GetPixelColor(475 + 109, 255, True) & ", #3: " & _GetPixelColor(475 + 65, 255 + 10, True) & ", #4: " & _GetPixelColor(475 + 55, 255 + 20, True), $COLOR_DEBUG)
 			If IsArray($ButtonPixel) Then
 				If $g_iDebugSetlog = 1 Then
@@ -35,7 +35,7 @@ Func ClickRemove($FeatureName = "Remove")
 				Return
 			EndIf
 			$i += 1
-			If _Sleep($iSpecialClick1) Then Return False ; improve pause button response
+			If _Sleep($DELAYSPECIALCLICK1) Then Return False ; improve pause button response
 		WEnd
 		Return True
 	Else

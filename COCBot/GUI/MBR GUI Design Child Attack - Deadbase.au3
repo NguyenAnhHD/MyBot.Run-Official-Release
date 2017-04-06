@@ -28,7 +28,7 @@ Global $g_hGUI_DEADBASE_TAB = 0, $g_hGUI_DEADBASE_TAB_ITEM1 = 0, $g_hGUI_DEADBAS
 
 Func CreateAttackSearchDeadBase()
 
-   $g_hGUI_DEADBASE = GUICreate("", $_GUI_MAIN_WIDTH - 40, $_GUI_MAIN_HEIGHT - 315, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_SEARCH)
+   $g_hGUI_DEADBASE = _GUICreate("", $g_iSizeWGrpTab3, $g_iSizeHGrpTab3, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_SEARCH)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_DEADBASE)
    ;creating subchilds first!
    CreateAttackSearchDeadBaseStandard()
@@ -36,7 +36,7 @@ Func CreateAttackSearchDeadBase()
    CreateAttackSearchDeadBaseMilking()
    GUISwitch($g_hGUI_DEADBASE)
 
-   $g_hGUI_DEADBASE_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 40, $_GUI_MAIN_HEIGHT - 315, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_DEADBASE_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
    $g_hGUI_DEADBASE_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,28,"Search"))
    CreateAttackSearchDeadBaseSearch()
 

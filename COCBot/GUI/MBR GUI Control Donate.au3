@@ -5,13 +5,18 @@
 ; Parameters ....: None
 ; Return values .: None
 ; Author ........: MyBot.run team
-; Modified ......: MonkeyHunter (07-2016)
+; Modified ......: MonkeyHunter (07-2016), CodeSlinger69 (2017)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
+#include-once
+
+Global $g_aiDonIcons[20] = [$eIcnDonBarbarian, $eIcnDonArcher, $eIcnDonGiant, $eIcnDonGoblin, $eIcnDonWallBreaker, $eIcnDonBalloon, $eIcnDonWizard, $eIcnDonHealer, _
+						 $eIcnDonDragon, $eIcnDonPekka, $eIcnDonBabyDragon, $eIcnDonMiner, $eIcnDonMinion, $eIcnDonHogRider, $eIcnDonValkyrie, $eIcnDonGolem, _
+						 $eIcnDonWitch, $eIcnDonLavaHound, $eIcnDonBowler, $eIcnDonBlank]
 
 Func btnDonateTroop()
     For $i = 0 To $eTroopCount-1 + $g_iCustomDonateConfigs
@@ -87,18 +92,18 @@ Func cmbDonateCustomA()
 	Local $combo1 = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomA[0])
 	Local $combo2 = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomA[1])
 	Local $combo3 = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomA[2])
-	GUICtrlSetImage($g_ahPicDonateCustomA[0], $g_sLibIconPath, $aDonIcons[$combo1])
-	GUICtrlSetImage($g_ahPicDonateCustomA[1], $g_sLibIconPath, $aDonIcons[$combo2])
-	GUICtrlSetImage($g_ahPicDonateCustomA[2], $g_sLibIconPath, $aDonIcons[$combo3])
+	GUICtrlSetImage($g_ahPicDonateCustomA[0], $g_sLibIconPath, $g_aiDonIcons[$combo1])
+	GUICtrlSetImage($g_ahPicDonateCustomA[1], $g_sLibIconPath, $g_aiDonIcons[$combo2])
+	GUICtrlSetImage($g_ahPicDonateCustomA[2], $g_sLibIconPath, $g_aiDonIcons[$combo3])
 EndFunc   ;==>cmbDonateCustomA
 
 Func cmbDonateCustomB()
 	Local $combo1 = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomB[0])
 	Local $combo2 = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomB[1])
 	Local $combo3 = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomB[2])
-	GUICtrlSetImage($g_ahPicDonateCustomB[0], $g_sLibIconPath, $aDonIcons[$combo1])
-	GUICtrlSetImage($g_ahPicDonateCustomB[1], $g_sLibIconPath, $aDonIcons[$combo2])
-	GUICtrlSetImage($g_ahPicDonateCustomB[2], $g_sLibIconPath, $aDonIcons[$combo3])
+	GUICtrlSetImage($g_ahPicDonateCustomB[0], $g_sLibIconPath, $g_aiDonIcons[$combo1])
+	GUICtrlSetImage($g_ahPicDonateCustomB[1], $g_sLibIconPath, $g_aiDonIcons[$combo2])
+	GUICtrlSetImage($g_ahPicDonateCustomB[2], $g_sLibIconPath, $g_aiDonIcons[$combo3])
 EndFunc   ;==>cmbDonateCustomB
 
 Func _DonateBtn($hFirstControl, $hLastControl)

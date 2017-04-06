@@ -110,7 +110,7 @@ Global $aOAER_DATA[$iOAER_Total]
 ;                                           							$iScript_Line	- Error script line number
 ;                                           							$sError_Msg		- Error message
 ;                                           							$vParams		- User parameters passed by $vParams
-;                                           							$hBitmap        - hBitmap of last screen capture.
+;                                           							$g_hBitmap        - hBitmap of last screen capture.
 ;					$vParams          - [Optional] User defined parameters that passed to $sFunction (default is '' - no parameters).
 ;					$sTitle           - [Optional] The title of the default error message dialog (used only if $sFunction = '').
 ;					$bUseStdOut       - [Optional] Defines the method that will be used to catch AutoIt errors (default is False - use hook method).

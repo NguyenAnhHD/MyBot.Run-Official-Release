@@ -87,14 +87,16 @@ Global $aIsGemWindow3[4] = [586, 266 + $g_iMidOffsetY, 0xBC1218, 20] ; Main Scre
 Global $aIsGemWindow4[4] = [595, 266 + $g_iMidOffsetY, 0xBC1218, 20] ; Main Screen, pixel below Red X to close gem window
 Global $aLootCartBtn[2] = [430, 640 + $g_iBottomOffsetY] ; Main Screen Loot Cart button
 Global $aCleanYard[4] = [418, 587 + $g_iBottomOffsetY, 0xE1debe, 20] ; Main Screen Clean Resources - Trees , Mushrooms etc
-Global $aIsTrainPgChk1[4]	  = [812, 97 + $g_iMidOffsetY, 0xE0070A, 10]  ; Main Screen, Train page open - Red below X
-Global $aIsTrainPgChk2[4]	  = [762, 328 + $g_iMidOffsetY, 0xF18439, 10]  ; Main Screen, Train page open - Dark Orange in left arrow
-Global $aRtnHomeCloud1[4]	  = [56, 592 + $g_iBottomOffsetY, 0x0A223F, 15]  ; Cloud Screen, during search, blue pixel in left eye
-Global $aRtnHomeCloud2[4]	  = [72, 592 + $g_iBottomOffsetY, 0x103F7E, 15]  ; Cloud Screen, during search, blue pixel in right eye
-Global $aDetectLang[2]	= [16, 634 + $g_iBottomOffsetY] ; Detect Language, bottom left Attack button must read "Attack"
+Global $aIsTrainPgChk1[4] = [812, 97 + $g_iMidOffsetY, 0xE0070A, 10] ; Main Screen, Train page open - Red below X
+Global $aIsTrainPgChk2[4] = [762, 328 + $g_iMidOffsetY, 0xF18439, 10] ; Main Screen, Train page open - Dark Orange in left arrow
+Global $aRtnHomeCloud1[4] = [56, 592 + $g_iBottomOffsetY, 0x0A223F, 15] ; Cloud Screen, during search, blue pixel in left eye
+Global $aRtnHomeCloud2[4] = [72, 592 + $g_iBottomOffsetY, 0x103F7E, 15] ; Cloud Screen, during search, blue pixel in right eye
+Global $aDetectLang[2] = [16, 634 + $g_iBottomOffsetY] ; Detect Language, bottom left Attack button must read "Attack"
 Global $aGreenArrowTrainTroops[2] = [389, 126]
 Global $aGreenArrowBrewSpells[2] = [586, 126]
-Global $g_aShopWindowOpen[4]	  = [804, 54, 0xC00508, 15]  ; Red pixel in lower right corner of RED X to close shop window
+Global $g_aShopWindowOpen[4] = [804, 54, 0xC00508, 15] ; Red pixel in lower right corner of RED X to close shop window
+Global $aTreasuryWindow[4] = [689, 170 + $g_iMidOffsetY, 0xFF747D, 20] ; Red pixel below X to close treasury window
+Global $aAttackForTreasury[4] = [88, 619 + $g_iMidOffsetY, 0xF0EBE8, 5] ; Red pixel below X to close treasury window
 
 ;Global $aKingHealth          = [ -1, 572 + $g_iBottomOffsetY, 0x4FD404,110] ; Attack Screen, Check King's Health, X coordinate is dynamic, not used from array
 ;Global $aQueenHealth         = [ -1, 573 + $g_iBottomOffsetY, 0x4FD404,110] ; Attack Screen, Check Queen's Health, X coordinate is dynamic, not used from array
@@ -138,7 +140,7 @@ Global $NextBtn[4] = [780, 546 + $g_iBottomOffsetY, 0xD34300, 20] ;  Next Button
 Global $aRequestTroopsAO[6] = [737, 565, 0xa2d44a, 0x808182, 0xb6b6b6, 10] ; Button Request Troops in Army Overview  (x,y,can request, request allready made, army full/no clan, toll)
 
 Global Const $aOpenChatTab[4] = [19, 335 + $g_iMidOffsetY, 0xE88D27, 20]
-Global Const $aCloseChat[4] = [331, 330 + $g_iMidOffsetY, 0xF0951D, 20]  ; duplicate with $aChatTab above, need to rename and fix all code to use one?
+Global Const $aCloseChat[4] = [331, 330 + $g_iMidOffsetY, 0xF0951D, 20] ; duplicate with $aChatTab above, need to rename and fix all code to use one?
 Global Const $aChatDonateBtnColors[4][4] = [[0x050505, 0, -4, 30], [0x89CA31, 0, 13, 15], [0x89CA31, 0, 16, 15], [0xFFFFFF, 21, 7, 5]]
 
 ;attackreport
@@ -162,13 +164,13 @@ Global Const $aIsAttackPage[4] = [70, 548 + $g_iBottomOffsetY, 0xC80000, 20] ; r
 ;Global Const $aBSExitButton[4] = [820, 700 + $g_iBottomOffsetY, 0x000000, 10] ; Bluestacks V0.9. - V0.10. Exit button
 
 ;CheckImageType (Normal, Snow, etc)
-Global Const $aImageTypeN1[4] = [237, 161, 0xD5A849, 30]; Sand on Forest Edge 'Lane' 860x780
-Global Const $aImageTypeN2[4] = [205, 180, 0x86A533, 30]; Grass on Forest Edge 'Lane' 860x780
-Global Const $aImageTypeS1[4] = [237, 161, 0xFEFDFD, 30]; Snow on Forest Edge 'Lane' 860x780
-Global Const $aImageTypeS2[4] = [205, 180, 0xFEFEFE, 30]; Snow on Forest Edge 'Lane' 860x780
+Global Const $aImageTypeN1[4] = [237, 161, 0xD5A849, 30] ; Sand on Forest Edge 'Lane' 860x780
+Global Const $aImageTypeN2[4] = [205, 180, 0x86A533, 30] ; Grass on Forest Edge 'Lane' 860x780
+Global Const $aImageTypeS1[4] = [237, 161, 0xFEFDFD, 30] ; Snow on Forest Edge 'Lane' 860x780
+Global Const $aImageTypeS2[4] = [205, 180, 0xFEFEFE, 30] ; Snow on Forest Edge 'Lane' 860x780
 
 
-Global Const $ProfileRep01[4] = [600, 260, 0x71769F, 20]; If colorcheck then village have 0 attacks and 0 defenses
+Global Const $ProfileRep01[4] = [600, 260, 0x71769F, 20] ; If colorcheck then village have 0 attacks and 0 defenses
 
 Global $aArmyTrainButtonRND[4] = [20, 540 + $g_iMidOffsetY, 55, 570 + $g_iMidOffsetY] ; Main Screen, Army Train Button, RND  Screen 860x732
 Global $aAttackButtonRND[4] = [20, 610 + $g_iMidOffsetY, 100, 670 + $g_iMidOffsetY] ; Attack Button, Main Screen, RND  Screen 860x732

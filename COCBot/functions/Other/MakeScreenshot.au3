@@ -22,22 +22,19 @@ Func MakeScreenshot($TargetDir, $type = "jpg")
 		Local $iLeft = 0, $iTop = 0, $iRight = $g_iAndroidClientWidth, $iBottom = $g_iAndroidClientHeight ; set size of ENTIRE screen to save
 		Local $iW = Number($iRight) - Number($iLeft)
 		Local $iH = Number($iBottom) - Number($iTop)
-		Local $hBitmapScreenshot
-		Local $hGraphic, $hBrush
-
 		Local $hHBitmapScreenshot = _CaptureRegion($iLeft, $iTop, $iRight, $iBottom, True)
-		$hBitmapScreenshot = _GDIPlus_BitmapCreateFromHBITMAP($hHBitmapScreenshot)
+		Local $hBitmapScreenshot = _GDIPlus_BitmapCreateFromHBITMAP($hHBitmapScreenshot)
+		Local $hGraphic = _GDIPlus_ImageGetGraphicsContext($hBitmapScreenshot) ; Get graphics content from bitmap image
+		Local $hBrush = _GDIPlus_BrushCreateSolid(0xFF000029) ;create a brush AARRGGBB (using 0x000029 = Dark Blue)
 
-		$hGraphic = _GDIPlus_ImageGetGraphicsContext($hBitmapScreenshot) ; Get graphics content from bitmap image
-		$hBrush = _GDIPlus_BrushCreateSolid(0xFF000029) ;create a brush AARRGGBB (using 0x000029 = Dark Blue)
-		If $ichkScreenshotHideName = 1 Then
-			If $aCCPos[0] = -1 Or $aCCPos[1] = -1 Then
+	    If $g_bScreenshotHideName Then
+			If $g_aiClanCastlePos[0] = -1 Or $g_aiClanCastlePos[1] = -1 Then
 				Setlog("Screenshot warning: Locate the Clan Castle to hide the clanname!", $COLOR_ERROR)
 			EndIf
 			_GDIPlus_GraphicsFillRect($hGraphic, 0, 0, 250, 50, $hBrush) ;draw filled rectangle on the image to hide the user IGN
-			If $aCCPos[0] <> -1 Then
-				Local $xCC = $aCCPos[0]
-				Local $yCC = $aCCPos[1]
+			If $g_aiClanCastlePos[0] <> -1 Then
+				Local $xCC = $g_aiClanCastlePos[0]
+				Local $yCC = $g_aiClanCastlePos[1]
 				ConvertToVillagePos($xCC, $yCC)
 				_GDIPlus_GraphicsFillRect($hGraphic, $xCC - 33, $yCC - 2, 66, 18, $hBrush) ;draw filled rectangle on the image to hide the user CC if position is known
 			EndIf

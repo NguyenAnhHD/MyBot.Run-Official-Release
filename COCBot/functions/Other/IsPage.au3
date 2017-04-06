@@ -22,7 +22,7 @@ Func IsPageLoop($aCheckPixel, $iLoop = 30)
 			$IsPage = True
 			ExitLoop
 		EndIf
-		If _Sleep($iDelayIsTrainPage1) Then ExitLoop
+		If _Sleep($DELAYISTRAINPAGE1) Then ExitLoop
 		$i += 1
 	WEnd
 

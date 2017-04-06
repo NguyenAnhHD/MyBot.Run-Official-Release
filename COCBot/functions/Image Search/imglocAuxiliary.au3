@@ -132,7 +132,7 @@ Func findButton($sButtonName, $buttonTileArrayOrPatternOrFullPath = Default, $ma
 
 		If $g_iDebugSetlog Then SetLog(" imgloc searching for: " & $sButtonName & " : " & $buttonTile)
 
-		Local $result = DllCall($g_sLibImgLocPath, "str", "FindTile", "handle", $hHBitmap2, "str", $buttonTile, "str", $searchArea, "Int", $maxReturnPoints)
+		Local $result = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $g_hHBitmap2, "str", $buttonTile, "str", $searchArea, "Int", $maxReturnPoints)
 		$error = @error ; Store error values as they reset at next function call
 		$extError = @extended
 		If $error Then
@@ -254,7 +254,7 @@ Func findImage($sImageName, $sImageTile, $sImageArea, $maxReturnPoints = 1, $bFo
 
 	If $g_iDebugSetlog Then SetLog("findImage Looking for : " & $sImageName & " : " & $sImageTile & " on " & $sImageArea)
 
-	Local $result = DllCall($g_sLibImgLocPath, "str", "FindTile", "handle", $hHBitmap2, "str", $sImageTile, "str", $sImageArea, "Int", $maxReturnPoints)
+	Local $result = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $g_hHBitmap2, "str", $sImageTile, "str", $sImageArea, "Int", $maxReturnPoints)
 	$error = @error ; Store error values as they reset at next function call
 	$extError = @extended
 	If $error Then
@@ -288,8 +288,8 @@ Func findImage($sImageName, $sImageTile, $sImageArea, $maxReturnPoints = 1, $bFo
 
 EndFunc   ;==>findImage
 
-Func GetDeployableNextTo($sPoints, $distance = 3, $redlineoverride="")
-	Local $result = DllCall($g_sLibImgLocPath, "str", "GetDeployableNextTo", "str", $sPoints, "int", $distance, "str" , $redlineoverride)
+Func GetDeployableNextTo($sPoints, $distance = 3, $redlineoverride = "")
+	Local $result = DllCall($g_hLibImgLoc, "str", "GetDeployableNextTo", "str", $sPoints, "int", $distance, "str", $redlineoverride)
 	Local $error = @error ; Store error values as they reset at next function call
 	Local $extError = @extended
 	If $error Then
@@ -305,7 +305,7 @@ Func GetDeployableNextTo($sPoints, $distance = 3, $redlineoverride="")
 EndFunc   ;==>GetDeployableNextTo
 
 Func GetOffsetRedline($sArea = "TL", $distance = 3)
-	Local $result = DllCall($g_sLibImgLocPath, "str", "GetOffSetRedline", "str", $sArea, "int", $distance)
+	Local $result = DllCall($g_hLibImgLoc, "str", "GetOffSetRedline", "str", $sArea, "int", $distance)
 	Local $error = @error ; Store error values as they reset at next function call
 	Local $extError = @extended
 	If $error Then
@@ -347,7 +347,7 @@ Func findMultiple($directory, $sCocDiamond, $redLines, $minLevel = 0, $maxLevel 
 	; Perform the search
 	If $bForceCapture Then _CaptureRegion2() ;to have FULL screen image to work with
 
-	Local $result = DllCall($g_sLibImgLocPath, "str", "SearchMultipleTilesBetweenLevels", "handle", $hHBitmap2, "str", $directory, "str", $sCocDiamond, "Int", $maxReturnPoints, "str", $redLines, "Int", $minLevel, "Int", $maxLevel)
+	Local $result = DllCall($g_hLibImgLoc, "str", "SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $directory, "str", $sCocDiamond, "Int", $maxReturnPoints, "str", $redLines, "Int", $minLevel, "Int", $maxLevel)
 	$error = @error ; Store error values as they reset at next function call
 	$extError = @extended
 	If $error Then
@@ -379,7 +379,7 @@ Func findMultiple($directory, $sCocDiamond, $redLines, $minLevel = 0, $maxLevel 
 
 		;;lets check if we should get redlinedata
 		If $redLines = "" Then
-			$IMGLOCREDLINE = returnImglocProperty("redline", "") ;global var set in imglocTHSearch
+			$g_sImglocRedline = returnImglocProperty("redline", "") ;global var set in imglocTHSearch
 			If $g_iDebugSetlog = 1 Then SetLog("findMultiple : Redline argument is emty, seting global Redlines")
 		EndIf
 		If $g_iDebugSetlog = 1 Then SetLog("******** findMultiple *** END ***", $COLOR_ORANGE)
@@ -461,8 +461,8 @@ Func FindImageInPlace($sImageName, $sImageTile, $place, $bForceCaptureRegion = T
 EndFunc   ;==>FindImageInPlace
 
 Func SearchRedLines($sCocDiamond = "ECD")
-	If $IMGLOCREDLINE <> "" Then Return $IMGLOCREDLINE
-	Local $result = DllCall($g_hLibImgLoc, "str", "SearchRedLines", "handle", $hHBITMAP2, "str", $sCocDiamond)
+	If $g_sImglocRedline <> "" Then Return $g_sImglocRedline
+	Local $result = DllCall($g_hLibImgLoc, "str", "SearchRedLines", "handle", $g_hHBitmap2, "str", $sCocDiamond)
 	Local $error = @error ; Store error values as they reset at next function call
 	Local $extError = @extended
 	If $error Then
@@ -479,24 +479,24 @@ Func SearchRedLines($sCocDiamond = "ECD")
 	Else
 		If $g_iDebugSetlog = 1 Then SetLog("SearchRedLines found : " & $result[0])
 	EndIf
-	$IMGLOCREDLINE = $result[0]
-	Return $IMGLOCREDLINE
+	$g_sImglocRedline = $result[0]
+	Return $g_sImglocRedline
 EndFunc   ;==>SearchRedLines
 
 Func SearchRedLinesMultipleTimes($sCocDiamond = "ECD", $iCount = 3, $iDelay = 300)
-	Local $bHBITMAP_synced = ($hHBITMAP = $hHBITMAP2)
-	Local $hHBITMAP2_old = $hHBITMAP2
-	Local $IMGLOCREDLINE_old
+	Local $bHBitmap_synced = ($g_hHBitmap = $g_hHBitmap2)
+	Local $g_hHBitmap2_old = $g_hHBitmap2
+	Local $g_sImglocRedline_old
 
-	; ensure current $IMGLOCREDLINE has been generated
+	; ensure current $g_sImglocRedline has been generated
 	SearchRedLines($sCocDiamond)
 	; count # of redline points
-	Local $iRedlinePoints = [UBound(StringSplit($IMGLOCREDLINE, "|", $STR_NOCOUNT)), 0]
+	Local $iRedlinePoints = [UBound(StringSplit($g_sImglocRedline, "|", $STR_NOCOUNT)), 0]
 
 	SetDebugLog("Initial # of redline points: " & $iRedlinePoints[0])
 
-	; clear $hHBITMAP2, so it doesn't get deleted
-	$hHBITMAP2 = 0
+	; clear $g_hHBitmap2, so it doesn't get deleted
+	$g_hHBitmap2 = 0
 
 	Local $iCaptureTime = 0
 	Local $iRedlineTime = 0
@@ -505,27 +505,27 @@ Func SearchRedLinesMultipleTimes($sCocDiamond = "ECD", $iCount = 3, $iDelay = 30
 
 	For $i = 1 To $iCount
 
-		$IMGLOCREDLINE_old = $IMGLOCREDLINE
+		$g_sImglocRedline_old = $g_sImglocRedline
 
-		Local $hTimer = TimerInit()
+		Local $hTimer = __TimerInit()
 
 		; take new screenshot
 		ForceCaptureRegion()
 		_CaptureRegion2()
 
-		$iCaptureTime = TimerDiff($hTimer)
+		$iCaptureTime = __TimerDiff($hTimer)
 
 		; generate new redline based on new screenshot
-		$IMGLOCREDLINE = "" ; clear current redline
+		$g_sImglocRedline = "" ; clear current redline
 		SearchRedLines($sCocDiamond)
 
-		$iRedlineTime = TimerDiff($hTimer) - $iCaptureTime
+		$iRedlineTime = __TimerDiff($hTimer) - $iCaptureTime
 
 		$aiTotals[0] += $iCaptureTime
 		$aiTotals[1] += $iRedlineTime
 
 		; count # of redline points
-		$iRedlinePoints[1] = UBound(StringSplit($IMGLOCREDLINE, "|", $STR_NOCOUNT))
+		$iRedlinePoints[1] = UBound(StringSplit($g_sImglocRedline, "|", $STR_NOCOUNT))
 
 		SetDebugLog($i & ". # of redline points: " & $iRedlinePoints[1])
 
@@ -535,11 +535,11 @@ Func SearchRedLinesMultipleTimes($sCocDiamond = "ECD", $iCount = 3, $iDelay = 30
 			$iBest = $i
 		Else
 			; old picture has more redline points
-			$IMGLOCREDLINE = $IMGLOCREDLINE_old
+			$g_sImglocRedline = $g_sImglocRedline_old
 		EndIf
 
 		If $i < $iCount Then
-			Local $iDelayCompensated = $iDelay - TimerDiff($hTimer)
+			Local $iDelayCompensated = $iDelay - __TimerDiff($hTimer)
 			If $iDelayCompensated >= 10 Then Sleep($iDelayCompensated)
 		EndIf
 
@@ -551,17 +551,17 @@ Func SearchRedLinesMultipleTimes($sCocDiamond = "ECD", $iCount = 3, $iDelay = 30
 		SetDebugLog("Using " & $iBest & ". redline with " & $iRedlinePoints[0] & " points (capture/redline avg. time: " & Int($aiTotals[0] / $iCount) & "/" & Int($aiTotals[1] / $iCount) & ")")
 	EndIf
 
-	; delete current $hHBITMAP2
-	_WinAPI_DeleteObject($hHBITMAP2)
+	; delete current $g_hHBitmap2
+	GdiDeleteHBitmap($g_hHBitmap2)
 
 	; restore previous captured image
-	If $bHBITMAP_synced Then
+	If $bHBitmap_synced Then
 		_CaptureRegion2Sync()
 	Else
-		$hHBITMAP2 = $hHBITMAP2_old
+		$g_hHBitmap2 = $g_hHBitmap2_old
 	EndIf
-	Return $IMGLOCREDLINE
-EndFunc
+	Return $g_sImglocRedline
+EndFunc   ;==>SearchRedLinesMultipleTimes
 
 Func decodeTroopEnum($tEnum)
 	Switch $tEnum

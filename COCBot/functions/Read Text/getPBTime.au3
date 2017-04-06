@@ -29,11 +29,11 @@ Func getPBTime()
 	EndIf
 
 	ClickP($aShieldInfoButton) ; click on PBT info icon
-	If _Sleep($iPersonalShield3) Then Return
+	If _Sleep($DELAYPERSONALSHIELD3) Then Return
 
 	Local $iCount = 0
 	While _CheckPixel($aIsShieldInfo, $g_bCapturePixel) = False ; wait for open PB info window
-		If _Sleep($iPersonalShield2) Then Return
+		If _Sleep($DELAYPERSONALSHIELD2) Then Return
 		$Result = getAttackDisable(180, 156 + $g_iMidOffsetY) ; Try to grab Ocr for PBT warning message as it can randomly block pixel check
 		If $g_iDebugSetlog = 1 Then Setlog("OCR PBT early warning= " & $Result, $COLOR_DEBUG)
 		If (StringLen($Result) > 3) And StringRegExp($Result, "[a-w]", $STR_REGEXPMATCH) Then ; Check string for valid characters
@@ -46,7 +46,7 @@ Func getPBTime()
 			Setlog("PBT information window failed to open", $COLOR_DEBUG)
 			If $g_iDebugImageSave = 1 Then DebugImageSave("PBTInfo_", $g_bCapturePixel, "png", False)
 			ClickP($aAway, 1, 0, "#9999") ; close window if opened
-			If _Sleep($iPersonalShield2) Then Return ; wait for close
+			If _Sleep($DELAYPERSONALSHIELD2) Then Return ; wait for close
 			Return
 		EndIf
 	WEnd
@@ -56,19 +56,19 @@ Func getPBTime()
 		$sTimeResult = getOcrPBTtime(555, 499 + $g_iMidOffsetY) ; read PBT time
 		If $g_iDebugSetlog = 1 Then Setlog("OCR PBT Time= " & $sTimeResult, $COLOR_DEBUG)
 		If $sTimeResult = "" Then ; try a 2nd time after a short delay if slow PC and null read
-			If _Sleep($iPersonalShield2) Then Return ; pause for slow PC
+			If _Sleep($DELAYPERSONALSHIELD2) Then Return ; pause for slow PC
 			$sTimeResult = getOcrPBTtime(555, 499 + $g_iMidOffsetY) ; read PBT time
 			If $g_iDebugSetlog = 1 Then Setlog("OCR2 PBT Time= " & $sTimeResult, $COLOR_DEBUG)
 			If $sTimeResult = "" And $bPBTStart = False Then ; error if no read value
 				Setlog("strange error, no PBT value found?", $COLOR_ERROR)
 				SetError(1, "Bad OCR of PB time value ")
 				ClickP($aAway, 1, 0, "#9999") ; close window
-				If _Sleep($iPersonalShield2) Then Return ; wait for close
+				If _Sleep($DELAYPERSONALSHIELD2) Then Return ; wait for close
 				Return
 			EndIf
 		EndIf
 
-		If _Sleep($iDelayRespond) Then Return ; improve pause/stop button response
+		If _Sleep($DELAYRESPOND) Then Return ; improve pause/stop button response
 
 		$aString = StringSplit($sTimeResult, " ") ; split hours/minutes or minutes/seconds
 		Switch $aString[0]
@@ -84,7 +84,7 @@ Func getPBTime()
 						Setlog("strange error, unexpected PBT value? |" & $aString[1], $COLOR_ERROR)
 						SetError(2, "Error processing time string")
 						ClickP($aAway, 1, 0, "#9999") ; close window
-						If _Sleep($iPersonalShield2) Then Return ; wait for close
+						If _Sleep($DELAYPERSONALSHIELD2) Then Return ; wait for close
 						Return
 				EndSelect
 			Case 2 ; 2 fields split from OCR
@@ -103,7 +103,7 @@ Func getPBTime()
 						Setlog("strange error, unexpected PBT value? |" & $aString[1] & "|" & $aString[2], $COLOR_ERROR)
 						SetError(3, "Error processing time string")
 						ClickP($aAway, 1, 0, "#9999") ; close window
-						If _Sleep($iPersonalShield2) Then Return ; wait for close
+						If _Sleep($DELAYPERSONALSHIELD2) Then Return ; wait for close
 						Return
 				EndSelect
 			Case Else ; Not likely condition, but just in case needed.
@@ -111,7 +111,7 @@ Func getPBTime()
 					Setlog("Error processing PBT time string: " & $sTimeResult, $COLOR_ERROR)
 					SetError(4, "Error processing time string")
 					ClickP($aAway, 1, 0, "#9999") ; close window
-					If _Sleep($iPersonalShield2) Then Return ; wait for close
+					If _Sleep($DELAYPERSONALSHIELD2) Then Return ; wait for close
 					Return
 				Else
 					Setlog("Error processing PBT time string: " & $sTimeResult, $COLOR_INFO)
@@ -129,10 +129,10 @@ Func getPBTime()
 		EndIf
 		If @error Then Setlog("_DateAdd error= " & @error, $COLOR_ERROR)
 		If $g_iDebugSetlog = 1 Then Setlog("PBT starts: " & $sPBTReturnResult, $COLOR_DEBUG)
-		If _Sleep($iPersonalShield1) Then Return
+		If _Sleep($DELAYPERSONALSHIELD1) Then Return
 
 		ClickP($aAway, 1, 0, "#9999") ; close window
-		If _Sleep($iPersonalShield2) Then Return ; wait for close
+		If _Sleep($DELAYPERSONALSHIELD2) Then Return ; wait for close
 
 		Return $sPBTReturnResult
 	Else

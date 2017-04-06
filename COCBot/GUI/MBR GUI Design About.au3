@@ -18,8 +18,8 @@ Global $g_hGUI_ABOUT = 0
 Global $g_hLblCreditsBckGrnd = 0, $g_hLblMyBotURL = 0, $g_hLblForumURL = 0
 
 Func CreateAboutTab()
-   $g_hGUI_ABOUT = GUICreate("", $_GUI_MAIN_WIDTH - 20, $_GUI_MAIN_HEIGHT - 255, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hFrmBotEx)
-   GUISetBkColor($COLOR_WHITE,$g_hGUI_ABOUT)
+   $g_hGUI_ABOUT = _GUICreate("", $g_iSizeWGrpTab1, $g_iSizeHGrpTab1, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hFrmBotEx)
+   ; GUISetBkColor($COLOR_WHITE, $g_hGUI_ABOUT)
 
    Local $sText = ""
    Local $x = 18, $y = 15 + $_GUI_MAIN_TOP
@@ -49,20 +49,20 @@ Func CreateAboutTab()
 	 GUICtrlCreateLabel($sText, $x - 5, $y, 410, 20, BITOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT),0)
 		 GUICtrlSetFont(-1, 9.5, $FW_BOLD, Default, "Arial")
 		 GUICtrlSetColor(-1, $COLOR_NAVY)
-	 $sText = "Boju, Codeslinger69, Cosote, Ezeck0001, Fliegerfaust, Hervidero, IceCube, MMHK, MonkeyHunter, MR.ViPeR, ProMac, Sardo, TheRevenor, Trlopes, Zengzeng"
+	 $sText = "Boju, Codeslinger69, Cosote, Fliegerfaust, Hervidero, MMHK, MonkeyHunter, ProMac, TripleM, Trlopes"
 	 GUICtrlCreateLabel($sText, $x + 5, $y + 15, 410, 50, BITOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT),0)
 		 GUICtrlSetFont(-1,9, $FW_MEDIUM, Default, "Arial")
 
-	 $y += 75
+	 $y += 60
 	 $sText =	"Inactive developers: "
 	 GUICtrlCreateLabel($sText, $x - 5, $y, 410, 20, BITOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
 		 GUICtrlSetFont(-1, 9.5, $FW_BOLD, Default, "Arial")
 		 GUICtrlSetColor(-1, $COLOR_NAVY)
-	 $sText = "Kaganus"
-	 GUICtrlCreateLabel($sText, $x + 5, $y + 15, 410, 20, BITOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
+	 $sText = "Ezeck0001, IceCube, Kaganus, MR.ViPeR, RoroTiti, Sardo, TheRevenor, Zengzeng"
+	 GUICtrlCreateLabel($sText, $x + 5, $y + 15, 410, 50, BITOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
 		 GUICtrlSetFont(-1, 9, $FW_MEDIUM, Default, "Arial")
-	 $y += 45
 
+		 $y += 50
 	 $sText =	"Retired developers: "
 	 GUICtrlCreateLabel($sText, $x - 5, $y, 410, 20, BITOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
 		 GUICtrlSetFont(-1, 9.5, $FW_BOLD, Default, "Arial")
@@ -71,7 +71,7 @@ Func CreateAboutTab()
 	 GUICtrlCreateLabel($sText, $x + 5, $y + 15, 410, 50, BITOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
 		 GUICtrlSetFont(-1, 9, $FW_MEDIUM, Default, "Arial")
 
-	 $y += 76
+	 $y += 71
 	 $sText = "Special thanks to all contributing forum members helping to make this" & @CRLF & "software better! And a special note to: @KevinM our server admin!"
 	 GUICtrlCreateLabel($sText, $x + 14, $y, 390, 30, BITOR($WS_VISIBLE, $ES_AUTOVSCROLL, $ES_CENTER), 0)
 		 GUICtrlSetFont(-1, 9, $FW_MEDIUM, Default, "Arial")

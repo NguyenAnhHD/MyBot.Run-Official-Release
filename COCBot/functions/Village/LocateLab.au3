@@ -31,9 +31,9 @@ Func LocateLab()
 			WinGetAndroidHandle()
 			ClickP($aAway, 1, 0, "#0379")
 			Local $aPos = FindPos()
-			$aLabPos[0] = Int($aPos[0])
-			$aLabPos[1] = Int($aPos[1])
-			If isInsideDiamond($aLabPos) = False Then
+			$g_aiLaboratoryPos[0] = Int($aPos[0])
+			$g_aiLaboratoryPos[1] = Int($aPos[1])
+			If isInsideDiamond($g_aiLaboratoryPos) = False Then
 				$iStupid += 1
 				Select
 					Case $iStupid = 1
@@ -55,8 +55,8 @@ Func LocateLab()
 						Return False
 					Case Else
 						SetLog(" Operator Error - Bad Laboratory Location.", $COLOR_ERROR)
-						$aLabPos[0] = -1
-						$aLabPos[1] = -1
+						$g_aiLaboratoryPos[0] = -1
+						$g_aiLaboratoryPos[1] = -1
 						ClickP($aAway, 1, 0, "#0381")
 						Return False
 				EndSelect
@@ -87,20 +87,20 @@ Func LocateLab()
 						ContinueLoop
 					Case $iSilly > 4
 						SetLog("Quit joking, Click the Army Camp, or restart bot and try again", $COLOR_ERROR)
-						$aLabPos[0] = -1
-						$aLabPos[1] = -1
+						$g_aiLaboratoryPos[0] = -1
+						$g_aiLaboratoryPos[1] = -1
 						ClickP($aAway, 1, 0, "#0383")
 						Return False
 				EndSelect
 			EndIf
 		Else
-			SetLog(" Operator Error - Bad Laboratory Location: " & "(" & $aLabPos[0] & "," & $aLabPos[1] & ")", $COLOR_ERROR)
-			$aLabPos[0] = -1
-			$aLabPos[1] = -1
+			SetLog(" Operator Error - Bad Laboratory Location: " & "(" & $g_aiLaboratoryPos[0] & "," & $g_aiLaboratoryPos[1] & ")", $COLOR_ERROR)
+			$g_aiLaboratoryPos[0] = -1
+			$g_aiLaboratoryPos[1] = -1
 			ClickP($aAway, 1, 0, "#0384")
 			Return False
 		EndIf
-		SetLog("Locate Laboratory Success: " & "(" & $aLabPos[0] & "," & $aLabPos[1] & ")", $COLOR_SUCCESS)
+		SetLog("Locate Laboratory Success: " & "(" & $g_aiLaboratoryPos[0] & "," & $g_aiLaboratoryPos[1] & ")", $COLOR_SUCCESS)
 		ExitLoop
 	WEnd
 	Clickp($aAway, 2, 0, "#0207")

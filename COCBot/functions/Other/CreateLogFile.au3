@@ -21,6 +21,8 @@ Func CreateLogFile()
 	$g_sLogFileName = @YEAR & "-" & @MON & "-" & @MDAY & "_" & @HOUR & "." & @MIN & "." & @SEC & ".log"
 	Local $sLogPath = $g_sProfileLogsPath & $g_sLogFileName
 	$g_hLogFile = FileOpen($sLogPath, $FO_APPEND)
+	SetDebugLog("Created log file: " & $sLogPath)
+	FlushGuiLog($g_hTxtLog, $g_oTxtLogInitText)
 EndFunc   ;==>CreateLogFile
 
 ; #FUNCTION# ====================================================================================================================
@@ -46,4 +48,5 @@ Func CreateAttackLogFile()
 	Local $sAttackLogFName = "AttackLog" & "-" & @YEAR & "-" & @MON & ".log"
 	Local $sAttackLogPath = $g_sProfileLogsPath & $sAttackLogFName
 	$g_hAttackLogFile = FileOpen($sAttackLogPath, $FO_APPEND)
+	SetDebugLog("Created attack log file: " & $sAttackLogPath)
 EndFunc   ;==>CreateAttackLogFile

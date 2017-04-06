@@ -4,8 +4,8 @@
 ; Syntax ........: getArmySpellCapacity()
 ; Parameters ....:
 ; Return values .: None
-; Author ........: Separated from checkArmyCamp()
-; Modified ......: CodeSlinger69 (2017)
+; Author ........:
+; Modified ......: CodeSlinger69 (01-2017)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -15,7 +15,7 @@
 #include-once
 
 Func getArmySpellCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
-   Local $TotalSFactory = 0
+	Local $TotalSFactory = 0
 
 	If $g_iDebugSetlogTrain = 1 Or $g_iDebugSetlog = 1 Then SETLOG("Begin getArmySpellCapacity:", $COLOR_DEBUG1)
 
@@ -27,7 +27,7 @@ Func getArmySpellCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 			SetError(2)
 			Return ; not open, requested to be open - error.
 		EndIf
-		If _Sleep($iDelaycheckArmyCamp5) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP5) Then Return
 	EndIf
 
 	Local $aGetSFactorySize[3] = ["", "", ""]
@@ -43,7 +43,7 @@ Func getArmySpellCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 			$sSpellsInfo = getArmyCampCap($aArmySpellSize[0], $aArmySpellSize[1]) ; OCR read Spells and total capacity
 			$iCount += 1
 			If $iCount > 10 Then ExitLoop ; try reading 30 times for 250+150ms OCR for 4 sec
-			If _Sleep($iDelaycheckArmyCamp5) Then Return ; Wait 250ms
+			If _Sleep($DELAYCHECKARMYCAMP5) Then Return ; Wait 250ms
 		WEnd
 
 		If $g_iDebugSetlogTrain = 1 Then Setlog("$sSpellsInfo = " & $sSpellsInfo, $COLOR_DEBUG)
@@ -52,19 +52,19 @@ Func getArmySpellCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 		If IsArray($aGetSFactorySize) Then
 			If $aGetSFactorySize[0] > 1 Then
 				$TotalSFactory = Number($aGetSFactorySize[2])
-				$CurSFactory = Number($aGetSFactorySize[1])
+				$g_iSpellFactorySize = Number($aGetSFactorySize[1])
 			Else
 				Setlog("Spell Factory size read error.", $COLOR_ERROR) ; log if there is read error
-				$CurSFactory = 0
+				$g_iSpellFactorySize = 0
 				$TotalSFactory = $g_iTotalSpellValue
 			EndIf
 		Else
 			Setlog("Spell Factory size read error.", $COLOR_ERROR) ; log if there is read error
-			$CurSFactory = 0
+			$g_iSpellFactorySize = 0
 			$TotalSFactory = $g_iTotalSpellValue
 		EndIf
 
-		SetLog("Total Spell(s) Capacity: " & $CurSFactory & "/" & $TotalSFactory)
+		SetLog("Total Spell(s) Capacity: " & $g_iSpellFactorySize & "/" & $TotalSFactory)
 	EndIf
 
 	If $TotalSFactory <> $g_iTotalSpellValue Then
@@ -73,7 +73,7 @@ Func getArmySpellCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 
 	If $bCloseArmyWindow = True Then
 		ClickP($aAway, 1, 0, "#0000") ;Click Away
-		If _Sleep($iDelaycheckArmyCamp4) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP4) Then Return
 	EndIf
 
 EndFunc   ;==>getArmySpellCapacity

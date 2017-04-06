@@ -16,8 +16,8 @@
 
 Func GetLocationMine()
 
-	If $iDetectedImageType = 0 Then
-		Local $result = DllCall($g_hLibFunctions, "str", "getLocationMineExtractor", "ptr", $hHBitmap2)
+	If $g_iDetectedImageType = 0 Then
+		Local $result = DllCall($g_hLibMyBot, "str", "getLocationMineExtractor", "ptr", $g_hHBitmap2)
 		If $g_iDebugBuildingPos = 1 Then Setlog("#*# GetLocationMine: " & $result[0], $COLOR_DEBUG1)
 		If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "Mine")
 		Return GetListPixel($result[0])
@@ -35,8 +35,8 @@ Func GetLocationMine()
 EndFunc   ;==>GetLocationMine
 
 Func GetLocationElixir()
-	If $iDetectedImageType = 0 Then
-		Local $result = DllCall($g_hLibFunctions, "str", "getLocationElixirExtractor", "ptr", $hHBitmap2)
+	If $g_iDetectedImageType = 0 Then
+		Local $result = DllCall($g_hLibMyBot, "str", "getLocationElixirExtractor", "ptr", $g_hHBitmap2)
 		If $g_iDebugBuildingPos = 1 Then Setlog("#*# GetLocationElixir: " & $result[0], $COLOR_DEBUG1)
 		If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "Elixir")
 		Return GetListPixel($result[0])
@@ -52,7 +52,7 @@ Func GetLocationElixir()
 EndFunc   ;==>GetLocationElixir
 
 Func GetLocationDarkElixir()
-	;Local $result = DllCall($g_hLibFunctions, "str", "getLocationDarkElixirExtractor", "ptr", $hHBitmap2)
+	;Local $result = DllCall($g_hLibMyBot, "str", "getLocationDarkElixirExtractor", "ptr", $g_hHBitmap2)
 	Local $directory = @ScriptDir & "\imgxml\Storages\Drills"
 	Local $Maxpositions = 3
 	Local $aResult = returnMultipleMatches($directory, $Maxpositions)
@@ -65,21 +65,21 @@ Func GetLocationDarkElixir()
 EndFunc   ;==>GetLocationDarkElixir
 
 Func GetLocationTownHall()
-	Local $result = DllCall($g_hLibFunctions, "str", "getLocationTownHall", "ptr", $hHBitmap2)
+	Local $result = DllCall($g_hLibMyBot, "str", "getLocationTownHall", "ptr", $g_hHBitmap2)
 	If $g_iDebugBuildingPos = 1 Then Setlog("#*# GetLocationTownHall: " & $result[0], $COLOR_DEBUG1)
 	If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "TownHall")
 	Return GetListPixel($result[0])
 EndFunc   ;==>GetLocationTownHall
 
 Func GetLocationDarkElixirStorageWithLevel()
-	Local $result = DllCall($g_hLibFunctions, "str", "getLocationDarkElixirStorageWithLevel", "ptr", $hHBitmap2)
+	Local $result = DllCall($g_hLibMyBot, "str", "getLocationDarkElixirStorageWithLevel", "ptr", $g_hHBitmap2)
 	If $g_iDebugBuildingPos = 1 Then Setlog("#*# GetLocationDarkElixirStorageWithLevel: " & $result[0], $COLOR_DEBUG1)
 	If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "DarkElixirStorageWithLevel")
 	Return $result[0]
 EndFunc   ;==>GetLocationDarkElixirStorageWithLevel
 
 Func GetLocationDarkElixirStorage()
-	Local $result = DllCall($g_hLibFunctions, "str", "getLocationDarkElixirStorage", "ptr", $hHBitmap2)
+	Local $result = DllCall($g_hLibMyBot, "str", "getLocationDarkElixirStorage", "ptr", $g_hHBitmap2)
 	If $g_iDebugBuildingPos = 1 Then Setlog("#*# GetLocationDarkElixirStorage: " & $result[0], $COLOR_DEBUG1)
 	If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "DarkElixirStorage")
 	Return GetListPixel($result[0])
@@ -97,12 +97,12 @@ Func GetLocationElixirWithLevel()
 	; LEV 7 elixir extractors level 11
 	; LEV 8 elixir extractors level 12
 
-	If $iDetectedImageType = 0 Then
-		Local $result = DllCall($g_hLibFunctions, "str", "getLocationElixirExtractorWithLevel", "ptr", $hHBitmap2)
+	If $g_iDetectedImageType = 0 Then
+		Local $result = DllCall($g_hLibMyBot, "str", "getLocationElixirExtractorWithLevel", "ptr", $g_hHBitmap2)
 		If $g_iDebugBuildingPos = 1 Then Setlog("#*# getLocationElixirExtractorWithLevel: " & $result[0], $COLOR_DEBUG1)
 		If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "ElixirExtractorWithLevel")
 	Else
-		Local $result = DllCall($g_hLibFunctions, "str", "getLocationSnowElixirExtractorWithLevel", "ptr", $hHBitmap2)
+		Local $result = DllCall($g_hLibMyBot, "str", "getLocationSnowElixirExtractorWithLevel", "ptr", $g_hHBitmap2)
 		If $g_iDebugBuildingPos = 1 Then Setlog("#*# getLocationSnowElixirExtractorWithLevel: " & $result[0], $COLOR_DEBUG1)
 		If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "SnowElixirExtractorWithLevel")
 	EndIf
@@ -121,13 +121,13 @@ Func GetLocationMineWithLevel()
 	; LEV 7 gold mine level 11
 	; LEV 8 gold mine level 12
 
-	If $iDetectedImageType = 0 Then
-		Local $result = DllCall($g_hLibFunctions, "str", "getLocationMineExtractorWithLevel", "ptr", $hHBitmap2)
+	If $g_iDetectedImageType = 0 Then
+		Local $result = DllCall($g_hLibMyBot, "str", "getLocationMineExtractorWithLevel", "ptr", $g_hHBitmap2)
 		If $g_iDebugBuildingPos = 1 Then Setlog("#*# getLocationMineExtractorWithLevel: " & $result[0], $COLOR_DEBUG1)
 		If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "MineExtractorWithLevel")
 
 	Else
-		Local $result = DllCall($g_hLibFunctions, "str", "getLocationSnowMineExtractorWithLevel", "ptr", $hHBitmap2)
+		Local $result = DllCall($g_hLibMyBot, "str", "getLocationSnowMineExtractorWithLevel", "ptr", $g_hHBitmap2)
 		If $g_iDebugBuildingPos = 1 Then Setlog("#*# getLocationSnowMineExtractorWithLevel: " & $result[0], $COLOR_DEBUG1)
 		If $g_iDebugGetLocation = 1 Then DebugImageGetLocation($result[0], "SnowMineExtractorWithLevel")
 	EndIf
@@ -135,7 +135,7 @@ Func GetLocationMineWithLevel()
 EndFunc   ;==>GetLocationMineWithLevel
 
 Func GetLocationDarkElixirWithLevel()
-	;Local $result = DllCall($g_hLibFunctions, "str", "getLocationDarkElixirExtractorWithLevel", "ptr", $hHBitmap2)
+	;Local $result = DllCall($g_hLibMyBot, "str", "getLocationDarkElixirExtractorWithLevel", "ptr", $g_hHBitmap2)
 
 	Local $directory = @ScriptDir & "\imgxml\Storages\Drills"
 	Local $Maxpositions = 3
@@ -149,7 +149,7 @@ EndFunc   ;==>GetLocationDarkElixirWithLevel
 
 Func GetLocationGoldStorage()
 
-	Local $hTimer = TimerInit()
+	Local $hTimer = __TimerInit()
 
 	; Variables
 	Local $directory = @ScriptDir & "\imgxml\Storages\Gold"
@@ -183,7 +183,7 @@ Func GetLocationGoldStorage()
 		Next
 	EndIf
 
-	If $g_iDebugSetlog = 1 Then SetLog("  - Calculated  in: " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
+	If $g_iDebugSetlog = 1 Then SetLog("  - Calculated  in: " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
 
 	If StringLen($TempVectStr) > 0 Then
 		$TempVectStr = StringLeft($TempVectStr, StringLen($TempVectStr) - 1)
@@ -199,7 +199,7 @@ EndFunc   ;==>GetLocationGoldStorage
 
 Func GetLocationElixirStorage()
 
-	Local $hTimer = TimerInit()
+	Local $hTimer = __TimerInit()
 	; Variables
 	Local $directory = @ScriptDir & "\imgxml\Storages\Elixir"
 	Local $TempVectStr
@@ -232,7 +232,7 @@ Func GetLocationElixirStorage()
 		Next
 	EndIf
 
-	If $g_iDebugSetlog = 1 Then SetLog("  - Calculated  in: " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
+	If $g_iDebugSetlog = 1 Then SetLog("  - Calculated  in: " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
 
 	If StringLen($TempVectStr) > 0 Then
 		$TempVectStr = StringLeft($TempVectStr, StringLen($TempVectStr) - 1)
@@ -294,7 +294,7 @@ Func DebugImageGetLocation($vectorstr, $type)
 	setlog("-------------------------------------------")
 ;~ 						Local $hPen = _GDIPlus_PenCreate(0xFFFFD800, 1)
 ;~ 						Local $multiplier = 2
-;~ 						Local $hGraphic = _GDIPlus_ImageGetGraphicsContext($hBitmap)
+;~ 						Local $hGraphic = _GDIPlus_ImageGetGraphicsContext($g_hBitmap)
 ;~ 						Local $hBrush = _GDIPlus_BrushCreateSolid(0xFFFFFFFF)
 ;~ 						_GDIPlus_GraphicsDrawLine($hGraphic, 0, 30, 60, 30, $hPen)
 ;~ 						_GDIPlus_GraphicsDrawLine($hGraphic, 30, 0, 30, 60, $hPen)
@@ -316,8 +316,8 @@ Func ConvertImgloc2MBR($Array, $Maxpositions, $level = False)
 			If IsArray($Coord) Then ; same level with several positions
 				For $t = 0 To UBound($Coord) - 1
 					If isInsideDiamondXY($Coord[$t][0], $Coord[$t][1]) Then ; just in case
-						If $level = true then $StringConverted &= $Array[$i][2] & "#" & $Coord[$t][0] & "-" & $Coord[$t][1] & "~"
-						If $level = false then $StringConverted &= $Coord[$t][0] & "-" & $Coord[$t][1] & "|"
+						If $level = True Then $StringConverted &= $Array[$i][2] & "#" & $Coord[$t][0] & "-" & $Coord[$t][1] & "~"
+						If $level = False Then $StringConverted &= $Coord[$t][0] & "-" & $Coord[$t][1] & "|"
 						$Max += 1
 						If $Max = $Maxpositions Then ExitLoop (2)
 					EndIf
@@ -329,7 +329,7 @@ Func ConvertImgloc2MBR($Array, $Maxpositions, $level = False)
 	EndIf
 
 	$StringConverted = StringTrimRight($StringConverted, 1) ; remove the last " |" or "~"
-	If $g_iDebugSetlog then Setlog("$StringConverted: " & $StringConverted)
+	If $g_iDebugSetlog Then Setlog("$StringConverted: " & $StringConverted)
 
 	Return $StringConverted ; xxx-yyy|xxx-yyy|n.... OR Lv#xxx-yyy~Lv#xxx-yyy
 

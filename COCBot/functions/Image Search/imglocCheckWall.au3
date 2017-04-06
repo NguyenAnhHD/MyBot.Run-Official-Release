@@ -1,14 +1,18 @@
-#cs ----------------------------------------------------------------------------
+; #FUNCTION# ====================================================================================================================
+; Name ..........: imglocCheckWall
+; Description ...:
+; Syntax ........:
+; Parameters ....:
+; Return values .:
+; Author ........: Trlopes (06-2016)
+; Modified ......:
+; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
+;                  MyBot is distributed under the terms of the GNU GPL
+; Related .......:
+; Link ..........: https://github.com/MyBotRun/MyBot/wiki
+; Example .......: No
+; ===============================================================================================================================
 
-	AutoIt Version: 3.3.14.2
-	Author:         trlopes
-
-	Script Function:
-	Template AutoIt script.
-
-#ce ----------------------------------------------------------------------------
-
-; Script Start - Add your code below here
 Func imglocCheckWall()
 
 	If _Sleep(500) Then Return
@@ -76,7 +80,7 @@ Func imglocFindWalls($walllevel, $searcharea = "DCD", $redline = "", $maxreturn 
 	_CaptureRegion2()
 
 	; Perform the search
-	Local $result = DllCall($g_sLibImgLocPath, "str", "SearchMultipleTilesBetweenLevels", "handle", $hHBitmap2, "str", $directory, "str", $searcharea, "Int", $maxReturnPoints, "str", $redLines, "Int", $minLevel, "Int", $maxLevel)
+	Local $result = DllCall($g_hLibImgLoc, "str", "SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $directory, "str", $searcharea, "Int", $maxReturnPoints, "str", $redLines, "Int", $minLevel, "Int", $maxLevel)
 	Local $error = @error ; Store error values as they reset at next function call
 	Local $extError = @extended
 

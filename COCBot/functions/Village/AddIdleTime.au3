@@ -16,11 +16,11 @@ Func AddIdleTime()
 	If $g_bTrainAddRandomDelayEnable = False Then Return
 	Local $iTimeToWait
 	If $g_iTrainAddRandomDelayMin < $g_iTrainAddRandomDelayMax Then
-		$iTimeToWait = random($g_iTrainAddRandomDelayMin, $g_iTrainAddRandomDelayMax, 1)
+		$iTimeToWait = Random($g_iTrainAddRandomDelayMin, $g_iTrainAddRandomDelayMax, 1)
 	Else
-		$iTimeToWait = random($g_iTrainAddRandomDelayMax, $g_iTrainAddRandomDelayMin, 1)
+		$iTimeToWait = Random($g_iTrainAddRandomDelayMax, $g_iTrainAddRandomDelayMin, 1)
 	EndIf
-	Setlog("Waiting, Add random delay of " & $iTimeToWait & " seconds.",$COLOR_INFO)
+	Setlog("Waiting, Add random delay of " & $iTimeToWait & " seconds.", $COLOR_INFO)
 	If _SleepStatus($iTimeToWait * 1000) Then Return
 	_GUICtrlStatusBar_SetText($g_hStatusBar, "")
-EndFunc   ;==>AddIdleTime()
+EndFunc   ;==>AddIdleTime

@@ -27,9 +27,23 @@ Func _CheckPixel($aScreenCode, $bNeedCapture = Default, $Ignore = Default, $sLog
 	EndIf
 	If _ColorCheck( _
 			_GetPixelColor($aScreenCode[0], $aScreenCode[1], $bNeedCapture, $sLogText, $LogTextColor, $bSilentSetLog), _ ; capture color #1
-			Hex($aScreenCode[2], 6), _  ; compare to Color #2 from screencode
+			Hex($aScreenCode[2], 6), _ ; compare to Color #2 from screencode
 			$aScreenCode[3], $Ignore) Then ; using tolerance from screencode and color mask name referenced by $Ignore
 		Return True
 	EndIf
-	Return False;
+	Return False ;
 EndFunc   ;==>_CheckPixel
+
+Func _WaitForCheckPixel($aScreenCode, $bNeedCapture = Default, $Ignore = Default, $sLogText = Default, $LogTextColor = Default, $bSilentSetLog = Default, $iWaitLoop = Default)
+	If $iWaitLoop = Default Then $iWaitLoop = 250  ; if default wait time per loop, then wait 250ms
+	Local $wCount = 0
+	While _CheckPixel($aScreenCode, $bNeedCapture, $Ignore, $sLogText, $LogTextColor, $bSilentSetLog) = False
+		If _Sleep($iWaitLoop ) Then Return
+		$wCount += 1
+		If $wCount > 20 Then ; wait for 20*250ms=5 seconds for pixel to appear
+			Setlog($sLogText & " not found!", $COLOR_ERROR)
+			Return False
+		EndIf
+	WEnd
+	Return True
+EndFunc

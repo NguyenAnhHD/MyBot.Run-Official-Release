@@ -5,8 +5,8 @@
 ; Syntax ........: CloseCoC($ReOpenCoC = False)
 ; Parameters ....:
 ; Return values .: None
-; Author ........: The Master (2015)
-; Modified ......: cosote (Dec 2015)
+; Author ........: The Master (06-2015)
+; Modified ......: cosote (12-2015)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -26,9 +26,10 @@ Func CloseCoC($ReOpenCoC = False)
 		SetLog("Closing CoC......", $COLOR_ERROR) ; Let user know what we do...
 	EndIf
 	WinGetAndroidHandle()
-	AndroidHomeButton()
+	;AndroidHomeButton()
 	If Not $g_bRunState Then Return
-	SendAdbCommand("shell am force-stop " & $g_sAndroidGamePackage)
+	;SendAdbCommand("shell am force-stop " & $g_sAndroidGamePackage)
+	AndroidAdbSendShellCommand("am force-stop " & $g_sAndroidGamePackage, Default, Default, False)
 	If Not $g_bRunState Then Return
 	If $ReOpenCoC Then
 		OpenCoC()
@@ -60,7 +61,7 @@ Func OpenCoC()
 
 	Local $RunApp = "", $iCount = 0
 	WinGetAndroidHandle()
-	AndroidHomeButton()
+	;AndroidHomeButton()
 	If _Sleep(500) Then Return
 	If Not StartAndroidCoC() Then Return
 	If Not $g_bRunState Then Return
@@ -99,7 +100,7 @@ Func WaitnOpenCoC($iWaitTime, $bFullRestart = False)
 	Local $sWaitTime = ""
 	Local $iMin, $iSec, $iHour, $iWaitSec
 	WinGetAndroidHandle()
-	AndroidHomeButton()
+	;AndroidHomeButton()
 	$iWaitSec = Round($iWaitTime / 1000)
 	$iHour = Floor(Floor($iWaitSec / 60) / 60)
 	$iMin = Floor(Mod(Floor($iWaitSec / 60), 60))
@@ -146,7 +147,7 @@ Func PoliteCloseCoC($sSource = "Unknown_")
 		While 1
 			checkObstacles()
 			AndroidBackButton()
-			If _Sleep($iDelayCloseOpen1000) Then Return ; wait for window to open
+			If _Sleep($DELAYCLOSEOPEN1000) Then Return ; wait for window to open
 			If ClickOkay("ExitOkay_" & $sSource, True) = True Then ExitLoop ; Confirm okay to exit
 			If $i > 10 Then
 				Setlog("Can not find Okay button to exit CoC, Forcefully Closing CoC", $COLOR_ERROR)
@@ -162,7 +163,7 @@ Func PoliteCloseCoC($sSource = "Unknown_")
 		While 1
 			checkObstacles()
 			AndroidBackButton()
-			If _Sleep($iDelayCloseOpen1000) Then Return ; wait for window to open
+			If _Sleep($DELAYCLOSEOPEN1000) Then Return ; wait for window to open
 			Switch $g_sAndroidGameDistributor
 				Case "Kunlun", "Huawei", "Kaopu", "Microvirt", "Yeshen", "Qihoo", "Baidu", "OPPO", "Anzhi", "Lenovo", "Aiyouxi"
 					$btnExit = FindExitButton($g_sAndroidGameDistributor)
@@ -171,7 +172,7 @@ Func PoliteCloseCoC($sSource = "Unknown_")
 						ExitLoop
 					EndIf
 				Case "9game"
-					If _Sleep($iDelayCloseOpen2000) Then Return ; wait more
+					If _Sleep($DELAYCLOSEOPEN2000) Then Return ; wait more
 					$btnExit = FindExitButton($g_sAndroidGameDistributor)
 					If IsArray($btnExit) Then
 						Click($btnExit[0] + 71, $btnExit[1] + 64) ; click offsets for the transparent window
@@ -181,7 +182,7 @@ Func PoliteCloseCoC($sSource = "Unknown_")
 				Case "VIVO", "Xiaomi"
 					$btnExit = FindExitButton($g_sAndroidGameDistributor)
 					If IsArray($btnExit) Then
-						Click($btnExit[0], $btnExit[1], 2, $iDelayCloseOpen3000) ; has to click twice slowly
+						Click($btnExit[0], $btnExit[1], 2, $DELAYCLOSEOPEN3000) ; has to click twice slowly
 						ExitLoop
 					EndIf
 				Case "Guopan"
@@ -189,7 +190,7 @@ Func PoliteCloseCoC($sSource = "Unknown_")
 					If IsArray($btnExit) Then
 						Click($btnExit[0], $btnExit[1])
 					EndIf
-					If _Sleep($iDelayCloseOpen2000) Then Return ; wait for second window
+					If _Sleep($DELAYCLOSEOPEN2000) Then Return ; wait for second window
 					$btnExit = FindExitButton("Kunlun")
 					If IsArray($btnExit) Then
 						Click($btnExit[0], $btnExit[1])

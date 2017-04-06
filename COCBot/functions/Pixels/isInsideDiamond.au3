@@ -81,15 +81,15 @@ Func isInsideDiamond($aCoords)
 EndFunc   ;==>isInsideDiamond
 
 #cs
-Global $g_iDebugSetlog = 1
-Func SetDebugLog($text)
+	Global $g_iDebugSetlog = 1
+	Func SetDebugLog($text)
 	ConsoleWrite($text & @CRLF)
-EndFunc
-Local $aTests[2][2] = [[595, 463], [575, 328]]
-Local $i, $x, $y
-For $i = 0 To UBound($aTests) - 1
+	EndFunc
+	Local $aTests[2][2] = [[595, 463], [575, 328]]
+	Local $i, $x, $y
+	For $i = 0 To UBound($aTests) - 1
 	$x = $aTests[$i][0]
 	$y = $aTests[$i][1]
 	SetDebugLog($x & ", " & $y & ":" & isInsideDiamondXY($x, $y))
-Next
+	Next
 #ce

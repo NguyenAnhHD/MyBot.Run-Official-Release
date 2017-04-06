@@ -14,7 +14,7 @@
 ; ===============================================================================================================================
 #include-once
 
-;$hGUI_Settings = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
+;$hGUI_Settings = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
 ;GUISetBkColor($COLOR_WHITE, $hGUI_Settings)
 
 Global $g_hChkBotStop = 0, $g_hCmbBotCommand = 0, $g_hCmbBotCond = 0, $g_hCmbHoursStop = 0
@@ -22,11 +22,12 @@ Global $g_hTxtRestartGold = 0, $g_hTxtRestartElixir = 0, $g_hTxtRestartDark = 0
 Global $g_hChkTrap = 1, $g_hChkCollect = 1, $g_hChkTombstones = 1, $g_hChkCleanYard = 0, $g_hChkGemsBox = 0
 Global $g_hBtnLocateSpellfactory = 0, $g_hBtnLocateDarkSpellFactory = 0
 Global $g_hBtnLocateKingAltar = 0, $g_hBtnLocateQueenAltar = 0, $g_hBtnLocateWardenAltar = 0, $g_hBtnLocateLaboratory = 0, $g_hBtnResetBuilding = 0
+Global $g_hChkTreasuryCollect = 0, $g_hTxtTreasuryGold = 0, $g_hTxtTreasuryElixir = 0, $g_hTxtTreasuryDark = 0
 
 Func CreateVillageMisc()
    Local $sTxtTip = ""
    Local $x = 15, $y = 45
-   GUICtrlCreateGroup(GetTranslated(610,1, "Halt Attack"), $x - 10, $y - 20, 440, 100)
+   GUICtrlCreateGroup(GetTranslated(610,1, "Halt Attack"), $x - 10, $y - 20, $g_iSizeWGrpTab2, 100)
 		$g_hChkBotStop = GUICtrlCreateCheckbox("", $x - 5, $y, 16, 16)
 			$sTxtTip = GetTranslated(610,2, "Use these options to set when the bot will stop attacking.")
 			_GUICtrlSetTip(-1, $sTxtTip)
@@ -84,13 +85,14 @@ Func CreateVillageMisc()
 			GUICtrlSetLimit(-1, 6)
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-   Local $x = 15, $y = 150
-   GUICtrlCreateGroup(GetTranslated(610,40, "Rearm, Collect, Clear"), $x -10, $y - 20 , 440, 190)
+   Local $x = 15, $y = 148
+   GUICtrlCreateGroup(GetTranslated(610,40, "Rearm, Collect, Clear"), $x -10, $y - 20 , $g_iSizeWGrpTab2, 235)
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnTrap, $x + 7, $y, 24, 24)
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnXbow, $x + 32, $y, 24, 24)
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnInferno, $x + 57, $y, 24, 24)
 		$g_hChkTrap = GUICtrlCreateCheckbox(GetTranslated(610,41, "Rearm Traps && Reload Xbows and Infernos"), $x + 100, $y + 4, -1, -1)
 			_GUICtrlSetTip(-1, GetTranslated(610,42, "Check this to automatically Rearm Traps, Reload Xbows and Infernos (if any) in your Village."))
+			GUICtrlSetState(-1, $GUI_CHECKED)
 
 	  $y += 35
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnMine, $x - 5, $y, 24, 24)
@@ -98,16 +100,60 @@ Func CreateVillageMisc()
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnDrill, $x + 45, $y, 24, 24)
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnLootCart, $x + 70, $y, 24, 24)
 		$g_hChkCollect = GUICtrlCreateCheckbox(GetTranslated(610,43, "Collect Resources && Loot Cart"), $x + 100, $y + 4, -1, -1, -1)
+			GUICtrlSetOnEvent(-1, "ChkCollect")
 			_GUICtrlSetTip(-1, GetTranslated(610,44, "Check this to automatically collect the Village's Resources") & @CRLF & _
 							   GetTranslated(610,45, "from Gold Mines, Elixir Collectors and Dark Elixir Drills.") & @CRLF & _
 							   GetTranslated(610,46, "This will also search for a Loot Cart in your village and collect it."))
 			GUICtrlSetState(-1, $GUI_CHECKED)
 
+		$y += 35
+		GUICtrlCreateIcon($g_sLibIconPath, $eIcnTreasury, $x + 22, $y - 10, 48, 48)
+		$g_hChkTreasuryCollect = GUICtrlCreateCheckbox(GetTranslated(610, 81, "Treasury"), $x + 100, $y + 4, -1, -1)
+			_GUICtrlSetTip(-1, GetTranslated(610, 82, "Check this to automatically collect Treasury when FULL,") & @CRLF & _
+					GetTranslated(610, 83,"'OR' when Storage values are BELOW minimum values on right,") & @CRLF & _
+					GetTranslated(610, 84,"Use zero as min values to ONLY collect when Treasury is full") & @CRLF & _
+					GetTranslated(610, 85,"Large minimum values will collect Treasury loot more often!"))
+			GUICtrlSetState(-1, $GUI_UNCHECKED)
+			GUICtrlSetOnEvent(-1, "ChkTreasuryCollect")
+
+		$x += 170
+		$y -= 10
+		GUICtrlCreateIcon ($g_sLibIconPath, $eIcnGold, $x + 58, $y + 4, 16, 16)
+		GUICtrlCreateLabel("<", $x + 50, $y + 6, -1, -1)
+		$g_hTxtTreasuryGold = GUICtrlCreateInput("1000000", $x + 75, $y + 4, 50, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+			GUICtrlSetState (-1, $GUI_DISABLE)
+			_GUICtrlSetTip(-1, GetTranslated(610, 86, "Minimum Gold Storage amount to collect Treasury.") & @CRLF & _
+					GetTranslated(610, 87, "Set same as Resume Attack values to collect when 'out of gold' error") & @CRLF & _
+					GetTranslated(610, 88, "happens while searching for attack") & @CRLF & GetTranslated(610, 85, -1))
+			GUICtrlSetLimit(-1, 7)
+		$y += 12
+		GUICtrlCreateLabel(GetTranslated(610, 89, "Or"), $x, $y + 6, -1, -1)
+		$y += 12
+		GUICtrlCreateIcon ($g_sLibIconPath, $eIcnElixir, $x + 58, $y + 4, 16, 16)
+		GUICtrlCreateLabel("<", $x + 50, $y + 6, -1, -1)
+		$g_hTxtTreasuryElixir = GUICtrlCreateInput("1000000", $x + 75, $y + 4, 50, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+			GUICtrlSetState (-1, $GUI_DISABLE)
+			_GUICtrlSetTip(-1, GetTranslated(610, 90, "Minimum Elixir Storage amount to collect Treasury.") & @CRLF & _
+					GetTranslated(610, 91, "Set same as Resume Attack values to collect when 'out of elixir' error") & @CRLF & _
+					GetTranslated(610, 92, "happens during troop training") & @CRLF & GetTranslated(610, 85, -1))
+			GUICtrlSetLimit(-1, 7)
+		$y -= 12
+		$x += 126
+		GUICtrlCreateLabel(GetTranslated(610, 89, -1), $x + 4, $y + 6, -1, -1)
+		GUICtrlCreateIcon ($g_sLibIconPath, $eIcnDark, $x + 58, $y + 4, 16, 16)
+		GUICtrlCreateLabel("<", $x + 50, $y + 6, -1, -1)
+		$g_hTxtTreasuryDark = GUICtrlCreateInput("1000", $x + 75, $y + 4, 50, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+			GUICtrlSetState (-1, $GUI_DISABLE)
+			_GUICtrlSetTip(-1, GetTranslated(610, 93, "Minimum Dark Elixir Storage amount to collect Treasury.") & @CRLF & _
+					GetTranslated(610, 91, -1) & @CRLF & GetTranslated(610, 92, -1) & @CRLF & GetTranslated(610, 85, -1))
+			GUICtrlSetLimit(-1, 6)
+
+	$x -= (170 + 126)
 	  $y += 35
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnTombstone, $x + 32 , $y, 24, 24)
 		$g_hChkTombstones = GUICtrlCreateCheckbox(GetTranslated(610,47, "Clear Tombstones"), $x + 100, $y + 4, -1, -1)
 			_GUICtrlSetTip(-1, GetTranslated(610,48, "Check this to automatically clear tombstones after enemy attack."))
-			GUICtrlSetState(-1, $GUI_UNCHECKED)
+			GUICtrlSetState(-1, $GUI_CHECKED)
 
 	  $y += 35
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnTree, $x + 20, $y, 24, 24)
@@ -121,12 +167,10 @@ Func CreateVillageMisc()
 		$g_hChkGemsBox = GUICtrlCreateCheckbox(GetTranslated(610,51, "Remove GemBox"), $x + 100, $y + 4, -1, -1)
 			_GUICtrlSetTip(-1, GetTranslated(610,52, "Check this to automatically clear GemBox."))
 			GUICtrlSetState(-1, $GUI_UNCHECKED)
+GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-   GUICtrlCreateGroup("", -99, -99, 1, 1)
-
-
-   Local $x = 20, $y = 345
-   GUICtrlCreateGroup(GetTranslated(610,53, "Locate Manually"), $x - 15, $y - 20, 440, 65)
+   Local $x = 20, $y = 385
+   GUICtrlCreateGroup(GetTranslated(610,53, "Locate Manually"), $x - 15, $y - 20, $g_iSizeWGrpTab2, 65)
 		Local $sTxtRelocate = GetTranslated(610,55, "Relocate your") & " "
 		$X -= 11
 		$y += 0

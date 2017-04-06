@@ -21,47 +21,67 @@
 ; ===============================================================================================================================
 #include-once
 
-Global $aTxtLogInitText[0][6] = [[]]
-Global $aTxtAtkLogInitText[0][6] = [[]]
+Global $g_oTxtLogInitText = ObjCreate("Scripting.Dictionary")
+Global $g_oTxtAtkLogInitText = ObjCreate("Scripting.Dictionary")
 
 
-Func SetLog($String, $Color = Default, $Font = Default, $FontSize = Default, $statusbar = Default, $time = Default, $bConsoleWrite = True, _
-			$LogPrefix = "L ", $bPostponed = $g_bCriticalMessageProcessing) ;Sets the text for the log
+Func SetLog($String, $Color = Default, $Font = Default, $FontSize = Default, $statusbar = Default, $bConsoleWrite = Default) ;Sets the text for the log
+	Return _SetLog($String, $Color, $Font, $FontSize, $statusbar, $bConsoleWrite)
+EndFunc   ;==>SetLog
+
+; internal _SetLog(), don't use outside this file
+Func _SetLog($String, $Color = Default, $Font = Default, $FontSize = Default, $statusbar = Default, $time = Default, $bConsoleWrite = Default, _
+			$LogPrefix = Default, $bPostponed = Default, $bSilentSetLog = Default, $bWriteToLogFile = Default)
 
 	If $Color = Default Then $Color = $COLOR_BLACK
 	If $Font = Default Then $Font = "Verdana"
 	If $FontSize = Default Then $FontSize = 7.5
 	If $statusbar = Default Then $statusbar = 1
 	If $time = Default Then $time = Time()
-	Local $log = $LogPrefix & TimeDebug() & $String
+	Local $debugTime = TimeDebug()
+	If $bConsoleWrite = Default Then $bConsoleWrite = True
+	If $LogPrefix = Default Then $LogPrefix = "L "
+	If $bPostponed = Default Then $bPostponed = $g_bCriticalMessageProcessing
+	If $bSilentSetLog = Default Then $bSilentSetLog = $g_bSilentSetLog
+	If $bWriteToLogFile = Default Then $bWriteToLogFile = True
+
+	Local $log = $LogPrefix & $debugTime & $String
 	If $bConsoleWrite = True And $String <> "" Then
 		Local $sLevel = GetLogLevel($Color)
 		ConsoleWrite($sLevel & $log & @CRLF) ; Always write any log to console
 	EndIf
-	If $g_hLogFile = 0 Then CreateLogFile()
+	If $g_hLogFile = 0 And $g_sProfileLogsPath Then
+		CreateLogFile()
+	EndIf
 
 	; write to log file
-	__FileWriteLog($g_hLogFile, $log)
-	If $g_bSilentSetLog = True Then
+	If $bWriteToLogFile Then __FileWriteLog($g_hLogFile, $log)
+	If $bSilentSetLog = True And ($bWriteToLogFile = False Or $g_hLogFile) Then
 		; Silent mode is active, only write to log file, not to log control
 		Return
 	EndIf
-	Local $txtLogMutex = AcquireMutex("txtLog")
-	Local $iIndex = UBound($aTxtLogInitText)
-	ReDim $aTxtLogInitText[$iIndex + 1][6]
-	$aTxtLogInitText[$iIndex][0] = $String
-	$aTxtLogInitText[$iIndex][1] = $Color
-	$aTxtLogInitText[$iIndex][2] = $Font
-	$aTxtLogInitText[$iIndex][3] = $FontSize
-	$aTxtLogInitText[$iIndex][4] = $statusbar
-	$aTxtLogInitText[$iIndex][5] = $time
-	ReleaseMutex($txtLogMutex)
+	;Local $txtLogMutex = AcquireMutex("txtLog")
+	Local $a[6]
+	$a[0] = $String
+	$a[1] = $Color
+	$a[2] = $Font
+	$a[3] = $FontSize
+	$a[4] = $statusbar
+	$a[5] = $time
+	If $g_hLogFile = 0 Then
+		; could not write to log file, so add additional info (does happen only before config file is available)
+		ReDim $a[8]
+		$a[6] = (($bSilentSetLog) ? (1) : (2)) ; write to log file with silent flag
+		$a[7] = $LogPrefix & $debugTime ; log file prefix
+	EndIf
+	$g_oTxtLogInitText($g_oTxtLogInitText.Count + 1) = $a
+	;ReleaseMutex($txtLogMutex)
 
-	If $g_hTxtLog <> 0 And $g_bRunState = False Or ($bPostponed = False And TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout) Then
+	If ($g_hTxtLog <> 0 And $g_bRunState = False) Or ($bPostponed = False And __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout) Then
 		; log now to GUI
 		CheckPostponedLog()
 	EndIf
-EndFunc   ;==>SetLog
+EndFunc   ;==>_SetLog
 
 Func GetLogLevel($Color)
 	; translate log level
@@ -116,71 +136,108 @@ Func SetDebugLog($String, $Color = Default, $bSilentSetLog = Default, $Font = De
 	Local $LogPrefix = "D "
 	Local $log = $LogPrefix & TimeDebug() & $String
 	If $g_iDebugSetlog = 1 And $bSilentSetLog = False Then
-		SetLog($String, $Color, $Font, $FontSize, $statusbar, Time(), True, $LogPrefix)
+		_SetLog($String, $Color, $Font, $FontSize, $statusbar, Default, True, $LogPrefix)
 	Else
 		If $String <> "" Then ConsoleWrite(GetLogLevel($Color) & $log & @CRLF) ; Always write any log to console
-		If $g_hLogFile = 0 Then CreateLogFile()
-		__FileWriteLog($g_hLogFile, $log)
+		If $g_hLogFile = 0 And $g_sProfileLogsPath Then CreateLogFile()
+		If $g_hLogFile Then
+			__FileWriteLog($g_hLogFile, $log)
+		Else
+			; log later
+			_SetLog($String, $Color, $Font, $FontSize, $statusbar, Default, False, $LogPrefix, Default, True)
+		EndIf
 	EndIf
 EndFunc   ;==>SetDebugLog
 
 Func SetGuiLog($String, $Color = Default, $bGuiLog = Default)
 	If $bGuiLog = Default Then $bGuiLog = True
 	If $bGuiLog = True Then
-		Return SetLog($String, $Color)
+		Return _SetLog($String, $Color)
 	EndIf
 	Return SetDebugLog($String, $Color)
 EndFunc   ;==>SetGuiLog
 
 Func FlushGuiLog(ByRef $hTxtLog, ByRef $aTxtLog, $bUpdateStatus = False, $sLogMutexName = "txtLog")
 	Local $wasLock = AndroidShieldLock(True) ; lock Android Shield as shield changes state when focus changes
-	Local $txtLogMutex = AcquireMutex($sLogMutexName) ; synchronize access
+	;Local $txtLogMutex = AcquireMutex($sLogMutexName) ; synchronize access
 
 	Local $activeBot = _WinAPI_GetActiveWindow() = $g_hFrmBot ; different scroll to bottom when bot not active to fix strange bot activation flickering
 	Local $hCtrl = _WinAPI_GetFocus() ; RichEdit tampers with focus so remember and restore
-	_SendMessage($hTxtLog, $WM_SETREDRAW, False, 0) ; disable redraw so logging has no visiual effect
-	_WinAPI_EnableWindow($hTxtLog, False) ; disable RichEdit
-	_GUICtrlRichEdit_SetSel($hTxtLog, -1, -1) ; select end
-
-	;add existing Log
-	Local $i
-	For $i = 0 To UBound($aTxtLog) - 1
-		If $i < UBound($aTxtLog) And UBound($aTxtLog, 2) > 5 Then
-			SetLogText($hTxtLog, $aTxtLog[$i][0], $aTxtLog[$i][1], $aTxtLog[$i][2], $aTxtLog[$i][3], $aTxtLog[$i][5])
-		EndIf
-	Next
-	Local $iLogs = UBound($aTxtLog)
-	If $bUpdateStatus = True And $iLogs - 1 >= 0 And $aTxtLog[$iLogs - 1][4] = 1 And $g_hStatusBar <> 0 Then
-		_GUICtrlStatusBar_SetText($g_hStatusBar, "Status : " & $aTxtLog[$iLogs - 1][0])
+	If $hTxtLog Then
+		_SendMessage($hTxtLog, $WM_SETREDRAW, False, 0) ; disable redraw so logging has no visiual effect
+		_WinAPI_EnableWindow($hTxtLog, False) ; disable RichEdit
+		_GUICtrlRichEdit_SetSel($hTxtLog, -1, -1) ; select end
 	EndIf
 
-	$iLogs = UBound($aTxtLog)
-	Redim $aTxtLog[0][6]
+	;add existing Log
+	Local $sLastStatus = ""
+	For $i = 1 To $aTxtLog.Count
+		Local $a = $aTxtLog($i)
+		Local $iSize = UBound($a)
+		If $hTxtLog Then
+			If $iSize = 0 And $a = 0 Then
+				; clear log command
+				_GUICtrlEdit_SetText($hTxtLog, "")
+				ContinueLoop
+			EndIf
+			If $iSize = 6 Or ($iSize > 6 And $a[6] = 2) Then
+				; log to GUI
+				SetLogText($hTxtLog, $a[0], $a[1], $a[2], $a[3], $a[5])
+			EndIf
+		EndIf
+		If $iSize > 7 And $a[6] > 0 Then
+			; log to file now (must be normal log, not attack log)
+			__FileWriteLog($g_hLogFile, $a[7] & $a[0])
+			If $a[6] = 1 Then
+				; was silent
+				ContinueLoop
+			EndIf
+		EndIf
 
-	_WinAPI_EnableWindow($hTxtLog, True) ; enabled RichEdit again
-	_GUICtrlRichEdit_SetSel($hTxtLog, -1, -1) ; select end (scroll to end)
-	_SendMessage($hTxtLog, $WM_SETREDRAW, True, 0) ; enabled RechEdit redraw again
-	_WinAPI_RedrawWindow($hTxtLog, 0, 0, $RDW_INVALIDATE) ; redraw RichEdit
-	If $activeBot And $hCtrl <> $hTxtLog Then _WinAPI_SetFocus($hCtrl) ; Restore Focus
+		If $bUpdateStatus = True And $g_hStatusBar <> 0 And $a[4] = 1 Then
+			$sLastStatus = $a[0]
+			; only till CR/LF or text overwrites
+			Local $iPosCr = StringInStr($sLastStatus, Chr(13))
+			Local $iPosLf = StringInStr($sLastStatus, Chr(10))
+			Local $iPos = $iPosCr
+			If $iPosLf > 0 And $iPosLf < $iPosCr Then $iPos = $iPosLf
+			If $iPos > 0 Then $sLastStatus = StringLeft($sLastStatus, $iPos - 1)
+		EndIf
+	Next
 
-	ReleaseMutex($txtLogMutex) ; end of synchronized block
+	If $sLastStatus Then
+		_GUICtrlStatusBar_SetText($g_hStatusBar, "Status : " & $sLastStatus)
+	EndIf
+
+	Local $iLogs = $aTxtLog.Count
+	$aTxtLog.RemoveAll
+
+	If $hTxtLog Then
+		_WinAPI_EnableWindow($hTxtLog, True) ; enabled RichEdit again
+		_GUICtrlRichEdit_SetSel($hTxtLog, -1, -1) ; select end (scroll to end)
+		_SendMessage($hTxtLog, $WM_SETREDRAW, True, 0) ; enabled RechEdit redraw again
+		_WinAPI_RedrawWindow($hTxtLog, 0, 0, $RDW_INVALIDATE) ; redraw RichEdit
+		If $activeBot And $hCtrl <> $hTxtLog Then _WinAPI_SetFocus($hCtrl) ; Restore Focus
+	EndIf
+
+	;ReleaseMutex($txtLogMutex) ; end of synchronized block
 	AndroidShieldLock($wasLock) ; unlock Android Shield
 	Return $iLogs
 EndFunc   ;==>FlushGuiLog
 
 Func CheckPostponedLog()
 	Local $iLogs = 0
-	If $g_bCriticalMessageProcessing Or TimerDiff($g_hTxtLogTimer) < $g_iTxtLogTimerTimeout Then Return 0
+	If $g_bCriticalMessageProcessing Or __TimerDiff($g_hTxtLogTimer) < $g_iTxtLogTimerTimeout Then Return 0
 
-	If UBound($aTxtLogInitText) > 0 And $g_hTxtLog <> 0 Then
-		$iLogs += FlushGuiLog($g_hTxtLog, $aTxtLogInitText, True, "txtLog")
+	If $g_oTxtLogInitText.Count > 0 And $g_hTxtLog <> 0 Then
+		$iLogs += FlushGuiLog($g_hTxtLog, $g_oTxtLogInitText, True, "txtLog")
 	EndIf
 
-	If UBound($aTxtAtkLogInitText) > 0 And $g_hTxtAtkLog <> 0 Then
-		$iLogs += FlushGuiLog($g_hTxtAtkLog, $aTxtAtkLogInitText, False, "txtAtkLog")
+	If $g_oTxtAtkLogInitText.Count > 0 And $g_hTxtAtkLog <> 0 Then
+		$iLogs += FlushGuiLog($g_hTxtAtkLog, $g_oTxtAtkLogInitText, False, "txtAtkLog")
 	EndIf
 
-	$g_hTxtLogTimer = TimerInit()
+	$g_hTxtLogTimer = __TimerInit()
 	Return $iLogs
 EndFunc   ;==>CheckPostponedLog
 
@@ -202,16 +259,16 @@ Func SetAtkLog($String1, $String2 = "", $Color = $COLOR_BLACK, $Font = "Lucida C
 	;string1 see in video, string1&string2 put in file
 	_FileWriteLog($g_hAttackLogFile, $String1 & $String2)
 
-	Local $txtLogMutex = AcquireMutex("txtAtkLog")
-	Local $iIndex = UBound($aTxtAtkLogInitText)
-	ReDim $aTxtAtkLogInitText[$iIndex + 1][6]
-	$aTxtAtkLogInitText[$iIndex][0] = $String1
-	$aTxtAtkLogInitText[$iIndex][1] = $Color
-	$aTxtAtkLogInitText[$iIndex][2] = $Font
-	$aTxtAtkLogInitText[$iIndex][3] = $FontSize
-	$aTxtAtkLogInitText[$iIndex][4] = 0 ; no status bar update
-	$aTxtAtkLogInitText[$iIndex][5] = 0 ; no time
-	ReleaseMutex($txtLogMutex)
+	;Local $txtLogMutex = AcquireMutex("txtAtkLog")
+	Dim $a[6]
+	$a[0] = $String1
+	$a[1] = $Color
+	$a[2] = $Font
+	$a[3] = $FontSize
+	$a[4] = 0 ; no status bar update
+	$a[5] = 0 ; no time
+	$g_oTxtAtkLogInitText($g_oTxtAtkLogInitText.Count + 1) = $a
+	;ReleaseMutex($txtLogMutex)
 
 EndFunc   ;==>SetAtkLog
 
@@ -222,5 +279,20 @@ Func AtkLogHead()
 EndFunc   ;==>AtkLogHead
 
 Func __FileWriteLog($handle, $text)
-	FileWriteLine($handle, $text)
+	Return FileWriteLine($handle, $text)
 EndFunc   ;==>__FileWriteLog
+
+Func ClearLog($hRichEditCtrl = $g_hTxtLog)
+	Switch $hRichEditCtrl
+	Case $g_hTxtLog
+		$g_oTxtLogInitText($g_oTxtLogInitText.Count + 1) = 0
+	Case $g_hTxtAtkLog
+		$g_oTxtAtkLogInitText($g_oTxtAtkLogInitText.Count + 1) = 0
+	EndSwitch
+EndFunc   ;==>ClearLog
+
+Func SetLogCentered($String, $sPad = Default, $Color = Default, $bClearLog = False)
+	If $sPad = Default Then $sPad = "="
+	If $bClearLog = True Then ClearLog($g_hTxtLog)
+	_SetLog(_PadStringCenter($String, 53, $sPad), $Color, "Lucida Console", 8)
+EndFunc   ;==>SetLogCentered

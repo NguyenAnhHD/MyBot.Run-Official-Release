@@ -22,10 +22,10 @@
 Func _GetPixelColor($iX, $iY, $bNeedCapture = False, $sLogText = Default, $LogTextColor = Default, $bSilentSetLog = Default)
 	Local $aPixelColor = 0
 	If $bNeedCapture = False Or $g_bRunState = False Then
-		$aPixelColor = _GDIPlus_BitmapGetPixel($hBitmap, $iX, $iY)
+		$aPixelColor = _GDIPlus_BitmapGetPixel($g_hBitmap, $iX, $iY)
 	Else
 		_CaptureRegion($iX - 1, $iY - 1, $iX + 1, $iY + 1)
-		$aPixelColor = _GDIPlus_BitmapGetPixel($hBitmap, 1, 1)
+		$aPixelColor = _GDIPlus_BitmapGetPixel($g_hBitmap, 1, 1)
 	EndIf
 	If $sLogText <> Default And IsString($sLogText) Then
 		Local $String = $sLogText & " at X,Y: " & $iX & "," & $iY & " Found: " & Hex($aPixelColor, 6)
@@ -35,8 +35,8 @@ Func _GetPixelColor($iX, $iY, $bNeedCapture = False, $sLogText = Default, $LogTe
 EndFunc   ;==>_GetPixelColor
 
 Func IsPixelColorGray($sPixelColorRgbHex)
-    If StringLen($sPixelColorRgbHex) <> 6 Then Return False
-    Local $sRed = StringLeft($sPixelColorRgbHex, 2)
-    Local $sBlue = StringRight($sPixelColorRgbHex, 2)
-    Return $sRed = $sBlue And $sRed = StringMid($sPixelColorRgbHex, 3, 2)
+	If StringLen($sPixelColorRgbHex) <> 6 Then Return False
+	Local $sRed = StringLeft($sPixelColorRgbHex, 2)
+	Local $sBlue = StringRight($sPixelColorRgbHex, 2)
+	Return $sRed = $sBlue And $sRed = StringMid($sPixelColorRgbHex, 3, 2)
 EndFunc   ;==>IsPixelColorGray

@@ -102,8 +102,8 @@ Func btnDeletePBMessages()
 EndFunc   ;==>btnDeletePBMessages
 
 Func NotifyHelp()
-	If FileExists(@ScriptDir & "\Help\NotifyHelp_" & $sLanguage & ".mht") Then
-		ShellExecute(@ScriptDir & "\Help\NotifyHelp_" & $sLanguage & ".mht")
+	If FileExists(@ScriptDir & "\Help\NotifyHelp_" & $g_sLanguage & ".mht") Then
+		ShellExecute(@ScriptDir & "\Help\NotifyHelp_" & $g_sLanguage & ".mht")
 	ElseIf FileExists(@ScriptDir & "\Help\NotifyHelp_English.mht") Then
 		ShellExecute(@ScriptDir & "\Help\NotifyHelp_English.mht")
 	EndIf

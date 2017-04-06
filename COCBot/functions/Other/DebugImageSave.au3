@@ -58,12 +58,12 @@ Func DebugImageSave($TxtName = "Unknown", $capturenew = True, $extensionpng = "p
 	WEnd
 
 	If $capturenew Then _CaptureRegion2()
-	Local $EditedImage = _GDIPlus_BitmapCreateFromHBITMAP($hHBitmap2)
+	Local $EditedImage = _GDIPlus_BitmapCreateFromHBITMAP($g_hHBitmap2)
 	_GDIPlus_ImageSaveToFile($EditedImage, $filename)
 	_GDIPlus_BitmapDispose($EditedImage)
 
 	If $g_iDebugSetlog = 1 Then Setlog($filename, $COLOR_DEBUG)
 
-	If _Sleep($iDelayDebugImageSave1) Then Return
+	If _Sleep($DELAYDEBUGIMAGESAVE1) Then Return
 
 EndFunc   ;==>DebugImageSave

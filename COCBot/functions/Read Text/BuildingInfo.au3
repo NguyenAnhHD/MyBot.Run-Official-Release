@@ -20,7 +20,7 @@ Func BuildingInfo($iXstart, $iYstart)
 
 	$sBldgText = getNameBuilding($iXstart, $iYstart) ; Get Unit name and level with OCR
 	If $sBldgText = "" Then ; try a 2nd time after a short delay if slow PC
-		If _Sleep($iDelayBuildingInfo1) Then Return
+		If _Sleep($DELAYBUILDINGINFO1) Then Return
 		$sBldgText = getNameBuilding($iXstart, $iYstart) ; Get Unit name and level with OCR
 	EndIf
 	If $g_iDebugSetlog = 1 Then Setlog("Read building Name String = " & $sBldgText, $COLOR_DEBUG) ;debug
@@ -54,7 +54,7 @@ Func BuildingInfo($iXstart, $iYstart)
 	If $aResult[2] <> "" Then $aResult[0] += 1
 	If $aResult[2] > 90 Then
 		If $aResult[2] = 200 Then
-			$aResult[2] = "Broken"  ; Broken Clan Castle (not rebuild yet): report 'Broken' as Level
+			$aResult[2] = "Broken" ; Broken Clan Castle (not rebuild yet): report 'Broken' as Level
 		Else
 			$aResult[2] = ""
 		EndIf

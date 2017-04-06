@@ -19,7 +19,7 @@
 ;
 Func DropOnEdges($troop, $nbSides, $number, $slotsPerEdge = 0)
 	If $nbSides = 0 Or $number = 1 Then
-		OldDropTroop($troop, $Edges[0], $number);
+		OldDropTroop($troop, $g_aaiEdgeDropPoints[0], $number) ;
 		Return
 	EndIf
 	If $nbSides < 1 Then Return
@@ -28,7 +28,7 @@ Func DropOnEdges($troop, $nbSides, $number, $slotsPerEdge = 0)
 		For $i = 0 To $nbSides - 3
 			KeepClicks()
 			Local $nbTroopsPerEdge = Round($nbTroopsLeft / ($nbSides - $i * 2))
-			DropOnEdge($troop, $Edges[$i], $nbTroopsPerEdge, $slotsPerEdge, $Edges[$i + 2], $i)
+			DropOnEdge($troop, $g_aaiEdgeDropPoints[$i], $nbTroopsPerEdge, $slotsPerEdge, $g_aaiEdgeDropPoints[$i + 2], $i)
 			$nbTroopsLeft -= $nbTroopsPerEdge * 2
 			ReleaseClicks()
 		Next
@@ -39,14 +39,14 @@ Func DropOnEdges($troop, $nbSides, $number, $slotsPerEdge = 0)
 		If $nbSides = 1 Or ($nbSides = 3 And $i = 2) Then
 			Local $nbTroopsPerEdge = Round($nbTroopsLeft / ($nbSides - $i))
 			If $g_iMatchMode = $LB And $g_aiAttackStdDropSides[$LB] >= 4 Then ; Used for DE or TH side attack
-				DropOnEdge($troop, $Edges[$BuildingEdge], $nbTroopsPerEdge, $slotsPerEdge)
+				DropOnEdge($troop, $g_aaiEdgeDropPoints[$g_iBuildingEdge], $nbTroopsPerEdge, $slotsPerEdge)
 			Else
-				DropOnEdge($troop, $Edges[$i], $nbTroopsPerEdge, $slotsPerEdge)
+				DropOnEdge($troop, $g_aaiEdgeDropPoints[$i], $nbTroopsPerEdge, $slotsPerEdge)
 			EndIf
 			$nbTroopsLeft -= $nbTroopsPerEdge
 		ElseIf ($nbSides = 2 And $i = 0) Or ($nbSides = 3 And $i <> 1) Then
 			Local $nbTroopsPerEdge = Round($nbTroopsLeft / ($nbSides - $i * 2))
-			DropOnEdge($troop, $Edges[$i + 3], $nbTroopsPerEdge, $slotsPerEdge, $Edges[$i + 1])
+			DropOnEdge($troop, $g_aaiEdgeDropPoints[$i + 3], $nbTroopsPerEdge, $slotsPerEdge, $g_aaiEdgeDropPoints[$i + 1])
 			$nbTroopsLeft -= $nbTroopsPerEdge * 2
 		EndIf
 		ReleaseClicks()

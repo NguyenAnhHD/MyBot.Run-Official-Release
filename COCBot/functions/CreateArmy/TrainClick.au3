@@ -11,16 +11,14 @@
 ;                  $aLootSpot           - [in/out] an array of [X location, Y location, Hex Color, Tolerance] to check after click, color used to see if out of Elixir for more troops
 ;						 $sdebugtxt				 - String with click debug text
 ; Return values .: None
-; Author ........: KnowJack (July 2015)
-; Modified ......: Sardo 2015-08, Boju 2016-06
+; Author ........: KnowJack (07-2015)
+; Modified ......: Sardo (08-2015), Boju (06-2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-
-;Global $TypeTroops[4] = [1, 10, 20, 0] ; unnecessary variable , is a parameter !!!
 
 Func TrainClick($x, $y, $iTimes, $iSpeed, $aWatchSpot, $sdebugtxt, $TypeTroops)
 	If IsTrainPage() Then
@@ -39,7 +37,7 @@ Func TrainClick($x, $y, $iTimes, $iSpeed, $aWatchSpot, $sdebugtxt, $TypeTroops)
 						If $g_iDebugClick = 1 Then SetLog("Camp is FULL after " & $i & " clicks", $COLOR_DEBUG)
 						ExitLoop
 					EndIf
-					If $iUseRandomClick = 0 then
+					If $g_bUseRandomClick = False Then
 						PureClick($x, $y) ;Click once.
 					Else
 						PureClickR($TypeTroops, $x, $y) ;Click once.
@@ -54,7 +52,7 @@ Func TrainClick($x, $y, $iTimes, $iSpeed, $aWatchSpot, $sdebugtxt, $TypeTroops)
 					If $g_iDebugClick = 1 Then SetLog("Camp is FULL", $COLOR_DEBUG)
 					Return ; Check to see if barrack full
 				EndIf
-				If $iUseRandomClick = 0 then
+				If $g_bUseRandomClick = False Then
 					PureClick($x, $y, $iTimes, $iSpeed) ;Click $iTimes.
 				Else
 					PureClickR($TypeTroops, $x, $y, $iTimes, $iSpeed) ;Click $iTimes.
@@ -70,11 +68,11 @@ Func TrainClick($x, $y, $iTimes, $iSpeed, $aWatchSpot, $sdebugtxt, $TypeTroops)
 				If $g_iDebugClick = 1 Then SetLog("Camp is FULL", $COLOR_DEBUG)
 				Return ; Check to see if barrack full
 			EndIf
-			If $iUseRandomClick = 0 then
+			If $g_bUseRandomClick = False Then
 				PureClick($x, $y)
 			Else
 				PureClickR($TypeTroops, $x, $y)
-			EndIF
+			EndIf
 
 			If _Sleep($iSpeed, False) Then Return
 		EndIf

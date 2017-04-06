@@ -18,7 +18,7 @@ Func getArmyTroopTime($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 
 	If $g_iDebugSetlogTrain = 1 Or $g_iDebugSetlog = 1 Then SETLOG("Begin getArmyTroopTime:", $COLOR_DEBUG1)
 
-	$aTimeTrain[0] = 0  ; reset time
+	$g_aiTimeTrain[0] = 0 ; reset time
 
 	If $bOpenArmyWindow = False And IsTrainPage() = False Then ; check for train page
 		SetError(1)
@@ -28,13 +28,13 @@ Func getArmyTroopTime($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 			SetError(2)
 			Return ; not open, requested to be open - error.
 		EndIf
-		If _Sleep($iDelaycheckArmyCamp5) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP5) Then Return
 	EndIf
 	Local $sResultTroops = getRemainTrainTimer(756, 169) ;Get time via OCR.
-	$aTimeTrain[0] = ConvertOCRTime("Troops", $sResultTroops)  ; update global array
+	$g_aiTimeTrain[0] = ConvertOCRTime("Troops", $sResultTroops) ; update global array
 
 	If $bCloseArmyWindow = True Then
 		ClickP($aAway, 1, 0, "#0000") ;Click Away
-		If _Sleep($iDelaycheckArmyCamp4) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP4) Then Return
 	EndIf
 EndFunc   ;==>getArmyTroopTime

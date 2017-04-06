@@ -39,7 +39,7 @@ Global $g_hChkDeadbase = 0, $g_hChkActivebase = 0, $g_hChkTHSnipe = 0, $g_hChkBu
 Global $g_hLblDeadbaseDisabled = 0, $g_hLblActivebaseDisabled = 0, $g_hLblTHSnipeDisabled = 0, $g_hLblBullyDisabled = 0
 
 Func CreateAttackSearch()
-   $g_hGUI_SEARCH = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ATTACK)
+   $g_hGUI_SEARCH = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ATTACK)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_SEARCH)
    ; ---
    ; Note:
@@ -71,7 +71,7 @@ Func CreateAttackSearch()
 
    ; SEARCH tab
    ;============
-   $g_hGUI_SEARCH_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 30, $_GUI_MAIN_HEIGHT - 255 - 30, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_SEARCH_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
    $g_hGUI_SEARCH_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,23,"DeadBase") & "    ") ; MUST add 4 spaces to make room for the Checkmark box!
    ; this tab will be empty because it is only used to display a child GUI
    ; below controls are only shown when the strategy is disabled and the child gui will be hidden.

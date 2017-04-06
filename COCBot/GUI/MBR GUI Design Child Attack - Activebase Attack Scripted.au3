@@ -19,11 +19,12 @@ Global $g_hCmbScriptNameAB = 0, $g_hCmbScriptRedlineImplAB = 0, $g_hCmbScriptDro
 Global $g_hLblNotesScriptAB = 0
 
 Func CreateAttackSearchActiveBaseScripted()
-   $g_hGUI_ACTIVEBASE_ATTACK_SCRIPTED = GUICreate("", $_GUI_MAIN_WIDTH - 195, $_GUI_MAIN_HEIGHT - 344, 150, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ACTIVEBASE)
+   $g_hGUI_ACTIVEBASE_ATTACK_SCRIPTED = _GUICreate("", $_GUI_MAIN_WIDTH - 195, $g_iSizeHGrpTab4, 150, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ACTIVEBASE)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_ACTIVEBASE_ATTACK_SCRIPTED)
 
    Local $x = 25, $y = 20
-	   GUICtrlCreateGroup(GetTranslated(607,1, -1), $x - 20, $y - 20, 270, 306)
+	   GUICtrlCreateGroup(GetTranslated(607,1, -1), $x - 20, $y - 20, 270, $g_iSizeHGrpTab4)
+
    ;	$x -= 15
    ;	    $chkmakeIMGCSVAB = GUICtrlCreateCheckbox(GetTranslated(607,2, -1), $x + 150, $y, -1, -1)
    ;			GUICtrlSetState(-1, $GUI_UNCHECKED)
@@ -31,7 +32,7 @@ Func CreateAttackSearchActiveBaseScripted()
    ;			_GUICtrlSetTip(-1, GetTranslated(607,3, -1))
 
 		   $y +=15
-		   $g_hCmbScriptNameAB = GUICtrlCreateCombo("", $x , $y, 200, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
+		   $g_hCmbScriptNameAB = GUICtrlCreateCombo("", $x , $y, 200, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL, $WS_VSCROLL))
 			   _GUICtrlSetTip(-1, GetTranslated(607,4, -1))
 			   GUICtrlSetState(-1, $GUI_UNCHECKED)
 			   GUICtrlSetOnEvent(-1, "cmbScriptNameAB")

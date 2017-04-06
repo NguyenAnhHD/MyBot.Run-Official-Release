@@ -17,7 +17,7 @@
 ; Param : 	$pixel : The pixel to add an offset
 ;			$xSign : The translation on X
 ;			$ySign : The translation on Y
-;			$hBitmap : handle of bitmap
+;			$g_hBitmap : handle of bitmap
 ; Return : 	The pixel with offset
 ; Strategy :
 ; 			According to the type of translation search the color of pixels around the current pixel

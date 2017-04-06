@@ -19,15 +19,15 @@ Func BoostKing()
 	If AllowBoosting("Barbarian King", $g_iCmbBoostBarbarianKing) = False Then Return
 
 	SetLog("Boost Barbarian King...", $COLOR_INFO)
-	If $KingAltarPos[0] = "" Or $KingAltarPos[0] = -1 Then
+	If $g_aiKingAltarPos[0] = "" Or $g_aiKingAltarPos[0] = -1 Then
 		LocateKingAltar()
 		SaveConfig()
-		If _Sleep($iDelayBoostHeroes4) Then Return
+		If _Sleep($DELAYBOOSTHEROES4) Then Return
 	EndIf
 
-	BoostStructure("Barbarian King", "King", $KingAltarPos, $g_iCmbBoostBarbarianKing, $g_hCmbBoostBarbarianKing)
+	BoostStructure("Barbarian King", "King", $g_aiKingAltarPos, $g_iCmbBoostBarbarianKing, $g_hCmbBoostBarbarianKing)
 
-	If _Sleep($iDelayBoostBarracks5) Then Return
+	If _Sleep($DELAYBOOSTBARRACKS5) Then Return
 	checkMainScreen(False) ; Check for errors during function
 EndFunc   ;==>BoostKing
 
@@ -37,15 +37,15 @@ Func BoostQueen()
 	If AllowBoosting("Archer Queen", $g_iCmbBoostArcherQueen) = False Then Return
 
 	SetLog("Boost Archer Queen...", $COLOR_INFO)
-	If $QueenAltarPos[0] = "" Or $QueenAltarPos[0] = -1 Then
+	If $g_aiQueenAltarPos[0] = "" Or $g_aiQueenAltarPos[0] = -1 Then
 		LocateQueenAltar()
 		SaveConfig()
-		If _Sleep($iDelayBoostHeroes4) Then Return
+		If _Sleep($DELAYBOOSTHEROES4) Then Return
 	EndIf
 
-	BoostStructure("Archer Queen", "Quee", $QueenAltarPos, $g_iCmbBoostArcherQueen, $g_hCmbBoostArcherQueen)
+	BoostStructure("Archer Queen", "Quee", $g_aiQueenAltarPos, $g_iCmbBoostArcherQueen, $g_hCmbBoostArcherQueen)
 
-	If _Sleep($iDelayBoostBarracks5) Then Return
+	If _Sleep($DELAYBOOSTBARRACKS5) Then Return
 	checkMainScreen(False) ; Check for errors during function
 EndFunc   ;==>BoostQueen
 
@@ -54,14 +54,14 @@ Func BoostWarden()
 	If AllowBoosting("Grand Warden", $g_iCmbBoostWarden) = False Then Return
 
 	SetLog("Boost Grand Warden...", $COLOR_INFO)
-	If $WardenAltarPos[0] = "" Or $WardenAltarPos[0] = -1 Then
+	If $g_aiWardenAltarPos[0] = "" Or $g_aiWardenAltarPos[0] = -1 Then
 		LocateWardenAltar()
 		SaveConfig()
-		If _Sleep($iDelayBoostHeroes4) Then Return
+		If _Sleep($DELAYBOOSTHEROES4) Then Return
 	EndIf
 
-	BoostStructure("Grand Warden", "Warden", $WardenAltarPos, $g_iCmbBoostWarden, $g_hCmbBoostWarden)
+	BoostStructure("Grand Warden", "Warden", $g_aiWardenAltarPos, $g_iCmbBoostWarden, $g_hCmbBoostWarden)
 
-	If _Sleep($iDelayBoostBarracks5) Then Return
+	If _Sleep($DELAYBOOSTBARRACKS5) Then Return
 	checkMainScreen(False) ; Check for errors during function
 EndFunc   ;==>BoostWarden

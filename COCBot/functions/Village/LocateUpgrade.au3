@@ -17,12 +17,12 @@ Func LocateUpgrades()
 
 	WinGetAndroidHandle()
 
-	If $HWnD <> 0 And $g_bAndroidBackgroundLaunched = True Then ; Android is running in background mode, so restart Android
+	If $g_hAndroidWindow <> 0 And $g_bAndroidBackgroundLaunched = True Then ; Android is running in background mode, so restart Android
 		Setlog("Reboot " & $g_sAndroidEmulator & " for Window access", $COLOR_ERROR)
 		RebootAndroid(True)
 	EndIf
 
-	If $HWnD = 0 Then ; If not found, Android is not open so exit politely
+	If $g_hAndroidWindow = 0 Then ; If not found, Android is not open so exit politely
 		Setlog($g_sAndroidEmulator & " is not open", $COLOR_ERROR)
 		SetError(1)
 		Return
@@ -33,7 +33,7 @@ Func LocateUpgrades()
 	Local $wasDown = AndroidShieldForcedDown()
 	AndroidShield("LocateUpgrades") ; Update shield status due to manual $g_bRunState
 
-;	Setlog("Upgrade Buildings and Auto Wall Upgrade Can Not Use same Loot Type!", $COLOR_SUCCESS)  = disabled due v7.0 skipwallupgrade code
+	;	Setlog("Upgrade Buildings and Auto Wall Upgrade Can Not Use same Loot Type!", $COLOR_SUCCESS)  = disabled due v7.0 skipwallupgrade code
 	Local $MsgBox, $stext
 	Local $icount = 0
 	Local $hGraphic = 0
@@ -43,13 +43,13 @@ Func LocateUpgrades()
 		If _GetPixelColor(1, 1) <> Hex(0x000000, 6) Or _GetPixelColor(850, 1) <> Hex(0x000000, 6) Then ; Check for zoomout in case user tried to zoom in.
 			SetLog("Locate Oops, prep screen 1st", $COLOR_INFO)
 			ZoomOut()
-			$bDisableBreakCheck = True ; stop early PB log off when locating upgrades
+			$g_bDisableBreakCheck = True ; stop early PB log off when locating upgrades
 			Collect()
-			$bDisableBreakCheck = False ; restore flag
+			$g_bDisableBreakCheck = False ; restore flag
 		EndIf
-		$bDisableBreakCheck = True ; stop early PB log off when locating upgrades
+		$g_bDisableBreakCheck = True ; stop early PB log off when locating upgrades
 		Collect() ; must collect or clicking on collectors will fail 1st time
-		$bDisableBreakCheck = False ; restore flag
+		$g_bDisableBreakCheck = False ; restore flag
 
 		If $bInitGraphics Then
 			$bInitGraphics = False
@@ -142,7 +142,7 @@ Func CheckUpgrades() ; Valdiate and determine the cost and type of the upgrade a
 		_ExtMsgBoxSet(1 + 64, $SS_CENTER, 0x004080, 0xFFFF00, 12, "Comic Sans MS", 500)
 		Local $stext = GetTranslated(640, 38, "Keep Mouse OUT of Android Emulator Window While I Check Your Upgrades, Thanks!!")
 		Local $MsgBox = _ExtMsgBox(48, GetTranslated(640, 36, "OK"), GetTranslated(640, 37, "Notice"), $stext, 15, $g_hFrmBot)
-		If _Sleep($iDelayCheckUpgrades1) Then Return
+		If _Sleep($DELAYCHECKUPGRADES) Then Return
 		If $MsgBox <> 1 Then
 			Setlog("Something weird happened in getting upgrade values, try again", $COLOR_ERROR)
 			Return False
@@ -169,34 +169,34 @@ Func CheckUpgrades() ; Valdiate and determine the cost and type of the upgrade a
 			If $g_abUpgradeRepeatEnable[$iz] = True Then GUICtrlSetState($g_hChkUpgradeRepeat[$iz], $GUI_UNCHECKED) ; Change repeat selection box to unchecked
 			ContinueLoop
 		EndIf
-;		GUICtrlSetState($g_hChkWalls, $GUI_UNCHECKED) ; Turn off upgrade walls since we have buidlings to upgrade  = disabled due v7.0 skipwallupgrade code
+		;		GUICtrlSetState($g_hChkWalls, $GUI_UNCHECKED) ; Turn off upgrade walls since we have buidlings to upgrade  = disabled due v7.0 skipwallupgrade code
 	Next
 	; Add duplicate check?
 
 EndFunc   ;==>CheckUpgrades
 
 Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type of the upgrade.
-	Local $inputbox, $iLoot, $aString, $aResult
+	Local $inputbox, $iLoot, $aString, $aResult, $ButtonPixel
 	Local $bOopsFlag = False
 
 	If $bRepeat = True Or $g_abUpgradeRepeatEnable[$inum] = True Then ; check for upgrade in process when continiously upgrading
 		ClickP($aAway, 1, 0, "#0999") ;Click Away to close windows
-		If _Sleep($iDelayUpgradeValue1) Then Return
+		If _Sleep($DELAYUPGRADEVALUE1) Then Return
 		BuildingClick($g_avBuildingUpgrades[$inum][0], $g_avBuildingUpgrades[$inum][1]) ;Select upgrade trained
-		If _Sleep($iDelayUpgradeValue4) Then Return
+		If _Sleep($DELAYUPGRADEVALUE4) Then Return
 		If $bOopsFlag = True Then DebugImageSave("ButtonView")
 		; check if upgrading collector type building, and reselect in case previous click only collect resource
 		If StringInStr($g_avBuildingUpgrades[$inum][4], "collect", $STR_NOCASESENSEBASIC) Or _
 				StringInStr($g_avBuildingUpgrades[$inum][4], "mine", $STR_NOCASESENSEBASIC) Or _
 				StringInStr($g_avBuildingUpgrades[$inum][4], "drill", $STR_NOCASESENSEBASIC) Then
 			ClickP($aAway, 1, 0, "#0999") ;Click away to deselect collector if was not full, and collected with previous click
-			If _Sleep($iDelayUpgradeValue1) Then Return
+			If _Sleep($DELAYUPGRADEVALUE1) Then Return
 			BuildingClick($g_avBuildingUpgrades[$inum][0], $g_avBuildingUpgrades[$inum][1]) ;Select collector upgrade trained
-			If _Sleep($iDelayUpgradeValue4) Then Return
+			If _Sleep($DELAYUPGRADEVALUE4) Then Return
 		EndIf
 		; check for upgrade in process
 		Local $offColors[3][3] = [[0x000000, 44, 17], [0xE07740, 69, 31], [0xF2F7F1, 81, 0]] ; 2nd pixel black broken hammer, 3rd pixel lt brown handle, 4th pixel white edge of button
-		Global $ButtonPixel = _MultiPixelSearch(284, 572, 570, 615, 1, 1, Hex(0x000000, 6), $offColors, 25) ; first pixel blackon side of button
+		Local $ButtonPixel = _MultiPixelSearch(284, 572, 570, 615, 1, 1, Hex(0x000000, 6), $offColors, 25) ; first pixel blackon side of button
 		If $g_iDebugSetlog = 1 Then Setlog("Pixel Color #1: " & _GetPixelColor(389, 572, True) & ", #2: " & _GetPixelColor(433, 589, True) & ", #3: " & _GetPixelColor(458, 603, True) & ", #4: " & _GetPixelColor(470, 572, True), $COLOR_DEBUG)
 		If IsArray($ButtonPixel) Then
 			If $g_iDebugSetlog = 1 Or $bOopsFlag = True Then
@@ -223,9 +223,9 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 		GUICtrlSetData($g_hTxtUpgradeEndTime[$inum], "") ; Set GUI time to match $g_avBuildingUpgrades variable
 		ClickP($aAway, 1, 0, "#0211") ;Click Away to close windows
 		SetLog("-$Upgrade #" & $inum + 1 & " Location =  " & "(" & $g_avBuildingUpgrades[$inum][0] & "," & $g_avBuildingUpgrades[$inum][1] & ")", $COLOR_DEBUG1) ;Debug
-		If _Sleep($iDelayUpgradeValue1) Then Return
+		If _Sleep($DELAYUPGRADEVALUE1) Then Return
 		BuildingClick($g_avBuildingUpgrades[$inum][0], $g_avBuildingUpgrades[$inum][1], "#0212") ;Select upgrade trained
-		If _Sleep($iDelayUpgradeValue2) Then Return
+		If _Sleep($DELAYUPGRADEVALUE2) Then Return
 		If $bOopsFlag = True Then DebugImageSave("ButtonView")
 	EndIf
 
@@ -248,7 +248,7 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 
 	; check for normal gold upgrade
 	Local $offColors[3][3] = [[0xD6714B, 47, 37], [0xF0E850, 70, 0], [0xF4F8F2, 79, 0]] ; 2nd pixel brown hammer, 3rd pixel gold, 4th pixel edge of button
-	Global $ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 620 + $g_iBottomOffsetY, 1, 1, Hex(0xF3F3F1, 6), $offColors, 30) ; first gray/white pixel of button
+	$ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 620 + $g_iBottomOffsetY, 1, 1, Hex(0xF3F3F1, 6), $offColors, 30) ; first gray/white pixel of button
 	If $g_iDebugSetlog = 1 And IsArray($ButtonPixel) Then
 		Setlog("GoldButtonPixel = " & $ButtonPixel[0] & ", " & $ButtonPixel[1], $COLOR_DEBUG) ;Debug
 		Setlog("Color #1: " & _GetPixelColor($ButtonPixel[0], $ButtonPixel[1], True) & ", #2: " & _GetPixelColor($ButtonPixel[0] + 47, $ButtonPixel[1] + 37, True) & ", #3: " & _GetPixelColor($ButtonPixel[0] + 70, $ButtonPixel[1], True) & ", #4: " & _GetPixelColor($ButtonPixel[0] + 79, $ButtonPixel[1], True), $COLOR_DEBUG)
@@ -256,7 +256,7 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 
 	If IsArray($ButtonPixel) = 0 Then ; If its not normal gold upgrade, then try to find elixir upgrade button
 		Local $offColors[3][3] = [[0xBC5B31, 38, 32], [0xF84CF9, 72, 0], [0xF5F9F2, 79, 0]] ; 2nd pixel brown hammer, 3rd pixel pink, 4th pixel edge of button
-		Global $ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 620 + $g_iBottomOffsetY, 1, 1, Hex(0xF4F7F2, 6), $offColors, 30) ; first gray/white pixel of button
+		$ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 620 + $g_iBottomOffsetY, 1, 1, Hex(0xF4F7F2, 6), $offColors, 30) ; first gray/white pixel of button
 		If $g_iDebugSetlog = 1 And IsArray($ButtonPixel) Then
 			Setlog("ElixirButtonPixel = " & $ButtonPixel[0] & ", " & $ButtonPixel[1], $COLOR_DEBUG) ;Debug
 			Setlog("Color #1: " & _GetPixelColor($ButtonPixel[0], $ButtonPixel[1], True) & ", #2: " & _GetPixelColor($ButtonPixel[0] + 38, $ButtonPixel[1] + 32, True) & ", #3: " & _GetPixelColor($ButtonPixel[0] + 70, $ButtonPixel[1], True) & ", #4: " & _GetPixelColor($ButtonPixel[0] + 79, $ButtonPixel[1], True), $COLOR_DEBUG)
@@ -265,7 +265,7 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 
 	If IsArray($ButtonPixel) = 0 Then ; If its not regular upgrade, then try to find Hero upgrade button
 		Local $offColors[3][3] = [[0xE07B50, 41, 23], [0x282020, 72, 0], [0xF4F5F2, 79, 0]] ; 2nd pixel brown hammer, 3rd pixel black, 4th pixel edge of button
-		Global $ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 620 + $g_iBottomOffsetY, 1, 1, Hex(0xF5F6F2, 6), $offColors, 25) ; first gray/white pixel of button4
+		$ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 620 + $g_iBottomOffsetY, 1, 1, Hex(0xF5F6F2, 6), $offColors, 25) ; first gray/white pixel of button4
 		If $g_iDebugSetlog = 1 And IsArray($ButtonPixel) Then
 			Setlog("HeroButtonPixel = " & $ButtonPixel[0] & ", " & $ButtonPixel[1], $COLOR_DEBUG) ;Debug
 			Setlog("Color #1: " & _GetPixelColor($ButtonPixel[0], $ButtonPixel[1], True) & ", #2: " & _GetPixelColor($ButtonPixel[0] + 41, $ButtonPixel[1] + 23, True) & ", #3: " & _GetPixelColor($ButtonPixel[0] + 72, $ButtonPixel[1], True) & ", #4: " & _GetPixelColor($ButtonPixel[0] + 79, $ButtonPixel[1], True), $COLOR_DEBUG)
@@ -279,7 +279,7 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 		EndIf
 
 		Click($ButtonPixel[0] + 20, $ButtonPixel[1] + 20, 1, 0, "#0213") ; Click Upgrade Button
-		If _Sleep($iDelayUpgradeValue3) Then Return
+		If _Sleep($DELAYUPGRADEVALUE3) Then Return
 
 		If $bOopsFlag = True And $g_iDebugImageSave = 1 Then DebugImageSave("UpgradeView")
 
@@ -312,9 +312,9 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 				If $g_avBuildingUpgrades[$inum][2] = "" Then $g_avBuildingUpgrades[$inum][2] = Number(getUpgradeResource(366, 487 + $g_iMidOffsetY)) ;read RED upgrade text
 				If $g_avBuildingUpgrades[$inum][2] = "" And $g_abUpgradeRepeatEnable[$inum] = False Then $bOopsFlag = True ; set error flag for user to set value if not repeat upgrade
 
-				$g_avBuildingUpgrades[$inum][6] = getBldgUpgradeTime(196, 304 + $g_iMidOffsetY); Try to read white text showing time for upgrade
+				$g_avBuildingUpgrades[$inum][6] = getBldgUpgradeTime(196, 304 + $g_iMidOffsetY) ; Try to read white text showing time for upgrade
 				Setlog("Upgrade #" & $inum + 1 & " Time = " & $g_avBuildingUpgrades[$inum][6], $COLOR_INFO)
-				If  $g_avBuildingUpgrades[$inum][6]  <> "" Then $g_avBuildingUpgrades[$inum][7] = ""  ; Clear old upgrade end time
+				If $g_avBuildingUpgrades[$inum][6] <> "" Then $g_avBuildingUpgrades[$inum][7] = "" ; Clear old upgrade end time
 
 			Case _ColorCheck(_GetPixelColor(719, 118 + $g_iMidOffsetY), Hex(0xDF0408, 6), 20) ; Check if the Hero Upgrade window is open
 				If _ColorCheck(_GetPixelColor(400, 485 + $g_iMidOffsetY), Hex(0xE0403D, 6), 20) Then ; Check if upgrade requires upgrade to TH and can not be completed
@@ -341,7 +341,7 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 				If $g_avBuildingUpgrades[$inum][2] = "" And $g_abUpgradeRepeatEnable[$inum] = False Then $bOopsFlag = True ; set error flag for user to set value
 				$g_avBuildingUpgrades[$inum][6] = getHeroUpgradeTime(464, 527 + $g_iMidOffsetY) ; Try to read white text showing time for upgrade
 				Setlog("Upgrade #" & $inum + 1 & " Time = " & $g_avBuildingUpgrades[$inum][6], $COLOR_INFO)
-				If  $g_avBuildingUpgrades[$inum][6]  <> "" Then $g_avBuildingUpgrades[$inum][7] = ""  ; Clear old upgrade end time
+				If $g_avBuildingUpgrades[$inum][6] <> "" Then $g_avBuildingUpgrades[$inum][7] = "" ; Clear old upgrade end time
 
 			Case Else
 				If isGemOpen(True) Then ClickP($aAway, 1, 0, "#0216")
@@ -352,7 +352,7 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 
 		EndSelect
 
-		If StringInStr($g_avBuildingUpgrades[$inum][4],"Warden") > 0 then $g_avBuildingUpgrades[$inum][3] = "Elixir"
+		If StringInStr($g_avBuildingUpgrades[$inum][4], "Warden") > 0 Then $g_avBuildingUpgrades[$inum][3] = "Elixir"
 
 		; Failsafe fix for upgrade value read problems if needed.
 		If $g_avBuildingUpgrades[$inum][3] <> "" And $bOopsFlag = True And $bRepeat = False Then ;check if upgrade type value to not waste time and for text read oops flag

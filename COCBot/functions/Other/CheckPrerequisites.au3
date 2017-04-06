@@ -14,13 +14,20 @@
 ; ===============================================================================================================================
 Func CheckPrerequisites($bSilent = False)
 	Local $isAllOK = True
-	Local $isNetFramework4dot5Installed = isNetFramework4dot5Installed()
+	Local $isNetFramework4Installed = isNetFramework4Installed()
+	;Local $isNetFramework4dot5Installed = isNetFramework4dot5Installed()
 	Local $isVC2010Installed = isVC2010Installed()
-	If ($isNetFramework4dot5Installed = False Or $isVC2010Installed = False) Then
+	If ($isNetFramework4Installed = False Or $isVC2010Installed = False) Then
+		If ($isNetFramework4Installed = False And Not $bSilent) Then
+			SetLog("The .Net Framework 4.0 is not installed", $COLOR_ERROR)
+			SetLog("Please download here : https://www.microsoft.com/en-US/download/details.aspx?id=17718", $COLOR_ERROR)
+		EndIf
+		#cs
 		If ($isNetFramework4dot5Installed = False And Not $bSilent) Then
 			SetLog("The .Net Framework 4.5 is not installed", $COLOR_ERROR)
 			SetLog("Please download here : https://www.microsoft.com/en-US/download/details.aspx?id=30653", $COLOR_ERROR)
 		EndIf
+		#ce
 		If ($isVC2010Installed = False And Not $bSilent) Then
 			SetLog("The VC 2010 x86 is not installed", $COLOR_ERROR)
 			SetLog("Please download here : https://www.microsoft.com/en-US/download/details.aspx?id=5555", $COLOR_ERROR)
@@ -33,6 +40,8 @@ Func CheckPrerequisites($bSilent = False)
 
 	If $isAllOK = False And Not $bSilent Then
 		GUICtrlSetState($g_hBtnStart, $GUI_DISABLE)
+		$g_bAutoStart = False
+		$g_bRestarted = False
 	EndIf
 	Return $isAllOK
 EndFunc   ;==>CheckPrerequisites
@@ -58,21 +67,11 @@ Func isNetFramework4dot5Installed()
 EndFunc   ;==>isNetFramework4dot5Installed
 
 Func isVC2010Installed()
-	Local $listRegistry[4] = ["HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x86", _
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\VC\VCRedist\x86", _
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\12.0\VC\Runtimes\x86", _
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\VC\Runtimes\x86" _
-			]
-
-	Local $success = False
-	For $reg In $listRegistry
-		Local $sKeyName = RegRead($reg, "Version")
-		If $sKeyName <> "" Then
-			$success = True
-			ExitLoop
-		EndIf
-	Next
-
+	Local $hDll = DLLOpen("msvcp100.dll")
+	Local $success = $hDll <> -1
+	If $success = False Then Return $success
+	DllClose($hDll)
+	_WinAPI_FreeLibrary($hDll)
 	Return $success
 EndFunc   ;==>isVC2010Installed
 
@@ -83,7 +82,7 @@ Func isEveryFileInstalled($bSilent = False)
 	Local $aCheckFiles[9] = [@ScriptDir & "\COCBot", _
 			$g_sLibPath, _
 			@ScriptDir & "\Images", _
-			$g_sLibFunctionsPath, _
+			$g_sLibMyBotPath, _
 			$g_sLibImageSearchPath, _
 			$g_sLibImgLocPath, _
 			$g_sLibIconPath, _
@@ -98,33 +97,33 @@ Func isEveryFileInstalled($bSilent = False)
 	ElseIf Not $bSilent Then
 		GUICtrlSetState($g_hBtnStart, $GUI_DISABLE)
 
-		Local $sText1="", $sText2="", $sText3="", $MsgBox=0
-		$sText1 = GetTranslated(640,11,"Hey Chief, we are missing some files!")
-		$sText2 = GetTranslated(640,12,"Please extract all files and folders and start this program again!")
-		$sText3 = GetTranslated(640,13,"Sorry, Start button disabled until fixed!")
+		Local $sText1 = "", $sText2 = "", $sText3 = "", $MsgBox = 0
+		$sText1 = GetTranslated(640, 11, "Hey Chief, we are missing some files!")
+		$sText2 = GetTranslated(640, 12, "Please extract all files and folders and start this program again!")
+		$sText3 = GetTranslated(640, 13, "Sorry, Start button disabled until fixed!")
 
 		Setlog($sText1, $COLOR_ERROR)
 		Setlog($sText2, $COLOR_ERROR)
 		Setlog($sText3, $COLOR_ERROR)
 
 		_ExtMsgBoxSet(1 + 64, $SS_CENTER, 0x004080, 0xFFFF00, 12, "Comic Sans MS", 500)
-		$MsgBox = _ExtMsgBox(48, GetTranslated(640,14,"Ok"), $sText1, $sText2, 0)
+		$MsgBox = _ExtMsgBox(48, GetTranslated(640, 14, "Ok"), $sText1, $sText2, 0)
 		GUICtrlSetState($g_hBtnStart, $GUI_DISABLE)
 	EndIf
-	If @Compiled Then;if .exe
-		If Not StringInStr(@ScriptFullPath, "MyBot.run.exe", 1) Then; if filename isn't MyBot.run.exe
+	If @Compiled Then ;if .exe
+		If Not StringInStr(@ScriptFullPath, "MyBot.run.exe", 1) Then ; if filename isn't MyBot.run.exe
 			If Not $bSilent Then
 				Local $sText1, $sText2, $MsgBox
-				$sText1 = GetTranslated(640,15,"Hey Chief, file name incorrect!")
-				$sText2 = GetTranslated(640,16,'You have renamed the file "MyBot.run.exe"! Please change it back to MyBot.run.exe and restart the bot!')
-				$sText3 = GetTranslated(640,13,"Sorry, Start button disabled until fixed!")
+				$sText1 = GetTranslated(640, 15, "Hey Chief, file name incorrect!")
+				$sText2 = GetTranslated(640, 16, 'You have renamed the file "MyBot.run.exe"! Please change it back to MyBot.run.exe and restart the bot!')
+				$sText3 = GetTranslated(640, 13, "Sorry, Start button disabled until fixed!")
 
 				Setlog($sText1, $COLOR_ERROR)
 				Setlog($sText2, $COLOR_ERROR)
 				Setlog($sText3, $COLOR_ERROR)
 
 				_ExtMsgBoxSet(1 + 64, $SS_CENTER, 0x004080, 0xFFFF00, 12, "Comic Sans MS", 500)
-				$MsgBox = _ExtMsgBox(48, GetTranslated(640,14,"Ok"), $sText1, $sText2, 0)
+				$MsgBox = _ExtMsgBox(48, GetTranslated(640, 14, "Ok"), $sText1, $sText2, 0)
 				GUICtrlSetState($g_hBtnStart, $GUI_DISABLE)
 			EndIf
 			$bResult = False
@@ -141,17 +140,17 @@ Func checkAutoitVersion($bSilent = False)
 	If Not $bSilent Then
 		Local $sText1 = "Hey Chief, your AutoIt version is out of date!"
 		Local $sText3 = "Click OK to download the latest version of AutoIt."
-		Local $sText2 = "The bot requires AutoIt version "&$requiredAutoit&" or above. Your version of AutoIt is "&@AutoItVersion&"." & @CRLF & $sText3 & @CRLF &"After installing the new version, open the bot again."
+		Local $sText2 = "The bot requires AutoIt version " & $requiredAutoit & " or above. Your version of AutoIt is " & @AutoItVersion & "." & @CRLF & $sText3 & @CRLF & "After installing the new version, open the bot again."
 		_ExtMsgBoxSet(1 + 64, $SS_CENTER, 0x004080, 0xFFFF00, 12, "Comic Sans MS", 500)
 		Local $MsgBox = _ExtMsgBox(48, "OK|Cancel", $sText1, $sText2, 0)
 		If $MsgBox = 1 Then ShellExecute("https://www.autoitscript.com/site/autoit/downloads/")
 	EndIf
 	Return 0
-EndFunc
+EndFunc   ;==>checkAutoitVersion
 
 Func checkIsAdmin($bSilent = False)
 	If IsAdmin() Then Return True
 	If Not $bSilent Then SetLog("My Bot running without admin privileges", $COLOR_ERROR)
 	Return False
-EndFunc
+EndFunc   ;==>checkIsAdmin
 

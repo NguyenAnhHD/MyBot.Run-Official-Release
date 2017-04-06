@@ -14,30 +14,40 @@
 ; ===============================================================================================================================
 #include-once
 
-Global $groupSearchDB = "", $groupHerosDB = "", $groupSearchAB = "", $groupHerosAB = "", $groupSpellsDB = "", $groupSpellsAB = "", $groupSearchTS = ""
+Global $g_aGroupSearchDB = "", $groupHerosDB = "", $groupSearchAB = "", $groupHerosAB = "", $groupSpellsDB = "", $groupSpellsAB = "", $groupSearchTS = ""
 
 ;Attack
-Global $groupAttackDB = "", $groupAttackDBSpell = "", $groupIMGAttackDB = "", $groupIMGAttackDBSpell = "", $groupAttackAB = "", $groupAttackABSpell = "", _
+Global $g_aGroupAttackDB = "", $g_aGroupAttackDBSpell = "", $groupIMGAttackDB = "", $groupIMGAttackDBSpell = "", $groupAttackAB = "", $groupAttackABSpell = "", _
 	   $groupIMGAttackAB = "", $groupIMGAttackABSpell = "", $groupAttackTS = "", $groupAttackTSSpell = "", $groupIMGAttackTS = "", $groupIMGAttackTSSpell = ""
 
+Global $g_aGroupListPicMinTrophy = "", $g_aGroupListPicMaxTrophy = ""
 
 ;End Battle
-Global $groupEndBattkeDB = "", $groupEndBattkeAB = "", $groupKingSleeping = "", $groupQueenSleeping = "", $groupWardenSleeping = "", $groupCloseWhileTraining = "", _
+Global $g_aGroupEndBattleDB = "", $groupEndBattkeAB = "", $groupKingSleeping = "", $groupQueenSleeping = "", $groupWardenSleeping = "", $groupCloseWhileTraining = "", _
 	   $grpTrainTroops = "", $grpCookSpell = ""
 
 ;Spell
-Global $groupLightning = "", $groupHeal = "", $groupRage = "", $groupJumpSpell = "", $groupFreeze = "", $groupClone = "", $groupIcnLightning = "", $groupIcnHeal = "", _
+Global $g_aGroupLightning = "", $groupHeal = "", $groupRage = "", $groupJumpSpell = "", $groupFreeze = "", $groupClone = "", $groupIcnLightning = "", $groupIcnHeal = "", _
 	   $groupIcnRage = "", $groupIcnJumpSpell = "", $groupIcnFreeze = "", $groupIcnClone = ""
 
 ;Dark Spell
-Global $groupPoison = "", $groupEarthquake = "", $groupHaste = "", $groupSkeleton = "", $groupIcnPoison = "", $groupIcnEarthquake = "", $groupIcnHaste = "", _
+Global $g_aGroupPoison = "", $groupEarthquake = "", $groupHaste = "", $groupSkeleton = "", $groupIcnPoison = "", $groupIcnEarthquake = "", $groupIcnHaste = "", _
 	   $groupIcnSkeleton = "", $groupListSpells = ""
 
 ;TH Level
-Global $groupListTHLevels = ""
+Global $g_aGroupListTHLevels = ""
+
+;PicDBMaxTH
+Global $g_aGroupListPicDBMaxTH = ""
+
+;PicABMaxTH
+Global $g_aGroupListPicABMaxTH = ""
+
+;PicBullyMaxTH
+Global $g_aGroupListPicBullyMaxTH = ""
 
 ;League
-Global $groupLeague = ""
+Global $g_aGroupLeague = ""
 
 ; Groups of controls
 Global $aTabControlsVillage, $aTabControlsDonate, $aTabControlsUpgrade, $aTabControlsNotify
@@ -46,9 +56,9 @@ Global $aTabControlsStrategies, $aTabControlsBot, $aTabControlsStats
 Global $oAlwaysEnabledControls = ObjCreate("Scripting.Dictionary")
 
 Func InitializeControlVariables()
-   $groupSearchDB = $g_hGrpDBFilter&"#"&$g_hCmbDBMeetGE&"#"&$g_hTxtDBMinGold&"#"&$g_hPicDBMinGold&"#"&$g_hTxtDBMinElixir&"#"&$g_hPicDBMinElixir&"#"& _
+   $g_aGroupSearchDB = $g_hGrpDBFilter&"#"&$g_hCmbDBMeetGE&"#"&$g_hTxtDBMinGold&"#"&$g_hPicDBMinGold&"#"&$g_hTxtDBMinElixir&"#"&$g_hPicDBMinElixir&"#"& _
 				    $g_hTxtDBMinGoldPlusElixir&"#"&$g_hPicDBMinGPEGold&"#"&$g_hChkDBMeetDE&"#"&$g_hTxtDBMinDarkElixir&"#"&$g_hPicDBMinDarkElixir&"#"&$g_hChkDBMeetTrophy&"#"& _
-				    $g_hTxtDBMinTrophy&"#"&$g_hPicDBMinTrophies&"#"&$g_hChkDBMeetTH&"#"&$g_hCmbDBTH&"#"&$g_hPicDBMaxTH10&"#"&$g_hChkDBMeetTHO&"#"& _
+				    $g_hTxtDBMinTrophy&"#"&$g_hTxtDBMaxTrophy&"#"&$g_hPicDBMinTrophies&"#"&$g_hChkDBMeetTH&"#"&$g_hCmbDBTH&"#"&$g_hChkDBMeetTHO&"#"& _
 				    $g_ahChkMeetOne[$DB]&"#"& _
 				    $g_ahChkMaxMortar[$DB]&"#"&$g_ahCmbWeakMortar[$DB]&"#"&$g_ahPicWeakMortar[$DB]&"#"&$g_ahChkMaxWizTower[$DB]&"#"&$g_ahCmbWeakWizTower[$DB]&"#"& _
 				    $g_ahPicWeakWizTower[$DB]&"#"& _
@@ -59,7 +69,7 @@ Func InitializeControlVariables()
 
    $groupSearchAB = $g_hGrpABFilter&"#"&$g_hCmbABMeetGE&"#"&$g_hTxtABMinGold&"#"&$g_hPicABMinGold&"#"&$g_hTxtABMinElixir&"#"&$g_hPicABMinElixir&"#"& _
 				    $g_hTxtABMinGoldPlusElixir&"#"&$g_hPicABMinGPEGold&"#"&$g_hChkABMeetDE&"#"&$g_hTxtABMinDarkElixir&"#"&	$g_hPicABMinDarkElixir&"#"&$g_hChkABMeetTrophy&"#"& _
-				    $g_hTxtABMinTrophy&"#"&$g_hPicABMinTrophies&"#"&$g_hChkABMeetTH&"#"&$g_hCmbABTH&"#"&$g_hPicABMaxTH10&"#"&$g_hChkABMeetTHO&"#"& _
+				    $g_hTxtABMinTrophy&"#"&$g_hTxtABMaxTrophy&"#"&$g_hPicABMinTrophies&"#"&$g_hChkABMeetTH&"#"&$g_hCmbABTH&"#"&$g_hChkABMeetTHO&"#"& _
 				    $g_ahChkMeetOne[$LB]&"#"& _
 				    $g_ahChkMaxMortar[$LB]&"#"&$g_ahCmbWeakMortar[$LB]&"#"&$g_ahPicWeakMortar[$LB]&"#"&$g_ahChkMaxWizTower[$LB]&"#"&$g_ahCmbWeakWizTower[$LB]&"#"& _
 					$g_ahPicWeakWizTower[$LB]&"#"&$g_ahChkMaxXBow[$LB]&"#"&$g_ahCmbWeakXBow[$LB]&"#"&$g_ahPicWeakXBow[$LB]&"#"&$g_ahChkMaxInferno[$LB]&"#"& _
@@ -77,10 +87,10 @@ Func InitializeControlVariables()
 					$g_hLblAddTiles&"#"&$g_hLblAddTiles2&"#"&$g_hLblSWTTiles&"#"&$g_hTxtSWTTiles&"#"&$g_hLblTHadd&"#"&$g_hTxtTHaddTiles
 
    ;Attack
-   $groupAttackDB = $g_hCmbDBAlgorithm&"#"&$g_hCmbDBSelectTroop&"#"&$g_hChkDBKingAttack&"#"&$g_hChkDBQueenAttack&"#"&$g_hChkDBWardenAttack&"#"&$g_hChkDBDropCC&"#"& _
+   $g_aGroupAttackDB = $g_hCmbDBAlgorithm&"#"&$g_hCmbDBSelectTroop&"#"&$g_hChkDBKingAttack&"#"&$g_hChkDBQueenAttack&"#"&$g_hChkDBWardenAttack&"#"&$g_hChkDBDropCC&"#"& _
 				    $g_hChkDBLightSpell&"#"&$g_hChkDBHealSpell&"#"&$g_hChkDBRageSpell&"#"&$g_hChkDBJumpSpell&"#"&$g_hChkDBFreezeSpell&"#"&$g_hChkDBPoisonSpell&"#"& _
 					$g_hChkDBEarthquakeSpell&"#"&$g_hChkDBHasteSpell&"#"&$g_hChkDBSkeletonSpell&"#"&$g_hChkDBCloneSpell
-   $groupAttackDBSpell = $g_hChkDBLightSpell&"#"&$g_hChkDBHealSpell&"#"&$g_hChkDBRageSpell&"#"&$g_hChkDBJumpSpell&"#"&$g_hChkDBFreezeSpell&"#"&$g_hChkDBPoisonSpell&"#"& _
+   $g_aGroupAttackDBSpell = $g_hChkDBLightSpell&"#"&$g_hChkDBHealSpell&"#"&$g_hChkDBRageSpell&"#"&$g_hChkDBJumpSpell&"#"&$g_hChkDBFreezeSpell&"#"&$g_hChkDBPoisonSpell&"#"& _
 						 $g_hChkDBEarthquakeSpell&"#"&$g_hChkDBHasteSpell&"#"&$g_hChkDBSkeletonSpell&"#"&$g_hChkDBCloneSpell
    $groupIMGAttackDB = $g_hPicDBKingAttack&"#"&$g_hPicDBQueenAttack&"#"&$g_hPicDBWardenAttack&"#"&$g_hPicDBDropCC&"#"&$g_hPicDBLightSpell&"#"&$g_hPicDBHealSpell&"#"& _
 					   $g_hPicDBRageSpell&"#"&$g_hPicDBJumpSpell&"#"&$g_hPicDBFreezeSpell&"#"&$g_hPicDBPoisonSpell&"#"&$g_hPicDBEarthquakeSpell&"#"&$g_hPicDBHasteSpell
@@ -109,9 +119,15 @@ Func InitializeControlVariables()
    $groupIMGAttackTSSpell = $g_hPicTSLightSpell&"#"&$g_hPicTSHealSpell&"#"&$g_hPicTSRageSpell&"#"&$g_hPicTSJumpSpell&"#"&$g_hPicTSFreezeSpell&"#"& _
 						    $g_hPicTSPoisonSpell&"#"&$g_hPicTSEarthquakeSpell&"#"&$g_hPicTSHasteSpell
 
+   $g_aGroupListPicMinTrophy = $g_hPicMinTrophies[$eLeagueUnranked]&"#"&$g_hPicMinTrophies[$eLeagueBronze]&"#"&$g_hPicMinTrophies[$eLeagueSilver]&"#"&$g_hPicMinTrophies[$eLeagueGold] &"#"& _
+				  $g_hPicMinTrophies[$eLeagueCrystal]&"#"&$g_hPicMinTrophies[$eLeagueMaster]&"#"&$g_hPicMinTrophies[$eLeagueChampion]&"#"&$g_hPicMinTrophies[$eLeagueTitan]&"#"& _
+				  $g_hPicMinTrophies[$eLeagueLegend]
+   $g_aGroupListPicMaxTrophy = $g_hPicMaxTrophies[$eLeagueUnranked]&"#"&$g_hPicMaxTrophies[$eLeagueBronze]&"#"&$g_hPicMaxTrophies[$eLeagueSilver]&"#"&$g_hPicMaxTrophies[$eLeagueGold] &"#"& _
+				  $g_hPicMaxTrophies[$eLeagueCrystal]&"#"&$g_hPicMaxTrophies[$eLeagueMaster]&"#"&$g_hPicMaxTrophies[$eLeagueChampion]&"#"&$g_hPicMaxTrophies[$eLeagueTitan]&"#"& _
+				  $g_hPicMaxTrophies[$eLeagueLegend]
 
    ;End Battle
-   $groupEndBattkeDB = $g_hGrpDBEndBattle&"#"&$g_hChkStopAtkDBNoLoot1&"#"&$g_hLblStopAtkDBNoLoot1a&"#"&$g_hTxtStopAtkDBNoLoot1&"#"&$g_hLblStopAtkDBNoLoot1b&"#"& _
+   $g_aGroupEndBattleDB = $g_hGrpDBEndBattle&"#"&$g_hChkStopAtkDBNoLoot1&"#"&$g_hLblStopAtkDBNoLoot1a&"#"&$g_hTxtStopAtkDBNoLoot1&"#"&$g_hLblStopAtkDBNoLoot1b&"#"& _
 					   $g_hChkStopAtkDBNoLoot2&"#"&$g_hChkStopAtkDBNoLoot2&"#"&$g_hLblStopAtkDBNoLoot2a&"#"&$g_hTxtStopAtkDBNoLoot2&"#"&$g_hLblStopAtkDBNoLoot2b&"#"& _
 					   $g_hLblDBMinRerourcesAtk2&"#"&$g_hTxtDBMinGoldStopAtk2&"#"&$g_hPicDBMinGoldStopAtk2&"#"&$g_hTxtDBMinElixirStopAtk2&"#"&$g_hPicDBMinElixirStopAtk2&"#"& _
 					   $g_hTxtDBMinDarkElixirStopAtk2&"#"&$g_hPicDBMinDarkElixirStopAtk2&"#"&$g_hChkDBEndNoResources&"#"&$g_hChkDBEndOneStar&"#"&$g_hChkDBEndTwoStars
@@ -139,7 +155,7 @@ Func InitializeControlVariables()
 				   $g_ahTxtTrainArmySpellCount[$eSpellSkeleton]
 
    ;Spell
-   $groupLightning = $g_ahPicTrainArmySpell[$eSpellLightning]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellLightning]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellLightning]
+   $g_aGroupLightning = $g_ahPicTrainArmySpell[$eSpellLightning]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellLightning]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellLightning]
    $groupHeal = $g_ahPicTrainArmySpell[$eSpellHeal]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellHeal]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellHeal]
    $groupRage = $g_ahPicTrainArmySpell[$eSpellRage]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellRage]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellRage]
    $groupJumpSpell = $g_ahPicTrainArmySpell[$eSpellJump]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellJump]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellJump]
@@ -154,7 +170,7 @@ Func InitializeControlVariables()
    $groupIcnClone = $g_ahPicTrainArmySpell[$eSpellClone]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellClone]
 
    ;Dark Spell
-   $groupPoison = $g_ahPicTrainArmySpell[$eSpellPoison]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellPoison]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellPoison]
+   $g_aGroupPoison = $g_ahPicTrainArmySpell[$eSpellPoison]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellPoison]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellPoison]
    $groupEarthquake = $g_ahPicTrainArmySpell[$eSpellEarthquake]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellEarthquake]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellEarthquake]
    $groupHaste = $g_ahPicTrainArmySpell[$eSpellHaste]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellHaste]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellHaste]
    $groupSkeleton = $g_ahPicTrainArmySpell[$eSpellSkeleton]&"#"&$g_ahTxtTrainArmySpellCount[$eSpellSkeleton]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellSkeleton]
@@ -164,15 +180,27 @@ Func InitializeControlVariables()
    $groupIcnHaste = $g_ahPicTrainArmySpell[$eSpellHaste]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellHaste]
    $groupIcnSkeleton = $g_ahPicTrainArmySpell[$eSpellSkeleton]&"#"&$g_ahLblTrainArmySpellLevel[$eSpellSkeleton]
 
-   $groupListSpells = $groupLightning&"#"&$groupHeal&"#"&$groupRage&"#"&$groupJumpSpell&"#"&$groupFreeze&"#"&$groupClone&"#"&$groupPoison&"#"& _
+   $groupListSpells = $g_aGroupLightning&"#"&$groupHeal&"#"&$groupRage&"#"&$groupJumpSpell&"#"&$groupFreeze&"#"&$groupClone&"#"&$g_aGroupPoison&"#"& _
 					  $groupEarthquake&"#"&$groupHaste&"#"&$groupSkeleton
 
    ;TH Level
-   $groupListTHLevels = $g_ahPicTHLevels[4]&"#"&$g_ahPicTHLevels[5]&"#"&$g_ahPicTHLevels[6]&"#"&$g_ahPicTHLevels[7]&"#"&$g_ahPicTHLevels[8]&"#"& _
+   $g_aGroupListTHLevels = $g_ahPicTHLevels[4]&"#"&$g_ahPicTHLevels[5]&"#"&$g_ahPicTHLevels[6]&"#"&$g_ahPicTHLevels[7]&"#"&$g_ahPicTHLevels[8]&"#"& _
 						$g_ahPicTHLevels[9]&"#"&$g_ahPicTHLevels[10]&"#"&$g_ahPicTHLevels[11]
 
+   ;PicDBMaxTH
+   $g_aGroupListPicDBMaxTH = $g_ahPicDBMaxTH[6]&"#"&$g_ahPicDBMaxTH[7]&"#"&$g_ahPicDBMaxTH[8]&"#"& _
+						$g_ahPicDBMaxTH[9]&"#"&$g_ahPicDBMaxTH[10]&"#"&$g_ahPicDBMaxTH[11]
+
+   ;PicABMaxTH
+   $g_aGroupListPicABMaxTH = $g_ahPicABMaxTH[6]&"#"&$g_ahPicABMaxTH[7]&"#"&$g_ahPicABMaxTH[8]&"#"& _
+						$g_ahPicABMaxTH[9]&"#"&$g_ahPicABMaxTH[10]&"#"&$g_ahPicABMaxTH[11]
+
+   ;PicBullyMaxTH
+   $g_aGroupListPicBullyMaxTH = $g_ahPicBullyMaxTH[6]&"#"&$g_ahPicBullyMaxTH[7]&"#"&$g_ahPicBullyMaxTH[8]&"#"& _
+						$g_ahPicBullyMaxTH[9]&"#"&$g_ahPicBullyMaxTH[10]&"#"&$g_ahPicBullyMaxTH[11]
+
    ;League
-   $groupLeague = $g_ahPicLeague[$eLeagueUnranked]&"#"&$g_ahPicLeague[$eLeagueBronze]&"#"&$g_ahPicLeague[$eLeagueSilver]&"#"&$g_ahPicLeague[$eLeagueGold] &"#"& _
+   $g_aGroupLeague = $g_ahPicLeague[$eLeagueUnranked]&"#"&$g_ahPicLeague[$eLeagueBronze]&"#"&$g_ahPicLeague[$eLeagueSilver]&"#"&$g_ahPicLeague[$eLeagueGold] &"#"& _
 				  $g_ahPicLeague[$eLeagueCrystal]&"#"&$g_ahPicLeague[$eLeagueMaster]&"#"&$g_ahPicLeague[$eLeagueChampion]&"#"&$g_ahPicLeague[$eLeagueTitan]&"#"& _
 				  $g_ahPicLeague[$eLeagueLegend]
 
@@ -196,7 +224,7 @@ Func InitializeControlVariables()
    Dim $aTabControlsStats = [$g_hGUI_STATS_TAB, $g_hGUI_STATS_TAB_ITEM1, $g_hGUI_STATS_TAB_ITEM2, $g_hGUI_STATS_TAB_ITEM3]
 
 	; always enabled / unchanged controls during enabling/disabling all GUI controls function
-	$oAlwaysEnabledControls($g_hChkUpdatingWhenMinimized) = 1
+	;$oAlwaysEnabledControls($g_hChkUpdatingWhenMinimized) = 1
 	$oAlwaysEnabledControls($g_hChkHideWhenMinimized) = 1
 	$oAlwaysEnabledControls($g_hChkDebugClick) = 1
 	$oAlwaysEnabledControls($g_hChkDebugSetlog) = 1
@@ -211,6 +239,7 @@ Func InitializeControlVariables()
 	$oAlwaysEnabledControls($g_hBtnTestTrain) = 1
 	$oAlwaysEnabledControls($g_hBtnTestDonateCC) = 1
 	$oAlwaysEnabledControls($g_hBtnTestRequestCC) = 1
+	$oAlwaysEnabledControls($g_hBtnTestSendText) = 1
 	$oAlwaysEnabledControls($g_hBtnTestAttackBar) = 1
 	$oAlwaysEnabledControls($g_hBtnTestClickDrag) = 1
 	$oAlwaysEnabledControls($g_hBtnTestImage) = 1

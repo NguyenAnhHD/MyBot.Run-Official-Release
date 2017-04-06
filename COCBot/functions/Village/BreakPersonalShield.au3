@@ -29,7 +29,7 @@ Func BreakPersonalShield()
 	If _CheckPixel($aHaveShield, $g_bCapturePixel) Then ; check for shield
 		If IsMainPage() Then ; check for main page
 			PureClickP($aShieldInfoButton)
-			If _Sleep($iPersonalShield1) Then ; wait for break shield window
+			If _Sleep($DELAYPERSONALSHIELD1) Then ; wait for break shield window
 				SetError(2) ; set error conditions to return to runbot if stop/pause
 				Return
 			EndIf
@@ -49,7 +49,7 @@ Func BreakPersonalShield()
 		If $g_iDebugSetlog = 1 Then Setlog("No shield available", $COLOR_SUCCESS)
 	EndIf
 
-	If _Sleep($iPersonalShield1) Then ; wait for break shield window
+	If _Sleep($DELAYPERSONALSHIELD1) Then ; wait for break shield window
 		SetError(2) ; set error conditions to return to runbot if stop/pause
 		Return
 	EndIf
@@ -59,7 +59,7 @@ Func BreakPersonalShield()
 	If _CheckPixel($aHavePerGuard, $g_bCapturePixel) Then ; check for personal guard timer
 		If IsMainPage() Then
 			PureClickP($aShieldInfoButton)
-			If _Sleep($iPersonalShield1) Then ; wait for break guard window
+			If _Sleep($DELAYPERSONALSHIELD1) Then ; wait for break guard window
 				SetError(2) ; set error conditions to return to runbot if stop
 				Return
 			EndIf

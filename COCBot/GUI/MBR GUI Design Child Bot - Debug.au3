@@ -14,20 +14,20 @@
 ; ===============================================================================================================================
 #include-once
 
-;$hGUI_BotDebug = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_BOT)
+;$hGUI_BotDebug = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_BOT)
 ;GUISwitch($hGUI_BotDebug)
 
 Global $g_hChkDebugClick = 0, $g_hChkDebugSetlog = 0, $g_hChkDebugOCR = 0, $g_hChkDebugImageSave = 0, $g_hChkdebugBuildingPos = 0, $g_hChkdebugTrain = 0, $g_hChkDebugOCRDonate = 0
 Global $g_hChkdebugAttackCSV = 0, $g_hChkMakeIMGCSV = 0, $g_hChkDebugDisableZoomout = 0, $g_hChkDebugDisableVillageCentering = 0, $g_hChkDebugDeadbaseImage = 0
 
-Global $g_hBtnTestTrain = 0, $g_hBtnTestDonateCC = 0, $g_hBtnTestRequestCC = 0, $g_hBtnTestAttackBar = 0, $g_hBtnTestClickDrag = 0, $g_hBtnTestImage = 0
+Global $g_hBtnTestTrain = 0, $g_hBtnTestDonateCC = 0, $g_hBtnTestRequestCC = 0, $g_hBtnTestSendText = 0, $g_hBtnTestAttackBar = 0, $g_hBtnTestClickDrag = 0, $g_hBtnTestImage = 0
 Global $g_hBtnTestVillageSize = 0, $g_hBtnTestDeadBase = 0, $g_hBtnTestTHimgloc = 0, $g_hBtnTestTrainsimgloc = 0, $g_hBtnTestQuickTrainsimgloc = 0, $g_hTxtTestFindButton = 0
 Global $g_hBtnTestFindButton = 0, $g_hBtnTestDeadBaseFolder = 0, $g_hBtnTestCleanYard = 0, $g_hBtnTestAttackCSV = 0, $g_hBtnTestimglocTroopBar = 0
-Global $g_hBtnTestConfigSave = 0, $g_hBtnTestConfigApply = 0, $g_hBtnTestConfigRead = 0
+Global $g_hBtnTestConfigSave = 0, $g_hBtnTestConfigApply = 0, $g_hBtnTestConfigRead = 0, $g_hBtnTestOcrMemory = 0
 
 Func CreateBotDebug()
    Local $x = 25, $y = 45
-   GUICtrlCreateGroup(GetTranslated(636, 34, "Debug"), $x - 20, $y - 20, 440, 360)
+   GUICtrlCreateGroup(GetTranslated(636, 34, "Debug"), $x - 20, $y - 20, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2)
 	  $g_hChkDebugClick = GUICtrlCreateCheckbox(GetTranslated(636, 40, "Click"), $x, $y - 5, -1, -1)
 	  _GUICtrlSetTip(-1, GetTranslated(636, 35, "Debug: Write the clicked (x,y) coordinates to the log."))
 	  $y += 20
@@ -124,6 +124,10 @@ Func CreateBotDebug()
 
 	  $g_hBtnTestQuickTrainsimgloc = GUICtrlCreateButton("Quick Train Test", $x, $y, 140, 25)
 
+	  $y += $yNext
+	  $g_hBtnTestOcrMemory = GUICtrlCreateButton("OCR Memory Test", $x, $y, 140, 25)
+
+
 	  ; now go up again
 	  $x -= 145
 
@@ -146,6 +150,9 @@ Func CreateBotDebug()
 	  $g_hBtnTestConfigApply = GUICtrlCreateButton("Config Apply", $x + 20, $y, 120, 25)
 	  $y -= $yNext
 	  $g_hBtnTestConfigRead = GUICtrlCreateButton("Config Read", $x + 20, $y, 120, 25)
+	  $y -= $yNext
+
+	  $g_hBtnTestSendText = GUICtrlCreateButton("Send Text", $x + 20, $y, 120, 25)
 	  $y -= $yNext
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc

@@ -16,7 +16,7 @@
 
 Func VillageReport($bBypass = False, $bSuppressLog = False)
 	PureClickP($aAway, 1, 0, "#0319") ;Click Away
-	If _Sleep($iDelayVillageReport1) Then Return
+	If _Sleep($DELAYVILLAGEREPORT1) Then Return
 
 	Switch $bBypass
 		Case False
@@ -28,22 +28,22 @@ Func VillageReport($bBypass = False, $bSuppressLog = False)
 	EndSwitch
 
 	getBuilderCount($bSuppressLog) ; update builder data
-	If _Sleep($iDelayRespond) Then Return
+	If _Sleep($DELAYRESPOND) Then Return
 
-	$iTrophyCurrent = getTrophyMainScreen($aTrophies[0], $aTrophies[1])
-	If Not $bSuppressLog Then Setlog(" [T]: " & _NumberFormat($iTrophyCurrent), $COLOR_SUCCESS)
+	$g_aiCurrentLoot[$eLootTrophy] = getTrophyMainScreen($aTrophies[0], $aTrophies[1])
+	If Not $bSuppressLog Then Setlog(" [T]: " & _NumberFormat($g_aiCurrentLoot[$eLootTrophy]), $COLOR_SUCCESS)
 
 	If _ColorCheck(_GetPixelColor(837, 134, True), Hex(0x302030, 6), 10) Then ; check if the village have a Dark Elixir Storage
-		$iGoldCurrent = getResourcesMainScreen(696, 23)
-		$iElixirCurrent = getResourcesMainScreen(696, 74)
-		$iDarkCurrent =  getResourcesMainScreen(728, 123)
-		$iGemAmount = getResourcesMainScreen(740, 171)
-		If Not $bSuppressLog Then SetLog(" [G]: " & _NumberFormat($iGoldCurrent) & " [E]: " & _NumberFormat($iElixirCurrent) & " [D]: " & _NumberFormat($iDarkCurrent) & " [GEM]: " & _NumberFormat($iGemAmount), $COLOR_SUCCESS)
+		$g_aiCurrentLoot[$eLootGold] = getResourcesMainScreen(696, 23)
+		$g_aiCurrentLoot[$eLootElixir] = getResourcesMainScreen(696, 74)
+		$g_aiCurrentLoot[$eLootDarkElixir] = getResourcesMainScreen(728, 123)
+		$g_iGemAmount = getResourcesMainScreen(740, 171)
+		If Not $bSuppressLog Then SetLog(" [G]: " & _NumberFormat($g_aiCurrentLoot[$eLootGold]) & " [E]: " & _NumberFormat($g_aiCurrentLoot[$eLootElixir]) & " [D]: " & _NumberFormat($g_aiCurrentLoot[$eLootDarkElixir]) & " [GEM]: " & _NumberFormat($g_iGemAmount), $COLOR_SUCCESS)
 	Else
-		$iGoldCurrent = getResourcesMainScreen(701, 23)
-		$iElixirCurrent = getResourcesMainScreen(701, 74)
-		$iGemAmount = getResourcesMainScreen(719, 123)
-		If Not $bSuppressLog Then SetLog(" [G]: " & _NumberFormat($iGoldCurrent) & " [E]: " & _NumberFormat($iElixirCurrent) & " [GEM]: " & _NumberFormat($iGemAmount), $COLOR_SUCCESS)
+		$g_aiCurrentLoot[$eLootGold] = getResourcesMainScreen(701, 23)
+		$g_aiCurrentLoot[$eLootElixir] = getResourcesMainScreen(701, 74)
+		$g_iGemAmount = getResourcesMainScreen(719, 123)
+		If Not $bSuppressLog Then SetLog(" [G]: " & _NumberFormat($g_aiCurrentLoot[$eLootGold]) & " [E]: " & _NumberFormat($g_aiCurrentLoot[$eLootElixir]) & " [GEM]: " & _NumberFormat($g_iGemAmount), $COLOR_SUCCESS)
 	EndIf
 	If $bBypass = False Then ; update stats
 		UpdateStats()
@@ -52,7 +52,7 @@ Func VillageReport($bBypass = False, $bSuppressLog = False)
 	Local $i = 0
 	While _ColorCheck(_GetPixelColor(819, 39, True), Hex(0xF8FCFF, 6), 20) = True ; wait for Builder/shop to close
 		$i += 1
-		If _Sleep($iDelayVillageReport1) Then Return
+		If _Sleep($DELAYVILLAGEREPORT1) Then Return
 		If $i >= 20 Then ExitLoop
 	WEnd
 

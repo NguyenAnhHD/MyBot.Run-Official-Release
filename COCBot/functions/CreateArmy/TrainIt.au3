@@ -7,7 +7,7 @@
 ;                  $iSleep           - [optional] delay value after click. Default is 400.
 ; Return values .: None
 ; Author ........:
-; Modified ......: KnowJack(July 2015), MonkeyHunter (05-2016), ProMac (01-2017), CodeSlinger69 (2017)
+; Modified ......: KnowJack(07-2015), MonkeyHunter (05-2016), ProMac (01-2017), CodeSlinger69 (01-2017)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......: GetTrainPos, GetFullName, GetGemName
@@ -29,12 +29,10 @@ Func TrainIt($iIndex, $howMuch = 1, $iSleep = 400)
 				If IsArray($RNDName) Then
 					TrainClickP($pos, $howMuch, $g_iTrainClickDelay, $FullName, "#0266", $RNDName)
 					If _Sleep($iSleep) Then Return False
-					If $OutOfElixir = 1 Then
+					If $g_bOutOfElixir = True Then
 						Setlog("Not enough " & ($bDark ? "Dark " : "") & "Elixir to train position " & GetTroopName($iIndex) & " troops!", $COLOR_ERROR)
 						Setlog("Switching to Halt Attack, Stay Online Mode...", $COLOR_ERROR)
-						$g_bChkBotStop = True ; set halt attack variable
-						$g_iCmbBotCond = 18 ; set stay online
-						If Not ($fullarmy = True) Then $g_bRestart = True ;If the army camp is full, If yes then use it to refill storages
+						If Not ($g_bFullArmy = True) Then $g_bRestart = True ;If the army camp is full, If yes then use it to refill storages
 						Return ; We are out of Elixir stop training.
 					EndIf
 					Return True
@@ -73,20 +71,20 @@ Func GetTrainPos(Const $iIndex)
 
 	; Get the Image path to search
 	If $iIndex >= $eBarb And $iIndex <= $eBowl Then
-	   Local $sDirectory = @ScriptDir & "\imgxml\Train\Train_Train\"
-	   Local $sFilter = String($g_asTroopShortNames[$iIndex]) & "*"
-	   Local $asImageToUse = _FileListToArray($sDirectory, $sFilter, $FLTA_FILES, True)
-	   If $g_iDebugSetlogTrain Then setlog("$asImageToUse Troops: " & $asImageToUse[1])
-	   Return GetVariable($asImageToUse[1], $iIndex)
-    EndIf
+		Local $sDirectory = @ScriptDir & "\imgxml\Train\Train_Train\"
+		Local $sFilter = String($g_asTroopShortNames[$iIndex]) & "*"
+		Local $asImageToUse = _FileListToArray($sDirectory, $sFilter, $FLTA_FILES, True)
+		If $g_iDebugSetlogTrain Then setlog("$asImageToUse Troops: " & $asImageToUse[1])
+		Return GetVariable($asImageToUse[1], $iIndex)
+	EndIf
 
 	If $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then
-	   Local $sDirectory = @ScriptDir & "\imgxml\Train\Spell_Train\"
-	   Local $sFilter = String($g_asSpellShortNames[$iIndex - $eLSpell]) & "*"
-	   Local $asImageToUse = _FileListToArray($sDirectory, $sFilter, $FLTA_FILES, True)
-	   If $g_iDebugSetlogTrain Then setlog("$asImageToUse Spell: " & $asImageToUse[1])
-	   Return GetVariable($asImageToUse[1], $iIndex)
-    EndIf
+		Local $sDirectory = @ScriptDir & "\imgxml\Train\Spell_Train\"
+		Local $sFilter = String($g_asSpellShortNames[$iIndex - $eLSpell]) & "*"
+		Local $asImageToUse = _FileListToArray($sDirectory, $sFilter, $FLTA_FILES, True)
+		If $g_iDebugSetlogTrain Then setlog("$asImageToUse Spell: " & $asImageToUse[1])
+		Return GetVariable($asImageToUse[1], $iIndex)
+	EndIf
 
 	Return 0
 EndFunc   ;==>GetTrainPos
@@ -97,16 +95,16 @@ Func GetFullName(Const $iIndex, Const $pos)
 	If $g_iDebugSetlogTrain = 1 Then SetLog("Func GetFullName $iIndex=" & $iIndex, $COLOR_DEBUG)
 
 	If $iIndex >= $eBarb And $iIndex <= $eBowl Then
-	   Local $text = ($iIndex >= $eMini ? "Dark" : "Normal")
-	   If $g_iDebugSetlogTrain = 1 Then Setlog("Troop Name: " & $g_asTroopNames[$iIndex])
-	   Return GetFullNameSlot($pos, $text)
-    EndIf
+		Local $text = ($iIndex >= $eMini ? "Dark" : "Normal")
+		If $g_iDebugSetlogTrain = 1 Then Setlog("Troop Name: " & $g_asTroopNames[$iIndex])
+		Return GetFullNameSlot($pos, $text)
+	EndIf
 
 	If $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then
-	   Return GetFullNameSlot($pos, "Spell")
-    EndIf
+		Return GetFullNameSlot($pos, "Spell")
+	EndIf
 
-    SetLog("Don't know how to find the full name of troop with index " & $iIndex & " yet")
+	SetLog("Don't know how to find the full name of troop with index " & $iIndex & " yet")
 	Local $slotTemp[4] = [-1, -1, -1, -1]
 	Return $slotTemp
 EndFunc   ;==>GetFullName
@@ -117,15 +115,15 @@ Func GetRNDName(Const $iIndex, Const $pos)
 	Local $aReturn[4]
 
 	If $iIndex <> -1 Then
-	  Local $aTempCoord = $pos
-	  $aReturn[0] = $aTempCoord[0] - 5
-	  $aReturn[1] = $aTempCoord[1] - 5
-	  $aReturn[2] = $aTempCoord[0] + 5
-	  $aReturn[3] = $aTempCoord[1] + 5
-	  Return $aReturn
-    EndIf
+		Local $aTempCoord = $pos
+		$aReturn[0] = $aTempCoord[0] - 5
+		$aReturn[1] = $aTempCoord[1] - 5
+		$aReturn[2] = $aTempCoord[0] + 5
+		$aReturn[3] = $aTempCoord[1] + 5
+		Return $aReturn
+	EndIf
 
-    SetLog("Don't know how to find the RND name of troop with index " & $iIndex & " yet!", $COLOR_ERROR)
+	SetLog("Don't know how to find the RND name of troop with index " & $iIndex & " yet!", $COLOR_ERROR)
 	Return 0
 EndFunc   ;==>GetRNDName
 
@@ -135,7 +133,7 @@ Func GetVariable(Const $ImageToUse, Const $iIndex)
 	; Capture the screen for comparison
 	_CaptureRegion2(25, 375, 840, 548)
 
-	Local $res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $hHBitmap2, "str", $ImageToUse, "str", "FV", "int", 1)
+	Local $res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $g_hHBitmap2, "str", $ImageToUse, "str", "FV", "int", 1)
 
 	If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 	If IsArray($res) Then

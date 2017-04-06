@@ -3,9 +3,9 @@
 ; Description ...: Obtain Status of Heroes, Available, Healing, Upgrading...
 ; Syntax ........: ArmyHeroStatus($iHeroEnum = $eKing, $bReturnTimeArray = False, $bOpenArmyWindow = False, $bCloseArmyWindow = False)
 ; Parameters ....: $Hero = enum value for hero to OR Hero name
-; Return values .: MR.ViPER (16-10-2016)
-; Author ........:
-; Modified ......: MR.ViPER (10-12-2016)
+; Return values .:
+; Author ........: MR.ViPER (10-2016)
+; Modified ......: MR.ViPER (12-2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -38,7 +38,7 @@ Func ArmyHeroStatus($Hero)
 EndFunc   ;==>ArmyHeroStatus
 
 Func CountHeroes()
-	Local $directory =  "trainwindow-HeroStatus-bundle"
+	Local $directory = "trainwindow-HeroStatus-bundle"
 	Local Const $aHeroesRect[3][4] = [[643, 340, 683, 390], [718, 340, 758, 390], [749, 340, 833, 390]]
 	Local $Result, $Status
 	Local $Available = 0, $Healing = 0, $Upgrading = 0, $None = 0, $AvaiAndHealing = 0

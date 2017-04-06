@@ -15,7 +15,7 @@
 
 Func RequestCC($ClickPAtEnd = True, $specifyText = "")
 
-	If $g_bRequestTroopsEnable = False Or $canRequestCC = False Or $bDonationEnabled = False Then
+	If $g_bRequestTroopsEnable = False Or $g_bCanRequestCC = False Or $g_bDonationEnabled = False Then
 		Return
 	EndIf
 
@@ -31,21 +31,21 @@ Func RequestCC($ClickPAtEnd = True, $specifyText = "")
 
 	;open army overview
 	If IsMainPage() Then
-		If $iUseRandomClick = 0 then
+		If $g_bUseRandomClick = False Then
 			Click($aArmyTrainButton[0], $aArmyTrainButton[1], 1, 0, "#0334")
 		Else
 			ClickR($aArmyTrainButtonRND, $aArmyTrainButton[0], $aArmyTrainButton[1], 1, 0)
-		EndIF
+		EndIf
 	EndIf
-	If _Sleep($iDelayRequestCC1) Then Return
+	If _Sleep($DELAYREQUESTCC1) Then Return
 
-	checkAttackDisable($iTaBChkIdle) ; Early Take-A-Break detection
+	checkAttackDisable($g_iTaBChkIdle) ; Early Take-A-Break detection
 
 	;wait to see army overview
 
 	Local $icount = 0
 	While Not ( _ColorCheck(_GetPixelColor($aArmyOverviewTest[0], $aArmyOverviewTest[1], True), Hex($aArmyOverviewTest[2], 6), $aArmyOverviewTest[3]))
-		If _Sleep($iDelayRequestCC1) Then ExitLoop
+		If _Sleep($DELAYREQUESTCC1) Then ExitLoop
 		$icount += 1
 		If $g_iDebugSetlog = 1 Then Setlog("$icount1 = " & $icount & ", " & _GetPixelColor($aArmyOverviewTest[0], $aArmyOverviewTest[1], True), $COLOR_DEBUG)
 		If $icount > 5 Then ExitLoop ; wait 6*500ms = 3 seconds max
@@ -63,15 +63,15 @@ Func RequestCC($ClickPAtEnd = True, $specifyText = "")
 	ElseIf _ColorCheck($color, Hex($aRequestTroopsAO[4], 6), $aRequestTroopsAO[5]) Then
 		;clan full or not in clan
 		SetLog("Your Clan Castle is already full or you are not in a clan.")
-		$canRequestCC = False
+		$g_bCanRequestCC = False
 	Else
 		;no button request found
 		SetLog("Cannot detect button request troops.")
-		setlog("The Pixel on " & $aRequestTroopsAO[0]& "-" & $aRequestTroopsAO[1]& " was: " & $color, $COLOR_ERROR)
+		setlog("The Pixel on " & $aRequestTroopsAO[0] & "-" & $aRequestTroopsAO[1] & " was: " & $color, $COLOR_ERROR)
 	EndIf
 
 	;exit from army overview
-	If _Sleep($iDelayRequestCC1) Then Return
+	If _Sleep($DELAYREQUESTCC1) Then Return
 	If $ClickPAtEnd = True Then ClickP($aAway, 2, 0, "#0335")
 
 EndFunc   ;==>RequestCC
@@ -84,7 +84,7 @@ Func _makerequest()
 	;wait window
 	Local $icount = 0
 	While Not ( _ColorCheck(_GetPixelColor($aCancRequestCCBtn[0], $aCancRequestCCBtn[1], True), Hex($aCancRequestCCBtn[2], 6), $aCancRequestCCBtn[3]))
-		If _Sleep($iDelaymakerequest1) Then ExitLoop
+		If _Sleep($DELAYMAKEREQUEST1) Then ExitLoop
 		$icount += 1
 		If $g_iDebugSetlog = 1 Then Setlog("$icount2 = " & $icount & ", " & _GetPixelColor($aCancRequestCCBtn[0], $aCancRequestCCBtn[1], True), $COLOR_DEBUG)
 		If $icount > 20 Then ExitLoop ; wait 21*500ms = 10.5 seconds max
@@ -92,23 +92,23 @@ Func _makerequest()
 	If $icount > 20 Then
 		SetLog("Request has already been made, or request window not available", $COLOR_ERROR)
 		ClickP($aAway, 2, 0, "#0257")
-		If _Sleep($iDelaymakerequest2) Then Return
+		If _Sleep($DELAYMAKEREQUEST2) Then Return
 	Else
 		If $g_sRequestTroopsText <> "" Then
-			If $g_bChkBackgroundMode = False And $g_bNoFocusTampering = False Then ControlFocus($HWnD, "", "")
+			If $g_bChkBackgroundMode = False And $g_bNoFocusTampering = False Then ControlFocus($g_hAndroidWindow, "", "")
 			; fix for Android send text bug sending symbols like ``"
 			AndroidSendText($g_sRequestTroopsText, True)
 			Click($atxtRequestCCBtn[0], $atxtRequestCCBtn[1], 1, 0, "#0254") ;Select text for request $atxtRequestCCBtn[2] = [430, 140]
-			_Sleep($iDelaymakerequest2)
+			_Sleep($DELAYMAKEREQUEST2)
 			If SendText($g_sRequestTroopsText) = 0 Then
 				Setlog(" Request text entry failed, try again", $COLOR_ERROR)
 				Return
 			EndIf
 		EndIf
-		If _Sleep($iDelaymakerequest2) Then Return ; wait time for text request to complete
+		If _Sleep($DELAYMAKEREQUEST2) Then Return ; wait time for text request to complete
 		$icount = 0
 		While Not _ColorCheck(_GetPixelColor($aSendRequestCCBtn[0], $aSendRequestCCBtn[1], True), Hex(0x5fac10, 6), 20)
-			If _Sleep($iDelaymakerequest1) Then ExitLoop
+			If _Sleep($DELAYMAKEREQUEST1) Then ExitLoop
 			$icount += 1
 			If $g_iDebugSetlog = 1 Then Setlog("$icount3 = " & $icount & ", " & _GetPixelColor($aSendRequestCCBtn[0], $aSendRequestCCBtn[1], True), $COLOR_DEBUG)
 			If $icount > 25 Then ExitLoop ; wait 26*500ms = 13 seconds max
@@ -117,9 +117,9 @@ Func _makerequest()
 			If $g_iDebugSetlog = 1 Then SetLog("Send request button not found", $COLOR_DEBUG)
 			CheckMainScreen(False) ;emergency exit
 		EndIf
-		If $g_bChkBackgroundMode = False And $g_bNoFocusTampering = False Then ControlFocus($HWnD, "", "")  ; make sure Android has window focus
+		If $g_bChkBackgroundMode = False And $g_bNoFocusTampering = False Then ControlFocus($g_hAndroidWindow, "", "") ; make sure Android has window focus
 		Click($aSendRequestCCBtn[0], $aSendRequestCCBtn[1], 1, 100, "#0256") ; click send button
-		$canRequestCC = False
+		$g_bCanRequestCC = False
 	EndIf
 
 EndFunc   ;==>_makerequest

@@ -46,6 +46,7 @@ Global $g_hChkCustomTrainOrderEnable = 0
 Global $g_ahCmbTroopOrder[$eTroopCount] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 Global $g_ahImgTroopOrder[$eTroopCount] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 Global $g_hBtnTroopOrderSet = 0, $g_ahImgTroopOrderSet = 0
+Global $g_hBtnRemoveTroops
 
 ; Options sub-tab
 Global $g_hChkCloseWhileTraining = 0, $g_hChkCloseWithoutShield = 0, $g_hChkCloseEmulator = 0, $g_hChkRandomClose = 0, $g_hRdoCloseWaitExact = 0, $g_hRdoCloseWaitRandom = 0
@@ -56,10 +57,10 @@ Global $g_hLblCloseWaitRdmPercent = 0, $g_hLblCloseWaitingTroops = 0, $g_hLblSym
 	   $g_hLblAddDelayIdlePhaseBetween = 0, $g_hLblAddDelayIdlePhaseSec = 0, $g_hPicCloseWaitTrain = 0, $g_hPicCloseWaitStop = 0, $g_hPicCloseWaitExact = 0
 
 Func CreateAttackTroops()
-   $g_hGUI_TRAINARMY = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ATTACK)
+   $g_hGUI_TRAINARMY = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ATTACK)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_TRAINARMY)
 
-   $g_hGUI_TRAINARMY_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 30, $_GUI_MAIN_HEIGHT - 255 - 30, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_TRAINARMY_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
 
    CreateTroopsSpellsSubTab()
    CreateBoostSubTab()
@@ -95,7 +96,7 @@ Func CreateTroopsSpellsSubTab()
 
    $x = 10
    $y = 45
-   $g_hGrpTrainTroops = GUICtrlCreateGroup(GetTranslated(1000, 1, "Train Troops"), $x, $y, 418, 195)
+   $g_hGrpTrainTroops = GUICtrlCreateGroup(GetTranslated(1000, 1, "Train Troops"), $x - 5, $y, $g_iSizeWGrpTab3, 195)
 
 	  $x = 30
 	  $y += 20
@@ -134,10 +135,10 @@ Func CreateTroopsSpellsSubTab()
 		  $g_ahPicTrainArmyTroop[$eTroopWallBreaker] = GUICtrlCreateIcon($g_sLibIconPath, $eIcnWallBreaker, $x, $y - 5, 32, 32)
 			 _GUICtrlSetTip(-1, GetTranslated(603,39, -1) & " " & $sTroopName & ":" & @CRLF & GetTranslated(621,40, -1))
 			 GUICtrlSetOnEvent(-1, "TrainTroopLevelClick")
-		  $g_ahLblTrainArmyTroopLevel[$eTroopWallBreaker] = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
+		  $g_ahLblTrainArmyTroopLevel[$eTroopWallbreaker] = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
 			 GUICtrlSetBkColor(-1, $COLOR_WHITE)
 			 GUICtrlSetFont(-1, 7, 400)
-		  $g_ahTxtTrainArmyTroopCount[$eTroopWallBreaker] = GUICtrlCreateInput("4", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+		  $g_ahTxtTrainArmyTroopCount[$eTroopWallbreaker] = GUICtrlCreateInput("4", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 			 _GUICtrlSetTip(-1, $sTxtSetPerc3 & " " & $sTroopName & " " & $sTxtSetPerc2)
 			 GUICtrlSetState(-1, $GUI_HIDE)
 			 GUICtrlSetLimit(-1, 3)
@@ -441,7 +442,7 @@ Func CreateTroopsSpellsSubTab()
 
    $x = 10
    $y = 240
-   $g_hGrpCookSpell = GUICtrlCreateGroup(GetTranslated(1000, 2, "Brew Spells"), $x, $y, 418, 123)
+   $g_hGrpCookSpell = GUICtrlCreateGroup(GetTranslated(1000, 2, "Brew Spells"), $x - 5, $y, $g_iSizeWGrpTab3, 123)
 	  $x += 20
 	  $y += 17
 		  GUICtrlCreateLabel(GetTranslated(622, 2, "Spell Capacity") & " :", $x - 15, $y, -1, -1, $SS_RIGHT)
@@ -622,7 +623,7 @@ Func  CreateBoostSubTab()
    $g_hGUI_TRAINARMY_TAB_ITEM2 = GUICtrlCreateTabItem(GetTranslated(600, 22, "Boost"))
 
    Local $x = 25, $y = 45
-   GUICtrlCreateGroup(GetTranslated(623, 2, "Boost Barracks"), $x - 20, $y - 20, 430, 60)
+   GUICtrlCreateGroup(GetTranslated(623, 2, "Boost Barracks"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 60)
 	   GUICtrlCreateIcon($g_sLibIconPath, $eIcnBarrackBoost, $x - 10, $y + 5, 24, 24)
 	   GUICtrlCreateIcon($g_sLibIconPath, $eIcnDarkBarrackBoost, $x + 19, $y + 5, 24, 24)
 	   GUICtrlCreateLabel(GetTranslated(623, 5, "Barracks") & " " & $sTextBoostLeft, $x + 20 + 29, $y + 4 + 7, -1, -1)
@@ -634,7 +635,7 @@ Func  CreateBoostSubTab()
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 
    $y += 65
-   GUICtrlCreateGroup(GetTranslated(623, 7, "Boost Spell Factories"), $x - 20, $y - 20, 430, 50)
+   GUICtrlCreateGroup(GetTranslated(623, 7, "Boost Spell Factories"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 50)
 	   GUICtrlCreateIcon($g_sLibIconPath, $eIcnSpellFactoryBoost, $x - 10, $y - 2, 24, 24)
 	   GUICtrlCreateIcon($g_sLibIconPath, $eIcnDarkSpellBoost, $x + 19, $y - 2, 24, 24)
 	   GUICtrlCreateLabel(GetTranslated(623, 8, "Spell Factory") & " " & $sTextBoostLeft, $x + 20 + 29, $y + 4, -1, -1)
@@ -646,7 +647,7 @@ Func  CreateBoostSubTab()
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 
    $y += 55
-   GUICtrlCreateGroup(GetTranslated(623, 12, "Boost Heroes"), $x - 20, $y - 20, 430, 95)
+   GUICtrlCreateGroup(GetTranslated(623, 12, "Boost Heroes"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 95)
 	   GUICtrlCreateIcon($g_sLibIconPath, $eIcnKingBoost, $x - 10, $y - 2, 24, 24)
 	   GUICtrlCreateLabel(GetTranslated(623, 13, "Barbarian King") & " " & $sTextBoostLeft, $x + 20, $y + 4, -1, -1)
 		  $sTxtTip = GetTranslated(623, 14, "Use this to boost your Barbarian King with GEMS! Use with caution!")
@@ -678,7 +679,7 @@ Func  CreateBoostSubTab()
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 
    $y += 50
-   GUICtrlCreateGroup(GetTranslated(623, 19, "Boost Schedule"), $x - 20, $y - 20, 430, 70)
+   GUICtrlCreateGroup(GetTranslated(623, 19, "Boost Schedule"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 70)
 
 	   GUICtrlCreateLabel(" 0", $x + 30, $y)
 	   GUICtrlCreateLabel(" 1", $x + 45, $y)
@@ -766,7 +767,7 @@ Func CreateTrainOrderSubTab()
    SetDefaultTroopGroup(False)
 
    Local $x = 25, $y = 45
-   GUICtrlCreateGroup(GetTranslated(641, 25, "Training Order"), $x - 20, $y - 20, 271, 335)
+   GUICtrlCreateGroup(GetTranslated(641, 25, "Training Order"), $x - 20, $y - 20, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3)
 	   $g_hChkCustomTrainOrderEnable = GUICtrlCreateCheckbox(GetTranslated(641, 26, "Custom Order"), $x - 5, $y, -1, -1)
 	   GUICtrlSetState(-1, $GUI_UNCHECKED)
 	   _GUICtrlSetTip(-1, GetTranslated(641, 27, "Enable to select a custom troop training order") & @CRLF & _
@@ -813,6 +814,11 @@ Func CreateTrainOrderSubTab()
 			  $y += 22 ; move down to next combobox location
 		  EndIf
 	  Next
+	  $y += 23
+	  $g_hBtnRemoveTroops = GUICtrlCreateButton(GetTranslated(641, 44, "Empty troop list"), $x, $y, 110, 22)
+			GUICtrlSetState(-1, BitOR($GUI_UNCHECKED, $GUI_DISABLE))
+			_GUICtrlSetTip(-1, GetTranslated(641, 45, "Push button to remove all troops from list and start over"))
+			GUICtrlSetOnEvent(-1, "btnRemoveTroops")
 
 	  $x = 25
 	  $y = 45 + 291
@@ -820,7 +826,8 @@ Func CreateTrainOrderSubTab()
 		  $g_hBtnTroopOrderSet = GUICtrlCreateButton(GetTranslated(641, 30, "Apply New Order"), $x, $y, 222, 20)
 			 GUICtrlSetState(-1, BitOR($GUI_UNCHECKED, $GUI_DISABLE))
 			 _GUICtrlSetTip(-1, GetTranslated(641, 31, "Push button when finished selecting custom troop training order") & @CRLF & _
-								GetTranslated(641, 32, "Icon changes color based on status: Red= Not Set, Green = Order Set"))
+								GetTranslated(641, 32, "Icon changes color based on status: Red= Not Set, Green = Order Set") & @CRLF & _
+								GetTranslated(641, 46, "When not all troop slots are filled, will use random troop order in empty slots!"))
 			 GUICtrlSetOnEvent(-1, "btnTroopOrderSet")
 		  $g_ahImgTroopOrderSet = GUICtrlCreateIcon($g_sLibIconPath, $eIcnSilverStar, $x + 226, $y + 2, 18, 18)
    GUICtrlCreateGroup("", -99, -99, 1, 1)

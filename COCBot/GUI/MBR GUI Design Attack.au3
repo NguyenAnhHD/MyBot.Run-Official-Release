@@ -23,7 +23,7 @@ Global $g_hGUI_ATTACK = 0
 Global $g_hGUI_ATTACK_TAB = 0, $g_hGUI_ATTACK_TAB_ITEM1 = 0, $g_hGUI_ATTACK_TAB_ITEM2 = 0, $g_hGUI_ATTACK_TAB_ITEM3 = 0
 
 Func CreateAttackTab()
-   $g_hGUI_ATTACK = GUICreate("", $_GUI_MAIN_WIDTH - 20, $_GUI_MAIN_HEIGHT - 255, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hFrmBotEx)
+   $g_hGUI_ATTACK = _GUICreate("", $g_iSizeWGrpTab1, $g_iSizeHGrpTab1, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hFrmBotEx)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_ATTACK)
 
    CreateAttackTroops()
@@ -31,7 +31,7 @@ Func CreateAttackTab()
    CreateAttackStrategies()
 
    GUISwitch($g_hGUI_ATTACK)
-   $g_hGUI_ATTACK_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 20, $_GUI_MAIN_HEIGHT - 255, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+   $g_hGUI_ATTACK_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab1, $g_iSizeHGrpTab1, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
    $g_hGUI_ATTACK_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,41,"Train Army"))
    $g_hGUI_ATTACK_TAB_ITEM2 = GUICtrlCreateTabItem(GetTranslated(600,42,"Search && Attack"))
    $g_hGUI_ATTACK_TAB_ITEM3 = GUICtrlCreateTabItem(GetTranslated(600,43,"Strategies"))

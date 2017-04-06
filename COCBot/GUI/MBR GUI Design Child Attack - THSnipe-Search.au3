@@ -29,7 +29,7 @@ Global $g_hLblAddTiles = 0, $g_hLblAddTiles2 = 0, $g_hLblSWTTiles = 0, $g_hLblTH
 Func CreateAttackSearchTHSnipeSearch()
    Local $sTxtTip = ""
    Local $x = 25, $y = 45
-	GUICtrlCreateGroup(GetTranslated(625,0, -1), $x - 20, $y - 20, 190, 305)
+	GUICtrlCreateGroup(GetTranslated(625,0, -1), $x - 20, $y - 20, 190, $g_iSizeHGrpTab4)
 		$x -= 15
 		$g_hChkTSActivateSearches = GUICtrlCreateCheckbox(GetTranslated(603,5, -1), $x, $y, 68, 18)
 			_GUICtrlSetTip(-1, GetTranslated(625,68, -1) & @CRLF & GetTranslated(625,69, -1))
@@ -85,7 +85,7 @@ Func CreateAttackSearchTHSnipeSearch()
 	  GUICtrlCreateGroup("", -99, -99, 1, 1)
 
     Local $x = 220, $y = 45
-	$g_hGrpTSFilter = GUICtrlCreateGroup(GetTranslated(625,14, -1), $x - 20, $y - 20, 225, 305)
+	$g_hGrpTSFilter = GUICtrlCreateGroup(GetTranslated(625,14, -1), $x - 20, $y - 20, 225, $g_iSizeHGrpTab4)
 		$x -= 15
 		$g_hCmbTSMeetGE = GUICtrlCreateCombo("", $x , $y + 10, 65, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
 			$sTxtTip = GetTranslated(625,15, -1) & @CRLF & GetTranslated(625,16, -1) & @CRLF & GetTranslated(625,17, -1) & @CRLF & GetTranslated(625,18, -1)

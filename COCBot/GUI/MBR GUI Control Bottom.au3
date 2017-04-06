@@ -14,32 +14,40 @@
 ; ===============================================================================================================================
 #include-once
 
-Global $ichklanguageFirst = 0
 Global $g_aFrmBotBottomCtrlState, $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedMouse = 0, $g_hFrmBotEmbeddedGraphics = 0
 
 Func Initiate()
+    Static $bCheckLanguageFirst = False
 	WinGetAndroidHandle()
-    If $HWnD <> 0 And ($g_bAndroidBackgroundLaunched = True Or AndroidControlAvailable()) Then
-		SetLog(_PadStringCenter(" " & $g_sBotTitle & " Powered by MyBot.run ", 50, "~"), $COLOR_DEBUG)
+    If $g_hAndroidWindow <> 0 And ($g_bAndroidBackgroundLaunched = True Or AndroidControlAvailable()) Then
+		SetLogCentered(" " & $g_sBotTitle & " Powered by MyBot.run ", "~", $COLOR_DEBUG)
 
 		Local $Compiled = @ScriptName & (@Compiled ? " Executable" : " Script")
 		SetLog($Compiled & " running on " & @OSVersion & " " & @OSServicePack & " " & @OSArch)
-		If Not $bSearchMode Then
-			SetLog(_PadStringCenter(" Bot Start ", 50, "="), $COLOR_SUCCESS)
+		If Not $g_bSearchMode Then
+			SetLogCentered(" Bot Start ", Default, $COLOR_SUCCESS)
 		Else
-			SetLog(_PadStringCenter(" Search Mode Start ", 50, "="), $COLOR_SUCCESS)
+			SetLogCentered(" Search Mode Start ", Default, $COLOR_SUCCESS)
 		EndIf
-		SetLog(_PadStringCenter("  Current Profile: " & $g_sProfileCurrentName & " ", 73, "-"), $COLOR_INFO)
+		SetLogCentered("  Current Profile: " & $g_sProfileCurrentName & " ", "-", $COLOR_INFO)
 		If $g_iDebugSetlog = 1 Or $g_iDebugOcr = 1 Or $g_iDebugRedArea = 1 Or $g_bDevMode = True Or $g_iDebugImageSave = 1 Or $g_iDebugBuildingPos = 1 Or $g_iDebugOCRdonate = 1 Or $g_iDebugAttackCSV  = 1 Then
-			SetLog(_PadStringCenter(" Warning Debug Mode Enabled! Setlog: " & $g_iDebugSetlog & " OCR: " & $g_iDebugOcr & " RedArea: " & $g_iDebugRedArea & " ImageSave: " & $g_iDebugImageSave & " BuildingPos: " & $g_iDebugBuildingPos & " OCRDonate: " & $g_iDebugOCRdonate & " AttackCSV: " & $g_iDebugAttackCSV, 55, "-"), $COLOR_ERROR)
+			SetLogCentered(" Warning Debug Mode Enabled! ", "-", $COLOR_ERROR)
+			SetLog("      Setlog : " & $g_iDebugSetlog, $COLOR_ERROR, "Lucida Console", 8)
+			SetLog("         OCR : " & $g_iDebugOcr, $COLOR_ERROR, "Lucida Console", 8)
+			SetLog("     RedArea : " & $g_iDebugRedArea, $COLOR_ERROR, "Lucida Console", 8)
+			SetLog("   ImageSave : " & $g_iDebugImageSave, $COLOR_ERROR, "Lucida Console", 8)
+			SetLog(" BuildingPos : " & $g_iDebugBuildingPos, $COLOR_ERROR, "Lucida Console", 8)
+			SetLog("   OCRDonate : " & $g_iDebugOCRdonate, $COLOR_ERROR, "Lucida Console", 8)
+			SetLog("   AttackCSV : " & $g_iDebugAttackCSV, $COLOR_ERROR, "Lucida Console", 8)
+			SetLogCentered(" Warning Debug Mode Enabled! ", "-", $COLOR_ERROR)
 		EndIf
 
 		$g_bFirstStart = True
 
 		If $g_bNotifyDeleteAllPushesOnStart = True Then _DeletePush()
 
-		If Not $bSearchMode Then
-			$g_hTimerSinceStarted = TimerInit()
+		If Not $g_bSearchMode Then
+			$g_hTimerSinceStarted = __TimerInit()
 		EndIf
 
 		AndroidBotStartEvent() ; signal android that bot is now running
@@ -47,7 +55,7 @@ Func Initiate()
 
 		;		$g_bRunState = True
 
-		If Not $bSearchMode Then
+		If Not $g_bSearchMode Then
 			;AdlibRegister("SetTime", 1000)
 			If $g_bRestarted = True Then
 				$g_bRestarted = False
@@ -64,11 +72,14 @@ Func Initiate()
 		ZoomOut()
 		If Not $g_bRunState Then Return
 
-		If Not $bSearchMode Then
+		If Not $g_bSearchMode Then
 			BotDetectFirstTime()
 			If Not $g_bRunState Then Return
 
-			If $ichklanguageFirst = 0 And $ichklanguage = 1 Then $ichklanguageFirst = TestLanguage()
+			If $bCheckLanguageFirst = False And $g_bCheckGameLanguage Then
+			   TestLanguage()
+			   $bCheckLanguageFirst = True
+			EndIf
 			If Not $g_bRunState Then Return
 
 			runBot()
@@ -91,7 +102,7 @@ Func InitiateLayout()
 		Local $BSx = $BSsize[2]
 		Local $BSy = $BSsize[3]
 
-		SetDebugLog("InitiateLayout: " & $title & " Android-ClientSize: " & $BSx & " x " & $BSy, $COLOR_INFO)
+		SetDebugLog("InitiateLayout: " & $g_sAndroidTitle & " Android-ClientSize: " & $BSx & " x " & $BSy, $COLOR_INFO)
 
 		If Not CheckScreenAndroid($BSx, $BSy) Then ; Is Client size now correct?
 			If $AdjustScreenIfNecessarry = True Then
@@ -131,6 +142,9 @@ Func chkBackground()
 		$g_bChkBackgroundMode = False
 		updateBtnHideState($GUI_DISABLE)
 	EndIf
+	If CheckDpiAwareness() Then
+		; DPI awareness changed
+	EndIf
 EndFunc   ;==>chkBackground
 
 Func IsStopped()
@@ -148,7 +162,7 @@ Func btnStart()
 	Else
 		$g_iBotAction = $eBotStart
 	EndIf
-			$actual_train_skip = 0
+			$g_iActualTrainSkip = 0
 
 EndFunc   ;==>btnStart
 
@@ -158,6 +172,7 @@ Func btnStop()
 		EnableControls($g_hFrmBotBottom, False, $g_aFrmBotBottomCtrlState)
 		$g_bRunState = False ; Exit BotStart()
 		$g_iBotAction = $eBotStop
+		ReduceBotMemory()
 	EndIf
 EndFunc   ;==>btnStop
 
@@ -206,9 +221,9 @@ EndFunc   ;==>btnAttackNowTS
 ;~ Hide Android Window again without overwriting $botPos[0] and [1]
 Func reHide()
 	WinGetAndroidHandle()
-	If $Hide = True And $HWnD <> 0 And $g_bAndroidEmbedded = False Then
+	If $g_bIsHidden = True And $g_hAndroidWindow <> 0 And $g_bAndroidEmbedded = False Then
 		SetDebugLog("Hide " & $g_sAndroidEmulator & " Window after restart")
-		Return WinMove2($HWnD, "", -32000, -32000)
+		Return WinMove2($g_hAndroidWindow, "", -32000, -32000)
 	EndIf
 	Return 0
 EndFunc   ;==>reHide
@@ -220,14 +235,14 @@ Func updateBtnHideState($newState = $GUI_ENABLE)
 EndFunc	  ;==>updateBtnHideState
 
 Func btnHide()
-	If $Hide = False Then
+	If $g_bIsHidden = False Then
 		GUICtrlSetData($g_hBtnHide, GetTranslated(602, 26, "Show"))
 		HideAndroidWindow(True)
-		$Hide = True
-	ElseIf $Hide = True Then
+		$g_bIsHidden = True
+	ElseIf $g_bIsHidden = True Then
 		GUICtrlSetData($g_hBtnHide, GetTranslated(602, 11, "Hide"))
 		HideAndroidWindow(False)
-		$Hide = False
+		$g_bIsHidden = False
 	EndIf
 EndFunc   ;==>btnHide
 
@@ -235,7 +250,7 @@ Func updateBtnEmbed()
 	If $g_hBtnEmbed = 0 Then Return False
 	UpdateFrmBotStyle()
 	Local $state = GUICtrlGetState($g_hBtnEmbed)
-	If $HWnD = 0 Or $g_bAndroidBackgroundLaunched = True Or $g_bAndroidEmbed = False Then
+	If $g_hAndroidWindow = 0 Or $g_bAndroidBackgroundLaunched = True Or $g_bAndroidEmbed = False Then
 		If $state <> $GUI_DISABLE Then GUICtrlSetState($g_hBtnEmbed, $GUI_DISABLE)
 		Return False
 	EndIf
@@ -257,8 +272,11 @@ EndFunc   ;==>updateBtnEmbed
 Func btnEmbed()
 	ResumeAndroid()
 	WinGetAndroidHandle()
-	WinGetPos($HWnD)
+	WinGetPos($g_hAndroidWindow)
 	If @error <> 0 Then Return SetError(0, 0, 0)
+	;If Not $g_bAndroidEmbedded And GetProcessDpiAwareness(GetAndroidPid()) And CheckDpiAwareness(False, True) Then
+		; DPI awareness changed
+	;EndIf
 	AndroidEmbed(Not $g_bAndroidEmbedded)
 EndFunc   ;==>btnHide
 
@@ -284,27 +302,27 @@ Func btnAnalyzeVillage()
 	checkDeadBase()
 
 	SETLOG("TOWNHALL CHECK imgloc..................")
-	$searchTH = imgloccheckTownhallADV2()
+	$g_iSearchTH = imgloccheckTownhallADV2()
 
 	SETLOG("TOWNHALL C# CHECK. IMGLOC..............")
 	imglocTHSearch()
 
 	SETLOG("MINE CHECK C#...................")
-	$PixelMine = GetLocationMine()
-	SetLog("[" & UBound($PixelMine) & "] Gold Mines")
+	$g_aiPixelMine = GetLocationMine()
+	SetLog("[" & UBound($g_aiPixelMine) & "] Gold Mines")
 	SETLOG("ELIXIR CHECK C#.................")
-	$PixelElixir = GetLocationElixir()
-	SetLog("[" & UBound($PixelElixir) & "] Elixir Collectors")
+	$g_aiPixelElixir = GetLocationElixir()
+	SetLog("[" & UBound($g_aiPixelElixir) & "] Elixir Collectors")
 
 	SETLOG("DARK ELIXIR CHECK C#............")
-	$PixelDarkElixir = GetLocationDarkElixir()
-	SetLog("[" & UBound($PixelDarkElixir) & "] Dark Elixir Drill/s")
+	$g_aiPixelDarkElixir = GetLocationDarkElixir()
+	SetLog("[" & UBound($g_aiPixelDarkElixir) & "] Dark Elixir Drill/s")
 
 	SETLOG("DARK ELIXIR STORAGE CHECK C#....")
-	$BuildingToLoc = GetLocationDarkElixirStorage
-	SetLog("[" & UBound($BuildingToLoc) & "] Dark Elixir Storage")
-	For $i = 0 To UBound($BuildingToLoc) - 1
-		Local $pixel = $BuildingToLoc[$i]
+	$g_iBuildingToLoc = GetLocationDarkElixirStorage
+	SetLog("[" & UBound($g_iBuildingToLoc) & "] Dark Elixir Storage")
+	For $i = 0 To UBound($g_iBuildingToLoc) - 1
+		Local $pixel = $g_iBuildingToLoc[$i]
 		If $g_iDebugSetlog = 1 Then SetLog("- Dark Elixir Storage " & $i + 1 & ": (" & $pixel[0] & "," & $pixel[1] & ")", $COLOR_DEBUG)
     Next
 
@@ -421,7 +439,7 @@ Func btnTestButtons()
 	Local $wasRunState = $g_bRunState
 	$g_bRunState = True
 	Local $ButtonX, $ButtonY
-	Local $hTimer = TimerInit()
+	Local $hTimer = __TimerInit()
 	Local $res
 	Local $ImagesToUse[3]
 	$ImagesToUse[0] = @ScriptDir & "\imgxml\rearm\Traps_0_90.xml"
@@ -432,7 +450,7 @@ Func btnTestButtons()
 	Local $w = 615
 	Local $h = 105
 
-	$ToleranceImgLoc = 0.950
+	$g_fToleranceImgLoc = 0.950
 
 	SETLOG("SearchTile TEST..................START")
 	;;;;;; Use the Polygon to a rectangle or Square search zone ;;;;;;;;;;
@@ -445,7 +463,7 @@ Func btnTestButtons()
 
 	For $i = 0 To 2
 		If FileExists($ImagesToUse[$i]) Then
-			$res = DllCall($g_sLibImgLocPath, "str", "FindTile", "handle", $hHBitmap2, "str", $ImagesToUse[$i], "str", $SearchArea, "str", $AreaInRectangle)
+			$res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $g_hHBitmap2, "str", $ImagesToUse[$i], "str", $SearchArea, "str", $AreaInRectangle)
 			If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 			If IsArray($res) Then
 				If $g_iDebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_ERROR)
@@ -479,16 +497,16 @@ Func btnTestButtons()
 			EndIf
 		EndIf
 	Next
-	SetLog("  - Calculated  in: " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
+	SetLog("  - Calculated  in: " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
 	SETLOG("SearchTile TEST..................STOP")
 
-	Local $hTimer = TimerInit()
+	Local $hTimer = __TimerInit()
 	SETLOG("MBRSearchImage TEST..................STOP")
 
 	For $i = 0 To 2
 		If FileExists($ImagesToUse[$i]) Then
 			_CaptureRegion2(125, 610, 740, 715)
-			$res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $hHBitmap2, "str", $ImagesToUse[$i], "str", "FV", "int", 1)
+			$res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $g_hHBitmap2, "str", $ImagesToUse[$i], "str", "FV", "int", 1)
 			If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 			If IsArray($res) Then
 				If $g_iDebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_ERROR)
@@ -522,7 +540,7 @@ Func btnTestButtons()
 			EndIf
 		EndIf
 	Next
-	SetLog("  - Calculated  in: " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
+	SetLog("  - Calculated  in: " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
 
 	SETLOG("MBRSearchImage TEST..................STOP")
 	$g_bRunState = $wasRunState
@@ -534,17 +552,17 @@ Func ButtonBoost()
 	Local $wasRunState = $g_bRunState
 	$g_bRunState = True
 	Local $ButtonX, $ButtonY
-	Local $hTimer = TimerInit()
+	Local $hTimer = __TimerInit()
 	Local $res
 	Local $ImagesToUse[2]
 	$ImagesToUse[0] = @ScriptDir & "\imgxml\boostbarracks\BoostBarrack_0_92.xml"
 	$ImagesToUse[1] = @ScriptDir & "\imgxml\boostbarracks\BarrackBoosted_0_92.xml"
-	$ToleranceImgLoc = 0.90
+	$g_fToleranceImgLoc = 0.90
 	SETLOG("MBRSearchImage TEST..................STARTED")
 	_CaptureRegion2(125, 610, 740, 715)
 	For $i = 0 To 1
 		If FileExists($ImagesToUse[$i]) Then
-			$res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $hHBitmap2, "str", $ImagesToUse[$i], "str", "FV", "int", 1)
+			$res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $g_hHBitmap2, "str", $ImagesToUse[$i], "str", "FV", "int", 1)
 			If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 			If IsArray($res) Then
 				If $g_iDebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_ERROR)
@@ -572,7 +590,7 @@ Func ButtonBoost()
 			EndIf
 		EndIf
 	Next
-	SetLog("  - Calculated  in: " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
+	SetLog("  - Calculated  in: " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds ", $COLOR_DEBUG1)
 	SETLOG("MBRSearchImage TEST..................STOP")
 	$g_bRunState = $wasRunState
 
@@ -597,7 +615,7 @@ Func ToggleGuiControls($Enable, $OptimizedRedraw = True)
 	Else
 		SetDebugLog("Enable GUI Controls")
 	EndIf
-	$GUIControl_Disabled = True
+	$g_bGUIControlDisabled = True
 	For $i = $g_hFirstControlToHide To $g_hLastControlToHide
 		If IsAlwaysEnabledControl($i) Then ContinueLoop
 		If $g_bNotifyPBEnable And $i = $g_hBtnNotifyDeleteMessages Then ContinueLoop ; exclude the DeleteAllMesages button when PushBullet is enabled
@@ -615,6 +633,6 @@ Func ToggleGuiControls($Enable, $OptimizedRedraw = True)
 	Else
 		ControlEnable("","",$g_hCmbGUILanguage)
 	EndIf
-	$GUIControl_Disabled = False
+	$g_bGUIControlDisabled = False
 	If $OptimizedRedraw = True Then SetRedrawBotWindow($bWasRedraw, Default, Default, Default, "ToggleGuiControls")
 EndFunc   ;==>ToggleGuiControls

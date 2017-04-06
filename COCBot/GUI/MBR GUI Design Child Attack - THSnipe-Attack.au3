@@ -26,7 +26,7 @@ Global $g_hPicTSLightSpell = 0, $g_hPicTSHealSpell = 0, $g_hPicTSRageSpell = 0, 
 Func CreateAttackSearchTHSnipeAttack()
    Local $sTxtTip
    Local $x = 25, $y = 40
-	GUICtrlCreateGroup(GetTranslated(624,1, -1), $x - 20, $y - 15, 420, 305)
+	GUICtrlCreateGroup(GetTranslated(624,1, -1), $x - 20, $y - 15, $g_iSizeWGrpTab4, $g_iSizeHGrpTab4)
 		$x -= 15
 		$g_hLblAttackTHType = GUICtrlCreateLabel(GetTranslated(624,2, -1) & ":", $x  , $y  , 135, 18, $SS_LEFT)
 

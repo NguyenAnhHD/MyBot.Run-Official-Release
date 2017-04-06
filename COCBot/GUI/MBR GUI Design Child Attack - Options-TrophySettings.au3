@@ -16,6 +16,8 @@
 
 Global $g_hChkTrophyRange = 0, $g_hTxtDropTrophy = 0, $g_hTxtMaxTrophy = 0, $g_hChkTrophyHeroes = 0, $g_hCmbTrophyHeroesPriority = 0, _
 	   $g_hChkTrophyAtkDead = 0, $g_hTxtDropTrophyArmyMin = 0
+Global $g_hPicMinTrophies[$eLeagueCount] = [0,0,0,0,0,0,0,0,0], $g_hLblMinTrophies = 0
+Global $g_hPicMaxTrophies[$eLeagueCount] = [0,0,0,0,0,0,0,0,0], $g_hLblMaxTrophies = 0
 
 Global $g_hLblTrophyHeroesPriority = 0, $g_hLblDropTrophyArmyMin = 0, $g_hLblDropTrophyArmyPercent = 0
 
@@ -23,7 +25,7 @@ Func CreateAttackSearchOptionsTrophySettings()
    Local $sTxtTip = ""
    Local $x = 25, $y = 45
 
-	GUICtrlCreateGroup(GetTranslated(609,1, "Trophy Settings"), $x - 20, $y - 20, 420, 305)
+	GUICtrlCreateGroup(GetTranslated(609,1, "Trophy Settings"), $x - 20, $y - 20, $g_iSizeWGrpTab4, $g_iSizeHGrpTab4)
 		$x += 25
 		$y += 25
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnTrophy, $x - 15, $y, 64, 64, $BS_ICON)
@@ -35,11 +37,58 @@ Func CreateAttackSearchOptionsTrophySettings()
 			GUICtrlSetLimit(-1, 4)
 			_GUICtrlSetTip(-1, GetTranslated(609,3, "MIN: The Bot will drop trophies until below this value."))
 			GuiCtrlSetState(-1,$GUI_DISABLE)
+			GUICtrlSetOnEvent(-1, "TxtDropTrophy")
+
+			$g_hPicMinTrophies[$eLeagueUnranked] = GUICtrlCreateIcon($g_sLibIconPath, $eUnranked, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_SHOW)
+			$g_hPicMinTrophies[$eLeagueBronze] = GUICtrlCreateIcon($g_sLibIconPath, $eBronze, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMinTrophies[$eLeagueSilver] = GUICtrlCreateIcon($g_sLibIconPath, $eSilver, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMinTrophies[$eLeagueGold] = GUICtrlCreateIcon($g_sLibIconPath, $eGold, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMinTrophies[$eLeagueCrystal] = GUICtrlCreateIcon($g_sLibIconPath, $eCrystal, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMinTrophies[$eLeagueMaster] = GUICtrlCreateIcon($g_sLibIconPath, $eMaster, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMinTrophies[$eLeagueChampion] = GUICtrlCreateIcon($g_sLibIconPath, $eChampion, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMinTrophies[$eLeagueTitan] = GUICtrlCreateIcon($g_sLibIconPath, $eTitan, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMinTrophies[$eLeagueLegend] = GUICtrlCreateIcon($g_sLibIconPath, $eLegend, $x + 116, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+		$g_hLblMinTrophies = GUICtrlCreateLabel("", $x + 133, $y - 15, 17, 17, $SS_CENTER)
+		GUICtrlSetFont(-1, 9, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+		GUICtrlSetColor(-1, $COLOR_BLACK)
+
 		GUICtrlCreateLabel(GetTranslated(603,13, "-"), $x + 148, $y + 4, -1, -1)
 		$g_hTxtMaxTrophy = GUICtrlCreateInput("5000", $x + 155, $y, 35, -1, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 			GUICtrlSetLimit(-1, 4)
 			_GUICtrlSetTip(-1, GetTranslated(609,4, "MAX: The Bot will drop trophies if your trophy count is greater than this value."))
 			GuiCtrlSetState(-1,$GUI_DISABLE)
+			GUICtrlSetOnEvent(-1, "TxtMaxTrophy")
+
+			$g_hPicMaxTrophies[$eLeagueUnranked] = GUICtrlCreateIcon($g_sLibIconPath, $eUnranked, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_SHOW)
+			$g_hPicMaxTrophies[$eLeagueBronze] = GUICtrlCreateIcon($g_sLibIconPath, $eBronze, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMaxTrophies[$eLeagueSilver] = GUICtrlCreateIcon($g_sLibIconPath, $eSilver, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMaxTrophies[$eLeagueGold] = GUICtrlCreateIcon($g_sLibIconPath, $eGold, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMaxTrophies[$eLeagueCrystal] = GUICtrlCreateIcon($g_sLibIconPath, $eCrystal, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMaxTrophies[$eLeagueMaster] = GUICtrlCreateIcon($g_sLibIconPath, $eMaster, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMaxTrophies[$eLeagueChampion] = GUICtrlCreateIcon($g_sLibIconPath, $eChampion, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMaxTrophies[$eLeagueTitan] = GUICtrlCreateIcon($g_sLibIconPath, $eTitan, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+			$g_hPicMaxTrophies[$eLeagueLegend] = GUICtrlCreateIcon($g_sLibIconPath, $eLegend, $x + 161, $y - 30, 24, 24)
+			GUICtrlSetState(-1,$GUI_HIDE)
+		$g_hLblMaxTrophies = GUICtrlCreateLabel("", $x + 178, $y - 15, 17, 17, $SS_CENTER)
+		GUICtrlSetFont(-1, 9, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+		GUICtrlSetColor(-1, $COLOR_BLACK)
 
 		$y += 24
 		$x += 20

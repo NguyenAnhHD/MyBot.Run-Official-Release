@@ -8,7 +8,7 @@
 ; Return values .: None
 ; Author ........: Sardo (2016)
 ; Modified ......:
-; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2016
+; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
@@ -17,8 +17,8 @@
 Func MakeDropLine($searchvect, $startpoint, $endpoint, $iLineDistanceThreshold = 75, $bLineToCorner = False)
 
 	SetDebugLog("MakeDropLine for " & UBound($searchvect) & " points")
-    If $bLineToCorner = False And UBound($searchvect) > 0 Then $startpoint = $searchvect[0]
-    If $bLineToCorner = False And UBound($searchvect) > 0 Then $endpoint = $searchvect[UBound($searchvect) - 1]
+	If $bLineToCorner = False And UBound($searchvect) > 0 Then $startpoint = $searchvect[0]
+	If $bLineToCorner = False And UBound($searchvect) > 0 Then $endpoint = $searchvect[UBound($searchvect) - 1]
 	SetDebugLog("MakeDropLine: Start = " & PixelToString($startpoint) & ", End = " & PixelToString($endpoint) & ": " & PixelArrayToString($searchvect, ","))
 
 	Local $startX = $startpoint[0]
@@ -30,8 +30,8 @@ Func MakeDropLine($searchvect, $startpoint, $endpoint, $iLineDistanceThreshold =
 	;CheckAttackLocation($endX, $endY)
 	Local $size = UBound($searchvect)
 	ReDim $searchvect[$size + 1]
-	$searchvect[$Size] = $endpoint
-	Local $Pixel0 = [$startX, $starty]
+	$searchvect[$size] = $endpoint
+	Local $Pixel0 = [$startX, $startY]
 	Local $ReturnVect = $startX & "," & $startY
 	Local $iLineIdx = -1
 
@@ -87,7 +87,7 @@ Func MakeDropLineOriginal($searchvect, $startpoint, $endpoint)
 	CheckAttackLocation($startX, $startY)
 	CheckAttackLocation($endX, $endY)
 
-	Local $point1 = [$startX, $starty]
+	Local $point1 = [$startX, $startY]
 	Local $t, $f
 	$t = 0
 	$f = 0
@@ -123,4 +123,4 @@ Func MakeDropLineOriginal($searchvect, $startpoint, $endpoint)
 	Next
 
 	Return GetListPixel($ReturnVect, ",")
-EndFunc   ;==>MakeDropLine
+EndFunc   ;==>MakeDropLineOriginal

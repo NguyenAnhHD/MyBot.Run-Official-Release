@@ -19,7 +19,7 @@ Global $hLangIcons = 0
 
 Func LoadLanguagesComboBox()
 
-	Local $hFileSearch = FileFindFirstFile($dirLanguages & "*.ini")
+	Local $hFileSearch = FileFindFirstFile($g_sDirLanguages & "*.ini")
 	Local $sFilename, $sLangDisplayName = "", $iFileIndex = 0
 
 	If $hLangIcons Then _GUIImageList_Destroy($hLangIcons)
@@ -32,12 +32,12 @@ Func LoadLanguagesComboBox()
 		$aLanguageFile[$iFileIndex][0] = StringLeft($sFilename, StringLen($sFilename) - 4)
 		; All Language Icons are made by YummyGum and can be found here: https://www.iconfinder.com/iconsets/142-mini-country-flags-16x16px
 		$aLanguageFile[$iFileIndex][2] = _GUIImageList_AddIcon($hLangIcons, @ScriptDir & "\lib\MBRBot.dll", Eval("e" & $aLanguageFile[$iFileIndex][0]) - 1 )
-		$sLangDisplayName = IniRead($dirLanguages & $sFilename, "Language", "DisplayName", "Unknown")
+		$sLangDisplayName = IniRead($g_sDirLanguages & $sFilename, "Language", "DisplayName", "Unknown")
 		$aLanguageFile[$iFileIndex][1] = $sLangDisplayName
 		If $sLangDisplayName = "Unknown" Then
 			; create a new language section and write the filename as default displayname (also for new empty language files)
-			IniWrite($dirLanguages & $sFilename, "Language", "DisplayName", StringLeft($sFilename, StringLen($sFilename) - 4)) ; removing ".ini" from filename
-			$sLangDisplayName = IniRead($dirLanguages & $sFilename, "Language", "DisplayName", "Unknown")
+			IniWrite($g_sDirLanguages & $sFilename, "Language", "DisplayName", StringLeft($sFilename, StringLen($sFilename) - 4)) ; removing ".ini" from filename
+			$sLangDisplayName = IniRead($g_sDirLanguages & $sFilename, "Language", "DisplayName", "Unknown")
 			$aLanguageFile[$iFileIndex][1] = $sLangDisplayName
 		EndIf
 
@@ -57,39 +57,43 @@ Func LoadLanguagesComboBox()
 			_GUICtrlComboBoxEx_AddString($g_hCmbGUILanguage, $aLanguageFile[$i][1], $eMissingLangIcon, $eMissingLangIcon)
 		EndIf
 	Next
-	_GUICtrlComboBoxEx_SetCurSel($g_hCmbGUILanguage, _GUICtrlComboBoxEx_FindStringExact($g_hCmbGUILanguage, $aLanguageFile[_ArraySearch($aLanguageFile, $sLanguage)][1]))
+	_GUICtrlComboBoxEx_SetCurSel($g_hCmbGUILanguage, _GUICtrlComboBoxEx_FindStringExact($g_hCmbGUILanguage, $aLanguageFile[_ArraySearch($aLanguageFile, $g_sLanguage)][1]))
 
 EndFunc   ;==>LoadLanguagesComboBox
 
 Func cmbLanguage()
 	Local $aLanguage = _GUICtrlComboBox_GetListArray($g_hCmbGUILanguage)
-	Local $sLanguageIndex = _ArraySearch($aLanguageFile, $aLanguage[_GUICtrlComboBox_GetCurSel($g_hCmbGUILanguage) + 1])
+	Local $g_sLanguageIndex = _ArraySearch($aLanguageFile, $aLanguage[_GUICtrlComboBox_GetCurSel($g_hCmbGUILanguage) + 1])
 
-	$sLanguage = $aLanguageFile[$sLanguageIndex][0] ; the filename = 0, the display name = 1
-	MsgBox("", "", GetTranslated(636, 71, "Restart Bot to load program with new language:") & " " & $aLanguageFile[$sLanguageIndex][1] & " (" & $sLanguage & ")")
-	IniWriteS($g_sProfileConfigPath, "other", "language", $sLanguage) ; save language before restarting
+	$g_sLanguage = $aLanguageFile[$g_sLanguageIndex][0] ; the filename = 0, the display name = 1
+	MsgBox("", "", GetTranslated(636, 71, "Restart Bot to load program with new language:") & " " & $aLanguageFile[$g_sLanguageIndex][1] & " (" & $g_sLanguage & ")")
+	IniWriteS($g_sProfileConfigPath, "other", "language", $g_sLanguage) ; save language before restarting
 	ShellExecute(@ScriptFullPath,$g_sProfileCurrentName & " " & $g_sAndroidEmulator & " " & $g_sAndroidInstance & " /r")
 EndFunc   ;==>cmbLanguage
 
+Func chkBotCustomTitleBarClick()
+	$g_iBotDesignFlags = BitOR(BitAND($g_iBotDesignFlags, BitNOT(1)), ((GUICtrlRead($g_hChkBotCustomTitleBarClick) = $GUI_CHECKED) ? 1 : 0))
+EndFunc   ;==>chkBotCustomTitleBarClick
+
 Func chkUseRandomClick()
-	$iUseRandomClick = (GUICtrlRead($g_hChkUseRandomClick) = $GUI_CHECKED ? 1 : 0)
+	$g_bUseRandomClick = (GUICtrlRead($g_hChkUseRandomClick) = $GUI_CHECKED)
 EndFunc   ;==>chkUseRandomClick
-
+#cs
 Func chkUpdatingWhenMinimized()
-	$iUpdatingWhenMinimized = (GUICtrlRead($g_hChkUpdatingWhenMinimized) = $GUI_CHECKED ? 1 : 0)
+	$g_bUpdatingWhenMinimized = (GUICtrlRead($g_hChkUpdatingWhenMinimized) = $GUI_CHECKED)
 EndFunc   ;==>chkUpdatingWhenMinimized
-
+#ce
 Func chkHideWhenMinimized()
-	$iHideWhenMinimized = (GUICtrlRead($g_hChkHideWhenMinimized) = $GUI_CHECKED ? 1 : 0)
-	TrayItemSetState($g_hTiHide, ($iHideWhenMinimized = 1 ? $TRAY_CHECKED : $TRAY_UNCHECKED))
+	$g_bHideWhenMinimized = (GUICtrlRead($g_hChkHideWhenMinimized) = $GUI_CHECKED)
+	TrayItemSetState($g_hTiHide, ($g_bHideWhenMinimized = 1 ? $TRAY_CHECKED : $TRAY_UNCHECKED))
 EndFunc   ;==>chkHideWhenMinimized
 
 Func chkScreenshotType()
-	$iScreenshotType = (GUICtrlRead($g_hChkScreenshotType) = $GUI_CHECKED ? 1 : 0)
+	$g_bScreenshotPNGFormat = (GUICtrlRead($g_hChkScreenshotType) = $GUI_CHECKED)
 EndFunc   ;==>chkScreenshotType
 
 Func chkScreenshotHideName()
-	$ichkScreenshotHideName = (GUICtrlRead($g_hChkScreenshotHideName) = $GUI_CHECKED ? 1 : 0)
+	$g_bScreenshotHideName = (GUICtrlRead($g_hChkScreenshotHideName) = $GUI_CHECKED)
 EndFunc   ;==>chkScreenshotHideName
 
 Func chkDeleteLogs()
@@ -151,7 +155,7 @@ Func txtSinglePBTimeForced()
 EndFunc   ;==>txtSinglePBTimeForced
 
 Func chkAutoResume()
-	$iChkAutoResume = (GUICtrlRead($g_hChkAutoResume) = $GUI_CHECKED ? 1 : 0)
+	$g_bAutoResumeEnable = (GUICtrlRead($g_hChkAutoResume) = $GUI_CHECKED)
 EndFunc
 
 Func chkDebugClick()
@@ -291,12 +295,22 @@ EndFunc   ;==>btnTestDonateCC
 Func btnTestRequestCC()
 	Local $currentRunState = $g_bRunState
 	$g_bRunState = True
-	$canRequestCC = True
+	$g_bCanRequestCC = True
 	SetLog(_PadStringCenter(" Test RequestCC begin (" & $g_sBotVersion & ")", 54, "="), $COLOR_INFO)
 	RequestCC()
 	SetLog(_PadStringCenter(" Test RequestCC end ", 54, "="), $COLOR_INFO)
 	$g_bRunState = $currentRunState
 EndFunc   ;==>btnTestRequestCC
+
+Func btnTestSendText()
+	Local $currentRunState = $g_bRunState
+	$g_bRunState = True
+	SetLog(_PadStringCenter(" Test SendText begin (" & $g_sBotVersion & ")", 54, "="), $COLOR_INFO)
+	Local $s = InputBox("Send characters to Android", "Text to send (please open a input box in Android):", "some text ;-)", "")
+	SendText($s)
+	SetLog(_PadStringCenter(" Test SendText end ", 54, "="), $COLOR_INFO)
+	$g_bRunState = $currentRunState
+EndFunc   ;==>SendText
 
 Func btnTestAttackBar()
 	Local $currentOCR = $g_iDebugOcr
@@ -309,9 +323,9 @@ Func btnTestAttackBar()
 	SetLog(_PadStringCenter(" Test Attack Bar begin (" & $g_sBotVersion & ")", 54, "="), $COLOR_INFO)
 
 	_CaptureRegion2(0, 571 + $g_iBottomOffsetY, 859, 671 + $g_iBottomOffsetY)
-	Local $result = DllCall($g_hLibFunctions, "str", "searchIdentifyTroop", "ptr", $hHBitmap2)
+	Local $result = DllCall($g_hLibMyBot, "str", "searchIdentifyTroop", "ptr", $g_hHBitmap2)
 	Setlog("DLL Troopsbar list: " & $result[0], $COLOR_DEBUG)
-	If $ichkFixClanCastle = 1 Then $result[0] = FixClanCastle($result[0])
+	If $g_bForceClanCastleDetection Then $result[0] = FixClanCastle($result[0])
 	Local $aTroopDataList = StringSplit($result[0], "|")
 	Local $aTemp[12][3]
 	If $result[0] <> "" Then
@@ -334,7 +348,7 @@ Func btnTestAttackBar()
 	Local $Date = @MDAY & "." & @MON & "." & @YEAR
 	Local $Time = @HOUR & "." & @MIN & "." & @SEC
 	$debugfile = "Test_Attack_Bar_" & $g_sBotVersion & "_" & $Date & "_" & $Time & ".png"
-	_GDIPlus_ImageSaveToFile($hBitmap, $savefolder & $debugfile)
+	_GDIPlus_ImageSaveToFile($g_hBitmap, $savefolder & $debugfile)
 	;make snapshot end
 
 	SetLog(_PadStringCenter(" Test Attack Bar end ", 54, "="), $COLOR_INFO)
@@ -370,7 +384,7 @@ Func btnTestImage()
 	If @error <> 0 Then
 		SetLog("Testing image cancelled, taking screenshot from " & $g_sAndroidEmulator, $COLOR_INFO)
 		_CaptureRegion()
-		$hHBMP = $hHBitmap
+		$hHBMP = $g_hHBitmap
 		TestCapture($hHBMP)
 	Else
 		SetLog("Testing image " & $sImageFile, $COLOR_INFO)
@@ -411,12 +425,12 @@ Func btnTestImage()
 		SetLog("Testing WaitForClouds DONE", $COLOR_SUCCESS)
 
 		SetLog("Testing checkAttackDisable...", $COLOR_SUCCESS)
-		SetLog("Testing checkAttackDisable($iTaBChkAttack)...", $COLOR_SUCCESS)
-		SetLog("checkAttackDisable($iTaBChkAttack) = " & checkAttackDisable($iTaBChkAttack))
-		SetLog("Testing checkAttackDisable($iTaBChkIdle)...", $COLOR_SUCCESS)
-		SetLog("checkAttackDisable($iTaBChkIdle) = " & checkAttackDisable($iTaBChkIdle))
-		SetLog("Testing checkAttackDisable($iTaBChkTime)...", $COLOR_SUCCESS)
-		SetLog("checkAttackDisable($iTaBChkTime) = " & checkAttackDisable($iTaBChkTime))
+		SetLog("Testing checkAttackDisable($g_iTaBChkAttack)...", $COLOR_SUCCESS)
+		SetLog("checkAttackDisable($g_iTaBChkAttack) = " & checkAttackDisable($g_iTaBChkAttack))
+		SetLog("Testing checkAttackDisable($g_iTaBChkIdle)...", $COLOR_SUCCESS)
+		SetLog("checkAttackDisable($g_iTaBChkIdle) = " & checkAttackDisable($g_iTaBChkIdle))
+		SetLog("Testing checkAttackDisable($g_iTaBChkTime)...", $COLOR_SUCCESS)
+		SetLog("checkAttackDisable($g_iTaBChkTime) = " & checkAttackDisable($g_iTaBChkTime))
 		SetLog("Testing checkAttackDisable DONE", $COLOR_SUCCESS)
 	Next
 
@@ -439,9 +453,9 @@ Func btnTestVillageSize()
 	_CaptureRegion2Sync()
 
 	SetLog("Testing GetVillageSize()", $COLOR_INFO)
-	Local $hTimer = TimerInit()
-	Local $village = GetVillageSize()
-	Local $ms = TimerDiff($hTimer)
+	Local $hTimer = __TimerInit()
+	Local $village = GetVillageSize(True)
+	Local $ms = __TimerDiff($hTimer)
 	If $village = 0 Then
 		SetLog("Village not found (" & Round($ms, 0) & " ms.)", $COLOR_WARNING)
 	Else
@@ -465,7 +479,7 @@ Func btnTestDeadBase()
 	If @error <> 0 Then
 		SetLog("Testing image cancelled, taking screenshot from " & $g_sAndroidEmulator, $COLOR_INFO)
 		_CaptureRegion()
-		$hHBMP = $hHBitmap
+		$hHBMP = $g_hHBitmap
 		TestCapture($hHBMP)
 	Else
 		SetLog("Testing image " & $sImageFile, $COLOR_INFO)
@@ -484,7 +498,7 @@ Func btnTestDeadBase()
 	ResetTHsearch()
 	SetLog("Testing FindTownhall()", $COLOR_INFO)
 	SetLog("FindTownhall() = " & FindTownhall(True), $COLOR_INFO)
-	SetLog("$IMGLOCREDLINE = " & $IMGLOCREDLINE, $COLOR_INFO)
+	SetLog("$g_sImglocRedline = " & $g_sImglocRedline, $COLOR_INFO)
 
 	SetLog("Testing checkDeadBase()", $COLOR_INFO)
 	SetLog("Result checkDeadBase() = " & checkDeadBase(), $COLOR_INFO)
@@ -520,7 +534,7 @@ Func btnTestAttackCSV()
 	If @error <> 0 Then
 		SetLog("Testing image cancelled, taking screenshot from " & $g_sAndroidEmulator, $COLOR_INFO)
 		_CaptureRegion()
-		$hHBMP = $hHBitmap
+		$hHBMP = $g_hHBitmap
 		TestCapture($hHBMP)
 	Else
 		SetLog("Testing image " & $sImageFile, $COLOR_INFO)
@@ -543,7 +557,7 @@ Func btnTestAttackCSV()
 	ResetTHsearch()
 	SetLog("Testing FindTownhall()", $COLOR_INFO)
 	SetLog("FindTownhall() = " & FindTownhall(True), $COLOR_INFO)
-	SetLog("$IMGLOCREDLINE = " & $IMGLOCREDLINE, $COLOR_INFO)
+	SetLog("$g_sImglocRedline = " & $g_sImglocRedline, $COLOR_INFO)
 
 	SetLog("Testing Algorithm_AttackCSV()", $COLOR_INFO)
 	Algorithm_AttackCSV()
@@ -575,8 +589,8 @@ EndFunc
 
 Func btnTestCleanYard()
 	Local $currentRunState = $g_bRunState
-	Local $iCurrFreeBuilderCount = $iFreeBuilderCount
-	$iTestFreeBuilderCount = 5
+	Local $iCurrFreeBuilderCount = $g_iFreeBuilderCount
+	$g_iTestFreeBuilderCount = 5
 	$g_bRunState = True
 	BeginImageTest()
 	Local $result
@@ -594,8 +608,8 @@ Func btnTestCleanYard()
 	SetLog("Testing CleanYard DONE" , $COLOR_INFO)
 	EndImageTest()
 	; restore original state
-	$iTestFreeBuilderCount = -1
-	$iFreeBuilderCount = $iCurrFreeBuilderCount
+	$g_iTestFreeBuilderCount = -1
+	$g_iFreeBuilderCount = $iCurrFreeBuilderCount
 	$g_bRunState = $currentRunState
 EndFunc
 
@@ -606,7 +620,7 @@ Func BeginImageTest($directory = $g_sProfileTempPath)
 		SetLog("Testing image cancelled, taking screenshot from " & $g_sAndroidEmulator, $COLOR_INFO)
 		ZoomOut()
 		_CaptureRegion()
-		$hHBMP = $hHBitmap
+		$hHBMP = $g_hHBitmap
 		TestCapture($hHBMP)
 		Return False
 	EndIf
@@ -648,3 +662,16 @@ Func FixClanCastle($inputString)
 	Return $OutputFinal
 
 EndFunc   ;==>FixClanCastle
+
+Func btnTestOcrMemory()
+
+	_CaptureRegion2(162, 200, 162 + 120 , 200 + 27)
+
+	For $i = 1 To 5000
+		DllCall($g_hLibMyBot, "str", "ocr", "ptr", $g_hHBitmap2, "str", "coc-DonTroops", "int", $g_iDebugOcr)
+		;getOcr($g_hHBitmap2, "coc-DonTroops")
+		;getOcrAndCapture("coc-DonTroops", 162, 200, 120, 27, True)
+
+	Next
+
+EndFunc

@@ -19,11 +19,12 @@ Global $g_hCmbScriptNameDB = 0, $g_hCmbScriptRedlineImplDB = 0, $g_hCmbScriptDro
 Global $g_hLblNotesScriptDB = 0
 
 Func CreateAttackSearchDeadBaseScripted()
-   $g_hGUI_DEADBASE_ATTACK_SCRIPTED = GUICreate("", $_GUI_MAIN_WIDTH - 195, $_GUI_MAIN_HEIGHT - 344, 150, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_DEADBASE)
+   $g_hGUI_DEADBASE_ATTACK_SCRIPTED = _GUICreate("", $_GUI_MAIN_WIDTH - 195, $g_iSizeHGrpTab4, 150, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_DEADBASE)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_DEADBASE_ATTACK_SCRIPTED)
 
    Local $x = 25, $y = 20
-	   GUICtrlCreateGroup(GetTranslated(607,1,"Deploy"), $x - 20, $y - 20, 270, 306)
+	   GUICtrlCreateGroup(GetTranslated(607,1,"Deploy"), $x - 20, $y - 20, 270, $g_iSizeHGrpTab4)
+
    ;	 $x -= 15
    ;		$chkmakeIMGCSVDB = GUICtrlCreateCheckbox(GetTranslated(607,2, "IMG"), $x + 150, $y, -1, -1)
    ;			$txtTip = GetTranslated(607,3, "Make IMG with extra info in Profile -> Temp Folder")
@@ -32,7 +33,7 @@ Func CreateAttackSearchDeadBaseScripted()
    ;			_GUICtrlSetTip(-1, $txtTip)
 
 		   $y +=15
-		   $g_hCmbScriptNameDB = GUICtrlCreateCombo("", $x, $y, 200, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
+		   $g_hCmbScriptNameDB = GUICtrlCreateCombo("", $x, $y, 200, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL, $WS_VSCROLL))
 			   _GUICtrlSetTip(-1, GetTranslated(607,4, "Choose the script; You can edit/add new scripts located in folder: 'CSV/Attack'"))
 			   GUICtrlSetState(-1, $GUI_UNCHECKED)
 			   GUICtrlSetOnEvent(-1, "cmbScriptNameDB")

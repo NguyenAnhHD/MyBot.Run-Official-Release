@@ -4,8 +4,8 @@
 ; Syntax ........: isNoUpgradeLoot($bNeedCaptureRegion), FALSE is default.
 ; Parameters ....: $bNeedCaptureRegion = True will make a new 2x2 screencapture to identify the pixels to test, False will assume there is a full screen capture to use.
 ; Return values .: True if Not enough loot, and clicks away to close the window
-; Author ........: KnowJack (May-2015)
-; Modified ......: Sardo 2015-08
+; Author ........: KnowJack (05-2015)
+; Modified ......: Sardo (08-2015)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......: Click
@@ -20,7 +20,7 @@ Func isNoUpgradeLoot($bNeedCaptureRegion = False)
 		If $g_iDebugSetlog = 1 Then Setlog("isNoUpgradeLoot Red Zero found", $COLOR_DEBUG)
 		PureClickP($aAway, 1, 0, "#0142") ; click away to close upgrade window
 		Return True
-	ElseIf _ColorCheck(_GetPixelColor(691, 523 + $g_iMidOffsetY, $bNeedCaptureRegion), Hex(0xE70A12, 6), 20) And _  ; Check Hero upgrades window
+	ElseIf _ColorCheck(_GetPixelColor(691, 523 + $g_iMidOffsetY, $bNeedCaptureRegion), Hex(0xE70A12, 6), 20) And _ ; Check Hero upgrades window
 			_ColorCheck(_GetPixelColor(691, 527 + $g_iMidOffsetY, $bNeedCaptureRegion), Hex(0xE70A12, 6), 20) And _
 			_ColorCheck(_GetPixelColor(691, 531 + $g_iMidOffsetY, $bNeedCaptureRegion), Hex(0xE70A12, 6), 20) Then ; Check for Red Zero = means not enough loot!
 		If $g_iDebugSetlog = 1 Then Setlog("IsNoUpgradeLoot Hero Red Zero Found", $COLOR_DEBUG)

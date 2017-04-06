@@ -7,7 +7,7 @@
 ; Syntax ........: GoldElixirChangeThSnipes()
 ; Parameters ....: $x
 ; Return values .: None
-; Author ........: Samota,
+; Author ........:
 ; Modified ......:
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
@@ -30,20 +30,20 @@ Func GoldElixirChangeThSnipes($x)
 		$Gold1 = getGoldVillageSearch(48, 69)
 		$Elixir1 = getElixirVillageSearch(48, 69 + 29)
 
-		Local $iBegin = TimerInit()
+		Local $iBegin = __TimerInit()
 
-		While TimerDiff($iBegin) < 2000
+		While __TimerDiff($iBegin) < 2000
 			CheckHeroesHealth()
-			If $checkKPower Or $checkQPower Then
-				If _Sleep($iDelayGoldElixirChange1) Then Return
+			If $g_bCheckKingPower Or $g_bCheckQueenPower Then
+				If _Sleep($DELAYGOLDELIXIRCHANGE1) Then Return
 			Else
-				If _Sleep($iDelayGoldElixirChange2) Then Return
+				If _Sleep($DELAYGOLDELIXIRCHANGE2) Then Return
 			EndIf
 
 			$Gold2 = getGoldVillageSearch(48, 69)
 
 			If $Gold2 = "" Then
-				If _Sleep($iDelayGoldElixirChange1) Then Return
+				If _Sleep($DELAYGOLDELIXIRCHANGE1) Then Return
 				$Gold2 = getGoldVillageSearch(48, 69)
 			EndIf
 			$Elixir2 = getElixirVillageSearch(48, 69 + 29)
@@ -55,7 +55,7 @@ Func GoldElixirChangeThSnipes($x)
 			EndIf
 
 			If ($Gold2 = "" And $Elixir2 = "") Then
-				If _Sleep($iDelayGoldElixirChange1) Then Return
+				If _Sleep($DELAYGOLDELIXIRCHANGE1) Then Return
 
 				If getGoldVillageSearch(48, 69) = "" And getElixirVillageSearch(48, 69 + 29) = "" Then
 					SetLog("Battle has finished", $COLOR_SUCCESS)

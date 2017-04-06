@@ -19,7 +19,7 @@ Func SearchTownHallLoc()
 	;how many distance tiles from border
 	Switch $g_iMatchMode
 		Case $TS
-			If $ArmyCapacity < 100 Then
+			If $g_iArmyCapacity < 100 Then
 				$addtiles = $g_iAtkTSAddTilesWhileTrain
 			Else
 				$addtiles = $g_iAtkTSAddTilesFullTroops
@@ -27,7 +27,7 @@ Func SearchTownHallLoc()
 		Case $LB
 			$addtiles = $g_iTHSnipeBeforeTiles[$LB]
 		Case $DB
-			If $duringMilkingAttack = 1 Then
+			If $g_bDuringMilkingAttack = True Then
 				$addtiles = $g_iMilkFarmTHMaxTilesFromBorder
 			Else
 				$addtiles = $g_iTHSnipeBeforeTiles[$DB]
@@ -38,29 +38,29 @@ Func SearchTownHallLoc()
 	; New Tile px on 44x44 map size : X = 16px and Y = 12px
 
 	;setlog("th add tiles = " & $addtiles)
-	If $searchTH <> "-" Then
-		If isInsideDiamondXY($THx, $THy) = False Then Return False
+	If $g_iSearchTH <> "-" Then
+		If isInsideDiamondXY($g_iTHx, $g_iTHy) = False Then Return False
 
 		For $i = 0 To 22
 
-			If $Thx < 114 + $i * 16 + Ceiling(($addtiles - 2) / 2 * 16) And $THy < 359 - $i * 12 + Ceiling(($addtiles - 2) / 2 * 12) Then
-				$THi = $i
-				$THside = 0  	; TopLeft
+			If $g_iTHx < 114 + $i * 16 + Ceiling(($addtiles - 2) / 2 * 16) And $g_iTHy < 359 - $i * 12 + Ceiling(($addtiles - 2) / 2 * 12) Then
+				$g_iTHi = $i
+				$g_iTHside = 0 ; TopLeft
 				Return True
 			EndIf
-			If $Thx < 117 + $i * 16 + Ceiling(($addtiles - 2) / 2 * 16) And $THy > 268 + $i * 12 - Floor(($addtiles - 2) / 2 * 12) Then
-				$THi = $i
-				$THside = 1 	; BottomLeft
+			If $g_iTHx < 117 + $i * 16 + Ceiling(($addtiles - 2) / 2 * 16) And $g_iTHy > 268 + $i * 12 - Floor(($addtiles - 2) / 2 * 12) Then
+				$g_iTHi = $i
+				$g_iTHside = 1 ; BottomLeft
 				Return True
 			EndIf
-			If $Thx > 743 - $i * 16 - Floor(($addtiles - 2) / 2 * 16) And $THy < 358 - $i * 12 + Ceiling(($addtiles - 2) / 2 * 12) Then
-				$THi = $i
-				$THside = 2		; TopRight
+			If $g_iTHx > 743 - $i * 16 - Floor(($addtiles - 2) / 2 * 16) And $g_iTHy < 358 - $i * 12 + Ceiling(($addtiles - 2) / 2 * 12) Then
+				$g_iTHi = $i
+				$g_iTHside = 2 ; TopRight
 				Return True
 			EndIf
-			If $Thx > 742 - $i * 16 - Floor(($addtiles - 2) / 2 * 16) And $THy > 268 + $i * 12 - Floor(($addtiles - 2) / 2 * 12) Then
-				$THi = $i
-				$THside = 3		; BottomRight
+			If $g_iTHx > 742 - $i * 16 - Floor(($addtiles - 2) / 2 * 16) And $g_iTHy > 268 + $i * 12 - Floor(($addtiles - 2) / 2 * 12) Then
+				$g_iTHi = $i
+				$g_iTHside = 3 ; BottomRight
 				Return True
 			EndIf
 		Next

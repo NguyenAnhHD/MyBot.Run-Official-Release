@@ -18,10 +18,10 @@ Func UpgradeWall()
 	If $g_bAutoUpgradeWallsEnable = True Then
 		SetLog("Checking Upgrade Walls", $COLOR_INFO)
 		If SkipWallUpgrade() Then Return
-		If $iFreeBuilderCount > 0 Then
+		If $g_iFreeBuilderCount > 0 Then
 			ClickP($aAway, 1, 0, "#0313") ; click away
-			Local $MinWallGold = Number($iGoldCurrent - $g_iWallCost) > Number($g_iUpgradeWallMinGold) ; Check if enough Gold
-			Local $MinWallElixir = Number($iElixirCurrent - $g_iWallCost) > Number($g_iUpgradeWallMinElixir) ; Check if enough Elixir
+			Local $MinWallGold = Number($g_aiCurrentLoot[$eLootGold] - $g_iWallCost) > Number($g_iUpgradeWallMinGold) ; Check if enough Gold
+			Local $MinWallElixir = Number($g_aiCurrentLoot[$eLootElixir] - $g_iWallCost) > Number($g_iUpgradeWallMinElixir) ; Check if enough Elixir
 
 			Switch $g_iUpgradeWallLootType
 				Case 0
@@ -67,7 +67,7 @@ Func UpgradeWall()
 			SetLog("No free builder, Upgrade Walls skipped..", $COLOR_ERROR)
 		EndIf
 	EndIf
-	If _Sleep($iDelayUpgradeWall1) Then Return
+	If _Sleep($DELAYUPGRADEWALL1) Then Return
 	checkMainScreen(False) ; Check for errors during function
 
 EndFunc   ;==>UpgradeWall
@@ -76,17 +76,17 @@ EndFunc   ;==>UpgradeWall
 Func UpgradeWallGold()
 
 	;Click($WallxLOC, $WallyLOC)
-	If _Sleep($iDelayRespond) Then Return
+	If _Sleep($DELAYRESPOND) Then Return
 
 	Local $offColors[3][3] = [[0xD6714B, 47, 37], [0xF0E850, 70, 0], [0xF4F8F2, 79, 0]] ; 2nd pixel brown hammer, 3rd pixel gold, 4th pixel edge of button
-	Global $ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 650 + $g_iBottomOffsetY, 1, 1, Hex(0xF3F3F1, 6), $offColors, 30) ; first gray/white pixel of button
+	Local $ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 650 + $g_iBottomOffsetY, 1, 1, Hex(0xF3F3F1, 6), $offColors, 30) ; first gray/white pixel of button
 	If IsArray($ButtonPixel) Then
 		If $g_iDebugSetlog = 1 Then
 			Setlog("ButtonPixel = " & $ButtonPixel[0] & ", " & $ButtonPixel[1], $COLOR_DEBUG) ;Debug
 			Setlog("Color #1: " & _GetPixelColor($ButtonPixel[0], $ButtonPixel[1], True) & ", #2: " & _GetPixelColor($ButtonPixel[0] + 47, $ButtonPixel[1] + 37, True) & ", #3: " & _GetPixelColor($ButtonPixel[0] + 70, $ButtonPixel[1], True) & ", #4: " & _GetPixelColor($ButtonPixel[0] + 79, $ButtonPixel[1], True), $COLOR_DEBUG)
 		EndIf
 		Click($ButtonPixel[0] + 20, $ButtonPixel[1] + 20, 1, 0, "#0316") ; Click Upgrade Gold Button
-		If _Sleep($iDelayUpgradeWallGold2) Then Return
+		If _Sleep($DELAYUPGRADEWALLGOLD2) Then Return
 
 		If _ColorCheck(_GetPixelColor(677, 150 + $g_iMidOffsetY, True), Hex(0xE1090E, 6), 20) Then ; wall upgrade window red x
 			If isNoUpgradeLoot(False) = True Then
@@ -100,12 +100,12 @@ Func UpgradeWallGold()
 				SetLog("Upgrade stopped due no loot", $COLOR_ERROR)
 				Return False
 			Else
-				If _Sleep($iDelayUpgradeWallGold3) Then Return
+				If _Sleep($DELAYUPGRADEWALLGOLD3) Then Return
 				SetLog("Upgrade complete", $COLOR_SUCCESS)
 				PushMsg("UpgradeWithGold")
-				$iNbrOfWallsUppedGold += 1
-				$iNbrOfWallsUpped += 1
-				$iCostGoldWall += $g_iWallCost
+				$g_iNbrOfWallsUppedGold += 1
+				$g_iNbrOfWallsUpped += 1
+				$g_iCostGoldWall += $g_iWallCost
 				UpdateStats()
 				Return True
 			EndIf
@@ -121,14 +121,14 @@ EndFunc   ;==>UpgradeWallGold
 Func UpgradeWallElixir()
 
 	;Click($WallxLOC, $WallyLOC)
-	If _Sleep($iDelayRespond) Then Return
+	If _Sleep($DELAYRESPOND) Then Return
 
 	Local $offColors[3][3] = [[0xBC5B31, 38, 32], [0xF84CF9, 72, 0], [0xF5F9F2, 79, 0]] ; 2nd pixel brown hammer, 3rd pixel gold, 4th pixel edge of button
-	Global $ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 650 + $g_iBottomOffsetY, 1, 1, Hex(0xF4F7F2, 6), $offColors, 30) ; first gray/white pixel of button
+	Local $ButtonPixel = _MultiPixelSearch(240, 563 + $g_iBottomOffsetY, 670, 650 + $g_iBottomOffsetY, 1, 1, Hex(0xF4F7F2, 6), $offColors, 30) ; first gray/white pixel of button
 	If IsArray($ButtonPixel) Then
 		Click($ButtonPixel[0] + 20, $ButtonPixel[1] + 20, 1, 0, "#0322") ; Click Upgrade Elixir Button
 
-		If _Sleep($iDelayUpgradeWallElixir2) Then Return
+		If _Sleep($DELAYUPGRADEWALLELIXIR2) Then Return
 		If _ColorCheck(_GetPixelColor(677, 150 + $g_iMidOffsetY, True), Hex(0xE1090E, 6), 20) Then
 			If isNoUpgradeLoot(False) = True Then
 				SetLog("Upgrade stopped due to insufficient loot", $COLOR_ERROR)
@@ -141,12 +141,12 @@ Func UpgradeWallElixir()
 				SetLog("Upgrade stopped due to insufficient loot", $COLOR_ERROR)
 				Return False
 			Else
-				If _Sleep($iDelayUpgradeWallElixir3) Then Return
+				If _Sleep($DELAYUPGRADEWALLELIXIR3) Then Return
 				SetLog("Upgrade complete", $COLOR_SUCCESS)
 				PushMsg("UpgradeWithElixir")
-				$iNbrOfWallsUppedElixir += 1
-				$iNbrOfWallsUpped += 1
-				$iCostElixirWall += $g_iWallCost
+				$g_iNbrOfWallsUppedElixir += 1
+				$g_iNbrOfWallsUpped += 1
+				$g_iCostElixirWall += $g_iWallCost
 				UpdateStats()
 				Return True
 			EndIf
@@ -173,16 +173,16 @@ Func SkipWallUpgrade() ; Dynamic Upgrades
 	Local $iAvailBuilderCount = 0
 
 	If getBuilderCount() = False Then Return True ; update builder data, return true to skip if problem
-	If _Sleep($iDelayRespond) Then Return True
+	If _Sleep($DELAYRESPOND) Then Return True
 
-	$iAvailBuilderCount = $iFreeBuilderCount ; capture local copy of free builders
+	$iAvailBuilderCount = $g_iFreeBuilderCount ; capture local copy of free builders
 
 	;;;;; Check building upgrade resouce needs .vs. available resources for walls
 	For $iz = 0 To UBound($g_avBuildingUpgrades, 1) - 1 ; loop through all upgrades to see if any are enabled.
 		If $g_abBuildingUpgradeEnable[$iz] = True Then $iUpgradeAction += 1 ; count number enabled
 	Next
 
-	If $iFreeBuilderCount > ($g_bUpgradeWallSaveBuilder ? 1 : 0) And $iUpgradeAction > 0 Then  ; check if builder available for bldg upgrade, and upgrades enabled
+	If $g_iFreeBuilderCount > ($g_bUpgradeWallSaveBuilder ? 1 : 0) And $iUpgradeAction > 0 Then ; check if builder available for bldg upgrade, and upgrades enabled
 		For $iz = 0 To UBound($g_avBuildingUpgrades, 1) - 1
 			; internal check if builder still available, if loop index upgrade slot is enabled, and if repeat upgrade is done/ready for next upgrade
 			If $iAvailBuilderCount > ($g_bUpgradeWallSaveBuilder ? 1 : 0) And $g_abBuildingUpgradeEnable[$iz] = True And ($g_avBuildingUpgrades[$iz][7] = "" And $g_abUpgradeRepeatEnable[$iz]) Then
@@ -200,19 +200,19 @@ Func SkipWallUpgrade() ; Dynamic Upgrades
 		If $iBuildingsNeedGold > 0 Or $iBuildingsNeedElixir > 0 Then ; if upgrade enabled and building upgrade resource is required, log user messages.
 			Switch $g_iUpgradeWallLootType
 				Case 0 ; Using gold
-					If $iGoldCurrent - ($iBuildingsNeedGold + $g_iWallCost + Number($g_iUpgradeWallMinGold)) < 0 Then
+					If $g_aiCurrentLoot[$eLootGold] - ($iBuildingsNeedGold + $g_iWallCost + Number($g_iUpgradeWallMinGold)) < 0 Then
 						SetLog("Skip Wall upgrade -insufficient gold for selected upgrades", $COLOR_WARNING)
 						Return True
 					EndIf
 				Case 1 ; Using elixir
-					If $iElixirCurrent - ($iBuildingsNeedElixir + $g_iWallCost + Number($g_iUpgradeWallMinElixir)) < 0 Then
+					If $g_aiCurrentLoot[$eLootElixir] - ($iBuildingsNeedElixir + $g_iWallCost + Number($g_iUpgradeWallMinElixir)) < 0 Then
 						SetLog("Skip Wall upgrade - insufficient elixir for selected upgrades", $COLOR_WARNING)
 						Return True
 					EndIf
 				Case 2 ; Using gold and elixir
-					If $iGoldCurrent - ($iBuildingsNeedGold + $g_iWallCost + Number($g_iUpgradeWallMinGold)) < 0 Then
+					If $g_aiCurrentLoot[$eLootGold] - ($iBuildingsNeedGold + $g_iWallCost + Number($g_iUpgradeWallMinGold)) < 0 Then
 						SetLog("Wall upgrade: insufficient gold for selected upgrades", $COLOR_WARNING)
-						If $iElixirCurrent - ($iBuildingsNeedElixir + $g_iWallCost + Number($g_iUpgradeWallMinElixir)) >= 0 Then
+						If $g_aiCurrentLoot[$eLootElixir] - ($iBuildingsNeedElixir + $g_iWallCost + Number($g_iUpgradeWallMinElixir)) >= 0 Then
 							Setlog("Using Elixir only for wall Upgrade", $COLOR_SUCCESS1)
 							$g_iUpgradeWallLootType = 1
 						Else
@@ -220,9 +220,9 @@ Func SkipWallUpgrade() ; Dynamic Upgrades
 							Return True
 						EndIf
 					EndIf
-					If $iElixirCurrent - ($iBuildingsNeedElixir + $g_iWallCost + Number($g_iUpgradeWallMinElixir)) < 0 Then
+					If $g_aiCurrentLoot[$eLootElixir] - ($iBuildingsNeedElixir + $g_iWallCost + Number($g_iUpgradeWallMinElixir)) < 0 Then
 						SetLog("Wall upgrade: insufficient elixir for selected upgrades", $COLOR_WARNING)
-						If $iGoldCurrent - ($iBuildingsNeedGold + $g_iWallCost + Number($g_iUpgradeWallMinGold)) >= 0 Then
+						If $g_aiCurrentLoot[$eLootGold] - ($iBuildingsNeedGold + $g_iWallCost + Number($g_iUpgradeWallMinGold)) >= 0 Then
 							Setlog("Using Gold only for wall Upgrade", $COLOR_SUCCESS1)
 							$g_iUpgradeWallLootType = 0
 						Else
@@ -232,21 +232,21 @@ Func SkipWallUpgrade() ; Dynamic Upgrades
 					EndIf
 			EndSwitch
 		EndIf
-		If _Sleep($iDelayRespond) Then Return True
+		If _Sleep($DELAYRESPOND) Then Return True
 	EndIf
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;End bldg upgrade value checking
 
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;##### Verify the Upgrade troop kind in Laboratory , if is elixir Spell/Troop , the Lab have priority #####;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	Local $bMinWallElixir = Number($iElixirCurrent) > ($g_iWallCost + Number($iLaboratoryElixirCost) + Number($g_iUpgradeWallMinElixir)) ; Check if enough Elixir
+	Local $bMinWallElixir = Number($g_aiCurrentLoot[$eLootElixir]) > ($g_iWallCost + Number($g_iLaboratoryElixirCost) + Number($g_iUpgradeWallMinElixir)) ; Check if enough Elixir
 	If $g_bAutoLabUpgradeEnable = True And $g_iCmbLaboratory >= 1 And $g_iCmbLaboratory <= 18 And $bMinWallElixir = False Then
 		For $i = 1 To 18
 			If $g_iCmbLaboratory = $i Then
-				Local $sName = $aLabTroops[$i][3]
+				Local $sName = $g_avLabTroops[$i][3]
 				ExitLoop
 			EndIf
 		Next
-		Local $LabElixirNeeded = $iLaboratoryElixirCost
-		If  $LabElixirNeeded = 0 Then  $LabElixirNeeded = "unknown" ; trap error condition of unknown value
+		Local $LabElixirNeeded = $g_iLaboratoryElixirCost
+		If $LabElixirNeeded = 0 Then $LabElixirNeeded = "unknown" ; trap error condition of unknown value
 		Switch $g_iUpgradeWallLootType
 			Case 0 ; Using gold
 				; do nothing

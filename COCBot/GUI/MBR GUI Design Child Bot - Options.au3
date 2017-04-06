@@ -14,7 +14,7 @@
 ; ===============================================================================================================================
 #include-once
 
-;$hGUI_BotOptions = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_BOT)
+;$hGUI_BotOptions = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_BOT)
 ;GUISwitch($hGUI_BotOptions)
 
 Global $g_hCmbGUILanguage = 0
@@ -22,7 +22,8 @@ Global $g_hChkDisableSplash = 0, $g_hChkForMBRUpdates = 0, $g_hChkDeleteLogs = 0
 	   $g_hChkDeleteLoots = 0, $g_hTxtDeleteLootsDays = 0
 Global $g_hChkAutostart = 0, $g_hTxtAutostartDelay = 0, $g_hChkCheckGameLanguage = 0, $g_hChkAutoAlign = 0, $g_hTxtAlignOffsetX = 0, $g_hTxtAlignOffsetY = 0, _
 	   $g_hCmbAlignmentOptions = 0
-Global $g_hChkUpdatingWhenMinimized = 0, $g_hChkHideWhenMinimized = 0, $g_hChkUseRandomClick = 0, $g_hChkScreenshotType = 0, $g_hChkScreenshotHideName = 0, _
+;Global $g_hChkUpdatingWhenMinimized = 0
+Global $g_hChkBotCustomTitleBarClick = 0, $g_hChkHideWhenMinimized = 0, $g_hChkUseRandomClick = 0, $g_hChkScreenshotType = 0, $g_hChkScreenshotHideName = 0, _
 	   $g_hTxtTimeAnotherDevice = 0
 Global $g_hChkSinglePBTForced = 0, $g_hTxtSinglePBTimeForced = 0, $g_hTxtPBTimeForcedExit = 0, $g_hChkFixClanCastle = 0, $g_hChkAutoResume = 0, $g_hTxtAutoResumeTime = 0
 
@@ -139,10 +140,17 @@ Func CreateBotOptions()
 
    Local $x = 240, $y = 45
    GUICtrlCreateGroup(GetTranslated(636,93, "Advanced"), $x - 20, $y - 20, 225, 102)
+	   #cs
 	   $g_hChkUpdatingWhenMinimized = GUICtrlCreateCheckbox(GetTranslated(636,96, "Updating when minimized"), $x, $y, -1, -1)
 		   GUICtrlSetState(-1, $GUI_DISABLE) ; must be always enabled
 		   GUICtrlSetOnEvent(-1, "chkUpdatingWhenMinimized")
 		   _GUICtrlSetTip(-1, GetTranslated(636,97, "Enable different minimize routine for bot window.\r\nWhen bot is minimized, screen updates are shown in taskbar preview."))
+	   $y += 19
+	   #ce
+	   $g_hChkBotCustomTitleBarClick = GUICtrlCreateCheckbox(GetTranslated(636,124, "My Bot design Title Bar"), $x, $y, -1, -1)
+		   If BitAND($g_iBotDesignFlags, 1) Then GUICtrlSetState(-1, $GUI_CHECKED)
+		   GUICtrlSetOnEvent(-1, "chkBotCustomTitleBarClick")
+		   _GUICtrlSetTip(-1, GetTranslated(636,125, "Enable optimized My Bot Window Title Bar and\r\nthin Window Border (restart of bot is required)"))
 	   $y += 19
 	   $g_hChkHideWhenMinimized = GUICtrlCreateCheckbox(GetTranslated(636,98, "Hide when minimized"), $x, $y, -1, -1)
 		   GUICtrlSetOnEvent(-1, "chkHideWhenMinimized")

@@ -4,8 +4,8 @@
 ; Syntax ........: checkArmyCamp()
 ; Parameters ....:
 ; Return values .: None
-; Author ........: Code Monkey #4,342
-; Modified ......: Sardo 2015-08, KnowJack(Aug2015). ProMac ( 08-2015)
+; Author ........:
+; Modified ......: Sardo (08-2015), KnowJack(08-2015). ProMac (08-2015)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -25,45 +25,45 @@ Func checkArmyCamp($bOpenArmyWindow = False, $bCloseArmyWindow = False, $bGetHer
 			SetError(2)
 			Return ; not open, requested to be open - error.
 		EndIf
-		If _Sleep($iDelaycheckArmyCamp5) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP5) Then Return
 	EndIf
 
 	GetArmyCapacity()
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 
 	;getArmyTroopCount() ; OLD METTHOD to detect troops on army over view window
-	If ISArmyWindow(False, $ArmyTAB) then CheckExistentArmy("Troops") ; Imgloc Method
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If ISArmyWindow(False, $ArmyTAB) Then CheckExistentArmy("Troops") ; Imgloc Method
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 
 	getArmyTroopTime()
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 
 	Local $HeroesRegenTime
 	getArmyHeroCount()
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 	If $bGetHeroesTime = True Then $HeroesRegenTime = getArmyHeroTime("all")
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 
 	getArmySpellCapacity()
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 
-	If ISArmyWindow(False, $ArmyTAB) then CheckExistentArmy("Spells") ; Imgloc Method
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If ISArmyWindow(False, $ArmyTAB) Then CheckExistentArmy("Spells") ; Imgloc Method
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 
 	getArmySpellTime()
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 
 	getArmyCCStatus()
-	If _Sleep($iDelaycheckArmyCamp6) Then Return ; 10ms improve pause button response
+	If _Sleep($DELAYCHECKARMYCAMP6) Then Return ; 10ms improve pause button response
 
-	If Not $fullArmy Then DeleteExcessTroops()
+	If Not $g_bFullArmy Then DeleteExcessTroops()
 
 	If $bCloseArmyWindow = True Then
 		ClickP($aAway, 1, 0, "#0000") ;Click Away
-		If _Sleep($iDelaycheckArmyCamp4) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP4) Then Return
 	EndIf
 
-	If $g_iDebugSetlogTrain = 1 Then SETLOG("End checkArmyCamp: canRequestCC= " & $canRequestCC & ", fullArmy= " & $fullArmy, $COLOR_DEBUG)
+	If $g_iDebugSetlogTrain = 1 Then SETLOG("End checkArmyCamp: canRequestCC= " & $g_bCanRequestCC & ", fullArmy= " & $g_bFullArmy, $COLOR_DEBUG)
 
 	Return $HeroesRegenTime
 
@@ -72,7 +72,7 @@ EndFunc   ;==>checkArmyCamp
 Func IsTroopToDonateOnly($pTroopType)
 
 	If $g_abAttackTypeEnable[$DB] Then
-		Local $tempArr = $troopsToBeUsed[$g_aiAttackTroopSelection[$DB]]
+		Local $tempArr = $g_aaiTroopsToBeUsed[$g_aiAttackTroopSelection[$DB]]
 		For $x = 0 To UBound($tempArr) - 1
 			If $tempArr[$x] = $pTroopType Then
 				Return False
@@ -80,7 +80,7 @@ Func IsTroopToDonateOnly($pTroopType)
 		Next
 	EndIf
 	If $g_abAttackTypeEnable[$LB] Then
-		Local $tempArr = $troopsToBeUsed[$g_aiAttackTroopSelection[$LB]]
+		Local $tempArr = $g_aaiTroopsToBeUsed[$g_aiAttackTroopSelection[$LB]]
 		For $x = 0 To UBound($tempArr) - 1
 			If $tempArr[$x] = $pTroopType Then
 				Return False

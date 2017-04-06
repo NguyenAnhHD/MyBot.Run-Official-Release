@@ -17,15 +17,16 @@
 #include-once
 
 Func _Sleep($iDelay, $iSleep = True, $CheckRunState = True, $SleepWhenPaused = True)
-    Static $hTimer_SetTime = 0
+	Static $hTimer_SetTime = 0
 	Static $hTimer_PBRemoteControlInterval = 0
-    Static $hTimer_PBDeleteOldPushesInterval = 0
-    Static $hTimer_EmptyWorkingSetAndroid = 0
+	Static $hTimer_PBDeleteOldPushesInterval = 0
+	Static $hTimer_EmptyWorkingSetAndroid = 0
 	Static $hTimer_EmptyWorkingSetBot = 0
 
-	Local $iBegin = TimerInit()
+	Local $iBegin = __TimerInit()
 
 	debugGdiHandle("_Sleep")
+	CheckBotRequests() ; check if bot window should be moved, minized etc.
 
 	If SetCriticalMessageProcessing() = False Then
 
@@ -34,27 +35,32 @@ Func _Sleep($iDelay, $iSleep = True, $CheckRunState = True, $SleepWhenPaused = T
 			$g_bMoveDivider = False
 		EndIf
 
-		If $iDelay > 0 And TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout Then
+		If $iDelay > 0 And __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout Then
 			If $g_bNotifyDeleteAllPushesNow = True Then PushMsg("DeleteAllPBMessages") ; only when button is pushed, and only when on a sleep cyle
 
-			If TimerDiff($hTimer_PBRemoteControlInterval) >= $g_iPBRemoteControlInterval Then
+			If __TimerDiff($hTimer_PBRemoteControlInterval) >= $g_iPBRemoteControlInterval Then
 				PushBulletRemoteControl()
-				$hTimer_PBRemoteControlInterval = TimerInit()
+				$hTimer_PBRemoteControlInterval = __TimerInit()
 			EndIf
-			If TimerDiff($hTimer_PBDeleteOldPushesInterval) >= $g_iPBDeleteOldPushesInterval Then
+			If __TimerDiff($hTimer_PBDeleteOldPushesInterval) >= $g_iPBDeleteOldPushesInterval Then
 				PushBulletDeleteOldPushes()
-				$hTimer_PBDeleteOldPushesInterval = TimerInit()
+				$hTimer_PBDeleteOldPushesInterval = __TimerInit()
 			EndIf
-			If $g_bRunState And TestCapture() = False And TimerDiff($hTimer_EmptyWorkingSetAndroid) >= $g_iEmptyWorkingSetAndroid Then
+			If $g_iEmptyWorkingSetAndroid > 0 And __TimerDiff($hTimer_EmptyWorkingSetAndroid) >= $g_iEmptyWorkingSetAndroid * 1000 And $g_bRunState And TestCapture() = False Then
 				If IsArray(getAndroidPos(True)) = 1 Then _WinAPI_EmptyWorkingSet(GetAndroidPid()) ; Reduce Working Set of Android Process
-				$hTimer_EmptyWorkingSetAndroid = TimerInit()
+				$hTimer_EmptyWorkingSetAndroid = __TimerInit()
 			EndIf
-			If TimerDiff($hTimer_EmptyWorkingSetBot) >= $g_iEmptyWorkingSetBot Then
-				ReduceBotMemory()
-				$hTimer_EmptyWorkingSetBot = TimerInit()
-			EndIF
+			If $g_iEmptyWorkingSetBot > 0 And __TimerDiff($hTimer_EmptyWorkingSetBot) >= $g_iEmptyWorkingSetBot * 1000 Then
+				ReduceBotMemory(False)
+				$hTimer_EmptyWorkingSetBot = __TimerInit()
+			EndIf
 
 			CheckPostponedLog()
+
+			If BotCloseRequestProcessed() Then
+				BotClose() ; improve responsive bot close
+				Return True
+			EndIf
 		EndIf
 	EndIf
 	;AndroidEmbedCheck()
@@ -63,7 +69,7 @@ Func _Sleep($iDelay, $iSleep = True, $CheckRunState = True, $SleepWhenPaused = T
 		ResumeAndroid()
 		Return True
 	EndIf
-	Local $iRemaining = $iDelay - TimerDiff($iBegin)
+	Local $iRemaining = $iDelay - __TimerDiff($iBegin)
 	While $iRemaining > 0
 		DllCall($g_hLibNTDLL, "dword", "ZwYieldExecution")
 		If $CheckRunState = True And $g_bRunState = False Then
@@ -74,35 +80,36 @@ Func _Sleep($iDelay, $iSleep = True, $CheckRunState = True, $SleepWhenPaused = T
 			If $g_bBotPaused And $SleepWhenPaused And $g_bTogglePauseAllowed Then TogglePauseSleep() ; Bot is paused
 			If $g_bTogglePauseUpdateState Then TogglePauseUpdateState("_Sleep") ; Update Pause GUI states
 			If $g_bMakeScreenshotNow = True Then
-				If $iScreenshotType = 0 Then
+				If $g_bScreenshotPNGFormat = False Then
 					MakeScreenshot($g_sProfileTempPath, "jpg")
 				Else
 					MakeScreenshot($g_sProfileTempPath, "png")
 				EndIf
 			EndIf
-			If TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout Then
-				If $g_bRunState And Not $bSearchMode And Not $g_bBotPaused And ($hTimer_SetTime = 0 Or TimerDiff($hTimer_SetTime) >= 750) Then
+			If __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout Then
+				If $g_bRunState And Not $g_bSearchMode And Not $g_bBotPaused And ($hTimer_SetTime = 0 Or __TimerDiff($hTimer_SetTime) >= 750) Then
 					SetTime()
-					$hTimer_SetTime = TimerInit()
+					$hTimer_SetTime = __TimerInit()
 				EndIf
 				AndroidEmbedCheck()
 				AndroidShieldCheck()
 				CheckPostponedLog()
 			EndIf
 		EndIf
-		$iRemaining = $iDelay - TimerDiff($iBegin)
-		If $iRemaining >= $iDelaySleep Then
-			_SleepMilli($iDelaySleep)
+		$iRemaining = $iDelay - __TimerDiff($iBegin)
+		If $iRemaining >= $DELAYSLEEP Then
+			_SleepMilli($DELAYSLEEP)
 		Else
 			_SleepMilli($iRemaining)
 		EndIf
+		CheckBotRequests() ; check if bot window should be moved
 	WEnd
 	Return False
 EndFunc   ;==>_Sleep
 
 Func _SleepMicro($iMicroSec)
-    DllStructSetData($hStruct_SleepMicro, "time", $iMicroSec * -10)
-    DllCall($g_hLibNTDLL, "dword", "ZwDelayExecution", "int", 0, "ptr", $pStruct_SleepMicro)
+	DllStructSetData($g_hStruct_SleepMicro, "time", $iMicroSec * -10)
+	DllCall($g_hLibNTDLL, "dword", "ZwDelayExecution", "int", 0, "ptr", $g_pStruct_SleepMicro)
 EndFunc   ;==>_SleepMicro
 
 Func _SleepMilli($iMilliSec)

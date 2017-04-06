@@ -13,7 +13,7 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-Global $TempBot[4] = [1, 10, 20, 0]
+Global $g_aiTempBot[4] = [1, 10, 20, 0]
 
 Func ClickZone ($x, $y, $Offset = 7, $debugtxt = "", $times = 1, $speed = 0, $OutScreen = (680 + $g_iBottomOffsetY), $scale = 3, $density = 1, $centerX = 0, $centerY = 0)
 	Local $BasY
@@ -22,12 +22,12 @@ Func ClickZone ($x, $y, $Offset = 7, $debugtxt = "", $times = 1, $speed = 0, $Ou
 	Else
 		$BasY = $y-$Offset
 	EndIf
-	Dim $TempBot[4] = [$x-$Offset, $BasY, $x+$Offset, $y+$Offset]
+	Dim $g_aiTempBot[4] = [$x-$Offset, $BasY, $x+$Offset, $y+$Offset]
 	If $g_iDebugClick = 1 Then
 		Local $txt = _DecodeDebug($debugtxt)
 		SetLog("ClickZone " & $x & "," & $y & "," & $times & "," & $speed & " " & $debugtxt & $txt, $COLOR_ACTION, "Verdana", "7.5", 0)
 	EndIf
-	ClickR($TempBot,$x, $y, $times, $speed, $OutScreen, $scale, $density, $centerX, $centerY)
+	ClickR($g_aiTempBot,$x, $y, $times, $speed, $OutScreen, $scale, $density, $centerX, $centerY)
 EndFunc
 
 Func ClickR($boundingBox, $x, $y, $times = 1, $speed = 0, $OutScreen = (680 + $g_iBottomOffsetY), $scale = 3, $density = 1, $centerX = 0, $centerY = 0)
@@ -37,7 +37,7 @@ Func ClickR($boundingBox, $x, $y, $times = 1, $speed = 0, $OutScreen = (680 + $g
 	Local $boxHeight = $boundingBox[3] - $boundingBox[1]
 	Local $boxCenterX = $boundingBox[0] + $boxWidth/2 + $centerX
 	Local $boxCenterY = $boundingBox[1] + $boxHeight/2 + $centerY
-	Local $loopStartTime = TimerInit()
+	Local $loopStartTime = __TimerInit()
 	Do
 		Local $angle = Random() * 2 *$PI
 		Local $xR = Random()
@@ -47,7 +47,7 @@ Func ClickR($boundingBox, $x, $y, $times = 1, $speed = 0, $OutScreen = (680 + $g
 			Local $offsetY = $distance * Cos($angle)
 			$x = $boxCenterX + $boxWidth * $offsetX/4
 			$y = $boxCenterY + $boxHeight * $offsetY/4
-			If TimerDiff($loopStartTime)>5000 Then
+			If __TimerDiff($loopStartTime)>5000 Then
 			$x = $boxCenterX
 			$y = $boxCenterY
 			ExitLoop
@@ -80,7 +80,7 @@ Func PureClickR($boundingBox, $x, $y, $times = 1, $speed = 0, $OutScreen = (680 
 	Local $boxHeight = $boundingBox[3] - $boundingBox[1]
 	Local $boxCenterX = $boundingBox[0] + $boxWidth/2 + $centerX
 	Local $boxCenterY = $boundingBox[1] + $boxHeight/2 + $centerY
-	Local $loopStartTime = TimerInit()
+	Local $loopStartTime = __TimerInit()
 	Do
 		Local $angle = Random() * 2 *$PI
 		Local $xR = Random()
@@ -90,7 +90,7 @@ Func PureClickR($boundingBox, $x, $y, $times = 1, $speed = 0, $OutScreen = (680 
 			Local $offsetY = $distance * Cos($angle)
 			$x = $boxCenterX + $boxWidth * $offsetX/4
 			$y = $boxCenterY + $boxHeight * $offsetY/4
-			If TimerDiff($loopStartTime)>5000 Then
+			If __TimerDiff($loopStartTime)>5000 Then
 			$x = $boxCenterX
 			$y = $boxCenterY
 			ExitLoop
@@ -123,7 +123,7 @@ Func GemClickR($boundingBox,$x, $y, $times = 1, $speed = 0, $debugtxt = "", $Out
 	Local $boxHeight = $boundingBox[3] - $boundingBox[1]
 	Local $boxCenterX = $boundingBox[0] + $boxWidth/2 + $centerX
 	Local $boxCenterY = $boundingBox[1] + $boxHeight/2 + $centerY
-	Local $loopStartTime = TimerInit()
+	Local $loopStartTime = __TimerInit()
 	Do
 		Local $angle = Random() * 2 *$PI
 		Local $xR = Random()
@@ -133,7 +133,7 @@ Func GemClickR($boundingBox,$x, $y, $times = 1, $speed = 0, $debugtxt = "", $Out
 			Local $offsetY = $distance * Cos($angle)
 			$x = $boxCenterX + $boxWidth * $offsetX/4
 			$y = $boxCenterY + $boxHeight * $offsetY/4
-			If TimerDiff($loopStartTime)>5000 Then
+			If __TimerDiff($loopStartTime)>5000 Then
 			$x = $boxCenterX
 			$y = $boxCenterY
 			ExitLoop

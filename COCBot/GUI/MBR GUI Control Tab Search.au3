@@ -5,7 +5,7 @@
 ; Parameters ....: None
 ; Return values .: None
 ; Author ........: GkevinOD (2014)
-; Modified ......: Hervidero (2015), CodeSlinger69 [2017]
+; Modified ......: Hervidero (2015), CodeSlinger69 [2017], MonkeyHunter (03-2017)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -38,6 +38,7 @@ EndFunc   ;==>chkDBMeetDE
 
 Func chkDBMeetTrophy()
 	_GUICtrlEdit_SetReadOnly($g_hTxtDBMinTrophy, GUICtrlRead($g_hChkDBMeetTrophy) = $GUI_CHECKED ? False : True)
+	_GUICtrlEdit_SetReadOnly($g_hTxtDBMaxTrophy, GUICtrlRead($g_hChkDBMeetTrophy) = $GUI_CHECKED ? False : True)
 EndFunc   ;==>chkDBMeetTrophy
 
 Func chkDBMeetTH()
@@ -77,6 +78,7 @@ EndFunc   ;==>chkABMeetDE
 
 Func chkABMeetTrophy()
 	_GUICtrlEdit_SetReadOnly($g_hTxtABMinTrophy, GUICtrlRead($g_hChkABMeetTrophy) = $GUI_CHECKED ? False : True)
+	_GUICtrlEdit_SetReadOnly($g_hTxtABMaxTrophy, GUICtrlRead($g_hChkABMeetTrophy) = $GUI_CHECKED ? False : True)
 EndFunc   ;==>chkABMeetTrophy
 
 Func chkABMeetTH()
@@ -123,7 +125,7 @@ Func chkDBActivateSearches()
 		GUICtrlSetState($g_hLblDBSearches, $GUI_ENABLE)
 		GUICtrlSetState($g_hTxtDBSearchesMax, $GUI_ENABLE)
 		;DBPanel($GUI_SHOW)
-		;_GUI_Value_STATE("SHOW", $groupSearchDB)
+		;_GUI_Value_STATE("SHOW", $g_aGroupSearchDB)
 		;cmbDBGoldElixir()
 		;_GUI_Value_STATE("SHOW", $groupHerosDB)
 	Else
@@ -131,7 +133,7 @@ Func chkDBActivateSearches()
 		GUICtrlSetState($g_hLblDBSearches, $GUI_DISABLE)
 		GUICtrlSetState($g_hTxtDBSearchesMax, $GUI_DISABLE)
 		;DBPanel($GUI_HIDE)
-		;_GUI_Value_STATE("HIDE", $groupSearchDB)
+		;_GUI_Value_STATE("HIDE", $g_aGroupSearchDB)
 		;_GUI_Value_STATE("HIDE", $groupHerosDB)
 	EndIf
 	;EnableSearchPanels($DB)
@@ -143,14 +145,14 @@ Func chkDBActivateTropies()
 		GUICtrlSetState($g_hTxtDBTropiesMin, $GUI_ENABLE)
 		GUICtrlSetState($g_hLblDBTropies, $GUI_ENABLE)
 		GUICtrlSetState($g_hTxtDBTropiesMax, $GUI_ENABLE)
-		;_GUI_Value_STATE("SHOW", $groupSearchDB)
+		;_GUI_Value_STATE("SHOW", $g_aGroupSearchDB)
 		;cmbDBGoldElixir()
 		;_GUI_Value_STATE("SHOW", $groupHerosDB)
 	Else
 		GUICtrlSetState($g_hTxtDBTropiesMin, $GUI_DISABLE)
 		GUICtrlSetState($g_hLblDBTropies, $GUI_DISABLE)
 		GUICtrlSetState($g_hTxtDBTropiesMax, $GUI_DISABLE)
-		;_GUI_Value_STATE("HIDE", $groupSearchDB)
+		;_GUI_Value_STATE("HIDE", $g_aGroupSearchDB)
 		;_GUI_Value_STATE("HIDE", $groupHerosDB)
 	EndIf
 	;EnableSearchPanels($DB)
@@ -161,13 +163,13 @@ Func chkDBActivateCamps()
 	If GUICtrlRead($g_hChkDBActivateCamps) = $GUI_CHECKED Then
 		GUICtrlSetState($g_hLblDBArmyCamps, $GUI_ENABLE)
 		GUICtrlSetState($g_hTxtDBArmyCamps, $GUI_ENABLE)
-		;_GUI_Value_STATE("SHOW", $groupSearchDB)
+		;_GUI_Value_STATE("SHOW", $g_aGroupSearchDB)
 		;cmbDBGoldElixir()
 		;_GUI_Value_STATE("SHOW", $groupHerosDB)
 	Else
 		GUICtrlSetState($g_hLblDBArmyCamps, $GUI_DISABLE)
 		GUICtrlSetState($g_hTxtDBArmyCamps, $GUI_DISABLE)
-		;_GUI_Value_STATE("HIDE", $groupSearchDB)
+		;_GUI_Value_STATE("HIDE", $g_aGroupSearchDB)
 		;_GUI_Value_STATE("HIDE", $groupHerosDB)
 	EndIf
 	;EnableSearchPanels($DB)
@@ -175,7 +177,7 @@ Func chkDBActivateCamps()
 EndFunc   ;==>chkDBActivateCamps
 
 Func EnableSearchPanels($mode)
-	;_GUI_Value_STATE("HIDE", $groupAttackDBSpell&"#"&$groupIMGAttackDBSpell&"#"&$groupAttackABSpell&"#"&$groupIMGAttackABSpell)
+	;_GUI_Value_STATE("HIDE", $g_aGroupAttackDBSpell&"#"&$groupIMGAttackDBSpell&"#"&$groupAttackABSpell&"#"&$groupIMGAttackABSpell)
 	Switch $mode
 		Case $DB
 			If GUICtrlRead($g_hChkDBActivateSearches) = $GUI_CHECKED Or _
@@ -187,30 +189,30 @@ Func EnableSearchPanels($mode)
 			   GUICtrlRead($g_hChkDBSpellsWait) = $GUI_CHECKED Then
 				_GUI_Value_STATE("SHOW", $groupHerosDB)
 				;search
-				_GUI_Value_STATE("SHOW", $groupSearchDB)
+				_GUI_Value_STATE("SHOW", $g_aGroupSearchDB)
 				;spells
 				_GUI_Value_STATE("SHOW", $groupSpellsDB)
 
 				cmbDBGoldElixir()
 				;attack
-				;_GUI_Value_STATE("SHOW", $groupAttackDB)
+				;_GUI_Value_STATE("SHOW", $g_aGroupAttackDB)
 				;_GUI_Value_STATE("SHOW", $groupIMGAttackDB)
 				;end battle
-				;_GUI_Value_STATE("SHOW", $groupEndBattkeDB)
+				;_GUI_Value_STATE("SHOW", $g_aGroupEndBattleDB)
 				;cmbDBAlgorithm()
 			Else
 				_GUI_Value_STATE("HIDE", $groupHerosDB)
 				;search
-				_GUI_Value_STATE("HIDE", $groupSearchDB)
+				_GUI_Value_STATE("HIDE", $g_aGroupSearchDB)
 				;attack
 
 				;Spells
 				_GUI_Value_STATE("HIDE", $groupSpellsDB)
 
-				;_GUI_Value_STATE("HIDE", $groupAttackDB)
+				;_GUI_Value_STATE("HIDE", $g_aGroupAttackDB)
 				;_GUI_Value_STATE("HIDE", $groupIMGAttackDB)
 				;end battle
-				;_GUI_Value_STATE("HIDE", $groupEndBattkeDB)
+				;_GUI_Value_STATE("HIDE", $g_aGroupEndBattleDB)
 			EndIf
 		Case $LB
 			If GUICtrlRead($g_hChkABActivateSearches) = $GUI_CHECKED Or _
@@ -382,7 +384,7 @@ Func chkTSActivateCamps()
 EndFunc   ;==>chkTSActivateCamps
 
 Func chkDBKingWait()
-	If $iTownHallLevel > 6 Or $iTownHallLevel = 0 Then ; Must be TH7 or above to have King
+	If $g_iTownHallLevel > 6 Or $g_iTownHallLevel = 0 Then ; Must be TH7 or above to have King
 		If GUICtrlRead($g_hChkDBKingWait) = $GUI_CHECKED Then
 			If $g_bUpgradeKingEnable = False Then
 				GUICtrlSetState($g_hChkDBKingAttack, $GUI_CHECKED)
@@ -403,7 +405,7 @@ Func chkDBKingWait()
 EndFunc   ;==>chkDBKingWait
 
 Func chkDBQueenWait()
-	If $iTownHallLevel > 8 Or $iTownHallLevel = 0 Then ; Must be TH9 or above to have Queen
+	If $g_iTownHallLevel > 8 Or $g_iTownHallLevel = 0 Then ; Must be TH9 or above to have Queen
 		If GUICtrlRead($g_hChkDBQueenWait) = $GUI_CHECKED Then
 			If $g_bUpgradeQueenEnable = False Then
 				GUICtrlSetState($g_hChkDBQueenAttack, $GUI_CHECKED)
@@ -424,7 +426,7 @@ Func chkDBQueenWait()
 EndFunc   ;==>chkDBQueenWait
 
 Func chkDBWardenWait()
-	If $iTownHallLevel > 10 Or $iTownHallLevel = 0 Then ; Must be TH11 to have warden
+	If $g_iTownHallLevel > 10 Or $g_iTownHallLevel = 0 Then ; Must be TH11 to have warden
 		If GUICtrlRead($g_hChkDBWardenWait) = $GUI_CHECKED Then
 			If $g_bUpgradeWardenEnable = False Then
 				GUICtrlSetState($g_hChkDBWardenAttack, $GUI_CHECKED)
@@ -446,7 +448,7 @@ Func chkDBWardenWait()
 EndFunc   ;==>chkDBWardenWait
 
 Func chkABKingWait()
-	If $iTownHallLevel > 6 Or $iTownHallLevel = 0 Then ; Must be TH7 or above to have King
+	If $g_iTownHallLevel > 6 Or $g_iTownHallLevel = 0 Then ; Must be TH7 or above to have King
 		If GUICtrlRead($g_hChkABKingWait) = $GUI_CHECKED Then
 			If $g_bUpgradeKingEnable = False Then
 				GUICtrlSetState($g_hChkABKingAttack, $GUI_CHECKED)
@@ -467,7 +469,7 @@ Func chkABKingWait()
 EndFunc   ;==>chkABKingWait
 
 Func chkABQueenWait()
-	If $iTownHallLevel > 8 Or $iTownHallLevel = 0 Then ; Must be TH9 or above to have Queen
+	If $g_iTownHallLevel > 8 Or $g_iTownHallLevel = 0 Then ; Must be TH9 or above to have Queen
 		If GUICtrlRead($g_hChkABQueenWait) = $GUI_CHECKED Then
 			If $g_bUpgradeQueenEnable = False Then
 				GUICtrlSetState($g_hChkABQueenAttack, $GUI_CHECKED)
@@ -488,7 +490,7 @@ Func chkABQueenWait()
 EndFunc   ;==>chkABQueenWait
 
 Func chkABWardenWait()
-	If $iTownHallLevel > 10 Or $iTownHallLevel = 0 Then ; Must be TH11 to have warden
+	If $g_iTownHallLevel > 10 Or $g_iTownHallLevel = 0 Then ; Must be TH11 to have warden
 		If GUICtrlRead($g_hChkABWardenWait) = $GUI_CHECKED Then
 			If $g_bUpgradeWardenEnable = False Then
 				GUICtrlSetState($g_hChkABWardenAttack, $GUI_CHECKED)
@@ -553,7 +555,7 @@ Func cmbABWaitForCCSpell()
 EndFunc
 
 Func chkDBSpellsWait()
-	If $iTownHallLevel > 4 Or $iTownHallLevel = 0 Then ; Must be TH5+ to have spells
+	If $g_iTownHallLevel > 4 Or $g_iTownHallLevel = 0 Then ; Must be TH5+ to have spells
 		For $i = $g_hPicDBLightSpellWait To $g_hPicDBHasteSpellWait
 			GUICtrlSetState($i, $GUI_ENABLE)
 		Next
@@ -577,7 +579,7 @@ Func chkDBSpellsWait()
 EndFunc
 
 Func chkABSpellsWait()
-	If $iTownHallLevel > 4 Or $iTownHallLevel = 0 Then ; Must be TH5+ to have spells
+	If $g_iTownHallLevel > 4 Or $g_iTownHallLevel = 0 Then ; Must be TH5+ to have spells
 		For $i = $g_hPicABLightSpellWait To $g_hPicABHasteSpellWait
 			GUICtrlSetState($i, $GUI_ENABLE)
 		Next
@@ -607,7 +609,7 @@ Func chkSpellWaitError()
 	Local $sErrorText, $sText, $MsgBox1, $MsgBox2, $MsgBox3
 
 	; Check if spell total GUI is larger than spell count trained for wait for spells to work properly!
-	If $iTotalTrainSpaceSpell > GUICtrlRead($g_hTxtTotalCountSpell) Then  ; we have an error!
+	If $g_iTotalTrainSpaceSpell > GUICtrlRead($g_hTxtTotalCountSpell) Then  ; we have an error!
 		$sErrorText = GetTranslated(625,110, "Total number of trained spells exceeds total set in GUI!") & @CRLF & _
 			GetTranslated(625,111, "Reduce number of trained spells,") & @CRLF & _
 			GetTranslated(625,112, "OR ELSE BOT WILL NEVER ATTACK!!") & @CRLF
@@ -664,7 +666,7 @@ Func chkSpellWaitError()
 							$sFunnyText = $sText & GetTranslated(625,124,"Sorry not that button!") & @CRLF
 						Case 2
 							_ExtMsgBoxSet(1 + 64, $SS_CENTER, 0xDC00FF, 0x011E00, 12, "Comic Sans MS", 480)
-							$sFunnyText = $sText & GetTranslated(625,125,"Donate £5000 to MyBot.run while you wait 15 minutes for this to time out?") & @CRLF
+							$sFunnyText = $sText & GetTranslated(625,125,"Donate ??5000 to MyBot.run while you wait 15 minutes for this to time out?") & @CRLF
 						Case 3
 							_ExtMsgBoxSet(1 + 64, $SS_CENTER, 0x000000, 0xFFFFFF, 12, "Tahoma", 480)
 							$sFunnyText = $sText & GetTranslated(625,126,"Having trouble finding the exit button?") & @CRLF
@@ -699,3 +701,38 @@ Func chkSpellWaitError()
 	EndIf
 EndFunc
 
+Func ChkUseWardenAbility()
+
+	If $g_iTownHallLevel > 10 Or $g_iTownHallLevel = 0 Then ; Must be TH11 to have warden, or starting without TH level set
+		If GUICtrlRead($g_hChkUseWardenAbility) = $GUI_CHECKED Then
+			GUICtrlSetState($g_hTxtWardenAbility, $GUI_ENABLE)
+			$g_bActivateWardenCondition = True
+		Else
+			GUICtrlSetState($g_hTxtWardenAbility, $GUI_DISABLE)
+			$g_bActivateWardenCondition = False
+		EndIf
+	Else
+		GUICtrlSetState($g_hChkUseWardenAbility, BitOR($GUI_DISABLE, $GUI_UNCHECKED))
+		GUICtrlSetState($g_hTxtWardenAbility, $GUI_DISABLE)
+		$g_bActivateWardenCondition = False
+	EndIf
+
+EndFunc
+
+Func CmbDBTH()
+	_GUI_Value_STATE("HIDE", $g_aGroupListPicDBMaxTH)
+	Local $iCmbValue = _GUICtrlComboBox_GetCurSel($g_hCmbDBTH) + 6
+	GUICtrlSetState($g_ahPicDBMaxTH[$iCmbValue], $GUI_SHOW)
+EndFunc   ;==>CmbDBTH
+
+Func CmbABTH()
+	_GUI_Value_STATE("HIDE", $g_aGroupListPicABMaxTH)
+	Local $iCmbValue = _GUICtrlComboBox_GetCurSel($g_hCmbABTH) + 6
+	GUICtrlSetState($g_ahPicABMaxTH[$iCmbValue], $GUI_SHOW)
+EndFunc   ;==>CmbABTH
+
+Func CmbBullyMaxTH()
+	_GUI_Value_STATE("HIDE", $g_aGroupListPicBullyMaxTH)
+	Local $iCmbValue = _GUICtrlComboBox_GetCurSel($g_hCmbBullyMaxTH) + 6
+	GUICtrlSetState($g_ahPicBullyMaxTH[$iCmbValue], $GUI_SHOW)
+EndFunc   ;==>CmbBullyMaxTH

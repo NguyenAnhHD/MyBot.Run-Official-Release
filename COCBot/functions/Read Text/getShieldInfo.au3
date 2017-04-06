@@ -51,7 +51,7 @@ Func getShieldInfo()
 	$sTimeResult = getOcrGuardShield(484, 21) ; read Shield time
 	If $g_iDebugSetlog = 1 Then Setlog("OCR Shield Time= " & $sTimeResult, $COLOR_DEBUG)
 	If $sTimeResult = "" Then ; try a 2nd time after a short delay if slow PC and null read
-		If _Sleep($iPersonalShield2) Then Return ; pause for slow PC
+		If _Sleep($DELAYPERSONALSHIELD2) Then Return ; pause for slow PC
 		$sTimeResult = getOcrGuardShield(484, 21) ; read Shield time
 		If $g_iDebugSetlog = 1 Then Setlog("OCR2 Shield Time= " & $sTimeResult, $COLOR_DEBUG)
 		If $sTimeResult = "" Then ; error if no read value
@@ -62,7 +62,7 @@ Func getShieldInfo()
 		EndIf
 	EndIf
 
-	If _Sleep($iPersonalShield3) Then Return ; improve pause/stop button response
+	If _Sleep($DELAYPERSONALSHIELD3) Then Return ; improve pause/stop button response
 
 	$aString = StringSplit($sTimeResult, " ") ; split hours/minutes or minutes/seconds
 	Switch $aString[0]

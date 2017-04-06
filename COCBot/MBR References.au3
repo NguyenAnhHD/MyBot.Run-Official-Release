@@ -5,6 +5,8 @@ Func ReferenceFunctions()
 	If True Then Return
 	; Reference to functions
 	Local $a1, $a2
+	BotMoveRequest()
+	BotMinimizeRequest()
 	setMaxDegreeOfParallelism()
 	FindPreferredAdbPath()
 	CloseVboxAndroidSvc()
@@ -144,7 +146,6 @@ Func ReferenceFunctions()
 	GetMEmuPath()
 	GetMEmuAdbPath()
 	InitMEmu()
-	WaitForAmMEmu(0)
 	SetScreenMEmu()
 	RebootMEmuSetScreen()
 	CloseMEmu()
@@ -204,7 +205,6 @@ Func ReferenceFunctions()
 	HideiToolsWindow()
 	EmbediTools()
 	AndroidEmbedded()
-	_ReduceMemory(0)
 	_ProcessSuspendResume2(0)
 	__EnumDefaultProc(0, 0)
 	__EnumPageFilesProc(0, 0, 0)
@@ -212,15 +212,6 @@ Func ReferenceFunctions()
 	DebugSaveDesktopImage(0)
 	SetGuiLog(0)
 	Tab(0, 0)
-	_BlockInputEx(0)
-	__BlockInputEx_KeyBoardHook_Proc(0, 0, 0)
-	__BlockInputEx_MouseHook_Proc(0, 0, 0)
-	__BlockInputEx_UnhookWinHooks_Proc()
-	__BlockInputEx_Parse_vkCodesList_CLASSes(0)
-	__BlockInputEx_Parse_vmCodesList_CLASSes(0)
-	__BlockInputEx_KeyStr_To_vkCode(0)
-	__BlockInputEx_WinGetHovered()
-	__BlockInputEx_OnAutoItExit()
 	isNetFramework4Installed()
 	WinGetPos2(0)
 	ControlGetPos2(0, 0, 0)
@@ -229,7 +220,6 @@ Func ReferenceFunctions()
 	IsClanInfoPage()
 	IsPixelColorGray(0)
 	_MultiPixelSearch2(0, 0, 0, 0, 0, 0, 0, 0, 0)
-	boolPixelSearch(0, 0, 0)
 	getArmyTroopQuantity(0, 0)
 	getArmyTroopKind(0, 0)
 	getBarracksTroopQuantity(0, 0)
@@ -243,20 +233,20 @@ Func ReferenceFunctions()
 	returnLowestLevelSingleMatch(0)
 	updateGlobalVillageOffset(0, 0)
 	GemClickR(0, 0, 0)
-EndFunc
+EndFunc   ;==>ReferenceFunctions
 
 Func ReferenceGlobals()
 	If True Then Return
 	; Reference to variables
 	Local $a1
-	$a1 = $troopsToBeUsed
-	$a1 = $MilkFarmOffsetMine
-	$a1 = $MilkFarmOffsetElixir
-	$a1 = $MilkFarmOffsetDark
+	$a1 = $g_aaiTroopsToBeUsed
+	$a1 = $g_asMilkFarmOffsetMine
+	$a1 = $g_asMilkFarmOffsetElixir
+	$a1 = $g_asMilkFarmOffsetDark
 	$a1 = $aArmyCCRemainTime
 	$a1 = $aIsReloadError
 	$a1 = $g_iAndroidControlClickWindow
-	$a1 = $weakDefenseMaxLevels
+	$a1 = $g_aWeakDefenseMaxLevels
 
 	$a1 = $ATTACKVECTOR_A
 	$a1 = $ATTACKVECTOR_B
@@ -292,7 +282,7 @@ Func ReferenceGlobals()
 	$a1 = $eIcnDonBalloon
 	$a1 = $eIcnBarbarian
 	$a1 = $eIcnDonBarbarian
-	$a1 = $eEmpty1
+	$a1 = $eBtnTest
 	$a1 = $eIcnBuilder
 	$a1 = $eIcnCC
 	$a1 = $eIcnGUI
@@ -326,7 +316,7 @@ Func ReferenceGlobals()
 	$a1 = $eIcnDonMinion
 	$a1 = $eIcnPekka
 	$a1 = $eIcnDonPekka
-	$a1 = $eEmpty2
+	$a1 = $eIcnTreasury
 	$a1 = $eIcnRageSpell
 	$a1 = $eIcnTroops
 	$a1 = $eIcnHourGlass
@@ -569,4 +559,4 @@ Func ReferenceGlobals()
 	$a1 = $eESpell
 	$a1 = $eHaSpell
 	$a1 = $eSkSpell
-EndFunc
+EndFunc   ;==>ReferenceGlobals

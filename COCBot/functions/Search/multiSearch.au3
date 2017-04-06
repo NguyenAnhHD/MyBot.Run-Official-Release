@@ -54,7 +54,7 @@ Func captureDebugImage($aResult, $subDirectory)
 		DirCreate($g_sProfileTempDebugPath & $subDirectory)
 
 		; Store a copy of the image handle
-		Local $editedImage = _GDIPlus_BitmapCreateFromHBITMAP($hHBitmap2)
+		Local $editedImage = _GDIPlus_BitmapCreateFromHBITMAP($g_hHBitmap2)
 
 		; Create the timestamp and filename
 		Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
@@ -97,7 +97,7 @@ Func returnPropertyValue($key, $property)
 	Local $aValue = DllCall($g_hLibImgLoc, "str", "GetProperty", "str", $key, "str", $property)
 	If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 	Return $aValue[0]
-EndFunc   ;==>getProperty
+EndFunc   ;==>returnPropertyValue
 
 Func updateResultsRow(ByRef $aResult, $redLines = "")
 	; Create the local variable to do the counting
@@ -107,7 +107,7 @@ Func updateResultsRow(ByRef $aResult, $redLines = "")
 		; Loop through the results to get the total number of objects found
 		If UBound($aResult) > 1 Then
 			For $j = 1 To UBound($aResult) - 1
-				$numberFound +=	Number($aResult[$j][4])
+				$numberFound += Number($aResult[$j][4])
 			Next
 		EndIf
 
@@ -127,7 +127,7 @@ Func multiMatches($directory, $maxReturnPoints = 0, $fullCocAreas = "DCD", $redL
 	If $forceCaptureRegion = True Then _CaptureRegion2()
 
 	; Perform the search
-	Local $res = DllCall($g_hLibImgLoc, "str", "SearchMultipleTilesBetweenLevels", "handle", $hHBitmap2, "str", $directory, "str", $fullCocAreas, "Int", $maxReturnPoints, "str", $redLines, "Int", $minLevel, "Int", $maxLevel)
+	Local $res = DllCall($g_hLibImgLoc, "str", "SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $directory, "str", $fullCocAreas, "Int", $maxReturnPoints, "str", $redLines, "Int", $minLevel, "Int", $maxLevel)
 	If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 
 	; Get the redline data

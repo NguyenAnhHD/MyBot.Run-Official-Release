@@ -22,7 +22,7 @@ Func MoveMouseOutBS()
 			; Since _WindowFromPoint() can return 'sub' windows, or control handles, we should seek the owner window
 			$hWindow = _WinAPI_GetAncestor($hControl, 2)
 			$txtTitleW = WinGetTitle($hWindow)
-			If $hWindow = $HWnD And $txtTitleW == $Title Then
+			If $hWindow = $g_hAndroidWindow And $txtTitleW == $g_sAndroidTitle Then
 				MouseMove(@DesktopWidth + 100, Round(@DesktopHeight / 2), 0)
 				SetLog("Keep Your Mouse Out of BlueStacks Window while bot is running", $COLOR_ERROR)
 			EndIf

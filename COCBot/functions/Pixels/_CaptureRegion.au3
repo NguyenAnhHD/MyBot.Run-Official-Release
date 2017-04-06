@@ -1,6 +1,6 @@
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: _CaptureRegion
-; Description ...: Saves a screenshot of the window into memory. Updates bitmap "$hBitmap" and bitmpa DC "$hHBitmap" Global handles
+; Description ...: Saves a screenshot of the window into memory. Updates bitmap "$g_hBitmap" and bitmpa DC "$g_hHBitmap" Global handles
 ; Syntax ........: _CaptureRegion([$iLeft = 0[, $iTop = 0[, $iRight = $g_iGAME_WIDTH[, $iBottom = $g_iGAME_HEIGHT[, $ReturnBMP[,
 ;                  $ReturnLocal_hHBitmap = False]]]]]])
 ; Parameters ....: $iLeft               - [optional] an integer value. Default is 0.
@@ -27,24 +27,24 @@ Func _CaptureRegion(Const $iLeft = 0, Const $iTop = 0, Const $iRight = $g_iGAME_
 		Return $_hHBitmap
 	EndIf
 
-	If $hHBitmap <> 0 And $hHBitmap <> $g_hHBitmapTest And $hHBitmap2 <> $hHBitmap Then
-		GdiDeleteHBitmap($hHBitmap)
+	If $g_hHBitmap <> 0 And $g_hHBitmap <> $g_hHBitmapTest And $g_hHBitmap2 <> $g_hHBitmap Then
+		GdiDeleteHBitmap($g_hHBitmap)
 	EndIf
-	_CaptureGameScreen($hHBitmap, $iLeft, $iTop, $iRight, $iBottom)
+	_CaptureGameScreen($g_hHBitmap, $iLeft, $iTop, $iRight, $iBottom)
 
-	If $hBitmap <> 0 Then
-		GdiDeleteBitmap($hBitmap)
+	If $g_hBitmap <> 0 Then
+		GdiDeleteBitmap($g_hBitmap)
 	EndIf
-	$hBitmap = _GDIPlus_BitmapCreateFromHBITMAP($hHBitmap)
-	GdiAddBitmap($hBitmap)
+	$g_hBitmap = _GDIPlus_BitmapCreateFromHBITMAP($g_hHBitmap)
+	GdiAddBitmap($g_hBitmap)
 
-	Return $hHBitmap
+	Return $g_hHBitmap
 
 EndFunc   ;==>_CaptureRegion
 
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: _CaptureRegion2
-; Description ...: Saves emulator screen shot into memory - updates global handle "$hHBitmap2" to bitmap new object
+; Description ...: Saves emulator screen shot into memory - updates global handle "$g_hHBitmap2" to bitmap new object
 ; Syntax ........: _CaptureRegion2([$iLeft = 0[, $iTop = 0[, $iRight = $g_iGAME_WIDTH[, $iBottom = $g_iGAME_HEIGHT]]]])
 ; Parameters ....: $iLeft               - [optional] an integer value. Default is 0.
 ;                  $iTop                - [optional] an integer value. Default is 0.
@@ -61,10 +61,10 @@ EndFunc   ;==>_CaptureRegion
 ; ===============================================================================================================================
 Func _CaptureRegion2(Const $iLeft = 0, Const $iTop = 0, Const $iRight = $g_iGAME_WIDTH, Const $iBottom = $g_iGAME_HEIGHT)
 
-	If $hHBitmap2 <> 0 And $hHBitmap2 <> $g_hHBitmapTest And $hHBitmap2 <> $hHBitmap Then
-		GdiDeleteHBitmap($hHBitmap2)
+	If $g_hHBitmap2 <> 0 And $g_hHBitmap2 <> $g_hHBitmapTest And $g_hHBitmap2 <> $g_hHBitmap Then
+		GdiDeleteHBitmap($g_hHBitmap2)
 	EndIf
-	_CaptureGameScreen($hHBitmap2, $iLeft, $iTop, $iRight, $iBottom)
+	_CaptureGameScreen($g_hHBitmap2, $iLeft, $iTop, $iRight, $iBottom)
 
 EndFunc   ;==>_CaptureRegion2
 
@@ -98,7 +98,7 @@ Func _CaptureGameScreen(ByRef $_hHBitmap, Const $iLeft = 0, Const $iTop = 0, Con
 				$_hHBitmap = AndroidScreencap($iLeft, $iTop, $iW, $iH)
 			Else
 				$SuspendMode = ResumeAndroid(False)
-				;Local $hCtrl = ControlGetHandle($HWnD, $g_sAppPaneName, $g_sAppClassInstance)
+				;Local $hCtrl = ControlGetHandle($g_hAndroidWindow, $g_sAppPaneName, $g_sAppClassInstance)
 				Local $hCtrl = ControlGetHandle(GetCurrentAndroidHWnD(), $g_sAppPaneName, $g_sAppClassInstance)
 				If $hCtrl = 0 Then SetLog("AndroidHandle not found, contact support", $COLOR_ERROR)
 				Local $hDC_Capture = _WinAPI_GetDC($hCtrl)
@@ -108,7 +108,7 @@ Func _CaptureGameScreen(ByRef $_hHBitmap, Const $iLeft = 0, Const $iTop = 0, Con
 
 				Local $flags = 0
 				; $PW_CLIENTONLY = 1 ; Only the client area of the window is copied to hdcBlt. By default, the entire window is copied.
-				; $PW_RENDERFULLCONTENT = 2 ; New in Windows 8.1, can capture DirectX/OpenGL screens through DWM
+				; $PW_RENDERFULLCONTENT = 2 ; New in Windows 8.1, suppost to capture DirectX/OpenGL screens through DWM (but didn't work for MEmu)
 				DllCall("user32.dll", "int", "PrintWindow", "hwnd", $hCtrl, "handle", $hMemDC, "int", $flags)
 				_WinAPI_SelectObject($hMemDC, $_hHBitmap)
 				_WinAPI_BitBlt($hMemDC, 0, 0, $iW, $iH, $hDC_Capture, $iLeft, $iTop, $SRCCOPY)
@@ -152,19 +152,19 @@ EndFunc   ;==>_CaptureGameScreen
 ; Example .......: No
 ; ===============================================================================================================================
 Func _CaptureDispose()
-	If $hBitmap <> 0 Then GdiDeleteBitmap($hBitmap)
-	If $hHBitmap <> 0 Then GdiDeleteHBitmap($hHBitmap)
-	If $hHBitmap2 <> 0 Then GdiDeleteHBitmap($hHBitmap2)
+	If $g_hBitmap <> 0 Then GdiDeleteBitmap($g_hBitmap)
+	If $g_hHBitmap <> 0 Then GdiDeleteHBitmap($g_hHBitmap)
+	If $g_hHBitmap2 <> 0 Then GdiDeleteHBitmap($g_hHBitmap2)
 	If $g_hHBitmapTest <> 0 Then GdiDeleteHBitmap($g_hHBitmapTest)
-	$hBitmap = 0
-	$hHBitmap = 0
-	$hHBitmap2 = 0
+	$g_hBitmap = 0
+	$g_hHBitmap = 0
+	$g_hHBitmap2 = 0
 	$g_hHBitmapTest = 0
 EndFunc   ;==>_CaptureDispose
 
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: _CaptureRegion2Sync
-; Description ...: Updates $hHBitmap2 from $hHBitmap
+; Description ...: Updates $g_hHBitmap2 from $g_hHBitmap
 ; Syntax ........: _CaptureRegion2Sync()
 ; Parameters ....: None
 ; Return values .: None
@@ -177,10 +177,10 @@ EndFunc   ;==>_CaptureDispose
 ; Example .......: No
 ; ===============================================================================================================================
 Func _CaptureRegion2Sync()
-	If $hHBitmap2 <> 0 And $hHBitmap2 <> $g_hHBitmapTest And $hHBitmap2 <> $hHBitmap Then
-		GdiDeleteHBitmap($hHBitmap2)
+	If $g_hHBitmap2 <> 0 And $g_hHBitmap2 <> $g_hHBitmapTest And $g_hHBitmap2 <> $g_hHBitmap Then
+		GdiDeleteHBitmap($g_hHBitmap2)
 	EndIf
-	$hHBitmap2 = GetHHBitmapArea($hHBitmap)
+	$g_hHBitmap2 = GetHHBitmapArea($g_hHBitmap)
 EndFunc   ;==>_CaptureRegion2Sync
 
 ; #FUNCTION# ====================================================================================================================
@@ -201,7 +201,7 @@ EndFunc   ;==>_CaptureRegion2Sync
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-Func GetHHBitmapArea(Const $_hHBitmap, Const $iLeft = 0, Const $iTop = 0, Const $iRight = $g_iGAME_WIDTH, Const $iBottom = $g_iGAME_HEIGHT)
+Func GetHHBitmapArea(Const ByRef $_hHBitmap, Const $iLeft = 0, Const $iTop = 0, Const $iRight = $g_iGAME_WIDTH, Const $iBottom = $g_iGAME_HEIGHT)
 	Local $iW = Number($iRight) - Number($iLeft), $iH = Number($iBottom) - Number($iTop)
 	Local $hDC = _WinAPI_GetDC($g_hFrmBot)
 	Local $hMemDC_src = _WinAPI_CreateCompatibleDC($hDC)
@@ -281,8 +281,8 @@ EndFunc   ;==>ForceCaptureRegion
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: TestCapture
 ; Description ...: Sets or checks for test image returned by _CaptureRegion functions
-; Syntax ........: TestCapture([$hHBitmap = Default])
-; Parameters ....: $hHBitmap       - [optional] When Default it returns True if test image is configures or sets test image
+; Syntax ........: TestCapture([$g_hHBitmap = Default])
+; Parameters ....: $g_hHBitmap       - [optional] When Default it returns True if test image is configures or sets test image
 ; Return values .: True/False when checking for test image or configured test image when updated
 ; Author ........: Cosote (2016-Aug)
 ; Modified ......:
@@ -292,11 +292,11 @@ EndFunc   ;==>ForceCaptureRegion
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-Func TestCapture(Const $hHBitmap = Default)
-	If $hHBitmap = Default Then Return $g_hHBitmapTest <> 0
+Func TestCapture(Const $g_hHBitmap = Default)
+	If $g_hHBitmap = Default Then Return $g_hHBitmapTest <> 0
 	If $g_hHBitmapTest <> 0 Then _WinAPI_DeleteObject($g_hHBitmapTest) ; delete previous DC object using global handle
-	$g_hHBitmapTest = $hHBitmap
-	Return $hHBitmap
+	$g_hHBitmapTest = $g_hHBitmap
+	Return $g_hHBitmap
 EndFunc   ;==>TestCapture
 
 ; #FUNCTION# ====================================================================================================================
@@ -325,41 +325,43 @@ Func debugGdiHandle(Const $sSource, Const $bLogAlways = False)
 				$g_iDebugGDICountMax = $g_iDebugGDICount
 				$sMsg &= " NEW MAX!"
 			EndIf
-			SetDebugLog($sMsg)
+			SetDebugLog($sMsg, Default, True)
 		EndIf
 	EndIf
 EndFunc   ;==>debugGdiHandle
 
-Func GdiAddBitmap(Const $_hBitmap)
+Func GdiAddBitmap(Const ByRef $_hBitmap)
 	If $g_iDebugGDICount <> 0 Then
 		$g_oDebugGDIHandles("Bitmap:" & $_hBitmap) = Time()
-		SetDebugLog("GdiAddBitmap " & $_hBitmap)
+		SetDebugLog("GdiAddBitmap " & $_hBitmap, Default, True)
 	EndIf
 EndFunc   ;==>GdiAddBitmap
 
 Func GdiDeleteBitmap(ByRef $_hBitmap)
+	If $g_iDebugGDICount <> 0 Then SetDebugLog("_GDIPlus_BitmapDispose>: " & $_hBitmap & ", active: " & $g_oDebugGDIHandles.Count, Default, True)
 	Local $Result = _GDIPlus_BitmapDispose($_hBitmap)
-	If $Result <> True Or @error Then SetDebugLog("GdiDeleteBitmap not deleted: " & $_hBitmap)
+	If ($Result <> True Or @error) And $g_iDebugGDICount = 0 Then SetDebugLog("GdiDeleteBitmap not deleted: " & $_hBitmap, Default, True)
 	If $g_iDebugGDICount <> 0 Then
+		SetDebugLog("_GDIPlus_BitmapDispose<: " & $_hBitmap & " " & $Result & ", active: " & $g_oDebugGDIHandles.Count, Default, True)
 		$g_oDebugGDIHandles.Remove("Bitmap:" & $_hBitmap)
-		SetDebugLog("GdiDeleteBitmap " & $_hBitmap)
+		SetDebugLog("GdiDeleteBitmap " & $_hBitmap & ", active: " & $g_oDebugGDIHandles.Count, Default, True)
 	EndIf
 	$_hBitmap = 0
 EndFunc   ;==>GdiDeleteBitmap
 
-Func GdiAddHBitmap(Const $_hHBitmap)
+Func GdiAddHBitmap(Const ByRef $_hHBitmap)
 	If $g_iDebugGDICount <> 0 Then
 		$g_oDebugGDIHandles("HBitmap:" & $_hHBitmap) = Time()
-		SetDebugLog("GdiAddHBitmap " & $_hHBitmap)
+		SetDebugLog("GdiAddHBitmap " & $_hHBitmap & ", active: " & $g_oDebugGDIHandles.Count, Default, True)
 	EndIf
 EndFunc   ;==>GdiAddHBitmap
 
 Func GdiDeleteHBitmap(ByRef $_hHBitmap)
 	Local $Result = _WinAPI_DeleteObject($_hHBitmap)
-	If $Result <> True Then SetDebugLog("GdiDeleteHBitmap not deleted: " & $_hHBitmap)
+	If ($Result <> True Or @error) And $g_iDebugGDICount = 0 Then SetDebugLog("GdiDeleteHBitmap not deleted: " & $_hHBitmap, Default, True)
 	If $g_iDebugGDICount <> 0 Then
 		$g_oDebugGDIHandles.Remove("HBitmap:" & $_hHBitmap)
-		SetDebugLog("GdiDeleteHBitmap " & $_hHBitmap)
+		SetDebugLog("GdiDeleteHBitmap " & $_hHBitmap & " " & $Result & ", active: " & $g_oDebugGDIHandles.Count, Default, True)
 	EndIf
 	$_hHBitmap = 0
 EndFunc   ;==>GdiDeleteHBitmap
@@ -372,6 +374,8 @@ EndFunc   ;==>__GDIPlus_Startup
 
 Func __GDIPlus_Shutdown()
 	_CaptureDispose()
+	Local $hDll = $__g_hGDIPDll
 	_GDIPlus_Shutdown()
+	_WinAPI_FreeLibrary($hDll)
 	debugGdiHandle("__GDIPlus_Shutdown", True)
 EndFunc   ;==>__GDIPlus_Shutdown

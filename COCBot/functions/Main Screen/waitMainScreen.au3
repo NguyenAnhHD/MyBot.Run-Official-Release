@@ -6,7 +6,7 @@
 ; Parameters ....:
 ; Return values .: None
 ; Author ........:
-; Modified ......: KnowJack (July/Aug 2015), TheMaster (2015)
+; Modified ......: KnowJack (08-2015), TheMaster1st (09-2015)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -23,7 +23,7 @@ Func waitMainScreen() ;Waits for main screen to popup
 		If Not $g_bRunState Then Return
 		If $g_iDebugSetlog = 1 Then Setlog("ChkObstl Loop = " & $i & "ExitLoop = " & $iCount, $COLOR_DEBUG) ; Debug stuck loop
 		$iCount += 1
-		Local $hWin = $HWnD
+		Local $hWin = $g_hAndroidWindow
 		If TestCapture() = False Then
 			If WinGetAndroidHandle() = 0 Then
 				If $hWin = 0 Then
@@ -33,7 +33,7 @@ Func waitMainScreen() ;Waits for main screen to popup
 				EndIf
 				Return
 			EndIf
-			getBSPos() ; Update $HWnd and Android Window Positions
+			getBSPos() ; Update $g_hAndroidWindow and Android Window Positions
 		EndIf
 		_CaptureRegion()
 		If _CheckPixel($aIsMain, $g_bNoCapturePixel) = True Then ;Checks for Main Screen
@@ -44,10 +44,10 @@ Func waitMainScreen() ;Waits for main screen to popup
 		ElseIf _CheckPixel($aIsDPI150, $g_bNoCapturePixel) = True Then
 			ShowDPIHelp(150)
 		Else
-			If TestCapture() = False And _Sleep($iDelaywaitMainScreen1) Then Return
+			If TestCapture() = False And _Sleep($DELAYWAITMAINSCREEN1) Then Return
 			If checkObstacles() Then $i = 0 ;See if there is anything in the way of mainscreen
 		EndIf
-		If Mod($i, 5) = 0 Then;every 10 seconds
+		If Mod($i, 5) = 0 Then ;every 10 seconds
 			If $g_iDebugImageSave = 1 Then DebugImageSave("WaitMainScreen_", False)
 		EndIf
 		If ($i > 105) Or ($iCount > 120) Then ExitLoop ; If CheckObstacles forces reset, limit total time to 4 minutes
@@ -90,15 +90,15 @@ Func waitMainScreen() ;Waits for main screen to popup
 EndFunc   ;==>waitMainScreen
 
 Func waitMainScreenMini()
-    If Not $g_bRunState Then Return
+	If Not $g_bRunState Then Return
 	Local $iCount = 0
-	Local $hTimer = TimerInit()
+	Local $hTimer = __TimerInit()
 	SetDebugLog("waitMainScreenMini")
 	If TestCapture() = False Then getBSPos() ; Update Android Window Positions
 	SetLog("Waiting for Main Screen after " & $g_sAndroidEmulator & " restart", $COLOR_INFO)
 	For $i = 0 To 60 ;30*2000 = 1 Minutes
-	    If Not $g_bRunState Then Return
-	    If TestCapture() = False And WinGetAndroidHandle() = 0 Then ExitLoop ; sets @error to 1
+		If Not $g_bRunState Then Return
+		If TestCapture() = False And WinGetAndroidHandle() = 0 Then ExitLoop ; sets @error to 1
 		If $g_iDebugSetlog = 1 Then Setlog("ChkObstl Loop = " & $i & "ExitLoop = " & $iCount, $COLOR_DEBUG) ; Debug stuck loop
 		$iCount += 1
 		_CaptureRegion()
@@ -106,14 +106,14 @@ Func waitMainScreenMini()
 			If TestCapture() = False And _Sleep(1000) Then Return
 			If CheckObstacles() Then $i = 0 ;See if there is anything in the way of mainscreen
 		Else
-			SetLog("CoC main window took " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds", $COLOR_SUCCESS)
+			SetLog("CoC main window took " & Round(__TimerDiff($hTimer) / 1000, 2) & " seconds", $COLOR_SUCCESS)
 			Return
 		EndIf
 		_StatusUpdateTime($hTimer, "Main Screen")
-		If ($i > 60) Or ($iCount > 80) Then ExitLoop  ; If CheckObstacles forces reset, limit total time to 6 minute before Force restart BS
+		If ($i > 60) Or ($iCount > 80) Then ExitLoop ; If CheckObstacles forces reset, limit total time to 6 minute before Force restart BS
 		If TestCapture() Then
 			Return "Main screen not available"
 		EndIf
 	Next
-	Return SetError( 1, 0, -1)
-EndFunc
+	Return SetError(1, 0, -1)
+EndFunc   ;==>waitMainScreenMini

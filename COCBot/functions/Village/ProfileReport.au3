@@ -17,29 +17,29 @@
 #include-once
 
 Func ProfileReport()
-   Local $AttacksWon = 0, $DefensesWon = 0
+	Local $AttacksWon = 0, $DefensesWon = 0
 
 	Local $iCount
 	ClickP($aAway, 1, 0, "#0221") ;Click Away
-	If _Sleep($iDelayProfileReport1) Then Return
+	If _Sleep($DELAYPROFILEREPORT1) Then Return
 
 	SetLog("Profile Report", $COLOR_INFO)
 	SetLog("Opening Profile page to read atk, def, donated and received...", $COLOR_INFO)
 	Click(30, 40, 1, 0, "#0222") ; Click Info Profile Button
-	If _Sleep($iDelayProfileReport2) Then Return
+	If _Sleep($DELAYPROFILEREPORT2) Then Return
 
 	While _ColorCheck(_GetPixelColor(400, 104 + $g_iMidOffsetY, True), Hex(0xA2A6BE, 6), 20) = False ; wait for Info Profile to open
-		If $g_iDebugSetlog = 1 Then Setlog("Profile wait time: " & $iCount & ", color= " & _GetPixelColor(400, 104 + $g_iMidOffsetY, True)& " pos (400," & 104 + $g_iMidOffsetY&")", $COLOR_DEBUG)
+		If $g_iDebugSetlog = 1 Then Setlog("Profile wait time: " & $iCount & ", color= " & _GetPixelColor(400, 104 + $g_iMidOffsetY, True) & " pos (400," & 104 + $g_iMidOffsetY & ")", $COLOR_DEBUG)
 		$iCount += 1
-		If _Sleep($iDelayProfileReport1) Then Return
+		If _Sleep($DELAYPROFILEREPORT1) Then Return
 		If $iCount >= 25 Then ExitLoop
 	WEnd
 	If $g_iDebugSetlog = 1 And $iCount >= 25 Then Setlog("Excess wait time for profile to open: " & $iCount, $COLOR_DEBUG)
-	If _Sleep($iDelayProfileReport1) Then Return
+	If _Sleep($DELAYPROFILEREPORT1) Then Return
 	$AttacksWon = ""
 
-	If _ColorCheck(_GetPixelColor($ProfileRep01[0], $ProfileRep01[1] , True), Hex($ProfileRep01[2], 6), $ProfileRep01[3]) = true  Then
-		If $g_iDebugSetlog=1 Then Setlog("Village have no attack and no defenses " & $ProfileRep01[0] & "," & $ProfileRep01[1] + $g_iMidOffsetY,$COLOR_DEBUG)
+	If _ColorCheck(_GetPixelColor($ProfileRep01[0], $ProfileRep01[1], True), Hex($ProfileRep01[2], 6), $ProfileRep01[3]) = True Then
+		If $g_iDebugSetlog = 1 Then Setlog("Village have no attack and no defenses " & $ProfileRep01[0] & "," & $ProfileRep01[1] + $g_iMidOffsetY, $COLOR_DEBUG)
 		$AttacksWon = 0
 		$DefensesWon = 0
 	Else
@@ -47,7 +47,7 @@ Func ProfileReport()
 		If $g_iDebugSetlog = 1 Then Setlog("$AttacksWon 1st read: " & $AttacksWon, $COLOR_DEBUG)
 		$iCount = 0
 		While $AttacksWon = "" ; Wait for $attacksWon to be readable in case of slow PC
-			If _Sleep($iDelayProfileReport1) Then Return
+			If _Sleep($DELAYPROFILEREPORT1) Then Return
 			$AttacksWon = getProfile(578, 268 + $g_iMidOffsetY)
 			If $g_iDebugSetlog = 1 Then Setlog("Read Loop $AttacksWon: " & $AttacksWon & ", Count: " & $iCount, $COLOR_DEBUG)
 			$iCount += 1
@@ -56,16 +56,16 @@ Func ProfileReport()
 		If $g_iDebugSetlog = 1 And $iCount >= 20 Then Setlog("Excess wait time for reading $AttacksWon: " & getProfile(578, 268 + $g_iMidOffsetY), $COLOR_DEBUG)
 		$DefensesWon = getProfile(790, 268 + $g_iMidOffsetY)
 	EndIf
-	$TroopsDonated = getProfile(158, 268 + $g_iMidOffsetY)
-	$TroopsReceived = getProfile(360, 268 + $g_iMidOffsetY)
+	$g_iTroopsDonated = getProfile(158, 268 + $g_iMidOffsetY)
+	$g_iTroopsReceived = getProfile(360, 268 + $g_iMidOffsetY)
 
-	SetLog(" [ATKW]: " & _NumberFormat($AttacksWon) & " [DEFW]: " & _NumberFormat($DefensesWon) & " [TDON]: " & _NumberFormat($TroopsDonated) & " [TREC]: " & _NumberFormat($TroopsReceived), $COLOR_SUCCESS)
+	SetLog(" [ATKW]: " & _NumberFormat($AttacksWon) & " [DEFW]: " & _NumberFormat($DefensesWon) & " [TDON]: " & _NumberFormat($g_iTroopsDonated) & " [TREC]: " & _NumberFormat($g_iTroopsReceived), $COLOR_SUCCESS)
 	Click(830, 80, 1, 0, "#0223") ; Close Profile page
-	If _Sleep($iDelayProfileReport3) Then Return
+	If _Sleep($DELAYPROFILEREPORT3) Then Return
 
 	$iCount = 0
 	While _CheckPixel($aIsMain, $g_bCapturePixel) = False ; wait for profile report window very slow close
-		If _Sleep($iDelayProfileReport3) Then Return
+		If _Sleep($DELAYPROFILEREPORT3) Then Return
 		$iCount += 1
 		If $g_iDebugSetlog = 1 Then Setlog("End ProfileReport $iCount= " & $iCount, $COLOR_DEBUG)
 		If $iCount > 50 Then

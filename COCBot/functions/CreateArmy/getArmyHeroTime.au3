@@ -8,8 +8,8 @@
 ;					  : $bCloseArmyWindow = Bool value, true if train overview window needs to be closed
 ;                     : $bForceReadTime   = Bool value, true if updrade remaining time should be read
 ; Return values .:
-; Author ........: MonkeyHunter (05/06-2016)
-; Modified ......: MR.ViPER (24-12-2016)
+; Author ........: MonkeyHunter (05-2016)
+; Modified ......: MR.ViPER (12-2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -36,24 +36,24 @@ Func getArmyHeroTime($HeroType = "all", $bOpenArmyWindow = False, $bCloseArmyWin
 			SetError(3)
 			Return ; not open, requested to be open - error.
 		EndIf
-		If _Sleep($iDelaycheckArmyCamp5) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP5) Then Return
 	EndIf
 
-	;If $iTownHallLevel < 7 then Return
-	If $bHaveAnyHero = -1 Then
+	;If $g_iTownHallLevel < 7 then Return
+	If $g_bHaveAnyHero = -1 Then
 		; The variable to see if the village have any hero is not set yet
 		; check if the village have any hero
 		Local $rImgSearch = Not (StringInStr(FindImageInPlace("HaveAnyHero", @ScriptDir & "\imgxml\trainwindow\HeroSlots\NoHero_1_95.xml", "620,400,675,430", True), ","))
-		If $g_iDebugSetlog = 1 Then SetLog("Setting $bHaveAnyHero Value To: " & $rImgSearch, $COLOR_DEBUG)
+		If $g_iDebugSetlog = 1 Then SetLog("Setting $g_bHaveAnyHero Value To: " & $rImgSearch, $COLOR_DEBUG)
 		If $rImgSearch = True Then
-			$bHaveAnyHero = 1
+			$g_bHaveAnyHero = 1
 		Else
-			$bHaveAnyHero = 0
-			Return	; There're no heroes to check, Return
+			$g_bHaveAnyHero = 0
+			Return ; There're no heroes to check, Return
 		EndIf
-	ElseIf $bHaveAnyHero = 0 Then
-		If $g_iDebugSetlog = 1 Then SetLog("$bHaveAnyHero = 0", $COLOR_DEBUG)
-		Return	; There're no heroes to check, Return
+	ElseIf $g_bHaveAnyHero = 0 Then
+		If $g_iDebugSetlog = 1 Then SetLog("$g_bHaveAnyHero = 0", $COLOR_DEBUG)
+		Return ; There're no heroes to check, Return
 	EndIf
 
 	Local $iRemainTrainHeroTimer = 0
@@ -61,11 +61,11 @@ Func getArmyHeroTime($HeroType = "all", $bOpenArmyWindow = False, $bCloseArmyWin
 	Local $sResult
 	Local $iResultHeroes[3] = [0, 0, 0] ; array to hold all remaining regen time read via OCR
 	Local Const $HeroSlots[3][2] = [[464, 446], [526, 446], [588, 446]] ; Location of hero status check tile
-	Local $tmpUpgradingHeroes[3] = [ $eHeroNone, $eHeroNone, $eHeroNone ]
+	Local $tmpUpgradingHeroes[3] = [$eHeroNone, $eHeroNone, $eHeroNone]
 	If StringInStr($HeroType, "all", $STR_NOCASESENSEBASIC) > 0 Then
-		$iHeroUpgrading[0] = 0
-		$iHeroUpgrading[1] = 0
-		$iHeroUpgrading[2] = 0
+		$g_iHeroUpgrading[0] = 0
+		$g_iHeroUpgrading[1] = 0
+		$g_iHeroUpgrading[2] = 0
 	EndIf
 
 	; Constant Array with OCR find location: [X pos, Y Pos, Text Name, Global enum value]
@@ -78,7 +78,7 @@ Func getArmyHeroTime($HeroType = "all", $bOpenArmyWindow = False, $bCloseArmyWin
 
 		; Check if slot has healing hero
 		$sResult = ArmyHeroStatus($index) ; OCR slot for status information
-		If $g_iDebugSetlog = 1 or $g_iDebugSetlogTrain = 1 Then SetLog($aHeroRemainData[$index][2] & " Status: " & $sResult, $COLOR_DEBUG)
+		If $g_iDebugSetlog = 1 Or $g_iDebugSetlogTrain = 1 Then SetLog($aHeroRemainData[$index][2] & " Status: " & $sResult, $COLOR_DEBUG)
 		If $sResult <> "" Then ; we found something
 			If StringInStr($sResult, "upgrade", $STR_NOCASESENSEBASIC) <> 0 Then
 				Switch $index
@@ -89,9 +89,9 @@ Func getArmyHeroTime($HeroType = "all", $bOpenArmyWindow = False, $bCloseArmyWin
 					Case 2
 						$tmpUpgradingHeroes[$index] = $eHeroWarden
 				EndSwitch
-				$iHeroUpgrading[$index] = 1
+				$g_iHeroUpgrading[$index] = 1
 			EndIf
-			If $bForceReadTime = False And StringInStr($sResult, "heal", $STR_NOCASESENSEBASIC) = 0 or StringInStr($sResult, "none", $STR_NOCASESENSEBASIC) <> 0 Then
+			If $bForceReadTime = False And StringInStr($sResult, "heal", $STR_NOCASESENSEBASIC) = 0 Or StringInStr($sResult, "none", $STR_NOCASESENSEBASIC) <> 0 Then
 				If $g_iDebugSetlogTrain = 1 Or $g_iDebugSetlog = 1 Then
 					SetLog("Hero slot#" & $index + 1 & " status: " & $sResult & " :skip time read", $COLOR_DEBUG)
 				EndIf
@@ -141,11 +141,11 @@ Func getArmyHeroTime($HeroType = "all", $bOpenArmyWindow = False, $bCloseArmyWin
 		EndIf
 	Next
 
-	If StringInStr($HeroType, "all", $STR_NOCASESENSEBASIC) > 0 Then $iHeroUpgradingBit = BitOR($tmpUpgradingHeroes[0], $tmpUpgradingHeroes[1], $tmpUpgradingHeroes[2])
+	If StringInStr($HeroType, "all", $STR_NOCASESENSEBASIC) > 0 Then $g_iHeroUpgradingBit = BitOR($tmpUpgradingHeroes[0], $tmpUpgradingHeroes[1], $tmpUpgradingHeroes[2])
 
 	If $bCloseArmyWindow = True Then
 		ClickP($aAway, 1, 0, "#0000") ;Click Away
-		If _Sleep($iDelaycheckArmyCamp4) Then Return
+		If _Sleep($DELAYCHECKARMYCAMP4) Then Return
 	EndIf
 
 	; Determine proper return value

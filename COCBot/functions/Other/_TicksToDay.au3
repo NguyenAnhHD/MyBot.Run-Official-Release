@@ -23,8 +23,8 @@ Func _TicksToDay($iTicks, ByRef $iDays, ByRef $iHours, ByRef $iMins, ByRef $iSec
 	_TicksToTime($iTicks, $iHours, $iMins, $iSecs)
 	If @error Then Return SetError(1, 0, 0) ; $iTicks < 0
 
-	$iDays = int($iHours/24)
-	$iHours = Mod($iHours,24)
+	$iDays = Int($iHours / 24)
+	$iHours = Mod($iHours, 24)
 
 	Return 1
 EndFunc   ;==>_TicksToDay

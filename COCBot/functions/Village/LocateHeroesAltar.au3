@@ -34,9 +34,9 @@ Func _LocateQueenAltar()
 
 	If _GetPixelColor($aTopLeftClient[0], $aTopLeftClient[1], True) <> Hex($aTopLeftClient[2], 6) Or _GetPixelColor($aTopRightClient[0], $aTopRightClient[1], True) <> Hex($aTopRightClient[2], 6) Then
 		Zoomout()
-		$bDisableBreakCheck = True ; stop early PB log off when locating upgrades
+		$g_bDisableBreakCheck = True ; stop early PB log off when locating upgrades
 		Collect()
-		$bDisableBreakCheck = False ; restore flag
+		$g_bDisableBreakCheck = False ; restore flag
 	EndIf
 
 	SetLog("Locating Queen Altar...", $COLOR_INFO)
@@ -49,9 +49,9 @@ Func _LocateQueenAltar()
 			WinGetAndroidHandle()
 			ClickP($aTopLeftClient)
 			Local $aPos = FindPos()
-			$QueenAltarPos[0] = $aPos[0]
-			$QueenAltarPos[1] = $aPos[1]
-			If isInsideDiamond($QueenAltarPos) = False Then
+			$g_aiQueenAltarPos[0] = $aPos[0]
+			$g_aiQueenAltarPos[1] = $aPos[1]
+			If isInsideDiamond($g_aiQueenAltarPos) = False Then
 				$iStupid += 1
 				Select
 					Case $iStupid = 1
@@ -62,24 +62,24 @@ Func _LocateQueenAltar()
 						$sErrorText = "Please try to click inside the grass field!" & @CRLF
 						ContinueLoop
 					Case $iStupid = 3
-						$sErrorText = "This is not funny, why did you click @ (" & $QueenAltarPos[0] & "," & $QueenAltarPos[1] & ")?" & @CRLF & "  Please stop!" & @CRLF & @CRLF
+						$sErrorText = "This is not funny, why did you click @ (" & $g_aiQueenAltarPos[0] & "," & $g_aiQueenAltarPos[1] & ")?" & @CRLF & "  Please stop!" & @CRLF & @CRLF
 						ContinueLoop
 					Case $iStupid = 4
 						$sErrorText = "Last Chance, DO NOT MAKE ME ANGRY, or" & @CRLF & "I will give ALL of your gold to Barbarian King," & @CRLF & "And ALL of your Gems to the Archer Queen!" & @CRLF
 						ContinueLoop
 					Case $iStupid > 4
-						SetLog(" Operator Error - Bad Queen Altar Location: " & "(" & $QueenAltarPos[0] & "," & $QueenAltarPos[1] & ")", $COLOR_ERROR)
+						SetLog(" Operator Error - Bad Queen Altar Location: " & "(" & $g_aiQueenAltarPos[0] & "," & $g_aiQueenAltarPos[1] & ")", $COLOR_ERROR)
 						ClickP($aTopLeftClient)
 						Return False
 					Case Else
-						SetLog(" Operator Error - Bad Queen Altar Location: " & "(" & $QueenAltarPos[0] & "," & $QueenAltarPos[1] & ")", $COLOR_ERROR)
-						$QueenAltarPos[0] = -1
-						$QueenAltarPos[1] = -1
+						SetLog(" Operator Error - Bad Queen Altar Location: " & "(" & $g_aiQueenAltarPos[0] & "," & $g_aiQueenAltarPos[1] & ")", $COLOR_ERROR)
+						$g_aiQueenAltarPos[0] = -1
+						$g_aiQueenAltarPos[1] = -1
 						ClickP($aTopLeftClient)
 						Return False
 				EndSelect
 			EndIf
-			SetLog("Queen Altar: " & "(" & $QueenAltarPos[0] & "," & $QueenAltarPos[1] & ")", $COLOR_SUCCESS)
+			SetLog("Queen Altar: " & "(" & $g_aiQueenAltarPos[0] & "," & $g_aiQueenAltarPos[1] & ")", $COLOR_SUCCESS)
 		Else
 			SetLog("Locate Queen Altar Cancelled", $COLOR_INFO)
 			ClickP($aTopLeftClient)
@@ -122,16 +122,16 @@ Func _LocateQueenAltar()
 						ContinueLoop
 					Case $iSilly > 4
 						SetLog("Quit joking, Click the Queen Altar, or restart bot and try again", $COLOR_ERROR)
-						$QueenAltarPos[0] = -1
-						$QueenAltarPos[1] = -1
+						$g_aiQueenAltarPos[0] = -1
+						$g_aiQueenAltarPos[1] = -1
 						ClickP($aTopLeftClient)
 						Return False
 				EndSelect
 			EndIf
 		Else
-			SetLog(" Operator Error - Bad Queen Altar Location: " & "(" & $QueenAltarPos[0] & "," & $QueenAltarPos[1] & ")", $COLOR_ERROR)
-			$QueenAltarPos[0] = -1
-			$QueenAltarPos[1] = -1
+			SetLog(" Operator Error - Bad Queen Altar Location: " & "(" & $g_aiQueenAltarPos[0] & "," & $g_aiQueenAltarPos[1] & ")", $COLOR_ERROR)
+			$g_aiQueenAltarPos[0] = -1
+			$g_aiQueenAltarPos[1] = -1
 			ClickP($aTopLeftClient)
 			Return False
 		EndIf
@@ -145,8 +145,8 @@ Func _LocateQueenAltar()
 	$stext = GetTranslated(640,38,"Now you can remove mouse out of Android Emulator, Thanks!!")
 	$MsgBox = _ExtMsgBox(48, GetTranslated(640,36,"OK"), GetTranslated(640,37,"Notice!"), $stext, 15)
 
-	IniWrite($g_sProfileBuildingPath, "other", "xQueenAltarPos", $QueenAltarPos[0])
-	IniWrite($g_sProfileBuildingPath, "other", "yQueenAltarPos", $QueenAltarPos[1])
+	IniWrite($g_sProfileBuildingPath, "other", "xQueenAltarPos", $g_aiQueenAltarPos[0])
+	IniWrite($g_sProfileBuildingPath, "other", "yQueenAltarPos", $g_aiQueenAltarPos[1])
 
 EndFunc   ;==>_LocateQueenAltar
 
@@ -168,9 +168,9 @@ Func _LocateKingAltar()
 
 	If _GetPixelColor($aTopLeftClient[0], $aTopLeftClient[1], True) <> Hex($aTopLeftClient[2], 6) Or _GetPixelColor($aTopRightClient[0], $aTopRightClient[1], True) <> Hex($aTopRightClient[2], 6) Then
 		Zoomout()
-		$bDisableBreakCheck = True ; stop early PB log off when locating upgrades
+		$g_bDisableBreakCheck = True ; stop early PB log off when locating upgrades
 		Collect()
-		$bDisableBreakCheck = False ; restore flag
+		$g_bDisableBreakCheck = False ; restore flag
 	EndIf
 
 	SetLog("Locating King Altar...", $COLOR_INFO)
@@ -183,9 +183,9 @@ Func _LocateKingAltar()
 		If $MsgBox = 1 Then
 			WinGetAndroidHandle()
 			Local $aPos = FindPos()
-			$KingAltarPos[0] = $aPos[0]
-			$KingAltarPos[1] = $aPos[1]
-			If isInsideDiamond($KingAltarPos) = False Then
+			$g_aiKingAltarPos[0] = $aPos[0]
+			$g_aiKingAltarPos[1] = $aPos[1]
+			If isInsideDiamond($g_aiKingAltarPos) = False Then
 				$iStupid += 1
 				Select
 					Case $iStupid = 1
@@ -196,24 +196,24 @@ Func _LocateKingAltar()
 						$sErrorText = "Please try to click inside the grass field!" & @CRLF
 						ContinueLoop
 					Case $iStupid = 3
-						$sErrorText = "This is not funny, why did you click @ (" & $KingAltarPos[0] & "," & $KingAltarPos[1] & ")?" & @CRLF & "  Please stop!" & @CRLF & @CRLF
+						$sErrorText = "This is not funny, why did you click @ (" & $g_aiKingAltarPos[0] & "," & $g_aiKingAltarPos[1] & ")?" & @CRLF & "  Please stop!" & @CRLF & @CRLF
 						ContinueLoop
 					Case $iStupid = 4
 						$sErrorText = "Last Chance, DO NOT MAKE ME ANGRY, or" & @CRLF & "I will give ALL of your gold to Barbarian King," & @CRLF & "And ALL of your Gems to the Archer Queen!" & @CRLF
 						ContinueLoop
 					Case $iStupid > 4
-						SetLog(" Operator Error - Bad King Altar Location: " & "(" & $KingAltarPos[0] & "," & $KingAltarPos[1] & ")", $COLOR_ERROR)
+						SetLog(" Operator Error - Bad King Altar Location: " & "(" & $g_aiKingAltarPos[0] & "," & $g_aiKingAltarPos[1] & ")", $COLOR_ERROR)
 						ClickP($aTopLeftClient)
 						Return False
 					Case Else
-						SetLog(" Operator Error - Bad King Altar Location: " & "(" & $KingAltarPos[0] & "," & $KingAltarPos[1] & ")", $COLOR_ERROR)
-						$KingAltarPos[0] = -1
-						$KingAltarPos[1] = -1
+						SetLog(" Operator Error - Bad King Altar Location: " & "(" & $g_aiKingAltarPos[0] & "," & $g_aiKingAltarPos[1] & ")", $COLOR_ERROR)
+						$g_aiKingAltarPos[0] = -1
+						$g_aiKingAltarPos[1] = -1
 						ClickP($aTopLeftClient)
 						Return False
 				EndSelect
 			EndIf
-			SetLog("King Altar: " & "(" & $KingAltarPos[0] & "," & $KingAltarPos[1] & ")", $COLOR_SUCCESS)
+			SetLog("King Altar: " & "(" & $g_aiKingAltarPos[0] & "," & $g_aiKingAltarPos[1] & ")", $COLOR_SUCCESS)
 		Else
 			SetLog("Locate King Altar Cancelled", $COLOR_INFO)
 			ClickP($aTopLeftClient)
@@ -255,16 +255,16 @@ Func _LocateKingAltar()
 						ContinueLoop
 					Case $iSilly > 4
 						SetLog("Quit joking, Click the King Altar, or restart bot and try again", $COLOR_ERROR)
-						$KingAltarPos[0] = -1
-						$KingAltarPos[1] = -1
+						$g_aiKingAltarPos[0] = -1
+						$g_aiKingAltarPos[1] = -1
 						ClickP($aTopLeftClient)
 						Return False
 				EndSelect
 			EndIf
 		Else
-			SetLog(" Operator Error - Bad King Altar Location: " & "(" & $KingAltarPos[0] & "," & $KingAltarPos[1] & ")", $COLOR_ERROR)
-			$KingAltarPos[0] = -1
-			$KingAltarPos[1] = -1
+			SetLog(" Operator Error - Bad King Altar Location: " & "(" & $g_aiKingAltarPos[0] & "," & $g_aiKingAltarPos[1] & ")", $COLOR_ERROR)
+			$g_aiKingAltarPos[0] = -1
+			$g_aiKingAltarPos[1] = -1
 			ClickP($aTopLeftClient)
 			Return False
 		EndIf
@@ -278,8 +278,8 @@ Func _LocateKingAltar()
 	$stext = GetTranslated(640,38,"Now you can remove mouse out of Android Emulator, Thanks!!")
 	$MsgBox = _ExtMsgBox(48, GetTranslated(640,36,"OK"), GetTranslated(640,37,"Notice!"), $stext, 15)
 
-	IniWrite($g_sProfileBuildingPath, "other", "xKingAltarPos", $KingAltarPos[0])
-	IniWrite($g_sProfileBuildingPath, "other", "yKingAltarPos", $KingAltarPos[1])
+	IniWrite($g_sProfileBuildingPath, "other", "xKingAltarPos", $g_aiKingAltarPos[0])
+	IniWrite($g_sProfileBuildingPath, "other", "yKingAltarPos", $g_aiKingAltarPos[1])
 
 EndFunc   ;==>_LocateKingAltar
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -297,7 +297,7 @@ EndFunc   ;==>LocateWardenAltar
 Func _LocateWardenAltar()
 	Local $stext, $MsgBox, $iSilly = 0, $iStupid = 0, $sErrorText = "", $sInfo
 
-	If Number($iTownHallLevel) < 11 Then
+	If Number($g_iTownHallLevel) < 11 Then
 		SetLog("Grand Warden requires TH11, Cancel locate Altar!", $COLOR_ERROR)
 		Return
 	EndIf
@@ -307,9 +307,9 @@ Func _LocateWardenAltar()
 
 	If _GetPixelColor($aTopLeftClient[0], $aTopLeftClient[1], True) <> Hex($aTopLeftClient[2], 6) And _GetPixelColor($aTopRightClient[0], $aTopRightClient[1], True) <> Hex($aTopRightClient[2], 6) Then
 		Zoomout()
-		$bDisableBreakCheck = True ; stop early PB log off when locating upgrades
+		$g_bDisableBreakCheck = True ; stop early PB log off when locating upgrades
 		Collect()
-		$bDisableBreakCheck = False ; restore flag
+		$g_bDisableBreakCheck = False ; restore flag
 	EndIf
 
 	SetLog("Locating Grand Warden Altar... work in progress!", $COLOR_INFO)
@@ -322,9 +322,9 @@ Func _LocateWardenAltar()
 		If $MsgBox = 1 Then
 			WinGetAndroidHandle()
 			Local $aPos = FindPos()
-			$WardenAltarPos[0] = $aPos[0]
-			$WardenAltarPos[1] = $aPos[1]
-			If isInsideDiamond($WardenAltarPos) = False Then
+			$g_aiWardenAltarPos[0] = $aPos[0]
+			$g_aiWardenAltarPos[1] = $aPos[1]
+			If isInsideDiamond($g_aiWardenAltarPos) = False Then
 				$iStupid += 1
 				Select
 					Case $iStupid = 1
@@ -335,24 +335,24 @@ Func _LocateWardenAltar()
 						$sErrorText = "Please try to click inside the grass field!" & @CRLF
 						ContinueLoop
 					Case $iStupid = 3
-						$sErrorText = "This is not funny, why did you click @ (" & $WardenAltarPos[0] & "," & $WardenAltarPos[1] & ")?" & @CRLF & "  Please stop!" & @CRLF & @CRLF
+						$sErrorText = "This is not funny, why did you click @ (" & $g_aiWardenAltarPos[0] & "," & $g_aiWardenAltarPos[1] & ")?" & @CRLF & "  Please stop!" & @CRLF & @CRLF
 						ContinueLoop
 					Case $iStupid = 4
 						$sErrorText = "Last Chance, DO NOT MAKE ME ANGRY, or" & @CRLF & "I will give ALL of your gold to Barbarian King," & @CRLF & "And ALL of your Gems to the Archer Queen!" & @CRLF
 						ContinueLoop
 					Case $iStupid > 4
-						SetLog(" Operator Error - Bad Grand Warden Altar Location: " & "(" & $WardenAltarPos[0] & "," & $WardenAltarPos[1] & ")", $COLOR_ERROR)
+						SetLog(" Operator Error - Bad Grand Warden Altar Location: " & "(" & $g_aiWardenAltarPos[0] & "," & $g_aiWardenAltarPos[1] & ")", $COLOR_ERROR)
 						ClickP($aTopLeftClient)
 						Return False
 					Case Else
-						SetLog(" Operator Error - Bad Grand Warden Altar Location: " & "(" & $WardenAltarPos[0] & "," & $WardenAltarPos[1] & ")", $COLOR_ERROR)
-						$WardenAltarPos[0] = -1
-						$WardenAltarPos[1] = -1
+						SetLog(" Operator Error - Bad Grand Warden Altar Location: " & "(" & $g_aiWardenAltarPos[0] & "," & $g_aiWardenAltarPos[1] & ")", $COLOR_ERROR)
+						$g_aiWardenAltarPos[0] = -1
+						$g_aiWardenAltarPos[1] = -1
 						ClickP($aTopLeftClient)
 						Return False
 				EndSelect
 			EndIf
-			SetLog("Grand Warden Altar: " & "(" & $WardenAltarPos[0] & "," & $WardenAltarPos[1] & ")", $COLOR_SUCCESS)
+			SetLog("Grand Warden Altar: " & "(" & $g_aiWardenAltarPos[0] & "," & $g_aiWardenAltarPos[1] & ")", $COLOR_SUCCESS)
 		Else
 			SetLog("Locate Grand Warden Altar Cancelled", $COLOR_INFO)
 			ClickP($aTopLeftClient)
@@ -395,16 +395,16 @@ Func _LocateWardenAltar()
 						ContinueLoop
 					Case $iSilly > 4
 						SetLog("Quit joking, Click the Grand Warden Altar, or restart bot and try again", $COLOR_ERROR)
-						$WardenAltarPos[0] = -1
-						$WardenAltarPos[1] = -1
+						$g_aiWardenAltarPos[0] = -1
+						$g_aiWardenAltarPos[1] = -1
 						ClickP($aTopLeftClient)
 						Return False
 				EndSelect
 			EndIf
 		Else
-			SetLog(" Operator Error - Bad Grand Warden Altar Location: " & "(" & $WardenAltarPos[0] & "," & $WardenAltarPos[1] & ")", $COLOR_ERROR)
-			$WardenAltarPos[0] = -1
-			$WardenAltarPos[1] = -1
+			SetLog(" Operator Error - Bad Grand Warden Altar Location: " & "(" & $g_aiWardenAltarPos[0] & "," & $g_aiWardenAltarPos[1] & ")", $COLOR_ERROR)
+			$g_aiWardenAltarPos[0] = -1
+			$g_aiWardenAltarPos[1] = -1
 			ClickP($aTopLeftClient)
 			Return False
 		EndIf
@@ -418,8 +418,8 @@ Func _LocateWardenAltar()
 	$stext = GetTranslated(640,38,"Now you can remove mouse out of Android Emulator, Thanks!!")
 	$MsgBox = _ExtMsgBox(48, GetTranslated(640,36,"OK"), GetTranslated(640,37,"Notice!"), $stext, 15)
 
-	IniWrite($g_sProfileBuildingPath, "other", "xWardenAltarPos", $WardenAltarPos[0])
-	IniWrite($g_sProfileBuildingPath, "other", "yWardenAltarPos", $WardenAltarPos[1])
+	IniWrite($g_sProfileBuildingPath, "other", "xWardenAltarPos", $g_aiWardenAltarPos[0])
+	IniWrite($g_sProfileBuildingPath, "other", "yWardenAltarPos", $g_aiWardenAltarPos[1])
 
 
 EndFunc   ;==>_LocateWardenAltar

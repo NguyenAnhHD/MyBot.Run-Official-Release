@@ -8,8 +8,8 @@
 ;                 $minCapacity-the minimum of how much the building contains
 ; Return values .:$capacityanalized-how many resources were detected in the building
 ; Author ........: Sardo (2016)
-; Modified ......: CodeSlinger69 (2017)
-; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2017
+; Modified ......: CodeSlinger69 (01-2017)
+; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
@@ -28,8 +28,8 @@ Func DetectAmountOfResourceInStructure($type, $coordinate, $level, $mincapacity)
 		Local $endoffilename
 		_CaptureRegion($coordinate[0] - 10, $coordinate[1] - 10, $coordinate[0] + 10, $coordinate[1] + 20)
 		Local $found = 0
-		For $t = UBound($CapacityStructureElixir[$level]) - 1 To 1 Step -1
-		    Local $a = $CapacityStructureElixir[$level]
+		For $t = UBound($g_asCapacityStructureElixir[$level]) - 1 To 1 Step -1
+		    Local $a = $g_asCapacityStructureElixir[$level]
 			$filename = $a[$t]
 			Local $capacityanalized = StringMid($filename, StringInStr($filename, "_", 0, 2) + 1, StringInStr($filename, "_", 0, 3) - StringInStr($filename, "_", 0, 2) - 1)
 			$tolerance = StringMid($filename, StringInStr($filename, "_", 0, 3) + 1, StringInStr($filename, "_", 0, 4) - StringInStr($filename, "_", 0, 3) - 1)

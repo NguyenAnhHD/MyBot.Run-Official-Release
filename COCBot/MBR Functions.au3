@@ -12,12 +12,13 @@
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-
+;#include-once
 #include "functions\Other\SetLog.au3"
-#include "functions\Other\Synchronization.au3"
+;#include "functions\Other\Synchronization.au3" ; now included in LaunchConsole.au3
 #include "functions\Other\OnAutoItErrorRegisterBot.au3"
 
 #include "functions\Config\profileFunctions.au3"
+#include "functions\Config\_Ini_Table.au3"
 #include "functions\Config\applyConfig.au3"
 #include "functions\Config\readConfig.au3"
 #include "functions\Config\saveConfig.au3"
@@ -28,7 +29,6 @@
 #include "functions\Attack\GoldElixirChangeEBO.au3"
 #include "functions\Attack\PrepareAttack.au3"
 #include "functions\Attack\ReturnHome.au3"
-#include "functions\Attack\SnipeWhileTrain.au3"
 #include "functions\Attack\Unbreakable.au3"
 
 #include "functions\Attack\Attack Algorithms\algorithm_AllTroops.au3"
@@ -161,7 +161,6 @@
 #include "functions\Other\WerFaultClose.au3"
 #include "functions\Other\_NumberFormat.au3"
 #include "functions\Other\_PadStringCenter.au3"
-#include "functions\Other\_ReduceMemory.au3"
 #include "functions\Other\_ProcessSuspendResume2.au3"
 #include "functions\Other\_Sleep.au3"
 #include "functions\Other\_SleepStatus.au3"
@@ -178,7 +177,6 @@
 #include "functions\Other\StringSize.au3"
 #include "functions\Other\Tab.au3"
 #include "functions\Other\Time.au3"
-#include "functions\Other\BlockInputEx.au3"
 #include "functions\Other\TogglePause.au3"
 #include "functions\Other\CheckPrerequisites.au3"
 #include "functions\Other\CheckDisplay.au3"
@@ -195,7 +193,6 @@
 #include "functions\Other\WindowSystemMenu.au3"
 #include "functions\Other\image_get_info.au3"
 
-#include "functions\Other\ComError.au3"
 #include "functions\Other\IsPage.au3"
 #include "functions\Other\MoveMouseOutBS.au3"
 #include "functions\Other\KillProcess.au3"
@@ -210,7 +207,6 @@
 #include "functions\Pixels\_GetPixelColor.au3"
 #include "functions\Pixels\_PixelSearch.au3"
 #include "functions\Pixels\_MultiPixelSearch.au3"
-#include "functions\Pixels\boolPixelSearch.au3"
 #include "functions\Pixels\isInsideDiamond.au3"
 
 #include "functions\Read Text\getBuilderCount.au3"
@@ -241,6 +237,7 @@
 #include "functions\Village\CheckBaseQuick.au3"
 #include "functions\Village\chkShieldStatus.au3"
 #include "functions\Village\Collect.au3"
+#include "functions\Village\TreasuryCollect.au3"
 #include "functions\Village\DonateCC.au3"
 #include "functions\Village\DonateCCWBL.au3"
 #include "functions\Village\DropTrophy.au3"

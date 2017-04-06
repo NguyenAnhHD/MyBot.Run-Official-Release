@@ -23,7 +23,7 @@ Global $g_hLblSmartUseLSpell = 0, $g_hLblSmartUseEQSpell = 0,  $g_hLblSmartZap =
 Func CreateAttackNewSmartZap()
 
    Local $x = 25, $y = 45
-	   GUICtrlCreateGroup(GetTranslated(638, 1, "SmartZap/NoobZap"), $x - 20, $y - 20, 420, 175)
+	   GUICtrlCreateGroup(GetTranslated(638, 1, "SmartZap/NoobZap"), $x - 20, $y - 20, $g_iSizeWGrpTab4, $g_iSizeHGrpTab4)
 		   GUICtrlCreateLabel(GetTranslated(638, 2, "Use This Spell to Zap Dark Drills"), $x + 20, $y, -1, -1)
 		   GUICtrlCreateIcon($g_sLibIconPath, $eIcnNewSmartZap, $x - 10, $y, 25, 25)
 		   GUICtrlCreateIcon($g_sLibIconPath, $eIcnLightSpell, $x + 45, $y + 20, 25, 25)
