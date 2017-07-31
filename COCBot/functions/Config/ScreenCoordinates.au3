@@ -145,9 +145,6 @@ Global Const $aRtnHomeCheck2[4] = [497, 548 + $g_iMidOffsetY, 0x79C326, 20]
 
 Global Const $aSearchLimit[6] = [19, 565, 104, 580, 0xD9DDCF, 10] ; (kaganus) no idea what this is for
 
-; Builder Base
-Global Const $aConfirmBoost[4] = [431, 438, 0xD9F57B, 10]
-
 ;inattackscreen
 Global Const $aIsAttackPage[4] = [70, 548 + $g_iBottomOffsetY, 0xC80000, 20] ; red button "end battle" 860x780
 
