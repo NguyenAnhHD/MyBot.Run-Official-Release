@@ -6533,10 +6533,10 @@ EndFunc
 Global $aCenterEnemyVillageClickDrag = [65, 545]
 Global $aCenterHomeVillageClickDrag = [160, 665]
 Global $aIsReloadError[4] = [457, 301 + $g_iMidOffsetY, 0x33B5E5, 10]
-Global $aIsMain[4] = [284, 29, 0x1C4466, 20]
+Global $aIsMain[4] = [294, 27, 0x364145, 25]
 Global $aIsDPI125[4] = [355, 35, 0x399CB8, 15]
 Global $aIsDPI150[4] = [426, 42, 0x348FAA, 15]
-Global $aIsMainGrayed[4] = [284, 29, 0x0B1B29, 15]
+Global $aIsMainGrayed[4] = [294, 27, 0x0B1B29, 15]
 Global $aIsOnBuilderIsland[4] = [838, 18, 0xffff46, 10]
 Global $aTopLeftClient[4] = [1, 1, 0x000000, 0]
 Global $aTopRightClient[4] = [850, 1, 0x000000, 0]
@@ -6628,116 +6628,6 @@ Global $aArmyTrainButtonRND[4] = [20, 540 + $g_iMidOffsetY, 55, 570 + $g_iMidOff
 Global $aAttackButtonRND[4] = [20, 610 + $g_iMidOffsetY, 100, 670 + $g_iMidOffsetY]
 Global $aFindMatchButtonRND[4] = [200, 510 + $g_iMidOffsetY, 300, 530 + $g_iMidOffsetY]
 Global $NextBtnRND[4] = [710, 530 + $g_iMidOffsetY, 830, 570 + $g_iMidOffsetY]
-Global $aTrainBarb[5] = [64, 354 + $g_iMidOffsetY, 0xE0AB38, 40, False]
-Global $aTrainArch[5] = [77, 482 + $g_iMidOffsetY, 0xB82A64, 40, False]
-Global $aTrainGiant[5] = [192, 387 + $g_iMidOffsetY, 0xF7AD78, 40, False]
-Global $aTrainGobl[5] = [178, 487 + $g_iMidOffsetY, 0xB0DB6E, 40, False]
-Global $aTrainWall[5] = [282, 385 + $g_iMidOffsetY, 0x000000, 40, False]
-Global $aTrainBall[5] = [249, 469 + $g_iMidOffsetY, 0x64242C, 40, False]
-Global $aTrainWiza[5] = [384, 384 + $g_iMidOffsetY, 0xF8D0B8, 40, False]
-Global $aTrainHeal[5] = [396, 500 + $g_iMidOffsetY, 0xF8EEE8, 40, False]
-Global $aTrainDrag[5] = [435, 354 + $g_iMidOffsetY, 0xFDF8F6, 40, False]
-Global $aTrainPekk[5] = [465, 493 + $g_iMidOffsetY, 0x0E0811, 40, False]
-Global $aTrainBabyD[5] = [578, 385 + $g_iMidOffsetY, 0x080000, 40, False]
-Global $aTrainMine[5] = [568, 452 + $g_iMidOffsetY, 0x989C98, 40, False]
-Global $aTrainMini[5] = [489, 375 + $g_iMidOffsetY, 0x7ACFF0, 40, False]
-Global $aTrainHogs[5] = [500, 467 + $g_iMidOffsetY, 0xB87867, 40, False]
-Global $aTrainValk[5] = [619, 398 + $g_iMidOffsetY, 0xD03E04, 40, False]
-Global $aTrainGole[5] = [583, 498 + $g_iMidOffsetY, 0x534E48, 40, False]
-Global $aTrainWitc[5] = [696, 353 + $g_iMidOffsetY, 0x636AE5, 40, False]
-Global $aTrainLava[5] = [687, 475 + $g_iMidOffsetY, 0x210D00, 40, False]
-Global $aTrainBowl[5] = [777, 356 + $g_iMidOffsetY, 0x8884F0, 40, False]
-Global $aFullBarb[4] = [100, 423 + $g_iMidOffsetY, 0x6D6D6D, 20]
-Global $aFullArch[4] = [100, 529 + $g_iMidOffsetY, 0x8A8A8A, 20]
-Global $aFullGiant[4] = [199, 422 + $g_iMidOffsetY, 0x676767, 20]
-Global $aFullGobl[4] = [199, 523 + $g_iMidOffsetY, 0x666666, 20]
-Global $aFullWall[4] = [297, 429 + $g_iMidOffsetY, 0x8D8D8D, 20]
-Global $aFullBall[4] = [296, 531 + $g_iMidOffsetY, 0x898989, 20]
-Global $aFullWiza[4] = [397, 421 + $g_iMidOffsetY, 0x676767, 20]
-Global $aFullHeal[4] = [398, 523 + $g_iMidOffsetY, 0x676767, 20]
-Global $aFullDrag[4] = [496, 421 + $g_iMidOffsetY, 0x676767, 20]
-Global $aFullPekk[4] = [493, 526 + $g_iMidOffsetY, 0x7D7D7D, 20]
-Global $aFullBabyD[4] = [590, 423 + $g_iMidOffsetY, 0x696969, 20]
-Global $aFullMine[4] = [594, 523 + $g_iMidOffsetY, 0x686868, 20]
-Global $aFullMini[4] = [456, 356 + $g_iMidOffsetY, 0x4D4D4D, 20]
-Global $aFullHogs[4] = [488, 512 + $g_iMidOffsetY, 0xA4A4A4, 20]
-Global $aFullValk[4] = [578, 370 + $g_iMidOffsetY, 0x8C8C8C, 20]
-Global $aFullGole[4] = [597, 509 + $g_iMidOffsetY, 0x3A3A3A, 20]
-Global $aFullWitc[4] = [671, 387 + $g_iMidOffsetY, 0x8D8D8D, 20]
-Global $aFullLava[4] = [721, 488 + $g_iMidOffsetY, 0x808080, 20]
-Global $aFullBowl[4] = [777, 407 + $g_iMidOffsetY, 0x727272, 20]
-Global $aTrainLSpell[5] = [ 70, 405 + $g_iMidOffsetY, 0x0A47EE, 40, False]
-Global $aTrainHSpell[5] = [ 70, 505 + $g_iMidOffsetY, 0xDAAF48, 40, False]
-Global $aTrainRSpell[5] = [170, 405 + $g_iMidOffsetY, 0x501886, 45, False]
-Global $aTrainJSpell[5] = [170, 505 + $g_iMidOffsetY, 0x4CCC08, 40, False]
-Global $aTrainFSpell[5] = [270, 405 + $g_iMidOffsetY, 0x29ADD0, 40, False]
-Global $aTrainCSpell[5] = [270, 505 + $g_iMidOffsetY, 0x20DDD8, 40, False]
-Global $aTrainPSpell[5] = [375, 405 + $g_iMidOffsetY, 0xF88010, 40, False]
-Global $aTrainESpell[5] = [375, 505 + $g_iMidOffsetY, 0xBF8B58, 40, False]
-Global $aTrainHaSpell[5] = [469, 409 + $g_iMidOffsetY, 0xf267a7, 40, False]
-Global $aTrainSkSpell[5] = [475, 505 + $g_iMidOffsetY, 0xE01800, 40, False]
-Global $aFullLSpell[4] = [74, 392 + $g_iMidOffsetY, 0x515151, 40]
-Global $aFullHSpell[4] = [70, 505 + $g_iMidOffsetY, 0xB1B1B1, 40]
-Global $aFullRSpell[4] = [186, 405 + $g_iMidOffsetY, 0x696969, 40]
-Global $aFullJSpell[4] = [170, 495 + $g_iMidOffsetY, 0xABABAB, 40]
-Global $aFullFSpell[4] = [266, 395 + $g_iMidOffsetY, 0x929292, 40]
-Global $aFullCSpell[4] = [269, 502 + $g_iMidOffsetY, 0xA4A4A4, 40]
-Global $aFullPSpell[4] = [375, 410 + $g_iMidOffsetY, 0x929292, 40]
-Global $aFullESpell[4] = [370, 510 + $g_iMidOffsetY, 0x858585, 40]
-Global $aFullHaSpell[4] = [470, 410 + $g_iMidOffsetY, 0x929292, 40]
-Global $aFullSkSpell[4] = [475, 510 + $g_iMidOffsetY, 0x4A4A4A, 40]
-Global $aTrainArmy[$eArmyCount] = [$aTrainBarb, $aTrainArch, $aTrainGiant, $aTrainGobl, $aTrainWall, $aTrainBall, $aTrainWiza, $aTrainHeal, $aTrainDrag, $aTrainPekk, $aTrainBabyD, $aTrainMine, $aTrainMini, $aTrainHogs, $aTrainValk, $aTrainGole, $aTrainWitc, $aTrainLava, $aTrainBowl, 0, 0, 0, 0, $aTrainLSpell, $aTrainHSpell, $aTrainRSpell, $aTrainJSpell, $aTrainFSpell, $aTrainCSpell, $aTrainPSpell, $aTrainESpell, $aTrainHaSpell, $aTrainSkSpell]
-Global $aFullArmy[$eArmyCount] = [$aFullBarb, $aFullArch, $aFullGiant, $aFullGobl, $aFullWall, $aFullBall, $aFullWiza, $aFullHeal, $aFullDrag, $aFullPekk, $aFullBabyD, $aFullMine, $aFullMini, $aFullHogs, $aFullValk, $aFullGole, $aFullWitc, $aFullLava, $aFullBowl, 0, 0, 0, 0, $aFullLSpell, $aFullHSpell, $aFullRSpell, $aFullJSpell, $aFullFSpell, $aFullCSpell, $aFullPSpell, $aFullESpell, $aFullHaSpell, $aFullSkSpell]
-Global $xBtnTrain = 89
-Global $yBtnTrain = 50
-Global $xTrainOffset = 97
-Global $yTrainOffset = 101
-Global $xTrain = 28
-Global $yTrain = 371
-Global $aTrainBarbRND[4] = [$xTrain +($xTrainOffset * 0), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 0), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainGiantRND[4]= [$xTrain +($xTrainOffset * 1), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 1), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainWallRND[4] = [$xTrain +($xTrainOffset * 2), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 2), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainWizaRND[4] = [$xTrain +($xTrainOffset * 3), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 3), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainDragRND[4] = [$xTrain +($xTrainOffset * 4), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 4), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainBabyDRND[4] = [$xTrain +($xTrainOffset * 5), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 5), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-$yTrain = $yTrain + $yTrainOffset
-Global $aTrainArchRND[4] = [$xTrain +($xTrainOffset * 0), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 0), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainGoblRND[4] = [$xTrain +($xTrainOffset * 1), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 1), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainBallRND[4] = [$xTrain +($xTrainOffset * 2), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 2), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainHealRND[4] = [$xTrain +($xTrainOffset * 3), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 3), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainPekkRND[4] = [$xTrain +($xTrainOffset * 4), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 4), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainMineRND[4] = [$xTrain +($xTrainOffset * 5), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 5), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $xTrain = 445
-Global $yTrain = 371
-Global $aTrainMiniRND[4] = [$xTrain +($xTrainOffset * 0), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 0), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainValkRND[4] = [$xTrain +($xTrainOffset * 1), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 1), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainWitcRND[4] = [$xTrain +($xTrainOffset * 2), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 2), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainBowlRND[4] = [$xTrain +($xTrainOffset * 3), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 3), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-$yTrain = $yTrain + $yTrainOffset
-Global $aTrainHogsRND[4] = [$xTrain +($xTrainOffset * 0), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 0), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainGoleRND[4] = [$xTrain +($xTrainOffset * 1), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 1), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainLavaRND[4] = [$xTrain +($xTrainOffset * 2), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 2), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $xBtnTrain = 89
-Global $yBtnTrain = 50
-Global $xTrainOffset = 97
-Global $yTrainOffset = 101
-Global $xTrain = 28
-Global $yTrain = 371
-Global $aTrainLSpellRND[4] = [$xTrain +($xTrainOffset * 0), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 0), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainRSpellRND[4]= [$xTrain +($xTrainOffset * 1), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 1), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainFSpellRND[4] = [$xTrain +($xTrainOffset * 2), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 2), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-$yTrain = $yTrain + $yTrainOffset
-Global $aTrainHSpellRND[4] = [$xTrain +($xTrainOffset * 0), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 0), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainJSpellRND[4] = [$xTrain +($xTrainOffset * 1), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 1), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainCSpellRND[4] = [$xTrain +($xTrainOffset * 2), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 2), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $xTrain = 331
-Global $yTrain = 371
-Global $aTrainPSpellRND[4] = [$xTrain +($xTrainOffset * 0), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 0), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainHaSpellRND[4] = [$xTrain +($xTrainOffset * 1), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 1), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-$yTrain = $yTrain + $yTrainOffset
-Global $aTrainESpellRND[4] = [$xTrain +($xTrainOffset * 0), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 0), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainSkSpellRND[4] = [$xTrain +($xTrainOffset * 1), $yTrain + $g_iMidOffsetY, $xTrain + $xBtnTrain +($xTrainOffset * 1), $yTrain + $yBtnTrain + $g_iMidOffsetY]
-Global $aTrainArmyRND[$eArmyCount] = [$aTrainBarbRND, $aTrainArchRND, $aTrainGiantRND, $aTrainGoblRND, $aTrainWallRND, $aTrainBallRND, $aTrainWizaRND, $aTrainHealRND, $aTrainDragRND, $aTrainPekkRND, $aTrainBabyDRND, $aTrainMineRND, $aTrainMiniRND, $aTrainHogsRND, $aTrainValkRND, $aTrainGoleRND, $aTrainWitcRND, $aTrainLavaRND, $aTrainBowlRND, 0, 0, 0, 0, $aTrainLSpellRND, $aTrainHSpellRND, $aTrainRSpellRND, $aTrainJSpell, $aTrainFSpellRND, $aTrainCSpellRND, $aTrainPSpellRND, $aTrainESpellRND, $aTrainHaSpellRND, $aTrainSkSpellRND]
 Func _StringSize($sText, $iSize = 8.5, $iWeight = 400, $iAttrib = 0, $sName = "", $iMaxWidth = 0, $hWnd = 0)
 If $iSize = Default Then $iSize = 8.5
 If $iWeight = Default Then $iWeight = 400
@@ -38455,7 +38345,7 @@ Else
 Setlog("Chief, is your Army ready for the battle? No, not yet!", $COLOR_ACTION)
 If $sLogText <> "" Then Setlog(" -" & $sLogText & " are not Ready!", $COLOR_ACTION)
 EndIf
-If not $bFullArmyCCTroops or not $bFullArmyCCSpells then $g_bCanRequestCC = true
+If Not $bFullArmyCCTroops Or Not $bFullArmyCCSpells Then $g_bCanRequestCC = True
 If $g_iDebugSetlog = 1 Then
 SetLog(" $g_bFullArmy: " & String($g_bFullArmy), $COLOR_DEBUG)
 SetLog(" $bCheckCCTroops: " & String($bFullArmyCCTroops), $COLOR_DEBUG)
@@ -38610,19 +38500,17 @@ EndIf
 EndIf
 If Not $g_bRunState Then Return
 If _Sleep(100) Then Return
-Local $sCCSpell, $sCCSpell2, $bCheckDBCCSpell = False, $bCheckABCCSpell = False
-Local $bCheckCCSpell2 = False
-Local $aShouldRemove[2] = [0, 0]
+Local $sCCSpell, $sCCSpell2, $bCheckDBCCSpell = False, $bCheckABCCSpell = False, $aShouldRemove[2] = [0, 0]
 If $CastleCapacity = 0 Or $CastleCapacity = "" Then Return $aShouldRemove
 If $g_abAttackTypeEnable[$DB] And $g_abSearchCastleSpellsWaitEnable[$DB] Then
 If $g_iDebugSetlogTrain Then Setlog("- Let's compare CC Spells on Dead Bases!", $COLOR_DEBUG)
 $bCheckDBCCSpell = True
 EndIf
 If $g_abAttackTypeEnable[$LB] And $g_abSearchCastleSpellsWaitEnable[$LB] Then
-If $g_iDebugSetlogTrain Then Setlog("- Let's compare CC Spells on live Bases", $COLOR_DEBUG)
+If $g_iDebugSetlogTrain Then Setlog("- Let's compare CC Spells on Active Bases", $COLOR_DEBUG)
 $bCheckABCCSpell = True
 EndIf
-If $bCheckDBCCSpell = False And $bCheckABCCSpell = False Then Return $aShouldRemove
+If Not $bCheckDBCCSpell And Not $bCheckABCCSpell Then Return $aShouldRemove
 For $Mode = $DB To $LB
 If BitOR($g_aiSearchCastleSpellsWaitRegular[$Mode], $g_aiSearchCastleSpellsWaitDark[$Mode]) > 0 Then
 Local $txt = "DB"
@@ -38650,16 +38538,6 @@ $sCCSpell = "HaSpell"
 Case 9
 $sCCSpell = "SkSpell"
 EndSwitch
-If($g_aiSearchCastleSpellsWaitRegular[$Mode] > 5 Or($g_aiSearchCastleSpellsWaitRegular[$Mode] = 0 And $g_aiSearchCastleSpellsWaitDark[$Mode] > 0)) And $CastleCapacity = 2 Then $bCheckCCSpell2 = True
-If $g_iDebugSetlogTrain Then Setlog("[1][" & $txt & "] GUI Spell is " & $sCCSpell, $COLOR_DEBUG)
-If($sCCSpell = $CCSpell1[0][0] Or $sCCSpell = "Any") And $CCSpell1[0][3] = 1 Then
-$aShouldRemove[0] = 0
-ElseIf($sCCSpell = $CCSpell1[0][0] Or $sCCSpell = "Any") And $CCSpell1[0][3] = 2 And($CCSpell1[0][0] <> $CCSpell2[0][0] Or $CCSpell2[0][0] <> "Any") Then
-$aShouldRemove[0] = 1
-Else
-$aShouldRemove[0] = $CCSpell1[0][3]
-EndIf
-If $bCheckCCSpell2 Then
 Switch $g_aiSearchCastleSpellsWaitDark[$Mode]
 Case 0
 $sCCSpell2 = "Any"
@@ -38672,17 +38550,25 @@ $sCCSpell2 = "HaSpell"
 Case 4
 $sCCSpell2 = "SkSpell"
 EndSwitch
-If $CCSpell1[0][3] = 2 And $sCCSpell2 <> $sCCSpell And $bCheckCCSpell2 = True Then
-Setlog("One more Dark Spell on Slot 1 than is needed!")
-$aShouldRemove[0] = 1
+Switch $CCSpell1[0][3]
+Case 1
+If($sCCSpell <> $CCSpell1[0][0] And $sCCSpell <> "Any") Then
+$aShouldRemove[0] = $CCSpell1[0][3]
 EndIf
-If $g_iDebugSetlogTrain Then Setlog("[2][" & $txt & "] GUI Spell is " & $sCCSpell2, $COLOR_DEBUG)
-If $sCCSpell2 = $CCSpell2[0][0] Or $sCCSpell2 = "Any" Or($sCCSpell2 = $sCCSpell And $CCSpell1[0][3] = $CastleCapacity) Then
-$aShouldRemove[1] = 0
-Else
+If $CastleCapacity = 2 and $g_aiSearchCastleSpellsWaitRegular[$Mode] > 5 Then
+If $sCCSpell2 <> $CCSpell2[0][0] And $sCCSpell2 <> "Any" Then
 $aShouldRemove[1] = $CCSpell2[0][3]
 EndIf
 EndIf
+Case 2
+If($sCCSpell <> $CCSpell1[0][0] And $sCCSpell <> "Any") And($sCCSpell2 <> $CCSpell1[0][0] And $sCCSpell2 <> "Any") Then
+$aShouldRemove[0] = $CCSpell1[0][3]
+ElseIf($sCCSpell <> $CCSpell1[0][0] And $sCCSpell <> "Any") Or($sCCSpell2 <> $CCSpell1[0][0] And $sCCSpell2 <> "Any") Then
+$aShouldRemove[0] = 1
+EndIf
+Case Else
+Return $aShouldRemove
+EndSwitch
 ExitLoop
 EndIf
 Next
@@ -39486,10 +39372,10 @@ EndSwitch
 If _CheckPixel($aIsTrainPgChk1, True) Then
 While $i < 1
 If Not $g_bRunState Then Return
-if $g_iDebugSetlogTrain then Setlog("$CheckIT[0]: " & $CheckIT[0])
-if $g_iDebugSetlogTrain then Setlog("$CheckIT[1]: " & $CheckIT[1])
-if $g_iDebugSetlogTrain then Setlog("$CheckIT[2]: " & Hex($CheckIT[2], 6))
-if $g_iDebugSetlogTrain then Setlog("$CheckIT[3]: " & $CheckIT[3])
+If $g_iDebugSetlogTrain Then Setlog("$CheckIT[0]: " & $CheckIT[0])
+If $g_iDebugSetlogTrain Then Setlog("$CheckIT[1]: " & $CheckIT[1])
+If $g_iDebugSetlogTrain Then Setlog("$CheckIT[2]: " & Hex($CheckIT[2], 6))
+If $g_iDebugSetlogTrain Then Setlog("$CheckIT[3]: " & $CheckIT[3])
 If _ColorCheck(_GetPixelColor($CheckIT[0], $CheckIT[1], True), Hex($CheckIT[2], 6), $CheckIT[3]) Then ExitLoop
 If _Sleep($DELAYISTRAINPAGE2) Then ExitLoop
 $i += 1
@@ -39954,11 +39840,11 @@ Local $aTempResult = StringSplit($iOCRResult, "#", $STR_NOCOUNT)
 $aResult[0] = Number($aTempResult[0])
 $aResult[1] = Number($aTempResult[1])
 If $aResult[1] <= 22 Then
-if $g_iDebugSetlogTrain then Setlog("$g_iTotalSpellValue: " & $g_iTotalSpellValue, $COLOR_DEBUG)
+If $g_iDebugSetlogTrain Then Setlog("$g_iTotalSpellValue: " & $g_iTotalSpellValue, $COLOR_DEBUG)
 $aResult[1] = $g_iTotalSpellValue
 $aResult[2] = $g_iTotalSpellValue - $aResult[0]
 ElseIf $aResult[1] <> $g_iTotalCampSpace Then
-If $g_iDebugSetlogTrain then Setlog("$g_iTotalCampSpace: " & $g_iTotalCampSpace, $COLOR_DEBUG)
+If $g_iDebugSetlogTrain Then Setlog("$g_iTotalCampSpace: " & $g_iTotalCampSpace, $COLOR_DEBUG)
 $aResult[1] = $g_iTotalCampSpace
 $aResult[2] = $g_iTotalCampSpace - $aResult[0]
 EndIf
@@ -40138,42 +40024,17 @@ Return False
 EndIf
 EndFunc
 Func TrainIt($iIndex, $iQuantity = 1, $iSleep = 400)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func TrainIt " & $iIndex & " " & $iQuantity & " " & $iSleep, $COLOR_DEBUG)
-Local $bDark = False
-_CaptureRegion()
+If $g_iDebugSetlogTrain = 1 Then SetLog("Func TrainIt $iIndex=" & $iIndex & " $howMuch=" & $iQuantity & " $iSleep=" & $iSleep, $COLOR_DEBUG)
+Local $bDark =($iIndex >= $eMini And $iIndex <= $eBowl)
 Local $aTrainPos = GetTrainPos($iIndex)
-If IsArray($aTrainPos) Then
-Switch _CheckPixel($aTrainPos, $g_bNoCapturePixel)
-Case False
-SetLog("Cannot verify the Train Position of " & GetTroopName($iIndex) & ". Using ImgLoc to find new Train Position!", $COLOR_WARNING)
-Local $aTempPos = GetTrainPosImgLoc($iIndex)
-If @error Then
-Setlog("Unrecoverable error occurred in TrainIt(), Skipping: " & GetTroopName($iIndex), $COLOR_ERROR)
-Local $badPixelColor = _GetPixelColor($aTrainPos[0], $aTrainPos[1], $g_bNoCapturePixel)
-If StringMid($badPixelColor, 1, 2) = StringMid($badPixelColor, 3, 2) And StringMid($badPixelColor, 1, 2) = StringMid($badPixelColor, 5, 2) Then
-If $g_iDebugSetlogTrain = 1 Then Setlog("Troop " & GetTroopName($iIndex) & " is not available due to full queue", $COLOR_DEBUG)
-Else
-Setlog("Bad pixel check on troop position " & GetTroopName($iIndex), $COLOR_ERROR)
-If $g_iDebugSetlogTrain = 1 Then Setlog("Train Pixel Color: " & $badPixelColor, $COLOR_DEBUG)
-If $g_iDebugSetlogTrain = 1 Then Setlog("Train Pixel Coords 2: " & $aTrainPos[0] & ":" & $aTrainPos[1], $COLOR_DEBUG)
-EndIf
-$g_bRestart = True
-SetError(1000, "", "")
-Return
-EndIf
-SetNewTrainPos($iIndex, $aTempPos)
-Local $aTempFullName = GetFullNameImgLoc($iIndex, $aTrainPos)
-SetNewFullName($iIndex, $aTempFullName)
-Local $aTempRNDPos = GetRNDNameImgLoc($iIndex, $aTrainPos)
-SetNewRNDName($iIndex, $aTempRNDPos)
-ContinueCase
-Case True
-Local $FullName = GetFullName($iIndex)
+If IsArray($aTrainPos) And $aTrainPos[0] <> -1 Then
+If _ColorCheck(_GetPixelColor($aTrainPos[0], $aTrainPos[1], $g_bCapturePixel), Hex($aTrainPos[2], 6), $aTrainPos[3]) = True Then
+Local $FullName = GetFullName($iIndex, $aTrainPos)
 If IsArray($FullName) Then
-Local $RNDName = GetRNDName($iIndex)
+Local $RNDName = GetRNDName($iIndex, $aTrainPos)
 If IsArray($RNDName) Then
 TrainClickP($aTrainPos, $iQuantity, $g_iTrainClickDelay, $FullName, "#0266", $RNDName)
-If _Sleep($iSleep) Then Return False
+If _Sleep($iSleep) Then Return
 If $g_bOutOfElixir Then
 Setlog("Not enough " &($bDark ? "Dark " : "") & "Elixir to train position " & GetTroopName($iIndex) & " troops!", $COLOR_ERROR)
 Setlog("Switching to Halt Attack, Stay Online Mode...", $COLOR_ERROR)
@@ -40182,261 +40043,196 @@ Return
 EndIf
 Return True
 Else
-Setlog("TrainIt position " & $iIndex & " - RNDName did not return array?", $COLOR_ERROR)
+Setlog("TrainIt position " & GetTroopName($iIndex) & " - RNDName did not return array?", $COLOR_ERROR)
 EndIf
 Else
 Setlog("TrainIt " & GetTroopName($iIndex) & " - FullName did not return array?", $COLOR_ERROR)
 EndIf
-EndSwitch
+Else
+Local $sBadPixelColor = _GetPixelColor($aTrainPos[0], $aTrainPos[1], $g_bCapturePixel)
+If $g_iDebugSetlogTrain Then Setlog("Positon X: " & $aTrainPos[0] & "| Y : " & $aTrainPos[1] & " |Color get: " & $sBadPixelColor & " | Need: " & $aTrainPos[2])
+If StringMid($sBadPixelColor, 1, 2) = StringMid($sBadPixelColor, 3, 2) And StringMid($sBadPixelColor, 1, 2) = StringMid($sBadPixelColor, 5, 2) Then
+Setlog("Troop " & GetTroopName($iIndex) & " is not available due to full queue", $COLOR_DEBUG)
+Else
+Setlog("Bad pixel check on troop position " & GetTroopName($iIndex), $COLOR_ERROR)
+If $g_iDebugSetlogTrain = 1 Then Setlog("Train Pixel Color: " & $sBadPixelColor, $COLOR_DEBUG)
+EndIf
+EndIf
 Else
 Setlog("Impossible happened? TrainIt troop position " & GetTroopName($iIndex) & " did not return array", $COLOR_ERROR)
 EndIf
 EndFunc
-Func GetTrainPos($iIndex)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func GetTrainPos $iIndex=" & $iIndex, $COLOR_DEBUG)
-If($iIndex >= $eBarb And $iIndex <= $eBowl) Or($iIndex >= $eLSpell And $iIndex <= $eSkSpell) Then
-Return $aTrainArmy[$iIndex]
-EndIf
-SetLog("Don't know how to train the troop " & GetTroopName($iIndex) & " yet", $COLOR_WARNING)
-Return 0
-EndFunc
-Func SetNewTrainPos($iIndex, $aNewTrainPos)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func SetTrainPos $iIndex=" & $iIndex, $COLOR_DEBUG)
-If($iIndex >= $eBarb And $iIndex <= $eBowl) Or($iIndex >= $eLSpell And $iIndex <= $eSkSpell) Then
-$aTrainArmy[$iIndex] = $aNewTrainPos
-Return 1
-EndIf
-SetLog("Don't know how to set the train pos of the troop " & GetTroopName($iIndex) & " yet", $COLOR_WARNING)
-Return 0
-EndFunc
-Func GetTrainPosImgLoc(Const $iIndex)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func GetTrainPosImgLoc $iIndex=" & $iIndex, $COLOR_DEBUG)
+Func GetTrainPos(Const $iIndex)
+If $g_iDebugSetlogTrain = 1 Then SetLog("GetTrainPos($iIndex=" & $iIndex & ")", $COLOR_DEBUG)
+Local $aTrainPos = $aTrainArmy[$iIndex]
+If $aTrainPos[0] <> -1 Then
+Return $aTrainPos
+Else
 If $iIndex >= $eBarb And $iIndex <= $eBowl Then
 Local $sDirectory = @ScriptDir & "\imgxml\Train\Train_Train\"
 Local $sFilter = String($g_asTroopShortNames[$iIndex]) & "*"
 Local $asImageToUse = _FileListToArray($sDirectory, $sFilter, $FLTA_FILES, True)
 If $g_iDebugSetlogTrain Then setlog("$asImageToUse Troops: " & $asImageToUse[1])
-Local $Result = GetVariable($asImageToUse[1], $iIndex)
-If @error Then
-SetError(1, "", "")
-Return
-EndIf
-Return $Result
+$aTrainPos = GetVariable($asImageToUse[1], $iIndex)
+$aTrainArmy[$iIndex] = $aTrainPos
+Return $aTrainPos
 EndIf
 If $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then
 Local $sDirectory = @ScriptDir & "\imgxml\Train\Spell_Train\"
 Local $sFilter = String($g_asSpellShortNames[$iIndex - $eLSpell]) & "*"
 Local $asImageToUse = _FileListToArray($sDirectory, $sFilter, $FLTA_FILES, True)
 If $g_iDebugSetlogTrain Then setlog("$asImageToUse Spell: " & $asImageToUse[1])
-Local $Result = GetVariable($asImageToUse[1], $iIndex)
-If @error Then
-SetError(1, "", "")
-Return
+$aTrainPos = GetVariable($asImageToUse[1], $iIndex)
+$aTrainArmy[$iIndex] = $aTrainPos
+Return $aTrainPos
 EndIf
-Return $Result
 EndIf
 Return 0
 EndFunc
-Func GetFullName($iIndex)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func GetFullName $iIndex=" & $iIndex, $COLOR_DEBUG)
-If($iIndex >= $eBarb And $iIndex <= $eBowl) Or($iIndex >= $eLSpell And $iIndex <= $eSkSpell) Then
-Return $aFullArmy[$iIndex]
-EndIf
-SetLog("Don't know how to find the full name of troop with index " & $iIndex & " yet")
-Return 0
-EndFunc
-Func SetNewFullName($iIndex, $aNewFullName)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func SetNewFullName $iIndex=" & $iIndex, $COLOR_DEBUG)
-If($iIndex >= $eBarb And $iIndex <= $eBowl) Or($iIndex >= $eLSpell And $iIndex <= $eSkSpell) Then
-$aFullArmy[$iIndex] = $aNewFullName
-Return 1
-EndIf
-SetLog("Don't know how to set the full name of troop with index " & $iIndex & " yet")
-Return 0
-EndFunc
-Func GetFullNameImgLoc(Const $iIndex, Const $pos)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func GetFullNameImgLoc $iIndex=" & $iIndex, $COLOR_DEBUG)
+Func GetFullName(Const $iIndex, Const $aTrainPos)
+If $g_iDebugSetlogTrain = 1 Then SetLog("GetFullName($iIndex=" & $iIndex & ")", $COLOR_DEBUG)
 If $iIndex >= $eBarb And $iIndex <= $eBowl Then
-Local $text =($iIndex >= $eMini ? "Dark" : "Normal")
-If $g_iDebugSetlogTrain = 1 Then Setlog("Troop Name: " & $g_asTroopNames[$iIndex])
-Return GetFullNameSlot($pos, $text)
+Local $sTroopType =($iIndex >= $eMini ? "Dark" : "Normal")
+Return GetFullNameSlot($aTrainPos, $sTroopType)
 EndIf
 If $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then
-Return GetFullNameSlot($pos, "Spell")
+Return GetFullNameSlot($aTrainPos, "Spell")
 EndIf
 SetLog("Don't know how to find the full name of troop with index " & $iIndex & " yet")
-Local $slotTemp[4] = [-1, -1, -1, -1]
-Return $slotTemp
+Local $aTempSlot[4] = [-1, -1, -1, -1]
+Return $aTempSlot
 EndFunc
-Func GetRNDName($iIndex)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func GetRNDName $iIndex=" & $iIndex, $COLOR_DEBUG)
-If($iIndex >= $eBarb And $iIndex <= $eBowl) Or($iIndex >= $eLSpell And $iIndex <= $eSkSpell) Then
-Return $aTrainArmyRND[$iIndex]
-EndIf
-SetLog("Don't know how to find the RND name of troop with index " & $iIndex & " yet!", $COLOR_ERROR)
-Return 0
-EndFunc
-Func SetNewRNDName($iIndex, $aNewRNDName)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func SetNewRNDName $iIndex=" & $iIndex, $COLOR_DEBUG)
-If($iIndex >= $eBarb And $iIndex <= $eBowl) Or($iIndex >= $eLSpell And $iIndex <= $eSkSpell) Then
-$aTrainArmyRND[$iIndex] = $aNewRNDName
-Return 1
-EndIf
-SetLog("Don't know how to set the RND name of troop with index " & $iIndex & " yet!", $COLOR_ERROR)
-Return 0
-EndFunc
-Func GetRNDNameImgLoc(Const $iIndex, Const $pos)
-If $g_iDebugSetlogTrain = 1 Then SetLog("Func GetRNDNameImggLoc $iIndex=" & $iIndex, $COLOR_DEBUG)
-Local $aReturn[4]
+Func GetRNDName(Const $iIndex, Const $aTrainPos)
+If $g_iDebugSetlogTrain = 1 Then SetLog("GetRNDName($iIndex=" & $iIndex & ")", $COLOR_DEBUG)
+Local $aTrainPosRND[4]
 If $iIndex <> -1 Then
-Local $aTempCoord = $pos
-$aReturn[0] = $aTempCoord[0] - Random(0, 5, 1)
-$aReturn[1] = $aTempCoord[1] - Random(0, 5, 1)
-$aReturn[2] = $aTempCoord[0] + Random(0, 5, 1)
-$aReturn[3] = $aTempCoord[1] + Random(0, 5, 1)
-Return $aReturn
+Local $aTempCoord = $aTrainPos
+$aTrainPosRND[0] = $aTempCoord[0] - 5
+$aTrainPosRND[1] = $aTempCoord[1] - 5
+$aTrainPosRND[2] = $aTempCoord[0] + 5
+$aTrainPosRND[3] = $aTempCoord[1] + 5
+Return $aTrainPosRND
 EndIf
 SetLog("Don't know how to find the RND name of troop with index " & $iIndex & " yet!", $COLOR_ERROR)
 Return 0
 EndFunc
 Func GetVariable(Const $ImageToUse, Const $iIndex)
-Local $FinalVariable[5] = [-1, -1, -1, -1, False]
+Local $aTrainPos[4] = [-1, -1, -1, -1]
 _CaptureRegion2(25, 375, 840, 548)
-Local $res = DllCallMyBot("FindTile", "handle", $g_hHBitmap2, "str", $ImageToUse, "str", "FV", "int", 1)
+Local $asResult = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $g_hHBitmap2, "str", $ImageToUse, "str", "FV", "int", 1)
 If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
-If IsArray($res) Then
-If $g_iDebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_ERROR)
-If $res[0] = "0" Then
+If IsArray($asResult) Then
+If $asResult[0] = "0" Then
 SetLog("No " & GetTroopName($iIndex) & " Icon found!", $COLOR_ERROR)
-SetError(1, "", "")
-Return
-ElseIf $res[0] = "-1" Then
-SetLog("DLL Error", $COLOR_ERROR)
-SetError(2, "", "")
-Return
-ElseIf $res[0] = "-2" Then
-SetLog("Invalid Resolution", $COLOR_ERROR)
-SetError(3, "", "")
-Return
+ElseIf $asResult[0] = "-1" Then
+SetLog("TrainIt.au3 GetVariable(): ImgLoc DLL Error Occured!", $COLOR_ERROR)
+ElseIf $asResult[0] = "-2" Then
+SetLog("TrainIt.au3 GetVariable(): Wrong Resolution used for ImgLoc Search!", $COLOR_ERROR)
 Else
-If $g_iDebugSetlogTrain Then Setlog("String: " & $res[0])
-Local $expRet = StringSplit($res[0], "|", $STR_NOCOUNT)
-If UBound($expRet) > 1 Then
-Local $posPoint = StringSplit($expRet[1], ",", $STR_NOCOUNT)
-If UBound($posPoint) > 1 Then
-Local $ButtonX = 25 + Int($posPoint[0])
-Local $ButtonY = 375 + Int($posPoint[1])
-Local $Colorcheck = "0x" & _GetPixelColor($ButtonX, $ButtonY, $g_bCapturePixel)
-Local $Tolerance = 40
-Local $FinalVariable[5] = [$ButtonX, $ButtonY, $Colorcheck, $Tolerance, True]
-If $g_iDebugSetlogTrain Then SetLog(" - " & GetTroopName($iIndex) & " Icon found!", $COLOR_SUCCESS)
-If $g_iDebugSetlogTrain Then SetLog("Found: [" & $ButtonX & "," & $ButtonY & "]", $COLOR_SUCCESS)
-If $g_iDebugSetlogTrain Then SetLog("Color check: " & $Colorcheck, $COLOR_SUCCESS)
-If $g_iDebugSetlogTrain Then SetLog("$Tolerance: " & $Tolerance, $COLOR_SUCCESS)
-Return $FinalVariable
-EndIf
-EndIf
+If $g_iDebugSetlogTrain Then Setlog("String: " & $asResult[0])
+Local $aResult = StringSplit($asResult[0], "|", $STR_NOCOUNT)
+Local $aCoordinates = StringSplit($aResult[1], ",", $STR_NOCOUNT)
+Local $iButtonX = 25 + Int($aCoordinates[0])
+Local $iButtonY = 375 + Int($aCoordinates[1])
+Local $sColorToCheck = "0x" & _GetPixelColor($iButtonX, $iButtonY, $g_bCapturePixel)
+Local $iTolerance = 40
+Local $aTrainPos[4] = [$iButtonX, $iButtonY, $sColorToCheck, $iTolerance]
+If $g_iDebugSetlogTrain Then SetLog("Found: [" & $iButtonX & "," & $iButtonY & "]", $COLOR_SUCCESS)
+If $g_iDebugSetlogTrain Then SetLog("$sColorToCheck: " & $sColorToCheck, $COLOR_SUCCESS)
+If $g_iDebugSetlogTrain Then SetLog("$iTolerance: " & $iTolerance, $COLOR_SUCCESS)
+Return $aTrainPos
 EndIf
 Else
 SetLog("Don't know how to train the troop with index " & $iIndex & " yet")
 EndIf
-Return $FinalVariable
+Return $aTrainPos
 EndFunc
 Func GetFullNameSlot(Const $iTrainPos, Const $sTroopType)
-Local $SlotH, $SlotV
-If $g_iDebugSetlogTrain Then Setlog("$iTrainPos[0]: " & $iTrainPos[0])
-If $g_iDebugSetlogTrain Then Setlog("$iTrainPos[1]: " & $iTrainPos[1])
-If $g_iDebugSetlogTrain Then Setlog("$sTroopType" & $sTroopType)
+Local $iSlotH, $iSlotV
 If $sTroopType = "Spell" Then
-If UBound($iTrainPos) < 2 Then Setlog("Issue on $iTrainPos!")
 Switch $iTrainPos[0]
-Case $iTrainPos[0] < 101
-$SlotH = 101
-Case $iTrainPos[0] > 105 And $iTrainPos[0] < 199
-$SlotH = 199
-Case $iTrainPos[0] > 203 And $iTrainPos[0] < 297
-$SlotH = 297
-Case $iTrainPos[0] > 302 And $iTrainPos[0] < 395
-$SlotH = 404
-Case $iTrainPos[0] > 400 And $iTrainPos[0] < 498
-$SlotH = 502
-Case $iTrainPos[0] > 498 And $iTrainPos[0] < 597
-$SlotH = 597
+Case 0 To 101
+$iSlotH = 101
+Case 105 To 199
+$iSlotH = 199
+Case 203 To 297
+$iSlotH = 297
+Case 302 To 395
+$iSlotH = 404
+Case 400 To 498
+$iSlotH = 502
+Case 499 To 597
+$iSlotH = 597
 Case Else
 If _ColorCheck(_GetPixelColor($iTrainPos[0], $iTrainPos[1], True), Hex(0xd3d3cb, 6), 5) Then
-Setlog("This slot is empty! | Spells", $COLOR_ERROR)
+Setlog("GetFullNameSlot(): It seems that there is no Slot for an Spell on: " & $iTrainPos[0] & "," & $iTrainPos[1] & "!", $COLOR_ERROR)
 EndIf
 EndSwitch
 Switch $iTrainPos[1]
-Case $iTrainPos[1] < 445
-$SlotV = 387
-Case $iTrainPos[1] > 445 And $iTrainPos[1] < 550
-$SlotV = 488
+Case 0 To 445
+$iSlotV = 387
+Case 446 To 550
+$iSlotV = 488
 EndSwitch
-Local $ToReturn[4] = [$SlotH, $SlotV, 0x9d9d9d, 20]
-If $g_iDebugSetlogTrain Then SetLog("GetFullNameSlot Spell Icon found!", $COLOR_SUCCESS)
-If $g_iDebugSetlogTrain Then SetLog("Full Train Found: [" & $SlotH & "," & $SlotV & "]", $COLOR_SUCCESS)
-Return $ToReturn
+Local $aSlot[4] = [$iSlotH, $iSlotV, 0x9d9d9d, 20]
+If $g_iDebugSetlogTrain Then SetLog("GetFullNameSlot(): Spell Icon found on: " & $iSlotH & "," & $iSlotV, $COLOR_DEBUG)
+Return $aSlot
 EndIf
 If $sTroopType = "Normal" Then
-If UBound($iTrainPos) < 2 Then Setlog("Issue on $iTrainPos!")
 Switch $iTrainPos[0]
-Case $iTrainPos[0] < 101
-$SlotH = 101
-Case $iTrainPos[0] > 105 And $iTrainPos[0] < 199
-$SlotH = 199
-Case $iTrainPos[0] > 199 And $iTrainPos[0] < 297
-$SlotH = 297
-Case $iTrainPos[0] > 297 And $iTrainPos[0] < 395
-$SlotH = 395
-Case $iTrainPos[0] > 395 And $iTrainPos[0] < 494
-$SlotH = 494
-Case $iTrainPos[0] > 494 And $iTrainPos[0] < 592
-$SlotH = 592
-Case $iTrainPos[0] > 592 And $iTrainPos[0] < 690
-$SlotH = 690
+Case 0 To 101
+$iSlotH = 101
+Case 105 To 199
+$iSlotH = 199
+Case 200 To 297
+$iSlotH = 297
+Case 298 To 395
+$iSlotH = 395
+Case 396 To 494
+$iSlotH = 494
+Case 495 To 592
+$iSlotH = 592
+Case 593 To 690
+$iSlotH = 690
 Case Else
 If _ColorCheck(_GetPixelColor($iTrainPos[0], $iTrainPos[1], True), Hex(0xd3d3cb, 6), 5) Then
-Setlog("This slot is empty! | Normal Troop", $COLOR_ERROR)
+Setlog("GetFullNameSlot(): It seems that there is no Slot for an Elixir Troop on: " & $iTrainPos[0] & "," & $iTrainPos[1] & "!", $COLOR_ERROR)
 EndIf
 EndSwitch
 Switch $iTrainPos[1]
-Case $iTrainPos[1] < 445
-$SlotV = 387
-Case $iTrainPos[1] > 445 And $iTrainPos[1] < 550
-$SlotV = 488
+Case 0 To 445
+$iSlotV = 387
+Case 446 To 550
+$iSlotV = 488
 EndSwitch
-Local $ToReturn[4] = [$SlotH, $SlotV, 0x9f9f9f, 20]
-If $g_iDebugSetlogTrain Then SetLog(" » GetFullNameSlot Normal Icon found!", $COLOR_SUCCESS)
-If $g_iDebugSetlogTrain Then SetLog("Full Train Found: [" & $SlotH & "," & $SlotV & "]", $COLOR_SUCCESS)
-Return $ToReturn
+Local $aSlot[4] = [$iSlotH, $iSlotV, 0x9F9F9F, 20]
+If $g_iDebugSetlogTrain Then SetLog("GetFullNameSlot(): Elixir Troop Icon found on: " & $iSlotH & "," & $iSlotV, $COLOR_DEBUG)
+Return $aSlot
 EndIf
 If $sTroopType = "Dark" Then
-If UBound($iTrainPos) < 2 Then Setlog("Issue on $iTrainPos!")
 Switch $iTrainPos[0]
-Case $iTrainPos[0] > 440 And $iTrainPos[0] < 517
-$SlotH = 517
-Case $iTrainPos[0] > 517 And $iTrainPos[0] < 615
-$SlotH = 615
-Case $iTrainPos[0] > 615 And $iTrainPos[0] < 714
-$SlotH = 714
-Case $iTrainPos[0] > 714 And $iTrainPos[0] < 812
-$SlotH = 812
+Case 440 To 517
+$iSlotH = 517
+Case 518 To 615
+$iSlotH = 615
+Case 616 To 714
+$iSlotH = 714
+Case 715 To 812
+$iSlotH = 812
 Case Else
 If _ColorCheck(_GetPixelColor($iTrainPos[0], $iTrainPos[1], True), Hex(0xd3d3cb, 6), 5) Then
-Setlog("This slot is empty! | Dark Troop", $COLOR_ERROR)
+Setlog("GetFullNameSlot(): It seems that there is no Slot for a Dark Elixir Troop on: " & $iTrainPos[0] & "," & $iTrainPos[1] & "!", $COLOR_ERROR)
 EndIf
 EndSwitch
 Switch $iTrainPos[1]
-Case $iTrainPos[1] < 445
-$SlotV = 397
-Case $iTrainPos[1] > 445 And $iTrainPos[1] < 550
-$SlotV = 498
+Case 0 To 445
+$iSlotV = 397
+Case 446 To 550
+$iSlotV = 498
 EndSwitch
-Local $ToReturn[4] = [$SlotH, $SlotV, 0x9f9f9f, 20]
-If $g_iDebugSetlogTrain Then SetLog("GetFullNameSlot Dark Icon found!", $COLOR_SUCCESS)
-If $g_iDebugSetlogTrain Then SetLog("Full Train Found: [" & $SlotH & "," & $SlotV & "]", $COLOR_SUCCESS)
-Return $ToReturn
+Local $aSlot[4] = [$iSlotH, $iSlotV, 0x9f9f9f, 20]
+If $g_iDebugSetlogTrain Then SetLog("GetFullNameSlot(): Dark Elixir Troop Icon found on: " & $iSlotH & "," & $iSlotV, $COLOR_DEBUG)
+Return $aSlot
 EndIf
 EndFunc
 Func _ImageSearch($findImage, $resultPosition, ByRef $x, ByRef $y, $Tolerance)
