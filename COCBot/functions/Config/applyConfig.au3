@@ -1950,11 +1950,11 @@ Func ApplyConfig_641_1($TypeReadSave)
 			GUICtrlSetState($g_hChkSuspendComputer, $g_bSuspendComputer ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkRandomClose, $g_bCloseRandom ? $GUI_CHECKED : $GUI_UNCHECKED)
 			btnCloseWaitStopRandom()
-			If $g_bCloseExactTime = True Then
+			If $g_bCloseExactTime Then
 				GUICtrlSetState($g_hRdoCloseWaitExact, $GUI_CHECKED)
 				GUICtrlSetState($g_hRdoCloseWaitRandom, $GUI_UNCHECKED)
 			EndIf
-			If $g_bCloseRandomTime = True Then
+			If $g_bCloseRandomTime Then
 				GUICtrlSetState($g_hRdoCloseWaitRandom, $GUI_CHECKED)
 				GUICtrlSetState($g_hRdoCloseWaitExact, $GUI_UNCHECKED)
 			EndIf
@@ -1985,8 +1985,8 @@ Func ApplyConfig_641_1($TypeReadSave)
 			$g_iTrainClickDelay = GUICtrlRead($g_hSldTrainITDelay)
 			; Training add random delay
 			$g_bTrainAddRandomDelayEnable = (GUICtrlRead($g_hChkTrainAddRandomDelayEnable) = $GUI_CHECKED)
-			$g_iTrainAddRandomDelayMin = GUICtrlRead($g_hTxtAddRandomDelayMin)
-			$g_iTrainAddRandomDelayMax = GUICtrlRead($g_hTxtAddRandomDelayMax)
+			$g_iTrainAddRandomDelayMin = Int(GUICtrlRead($g_hTxtAddRandomDelayMin))
+			$g_iTrainAddRandomDelayMax = Int(GUICtrlRead($g_hTxtAddRandomDelayMax))
 	EndSwitch
 EndFunc   ;==>ApplyConfig_641_1
 

@@ -180,7 +180,6 @@
 #include "functions\Other\Time.au3"
 #include "functions\Other\TogglePause.au3"
 #include "functions\Other\CheckPrerequisites.au3"
-#include "functions\Other\CheckDisplay.au3"
 #include "functions\Other\WindowsArrange.au3"
 #include "functions\Other\MakeScreenshot.au3"
 #include "functions\Other\ClickDrag.au3"

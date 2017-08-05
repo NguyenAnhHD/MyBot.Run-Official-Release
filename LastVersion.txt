@@ -1,0 +1,7 @@
+[mod]
+
+version    = "v1.7.1"
+
+messagenew = "Fully working with May update\nNew GUI and lots of new features\nFor more information, go to \nhttps://mybot.run\n\n Always free and open source."
+
+messageold = "A new version of MyBot AIO++ MOD (v1.7.1) is available!\nPlease download the latest from:\nhttps://mybot.run"

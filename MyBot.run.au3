@@ -221,6 +221,9 @@ Func ProcessCommandLine()
 	; Handle Command Line Parameters
 	If $g_asCmdLine[0] > 0 Then
 		$g_sProfileCurrentName = StringRegExpReplace($g_asCmdLine[1], '[/:*?"<>|]', '_')
+		If $g_asCmdLine[0] >= 2 Then
+			If StringInStr($g_asCmdLine[2], "BlueStacks3") Then $g_asCmdLine[2] = "BlueStacks2"
+		EndIf
 	ElseIf FileExists($g_sProfilePath & "\profile.ini") Then
 		$g_sProfileCurrentName = StringRegExpReplace(IniRead($g_sProfilePath & "\profile.ini", "general", "defaultprofile", ""), '[/:*?"<>|]', '_')
 		If $g_sProfileCurrentName = "" Or Not FileExists($g_sProfilePath & "\" & $g_sProfileCurrentName) Then $g_sProfileCurrentName = "<No Profiles>"
@@ -520,8 +523,6 @@ Func FinalInitialization(Const $sAI)
 
 	;AdlibRegister("PushBulletRemoteControl", $g_iPBRemoteControlInterval)
 	;AdlibRegister("PushBulletDeleteOldPushes", $g_iPBDeleteOldPushesInterval)
-
-	;CheckDisplay() ; verify display size and DPI (Dots Per Inch) setting (disabled now as scaled desktop is now supported)
 
 	LoadAmountOfResourcesImages()
 

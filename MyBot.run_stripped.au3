@@ -6533,10 +6533,8 @@ EndFunc
 Global $aCenterEnemyVillageClickDrag = [65, 545]
 Global $aCenterHomeVillageClickDrag = [160, 665]
 Global $aIsReloadError[4] = [457, 301 + $g_iMidOffsetY, 0x33B5E5, 10]
-Global $aIsMain[4] = [294, 27, 0x364145, 25]
-Global $aIsDPI125[4] = [355, 35, 0x399CB8, 15]
-Global $aIsDPI150[4] = [426, 42, 0x348FAA, 15]
-Global $aIsMainGrayed[4] = [294, 27, 0x0B1B29, 15]
+Global $aIsMain[4] = [278, 9, 0x77BDE0, 20]
+Global $aIsMainGrayed[4] = [278, 9, 0x3C5F70, 15]
 Global $aIsOnBuilderIsland[4] = [838, 18, 0xffff46, 10]
 Global $aTopLeftClient[4] = [1, 1, 0x000000, 0]
 Global $aTopRightClient[4] = [850, 1, 0x000000, 0]
@@ -6628,6 +6626,36 @@ Global $aArmyTrainButtonRND[4] = [20, 540 + $g_iMidOffsetY, 55, 570 + $g_iMidOff
 Global $aAttackButtonRND[4] = [20, 610 + $g_iMidOffsetY, 100, 670 + $g_iMidOffsetY]
 Global $aFindMatchButtonRND[4] = [200, 510 + $g_iMidOffsetY, 300, 530 + $g_iMidOffsetY]
 Global $NextBtnRND[4] = [710, 530 + $g_iMidOffsetY, 830, 570 + $g_iMidOffsetY]
+Global $aTrainBarb[4] = [-1, -1, -1, -1]
+Global $aTrainArch[4] = [-1, -1, -1, -1]
+Global $aTrainGiant[4] = [-1, -1, -1, -1]
+Global $aTrainGobl[4] = [-1, -1, -1, -1]
+Global $aTrainWall[4] = [-1, -1, -1, -1]
+Global $aTrainBall[4] = [-1, -1, -1, -1]
+Global $aTrainWiza[4] = [-1, -1, -1, -1]
+Global $aTrainHeal[4] = [-1, -1, -1, -1]
+Global $aTrainDrag[4] = [-1, -1, -1, -1]
+Global $aTrainPekk[4] = [-1, -1, -1, -1]
+Global $aTrainBabyD[4] = [-1, -1, -1, -1]
+Global $aTrainMine[4] = [-1, -1, -1, -1]
+Global $aTrainMini[4] = [-1, -1, -1, -1]
+Global $aTrainHogs[4] = [-1, -1, -1, -1]
+Global $aTrainValk[4] = [-1, -1, -1, -1]
+Global $aTrainGole[4] = [-1, -1, -1, -1]
+Global $aTrainWitc[4] = [-1, -1, -1, -1]
+Global $aTrainLava[4] = [-1, -1, -1, -1]
+Global $aTrainBowl[4] = [-1, -1, -1, -1]
+Global $aTrainLSpell[4] = [-1, -1, -1, -1]
+Global $aTrainHSpell[4] = [-1, -1, -1, -1]
+Global $aTrainRSpell[4] = [-1, -1, -1, -1]
+Global $aTrainJSpell[4] = [-1, -1, -1, -1]
+Global $aTrainFSpell[4] = [-1, -1, -1, -1]
+Global $aTrainCSpell[4] = [-1, -1, -1, -1]
+Global $aTrainPSpell[4] = [-1, -1, -1, -1]
+Global $aTrainESpell[4] = [-1, -1, -1, -1]
+Global $aTrainHaSpell[4] = [-1, -1, -1, -1]
+Global $aTrainSkSpell[4] = [-1, -1, -1, -1]
+Global $aTrainArmy[$eArmyCount] = [$aTrainBarb, $aTrainArch, $aTrainGiant, $aTrainGobl, $aTrainWall, $aTrainBall, $aTrainWiza, $aTrainHeal, $aTrainDrag, $aTrainPekk, $aTrainBabyD, $aTrainMine, $aTrainMini, $aTrainHogs, $aTrainValk, $aTrainGole, $aTrainWitc, $aTrainLava, $aTrainBowl, 0, 0, 0, 0, $aTrainLSpell, $aTrainHSpell, $aTrainRSpell, $aTrainJSpell, $aTrainFSpell, $aTrainCSpell, $aTrainPSpell, $aTrainESpell, $aTrainHaSpell, $aTrainSkSpell]
 Func _StringSize($sText, $iSize = 8.5, $iWeight = 400, $iAttrib = 0, $sName = "", $iMaxWidth = 0, $hWnd = 0)
 If $iSize = Default Then $iSize = 8.5
 If $iWeight = Default Then $iWeight = 400
@@ -27496,11 +27524,11 @@ GUICtrlSetState($g_hChkCloseEmulator, $g_bCloseEmulator ? $GUI_CHECKED : $GUI_UN
 GUICtrlSetState($g_hChkSuspendComputer, $g_bSuspendComputer ? $GUI_CHECKED : $GUI_UNCHECKED)
 GUICtrlSetState($g_hChkRandomClose, $g_bCloseRandom ? $GUI_CHECKED : $GUI_UNCHECKED)
 btnCloseWaitStopRandom()
-If $g_bCloseExactTime = True Then
+If $g_bCloseExactTime Then
 GUICtrlSetState($g_hRdoCloseWaitExact, $GUI_CHECKED)
 GUICtrlSetState($g_hRdoCloseWaitRandom, $GUI_UNCHECKED)
 EndIf
-If $g_bCloseRandomTime = True Then
+If $g_bCloseRandomTime Then
 GUICtrlSetState($g_hRdoCloseWaitRandom, $GUI_CHECKED)
 GUICtrlSetState($g_hRdoCloseWaitExact, $GUI_UNCHECKED)
 EndIf
@@ -27526,8 +27554,8 @@ $g_iCloseRandomTimePercent = _GUICtrlComboBox_GetCurSel($g_hCmbCloseWaitRdmPerce
 $g_iCloseMinimumTime = GUICtrlRead($g_hCmbMinimumTimeClose)
 $g_iTrainClickDelay = GUICtrlRead($g_hSldTrainITDelay)
 $g_bTrainAddRandomDelayEnable =(GUICtrlRead($g_hChkTrainAddRandomDelayEnable) = $GUI_CHECKED)
-$g_iTrainAddRandomDelayMin = GUICtrlRead($g_hTxtAddRandomDelayMin)
-$g_iTrainAddRandomDelayMax = GUICtrlRead($g_hTxtAddRandomDelayMax)
+$g_iTrainAddRandomDelayMin = Int(GUICtrlRead($g_hTxtAddRandomDelayMin))
+$g_iTrainAddRandomDelayMax = Int(GUICtrlRead($g_hTxtAddRandomDelayMax))
 EndSwitch
 EndFunc
 Func readConfig($inputfile = $g_sProfileConfigPath)
@@ -42856,15 +42884,11 @@ EndIf
 getBSPos()
 EndIf
 _CaptureRegion()
-If _CheckPixel($aIsMain, $g_bNoCapturePixel) = True Then
+If _CheckPixel($aIsMain, $g_bNoCapturePixel) Then
 If $g_iDebugSetlog = 1 Then Setlog("Screen cleared, WaitMainScreen exit", $COLOR_DEBUG)
 Return
-ElseIf _CheckPixel($aIsDPI125, $g_bNoCapturePixel) = True Then
-ShowDPIHelp(125)
-ElseIf _CheckPixel($aIsDPI150, $g_bNoCapturePixel) = True Then
-ShowDPIHelp(150)
 Else
-If TestCapture() = False And _Sleep($DELAYWAITMAINSCREEN1) Then Return
+If Not TestCapture() And _Sleep($DELAYWAITMAINSCREEN1) Then Return
 If checkObstacles() Then $i = 0
 EndIf
 If Mod($i, 5) = 0 Then
@@ -47937,28 +47961,6 @@ Func checkIsAdmin($bSilent = False)
 If IsAdmin() Then Return True
 If Not $bSilent Then SetLog("My Bot running without admin privileges", $COLOR_ERROR)
 Return False
-EndFunc
-Func ShowDPIHelp($currentDPI)
-Local $text = GetTranslatedFileIni("MBR Popups", "Settings_DPI_Error_01", "Your DPI is incorrect. It is set to") & " " & $currentDPI & GetTranslatedFileIni("MBR Popups", "Settings_DPI_Error_02", "%. You must set it to 100% for this bot to work.") & @CRLF & GetTranslatedFileIni("MBR Popups", "Settings_DPI_Error_03", "When you have changed the DPI to the correct value, reboot your computer and run the bot again.") & @CRLF & GetTranslatedFileIni("MBR Popups", "Settings_DPI_Error_04", "You won't be able to use the bot until you make this change.") & @CRLF & @CRLF & GetTranslatedFileIni("MBR Popups", "Settings_DPI_Error_05", "Click OK to view instructions on how to change DPI")
-Local $button = MsgBox($MB_OKCANCEL + $MB_ICONWARNING, GetTranslatedFileIni("MBR Popups", "Settings_DPI_Error_06", "DPI incorrect"), $text)
-If $button = $IDOK Then
-Switch @OSVersion
-Case "WIN_10"
-ShellExecute("https://mybot.run/forums/index.php?/topic/15137-change-dpi-to-100/#comment-141136")
-Case "WIN_8", "WIN_81"
-ShellExecute("https://mybot.run/forums/index.php?/topic/15137-change-dpi-to-100/#comment-141160")
-Case "WIN_7"
-ShellExecute("https://mybot.run/forums/index.php?/topic/15137-change-dpi-to-100/#comment-141159")
-Case "WIN_VISTA"
-ShellExecute("https://mybot.run/forums/index.php?/topic/15137-change-dpi-to-100/#comment-141161")
-Case "WIN_2012"
-ShellExecute("https://mybot.run/forums/index.php?/topic/15137-change-dpi-to-100/#comment-141160")
-Case Else
-MsgBox($MB_OK, GetTranslatedFileIni("MBR Popups", "Settings_DPI_Error_07", "Unsupported"), GetTranslatedFileIni("MBR Popups", "Settings_DPI_Error_08", "Sorry, your operating system isn't supported by the bot."))
-EndSwitch
-EndIf
-btnStop()
-GUICtrlSetState($g_hBtnStart, $GUI_DISABLE)
 EndFunc
 Func WindowsArrange($position, $offsetX = 0, $offsetY = 0)
 WinGetAndroidHandle()
@@ -61233,6 +61235,36 @@ $a1 = $ePSpell
 $a1 = $eESpell
 $a1 = $eHaSpell
 $a1 = $eSkSpell
+$a1 = $aTrainBarb
+$a1 = $aTrainArch
+$a1 = $aTrainGiant
+$a1 = $aTrainGobl
+$a1 = $aTrainWall
+$a1 = $aTrainBall
+$a1 = $aTrainWiza
+$a1 = $aTrainHeal
+$a1 = $aTrainDrag
+$a1 = $aTrainPekk
+$a1 = $aTrainBabyD
+$a1 = $aTrainMine
+$a1 = $aTrainMini
+$a1 = $aTrainHogs
+$a1 = $aTrainValk
+$a1 = $aTrainGole
+$a1 = $aTrainWitc
+$a1 = $aTrainLava
+$a1 = $aTrainBowl
+$a1 = $aTrainLSpell
+$a1 = $aTrainHSpell
+$a1 = $aTrainRSpell
+$a1 = $aTrainJSpell
+$a1 = $aTrainFSpell
+$a1 = $aTrainCSpell
+$a1 = $aTrainPSpell
+$a1 = $aTrainESpell
+$a1 = $aTrainHaSpell
+$a1 = $aTrainSkSpell
+$a1 = $aTrainArmy
 EndFunc
 Opt("GUIResizeMode", $GUI_DOCKALL)
 Opt("GUIEventOptions", 1)
@@ -61340,6 +61372,9 @@ Next
 EndIf
 If $g_asCmdLine[0] > 0 Then
 $g_sProfileCurrentName = StringRegExpReplace($g_asCmdLine[1], '[/:*?"<>|]', '_')
+If $g_asCmdLine[0] >= 2 Then
+If StringInStr($g_asCmdLine[2], "BlueStacks3") Then $g_asCmdLine[2] = "BlueStacks2"
+EndIf
 ElseIf FileExists($g_sProfilePath & "\profile.ini") Then
 $g_sProfileCurrentName = StringRegExpReplace(IniRead($g_sProfilePath & "\profile.ini", "general", "defaultprofile", ""), '[/:*?"<>|]', '_')
 If $g_sProfileCurrentName = "" Or Not FileExists($g_sProfilePath & "\" & $g_sProfileCurrentName) Then $g_sProfileCurrentName = "<No Profiles>"
