@@ -2,12 +2,12 @@
 #pragma compile(Icon, "Images\MyBot.ico")
 #pragma compile(FileDescription, Clash of Clans Bot - A Free Clash of Clans bot - https://mybot.run)
 #pragma compile(ProductName, My Bot)
-#pragma compile(ProductVersion, 7.2.3)
-#pragma compile(FileVersion, 7.2.3)
+#pragma compile(ProductVersion, 7.2.4)
+#pragma compile(FileVersion, 7.2.4)
 #pragma compile(LegalCopyright, © https://mybot.run)
 #pragma compile(Out, MyBot.run.exe) ; Required
 Opt("MustDeclareVars", 1)
-Global $g_sBotVersion = "v7.2.3"
+Global $g_sBotVersion = "v7.2.4"
 Global $g_sBotTitle = ""
 Global $g_hFrmBot = 0
 Global Const $WAIT_TIMEOUT = 258
@@ -5529,11 +5529,15 @@ Global $__MEmu_PhoneLayout = "2"
 Global $__MEmu_Window[4][5] = [ ["3.0.8", $g_iDEFAULT_WIDTH + 40, $g_iDEFAULT_HEIGHT - 14, 36, "-1"], ["2.6.2", $g_iDEFAULT_WIDTH + 48, $g_iDEFAULT_HEIGHT - 10, 40, "2"], ["2.5.0", $g_iDEFAULT_WIDTH + 51, $g_iDEFAULT_HEIGHT - 12, 45, "0"], ["2.2.1", $g_iDEFAULT_WIDTH + 51, $g_iDEFAULT_HEIGHT - 12, 45, "0"] ]
 Global $__Droid4X_Window[3][3] = [ ["0.10.0", $g_iDEFAULT_WIDTH + 6, $g_iDEFAULT_HEIGHT + 53], ["0.8.6", $g_iDEFAULT_WIDTH + 10, $g_iDEFAULT_HEIGHT + 50] ]
 Global $__Nox_Config[2][2] = [ ["3.8.1.3", "[CLASS:subWin; INSTANCE:1]|[CLASS:Qt5QWindowIcon; INSTANCE:5]"], ["3.1.0", "[CLASS:Qt5QWindowIcon; INSTANCE:4]"] ]
-Global $g_avAndroidAppConfig[8][15] = [ ["MEmu", "MEmu", "MEmu ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 51, $g_iDEFAULT_HEIGHT - 12, 0, "127.0.0.1:21503", 0 + 2 + 4 + 8 + 16 + 32, '# ', 'Microvirt Virtual Input', 0], ["BlueStacks2", "Android", "BlueStacks ", "[CLASS:BlueStacksApp; INSTANCE:1]", "_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, 0, "127.0.0.1:5555", 1 + 8 + 16 + 32 + 128, '$ ', 'BlueStacks Virtual Touch', 0], ["BlueStacks", "Android", "BlueStacks App Player", "[CLASS:BlueStacksApp; INSTANCE:1]", "_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, 0, "127.0.0.1:5555", 1 + 8 + 16 + 32 + 128, '$ ', 'BlueStacks Virtual Touch', 0], ["KOPLAYER", "KOPLAYER", "KOPLAYER", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 64, $g_iDEFAULT_HEIGHT - 8, 0, "127.0.0.1:6555", 0 + 2 + 4 + 8 + 16 + 32, '# ', 'ttVM Virtual Input', 0], ["LeapDroid", "vm1", "Leapd", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, 0, "emulator-5554", 1 + 8 + 16 + 32, '# ', 'qwerty2', 1], ["iTools", "iToolsVM", "iTools ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 2, $g_iDEFAULT_HEIGHT - 13, 0, "127.0.0.1:54001", 1 + 8 + 16 + 32 + 64, '# ', 'iTools Virtual PassThrough Input', 0], ["Droid4X", "droid4x", "Droid4X ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 10, $g_iDEFAULT_HEIGHT + 50, 0, "127.0.0.1:26944", 0 + 2 + 4 + 8 + 16 + 32, '# ', 'droid4x Virtual Input', 0], ["Nox", "nox", "No", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 4, $g_iDEFAULT_HEIGHT - 10, 0, "127.0.0.1:62001", 0 + 2 + 4 + 8 + 16 + 32, '# ', '(nox Virtual Input|Android Input)', -1] ]
+Global $g_avAndroidAppConfig[8][16] = [ ["MEmu", "MEmu", "MEmu ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 51,$g_iDEFAULT_HEIGHT - 12,0, "127.0.0.1:21503", 2 + 4 + 8 + 16 + 32, '# ', 'Microvirt Virtual Input', 0, 2], ["BlueStacks2","Android", "BlueStacks ", "[CLASS:BlueStacksApp; INSTANCE:1]","_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "127.0.0.1:5555", 1 + 2 + 8 + 16 + 32 + 128,'$ ', 'BlueStacks Virtual Touch', 0, 1], ["BlueStacks", "Android", "BlueStacks App Player","[CLASS:BlueStacksApp; INSTANCE:1]","_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "127.0.0.1:5555", 1 + 8 + 16 + 32 + 128,'$ ', 'BlueStacks Virtual Touch', 0, 1], ["KOPLAYER", "KOPLAYER","KOPLAYER", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 64,$g_iDEFAULT_HEIGHT - 8, 0, "127.0.0.1:6555", 1 + 2 + 4 + 8 + 16 + 32, '# ', 'ttVM Virtual Input', 0, 2], ["LeapDroid", "vm1", "Leapd", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "emulator-5554", 1 + 8 + 16 + 32, '# ', 'qwerty2', 1, 1], ["iTools", "iToolsVM","iTools ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 2, $g_iDEFAULT_HEIGHT - 13,0, "127.0.0.1:54001", 1 + 2 + 8 + 16 + 32 + 64, '# ', 'iTools Virtual PassThrough Input', 0, 1], ["Droid4X", "droid4x", "Droid4X ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 10,$g_iDEFAULT_HEIGHT + 50,0, "127.0.0.1:26944", 2 + 4 + 8 + 16 + 32, '# ', 'droid4x Virtual Input', 0, 2], ["Nox", "nox", "No", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 4, $g_iDEFAULT_HEIGHT - 10,0, "127.0.0.1:62001", 1 + 2 + 4 + 8 + 16 + 32, '# ', '(nox Virtual Input|Android Input)',-1, 2] ]
 Global $g_bOnlyInstance = True
 Global $g_bFoundRunningAndroid = False
 Global $g_bFoundInstalledAndroid = False
 Global Const $g_iOpenAndroidActiveMaxTry = 3
+Global Const $g_iAndroidBackgroundModeDirectX = 1
+Global Const $g_iAndroidBackgroundModeOpenGL = 2
+Global $g_iAndroidBackgroundMode = 0
+Global $g_iAndroidBackgroundModeDefault = 1
 Global $g_iAndroidConfig = 0
 Global $g_sAndroidVersion
 Global $g_sAndroidEmulator
@@ -5615,6 +5619,7 @@ Global $__iTools_Path
 Global $__VBoxManage_Path
 Global $__VBoxVMinfo
 Global $__VBoxGuestProperties
+Global $__VBoxExtraData
 Global $g_hToolTip = 0
 Global $g_iGlobalActiveBotsAllowed = EnvGet("NUMBER_OF_PROCESSORS")
 If IsNumber($g_iGlobalActiveBotsAllowed) = 0 Or $g_iGlobalActiveBotsAllowed < 1 Then $g_iGlobalActiveBotsAllowed = 2
@@ -6246,8 +6251,8 @@ $g_oBldgMaxQty.add($eBldgAirDefense, $aBldgAirDefense)
 EndFunc
 _FilloBldgMaxQty()
 Global $g_oBldgImages = ObjCreate("Scripting.Dictionary")
-$g_oBldgImages.add($eBldgTownHall & "_" & "0","imglocth-bundle")
-$g_oBldgImages.add($eBldgTownHall & "_" & "1","snow-imglocth-bundle")
+$g_oBldgImages.add($eBldgTownHall & "_" & "0", "imglocth-bundle")
+$g_oBldgImages.add($eBldgTownHall & "_" & "1", "snow-imglocth-bundle")
 $g_oBldgImages.add($eBldgGoldM & "_" & "0", @ScriptDir & "\imgxml\Storages\Mines")
 $g_oBldgImages.add($eBldgGoldM & "_" & "1", @ScriptDir & "\imgxml\Storages\Mines_Snow")
 $g_oBldgImages.add($eBldgElixirC & "_" & "0", @ScriptDir & "\imgxml\Storages\Collectors")
@@ -7401,6 +7406,7 @@ $g_iAndroidSupportFeature = $g_avAndroidAppConfig[$g_iAndroidConfig][11]
 $g_sAndroidShellPrompt = $g_avAndroidAppConfig[$g_iAndroidConfig][12]
 $g_sAndroidMouseDevice = $g_avAndroidAppConfig[$g_iAndroidConfig][13]
 $g_iAndroidEmbedMode = $g_avAndroidAppConfig[$g_iAndroidConfig][14]
+$g_iAndroidBackgroundModeDefault = $g_avAndroidAppConfig[$g_iAndroidConfig][15]
 $g_bAndroidAdbScreencap = $g_bAndroidAdbScreencapEnabled = True And BitAND($g_iAndroidSupportFeature, 2) = 2
 $g_bAndroidAdbClick = $g_bAndroidAdbClickEnabled = True And AndroidAdbClickSupported()
 $g_bAndroidAdbInput = $g_bAndroidAdbInputEnabled = True And BitAND($g_iAndroidSupportFeature, 8) = 8
@@ -7413,6 +7419,14 @@ $g_bUpdateAndroidWindowTitle = False
 If $g_bAndroidAdbScreencap And IsDeclared("g_hChkBackground") Then
 chkBackground()
 EndIf
+EndFunc
+Func AndroidSupportFeaturesSet($iValue, $iIdx = $g_iAndroidConfig)
+$g_avAndroidAppConfig[$iIdx][11] = BitOR($g_avAndroidAppConfig[$iIdx][11], $iValue)
+$g_iAndroidSupportFeature = BitOR($g_iAndroidSupportFeature, $iValue)
+EndFunc
+Func AndroidSupportFeaturesRemove($iValue, $iIdx = $g_iAndroidConfig)
+$g_avAndroidAppConfig[$iIdx][11] = BitAND($g_avAndroidAppConfig[$iIdx][11], BitXOR(-1, $iValue))
+$g_iAndroidSupportFeature = BitAND($g_iAndroidSupportFeature, BitXOR(-1, $iValue))
 EndFunc
 Func AndroidMakeDpiAware()
 Return BitAND($g_iAndroidSupportFeature, 64) > 0 And $g_bAndroidAdbScreencap = False
@@ -7465,7 +7479,7 @@ If $emulator <> Default Then SetLog("Unknown Android Emulator " & $emulator, $CO
 If $instance = "" Then $instance = Default
 If $instance = Default Then $instance = $g_avAndroidAppConfig[$g_iAndroidConfig][1]
 SetDebugLog("UpdateAndroidConfig(""" & $instance & """)")
-InitAndroidConfig()
+InitAndroidConfig(False)
 $g_sAndroidInstance = $instance
 If BitAND($g_iAndroidSecureFlags, 1) = 1 Then
 $g_sAndroidPicturesHostFolder = ""
@@ -7918,13 +7932,20 @@ Local $aPriorValues = [ $g_sAndroidEmulator , $g_iAndroidConfig , $g_sAndroidVer
 SetDebugLog("InitAndroid(" & $bCheckOnly & "): " & $g_sAndroidEmulator)
 If Not $bCheckOnly Then
 If $g_sAndroidInstance = "" Then $g_sAndroidInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][1]
+$__VBoxGuestProperties = ""
+$__VBoxExtraData = ""
 EndIf
 Local $Result = Execute("Init" & $g_sAndroidEmulator & "(" & $bCheckOnly & ")")
 If $Result = "" And @error <> 0 Then
 SetLog("Android support for " & $g_sAndroidEmulator & " is not available", $COLOR_ERROR)
 EndIf
-Local $successful = @error = 0
+Local $successful = @error = 0, $process_killed
 If Not $bCheckOnly And $Result Then
+If FileExists($__VBoxManage_Path) Then
+If $__VBoxGuestProperties = "" Then $__VBoxGuestProperties = LaunchConsole($__VBoxManage_Path, "guestproperty enumerate " & $g_sAndroidInstance, $process_killed)
+If $__VBoxExtraData = "" Then $__VBoxExtraData = LaunchConsole($__VBoxManage_Path, "getextradata " & $g_sAndroidInstance & " enumerate", $process_killed)
+EndIf
+UpdateAndroidBackgroundMode()
 Local $pAndroidFileVersionInfo
 If _WinAPI_GetFileVersionInfo($g_sAndroidProgramPath, $pAndroidFileVersionInfo) Then
 $g_avAndroidProgramFileVersionInfo = _WinAPI_VerQueryValue($pAndroidFileVersionInfo)
@@ -9712,6 +9733,68 @@ If $iWaitInSecAfterLaunch > 0 Then
 _SleepStatus($iWaitInSecAfterLaunch * 1000)
 EndIf
 Return $pid
+EndFunc
+Func UpdateAndroidBackgroundMode()
+Local $iMode =(($g_iAndroidBackgroundMode = 0) ?($g_iAndroidBackgroundModeDefault) :($g_iAndroidBackgroundMode))
+Local $iBackgroundMode = Execute("Get" & $g_sAndroidEmulator & "BackgroundMode()")
+If $iBackgroundMode = "" And @error <> 0 Then
+Local $sMode = "Unknown"
+Switch $iMode
+Case $g_iAndroidBackgroundModeDirectX
+$sMode = "DirectX/WinAPI"
+Case $g_iAndroidBackgroundModeOpenGL
+$sMode = "OpenGL/ADB screencap"
+EndSwitch
+SetLog($g_sAndroidEmulator & " DirectX/OpenGL cannot be detected")
+SetLog("Using " & $sMode & " for Background Mode")
+Else
+Local $sGraphicsEngine = "Unknown"
+Switch $iBackgroundMode
+Case $g_iAndroidBackgroundModeDirectX
+$sGraphicsEngine = "DirectX"
+SetDebugLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") is using DirectX, enable WinAPI for Background Mode")
+AndroidSupportFeaturesSet(1)
+Case $g_iAndroidBackgroundModeOpenGL
+$sGraphicsEngine = "OpenGL"
+SetDebugLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") is using OpenGL, disable WinAPI for Background Mode")
+AndroidSupportFeaturesRemove(1)
+Case Else
+SetLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") unsupported Graphics Engine / Render Mode", $COLOR_WARNING)
+EndSwitch
+EndIf
+Switch $iMode
+Case 1
+If BitAND($g_iAndroidSupportFeature, 1) = 0 Then
+If BitAND($g_iAndroidSupportFeature, 2) > 0 Then
+SetLog("Android DirectX not available, using ADB screencap for background capture", $COLOR_WARNING)
+Else
+SetLog("Android DirectX and ADB screencap not available, Background Mode not supported", $COLOR_ERROR)
+EndIf
+Else
+SetDebugLog("Disable ADB screencap, using WinAPI DirectX for Background Mode")
+$g_bAndroidAdbScreencap = False
+EndIf
+Case 2
+If $g_bAndroidAdbScreencapEnabled <> True Or $g_bAndroidSharedFolderAvailable <> True Then
+SetLog("Android ADB screencap disabled, please check Android Options", $COLOR_ERROR)
+Else
+If BitAND($g_iAndroidSupportFeature, 2) = 0 Then
+If BitAND($g_iAndroidSupportFeature, 1) > 0 Then
+SetLog("Android ADB screencap not available, using WinAPI for background capture", $COLOR_WARNING)
+Else
+SetLog("Android ADB screencap and DirectX not available, Background Mode not supported", $COLOR_ERROR)
+EndIf
+Else
+SetDebugLog("Enable ADB screencap for Background Mode")
+$g_bAndroidAdbScreencap = $g_bAndroidAdbScreencapEnabled = True And BitAND($g_iAndroidSupportFeature, 2) = 2
+EndIf
+EndIf
+Case Else
+SetLog("Unsupported Android Background Mode " & $iMode, $COLOR_ERROR)
+EndSwitch
+If IsDeclared("g_hChkBackground") Then
+chkBackground()
+EndIf
 EndFunc
 Global $g_sNO_COC, $g_sUNKNOWN_COC
 Global $_g_asDISTRIBUTORS[20][4]
@@ -16674,9 +16757,9 @@ _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "C
 GUICtrlSetState(-1, $GUI_UNCHECKED)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
-Global $g_hCmbCOCDistributors = 0, $g_hCmbSuspendAndroid = 0, $g_hChkAndroidAdbClickDragScript = 0
+Global $g_hCmbCOCDistributors = 0, $g_hCmbAndroidBackgroundMode = 0, $g_hCmbSuspendAndroid = 0, $g_hChkAndroidAdbClickDragScript = 0
 Func CreateBotAndroid()
-Local $x = 25, $y = 45, $w = 210, $h = 50
+Local $x = 25, $y = 45, $y2, $w = 210, $h = 50
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR Distributors", "Group_01", "Distributors"), $x - 20, $y - 20, $w, $h)
 $y -= 2
 $g_hCmbCOCDistributors = GUICtrlCreateCombo("", $x - 8, $y, 185, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
@@ -16686,14 +16769,24 @@ SetCurSelCmbCOCDistributors()
 GUICtrlSetOnEvent(-1, "cmbCOCDistributors")
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $y += $h + 5
+$y2 = $y
 $w = $g_iSizeWGrpTab2 - 2
+$h = 80
 GUICtrlCreateGroup(GetTranslatedFileIni("Android", "Android_Options", "Android Options"), $x - 20, $y - 20, $w, $h)
+GUICtrlCreateLabel(GetTranslatedFileIni("Android", "LblBackgroundMode", "Screencapture Background Mode"), $x - 8, $y + 5, 180, 22, $SS_RIGHT)
+$g_hCmbAndroidBackgroundMode = GUICtrlCreateCombo("", $x - 8 + 180 + 5, $y, 200, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
+GUICtrlSetData(-1, GetTranslatedFileIni("Android", "CmbBackgroundMode", "Default|Use WinAPI (need Android DirectX)|Use ADB screencap"))
+_GUICtrlSetTip(-1, GetTranslatedFileIni("Android", "CmbBackgroundMode_Info", 'Control how the Android screenshot is taken in background mode.\nDefault chooses WinAPI or screencap based on Android Emulator.\nInfo: WinAPI is faster than screencap, but screencap always works,\neven if screen is off (we call that the "True Background Mode")!'))
+_GUICtrlComboBox_SetCurSel(-1, $g_iAndroidBackgroundMode)
+GUICtrlSetOnEvent(-1, "cmbAndroidBackgroundMode")
+$y += 25
 $g_hChkAndroidAdbClickDragScript = GUICtrlCreateCheckbox(GetTranslatedFileIni("Android", "ChkAdbClickDragScript", "Use script for accurate Click && Drag"), $x, $y, -1, -1)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("Android", "ChkAdbClickDragScript_Info", "Use Android specific script file for Click & Drag.\r\nIf unchecked use more compatible 'input swipe'."))
 GUICtrlSetState(-1,(($g_bAndroidAdbClickDragScript) ?($GUI_CHECKED) :($GUI_UNCHECKED)))
 GUICtrlCreateGroup("", -99, -99, 1, 1)
-$y += $h + 5
+$y = $y2 + $h + 5
 $w = $g_iSizeWGrpTab2 - 2
+$h = 50
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR Distributors", "Group_02", "Advanced Android Options"), $x - 20, $y - 20, $w, $h)
 $y -= 2
 GUICtrlCreateLabel(GetTranslatedFileIni("MBR Distributors", "LblAdvanced_Android_Options", "Suspend/Resume Android"), $x - 8, $y + 5, 180, 22, $SS_RIGHT)
@@ -16704,7 +16797,7 @@ _GUICtrlComboBox_SetCurSel(-1, AndroidSuspendFlagsToIndex($g_iAndroidSuspendMode
 GUICtrlSetOnEvent(-1, "cmbSuspendAndroid")
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $y += $h + 5
-Local $y2 = $y
+$y2 = $y
 $w = 240
 $h = 80
 GUICtrlCreateGroup(GetTranslatedFileIni("Android Control", "Group_03", "Android Control"), $x - 20, $y - 20, $w, $h)
@@ -23754,6 +23847,10 @@ EndFunc
 Func cmbSuspendAndroid()
 $g_iAndroidSuspendModeFlags = AndroidSuspendIndexToFlags(_GUICtrlComboBox_GetCurSel($g_hCmbSuspendAndroid))
 EndFunc
+Func cmbAndroidBackgroundMode()
+$g_iAndroidBackgroundMode = _GUICtrlComboBox_GetCurSel($g_hCmbAndroidBackgroundMode)
+UpdateAndroidBackgroundMode()
+EndFunc
 Func BotStart($bAutostartDelay = 0)
 ResumeAndroid()
 CalCostCamp()
@@ -25895,10 +25992,12 @@ Switch $TypeReadSave
 Case "Read"
 SetCurSelCmbCOCDistributors()
 UpdateBotTitle()
+_GUICtrlComboBox_SetCurSel($g_hCmbAndroidBackgroundMode, $g_iAndroidBackgroundMode)
 GUICtrlSetState($g_hChkAndroidAdbClickDragScript, $g_bAndroidAdbClickDragScript ? $GUI_CHECKED : $GUI_UNCHECKED)
 _GUICtrlComboBox_SetCurSel($g_hCmbSuspendAndroid, AndroidSuspendFlagsToIndex($g_iAndroidSuspendModeFlags))
 Case "Save"
 cmbCOCDistributors()
+cmbAndroidBackgroundMode()
 $g_bAndroidAdbClickDragScript =(GUICtrlRead($g_hChkAndroidAdbClickDragScript) = $GUI_CHECKED ? True : False)
 cmbSuspendAndroid()
 EndSwitch
@@ -27719,6 +27818,7 @@ $g_sAndroidGameClass = IniRead($g_sProfileConfigPath, "android", "game.class", $
 $g_sUserGameDistributor = IniRead($g_sProfileConfigPath, "android", "user.distributor", $g_sUserGameDistributor)
 $g_sUserGamePackage = IniRead($g_sProfileConfigPath, "android", "user.package", $g_sUserGamePackage)
 $g_sUserGameClass = IniRead($g_sProfileConfigPath, "android", "user.class", $g_sUserGameClass)
+$g_iAndroidBackgroundMode = Int(IniRead($g_sProfileConfigPath, "android", "backgroundmode", $g_iAndroidBackgroundMode))
 $g_bAndroidCheckTimeLagEnabled = Int(IniRead($g_sProfileConfigPath, "android", "check.time.lag.enabled",($g_bAndroidCheckTimeLagEnabled ? 1 : 0))) = 1
 $g_iAndroidAdbScreencapTimeoutMin = Int(IniRead($g_sProfileConfigPath, "android", "adb.screencap.timeout.min", $g_iAndroidAdbScreencapTimeoutMin))
 $g_iAndroidAdbScreencapTimeoutMax = Int(IniRead($g_sProfileConfigPath, "android", "adb.screencap.timeout.max", $g_iAndroidAdbScreencapTimeoutMax))
@@ -28607,6 +28707,7 @@ _Ini_Add("android", "game.class", $g_sAndroidGameClass)
 _Ini_Add("android", "user.distributor", $g_sUserGameDistributor)
 _Ini_Add("android", "user.package", $g_sUserGamePackage)
 _Ini_Add("android", "user.class", $g_sUserGameClass)
+_Ini_Add("android", "backgroundmode", $g_iAndroidBackgroundMode)
 _Ini_Add("android", "check.time.lag.enabled",($g_bAndroidCheckTimeLagEnabled ? "1" : "0"))
 _Ini_Add("android", "adb.screencap.timeout.min", $g_iAndroidAdbScreencapTimeoutMin)
 _Ini_Add("android", "adb.screencap.timeout.max", $g_iAndroidAdbScreencapTimeoutMax)
@@ -40054,9 +40155,11 @@ EndFunc
 Func TrainIt($iIndex, $iQuantity = 1, $iSleep = 400)
 If $g_iDebugSetlogTrain = 1 Then SetLog("Func TrainIt $iIndex=" & $iIndex & " $howMuch=" & $iQuantity & " $iSleep=" & $iSleep, $COLOR_DEBUG)
 Local $bDark =($iIndex >= $eMini And $iIndex <= $eBowl)
+Local $iErrors = 0
+Do
 Local $aTrainPos = GetTrainPos($iIndex)
 If IsArray($aTrainPos) And $aTrainPos[0] <> -1 Then
-If _ColorCheck(_GetPixelColor($aTrainPos[0], $aTrainPos[1], $g_bCapturePixel), Hex($aTrainPos[2], 6), $aTrainPos[3]) = True Then
+If _ColorCheck(_GetPixelColor($aTrainPos[0], $aTrainPos[1], $g_bCapturePixel), Hex($aTrainPos[2], 6), $aTrainPos[3]) Then
 Local $FullName = GetFullName($iIndex, $aTrainPos)
 If IsArray($FullName) Then
 Local $RNDName = GetRNDName($iIndex, $aTrainPos)
@@ -40082,13 +40185,22 @@ If $g_iDebugSetlogTrain Then Setlog("Positon X: " & $aTrainPos[0] & "| Y : " & $
 If StringMid($sBadPixelColor, 1, 2) = StringMid($sBadPixelColor, 3, 2) And StringMid($sBadPixelColor, 1, 2) = StringMid($sBadPixelColor, 5, 2) Then
 Setlog("Troop " & GetTroopName($iIndex) & " is not available due to full queue", $COLOR_DEBUG)
 Else
-Setlog("Bad pixel check on troop position " & GetTroopName($iIndex), $COLOR_ERROR)
+If $iErrors = 0 Then
+Local $aEmptyArray[4] = [-1,-1,-1,-1]
+$aTrainArmy[$iIndex] = $aEmptyArray
+$iErrors += 1
+Else
+If $g_iDebugSetlogTrain = 1 Then DebugImageSave("BadPixelCheck_" & GetTroopName($iIndex))
+SetLog("Bad pixel check on troop position " & GetTroopName($iIndex), $COLOR_ERROR)
 If $g_iDebugSetlogTrain = 1 Then Setlog("Train Pixel Color: " & $sBadPixelColor, $COLOR_DEBUG)
+$iErrors = 0
+EndIf
 EndIf
 EndIf
 Else
 Setlog("Impossible happened? TrainIt troop position " & GetTroopName($iIndex) & " did not return array", $COLOR_ERROR)
 EndIf
+Until $iErrors = 0
 EndFunc
 Func GetTrainPos(Const $iIndex)
 If $g_iDebugSetlogTrain = 1 Then SetLog("GetTrainPos($iIndex=" & $iIndex & ")", $COLOR_DEBUG)
@@ -43747,33 +43859,6 @@ $g_sAndroidAdbDevice = "127.0.0.1:" & $BstAdbPort
 Else
 $g_sAndroidAdbDevice = $g_avAndroidAppConfig[$__BS2_Idx][10]
 EndIf
-Local $GlRenderMode = RegRead($g_sHKLM & "\SOFTWARE\BlueStacks\Guests\" & $g_sAndroidInstance & "\Config\", "GlRenderMode")
-Switch $GlRenderMode
-Case 4
-If $g_iDebugSetlog = 1 Then
-SetDebugLog($g_sAndroidEmulator & " is using DirectX, disable ADB background mode")
-Else
-SetDebugLog($g_sAndroidEmulator & " is using DirectX")
-EndIf
-$g_avAndroidAppConfig[$__BS2_Idx][11] = BitOR($g_avAndroidAppConfig[$__BS2_Idx][11], 1)
-$g_avAndroidAppConfig[$__BS2_Idx][11] = BitAND($g_avAndroidAppConfig[$__BS2_Idx][11], BitXOR(-1, 2))
-$g_iAndroidSupportFeature = BitOR($g_iAndroidSupportFeature, 1)
-$g_iAndroidSupportFeature = BitAND($g_iAndroidSupportFeature, BitXOR(-1, 2))
-$g_bAndroidAdbScreencap = $g_bAndroidAdbScreencapEnabled = True And BitAND($g_iAndroidSupportFeature, 2) = 2
-Case 1
-If $g_iDebugSetlog = 1 Then
-SetDebugLog($g_sAndroidEmulator & " is using OpenGL, enabled ADB background mode")
-Else
-SetDebugLog($g_sAndroidEmulator & " is using OpenGL")
-EndIf
-$g_avAndroidAppConfig[$__BS2_Idx][11] = BitAND($g_avAndroidAppConfig[$__BS2_Idx][11], BitXOR(-1, 1))
-$g_avAndroidAppConfig[$__BS2_Idx][11] = BitOR($g_avAndroidAppConfig[$__BS2_Idx][11], 2)
-$g_iAndroidSupportFeature = BitAND($g_iAndroidSupportFeature, BitXOR(-1, 1))
-$g_iAndroidSupportFeature = BitOR($g_iAndroidSupportFeature, 2)
-$g_bAndroidAdbScreencap = $g_bAndroidAdbScreencapEnabled = True And BitAND($g_iAndroidSupportFeature, 2) = 2
-Case Else
-SetLog($g_sAndroidEmulator & " unknown render mode " & $GlRenderMode, $COLOR_WARNING)
-EndSwitch
 EndIf
 Return $bInstalled
 EndFunc
@@ -44247,7 +44332,6 @@ $g_sAndroidPicturesHostPath = ""
 $g_bAndroidAdbScreencap = False
 $g_bAndroidSharedFolderAvailable = False
 EndIf
-$__VBoxGuestProperties = LaunchConsole($__VBoxManage_Path, "guestproperty enumerate " & $g_sAndroidInstance, $process_killed)
 WinGetAndroidHandle()
 UpdateDroid4XConfig()
 EndIf
@@ -44527,17 +44611,16 @@ If $iErrCnt > 0 Then Return False
 Return True
 EndFunc
 Func UpdateMEmuConfig()
-Local $Value, $process_killed, $aRegExResult
+Local $aRegExResult
 Local $iSizeConfig = FindMEmuWindowConfig()
-$Value = LaunchConsole($__VBoxManage_Path, "guestproperty get " & $g_sAndroidInstance & " phone_layout", $process_killed)
-$aRegExResult = StringRegExp($Value, "Value: (.+)", $STR_REGEXPARRAYMATCH)
+$aRegExResult = StringRegExp($__VBoxGuestProperties, "Name: phone_layout, value: (.+), timestamp:", $STR_REGEXPARRAYMATCH)
 If @error = 0 Then
 $__MEmu_PhoneLayout = $aRegExResult[0]
 If $iSizeConfig > -1 And $__MEmu_Window[$iSizeConfig][4] = "-1" Then
-SetDebugLog($g_sAndroidEmulator & " phone_layout is " & $__MEmu_PhoneLayout & ", but set to -1 to disable screen compensation", $COLOR_ERROR)
+SetDebugLog($g_sAndroidEmulator & " phone_layout is " & $__MEmu_PhoneLayout & ", but set to -1 to disable screen compensation")
 $__MEmu_PhoneLayout = $__MEmu_Window[$iSizeConfig][4]
 Else
-SetDebugLog($g_sAndroidEmulator & " phone_layout is " & $__MEmu_PhoneLayout, $COLOR_ERROR)
+SetDebugLog($g_sAndroidEmulator & " phone_layout is " & $__MEmu_PhoneLayout)
 EndIf
 Else
 SetDebugLog("Cannot read " & $g_sAndroidEmulator & " guestproperty phone_layout!", $COLOR_ERROR)
@@ -45017,10 +45100,10 @@ If Not @error Then
 $g_bAndroidSharedFolderAvailable = True
 $g_sAndroidPicturesHostPath = $aRegExResult[UBound($aRegExResult) - 1] & "\"
 Else
-If FileExists(@MyDocumentsDir & "\Nox_share\") then
+If FileExists(@MyDocumentsDir & "\Nox_share\") Then
 $g_bAndroidSharedFolderAvailable = True
 $g_sAndroidPicturesHostPath = @MyDocumentsDir & "\Nox_share\Other\"
-If not FileExists($g_sAndroidPicturesHostPath) then
+If Not FileExists($g_sAndroidPicturesHostPath) Then
 DirCreate($g_sAndroidPicturesHostPath)
 EndIf
 Else
@@ -45030,7 +45113,6 @@ $g_sAndroidPicturesHostPath = ""
 SetLog($g_sAndroidEmulator & " Background Mode is not available", $COLOR_ERROR)
 EndIf
 EndIf
-$__VBoxGuestProperties = LaunchConsole($__VBoxManage_Path, "guestproperty enumerate " & $g_sAndroidInstance, $process_killed)
 Local $v = GetVersionNormalized($g_sAndroidVersion)
 For $i = 0 To UBound($__Nox_Config) - 1
 Local $v2 = GetVersionNormalized($__Nox_Config[$i][0])
@@ -45043,6 +45125,14 @@ Next
 EndIf
 Return True
 EndFunc
+Func GetNoxConfigFile()
+Local $sLocalAppData = EnvGet("LOCALAPPDATA")
+Local $sPre = ""
+If $g_sAndroidInstance <> "nox" Then $sPre = "clone_" & $g_sAndroidInstance & "_"
+Local $sConfig = $sLocalAppData & "\Nox\" & $sPre & "conf.ini"
+If FileExists($sConfig) Then Return $sConfig
+Return ""
+EndFunc
 Func SetScreenNox()
 If Not InitAndroid() Then Return False
 Local $cmdOutput, $process_killed
@@ -45053,11 +45143,8 @@ If StringRight($path, 1) = "\" Then $path = StringLeft($path, StringLen($path) -
 $cmdOutput = LaunchConsole($__VBoxManage_Path, "sharedfolder remove " & $g_sAndroidInstance & " --name Other", $process_killed)
 $cmdOutput = LaunchConsole($__VBoxManage_Path, "sharedfolder add " & $g_sAndroidInstance & " --name Other --hostpath """ & $path & """  --automount", $process_killed)
 EndIf
-Local $sLocalAppData = EnvGet("LOCALAPPDATA")
-Local $sPre = ""
-If $g_sAndroidInstance <> "nox" Then $sPre = "clone_" & $g_sAndroidInstance & "_"
-Local $sConfig = $sLocalAppData & "\Nox\" & $sPre & "conf.ini"
-If FileExists($sConfig) Then
+Local $sConfig = GetNoxConfigFile()
+If $sConfig Then
 SetDebugLog("Configure Nox screen config: " & $sConfig)
 IniWrite($sConfig, "setting", "h_resolution", $g_iAndroidClientWidth & "x" & $g_iAndroidClientHeight)
 IniWrite($sConfig, "setting", "h_dpi", "160")
@@ -45299,7 +45386,6 @@ $g_bAndroidAdbScreencap = False
 $g_sAndroidPicturesHostPath = ""
 SetLog($g_sAndroidEmulator & " Background Mode is not available", $COLOR_RED)
 EndIf
-$__VBoxGuestProperties = LaunchConsole($__VBoxManage_Path, "guestproperty enumerate " & $g_sAndroidInstance, $process_killed)
 EndIf
 Return True
 EndFunc
@@ -45493,7 +45579,6 @@ If StringInStr($__VBoxVMinfo, "Could not find a registered machine named") > 0 T
 SetLog("Cannot find " & $g_sAndroidEmulator & " instance " & $g_sAndroidInstance, $COLOR_ERROR)
 Return False
 EndIf
-$__VBoxGuestProperties = LaunchConsole($iTools_Manage_Path, "guestproperty enumerate " & $g_sAndroidInstance, $process_killed)
 $g_sAndroidProgramPath = $iTools_Path & "iToolsAVM.exe"
 $g_sAndroidAdbPath = FindPreferredAdbPath()
 If $g_sAndroidAdbPath = "" Then $g_sAndroidAdbPath = $iTools_Path & "tools\adb.exe"

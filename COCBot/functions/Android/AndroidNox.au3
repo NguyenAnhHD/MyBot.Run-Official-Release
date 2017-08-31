@@ -119,6 +119,23 @@ Func GetNoxAdbPath()
 	Return ""
 EndFunc   ;==>GetNoxAdbPath
 
+Func GetNoxBackgroundMode()
+	; get OpenGL/DirectX config
+	Local $sConfig = GetNoxConfigFile()
+	If $sConfig Then
+		Local $graphic_engine_type = IniRead($sConfig, "setting", "graphic_engine_type", "") ; 0 = OpenGL, 1 = DirectX
+		Switch $graphic_engine_type
+			Case "0"
+				Return $g_iAndroidBackgroundModeOpenGL
+			Case "1"
+				Return $g_iAndroidBackgroundModeDirectX
+			Case Else
+				SetLog($g_sAndroidEmulator & " unsupported Graphics Engine Type " & $graphic_engine_type, $COLOR_WARNING)
+		EndSwitch
+	EndIf
+	Return 0
+EndFunc   ;==>GetNoxBackgroundMode
+
 Func InitNox($bCheckOnly = False)
 	Local $process_killed, $aRegExResult, $g_sAndroidAdbDeviceHost, $g_sAndroidAdbDevicePort, $oops = 0
 	Local $Version = RegRead($g_sHKLM & "\SOFTWARE" & $g_sWow6432Node & "\Microsoft\Windows\CurrentVersion\Uninstall\Nox\", "DisplayVersion")
@@ -197,10 +214,10 @@ Func InitNox($bCheckOnly = False)
 			$g_sAndroidPicturesHostPath = $aRegExResult[UBound($aRegExResult) - 1] & "\"
 		Else
 			; Check the shared folder 'Nox_share' , this is the default path on last version
-			If FileExists(@MyDocumentsDir & "\Nox_share\") then
+			If FileExists(@MyDocumentsDir & "\Nox_share\") Then
 				$g_bAndroidSharedFolderAvailable = True
 				$g_sAndroidPicturesHostPath = @MyDocumentsDir & "\Nox_share\Other\"
-				If not FileExists($g_sAndroidPicturesHostPath) then
+				If Not FileExists($g_sAndroidPicturesHostPath) Then
 					; Just in case of 'Other' Folder doesn't exist
 					DirCreate($g_sAndroidPicturesHostPath)
 				EndIf
@@ -211,8 +228,6 @@ Func InitNox($bCheckOnly = False)
 				SetLog($g_sAndroidEmulator & " Background Mode is not available", $COLOR_ERROR)
 			EndIf
 		EndIf
-
-		$__VBoxGuestProperties = LaunchConsole($__VBoxManage_Path, "guestproperty enumerate " & $g_sAndroidInstance, $process_killed)
 
 		Local $v = GetVersionNormalized($g_sAndroidVersion)
 		For $i = 0 To UBound($__Nox_Config) - 1
@@ -231,6 +246,15 @@ Func InitNox($bCheckOnly = False)
 	Return True
 
 EndFunc   ;==>InitNox
+
+Func GetNoxConfigFile()
+	Local $sLocalAppData = EnvGet("LOCALAPPDATA")
+	Local $sPre = ""
+	If $g_sAndroidInstance <> "nox" Then $sPre = "clone_" & $g_sAndroidInstance & "_"
+	Local $sConfig = $sLocalAppData & "\Nox\" & $sPre & "conf.ini"
+	If FileExists($sConfig) Then Return $sConfig
+	Return ""
+EndFunc   ;==>GetNoxConfigFile
 
 Func SetScreenNox()
 
@@ -254,11 +278,8 @@ Func SetScreenNox()
 	EndIf
 
 	; find Nox conf.ini in C:\Users\User\AppData\Local\Nox and set "Fix window size" to Enable, "Remember size and position" to Disable and screen res also
-	Local $sLocalAppData = EnvGet("LOCALAPPDATA")
-	Local $sPre = ""
-	If $g_sAndroidInstance <> "nox" Then $sPre = "clone_" & $g_sAndroidInstance & "_"
-	Local $sConfig = $sLocalAppData & "\Nox\" & $sPre & "conf.ini"
-	If FileExists($sConfig) Then
+	Local $sConfig = GetNoxConfigFile()
+	If $sConfig Then
 		SetDebugLog("Configure Nox screen config: " & $sConfig)
 		IniWrite($sConfig, "setting", "h_resolution", $g_iAndroidClientWidth & "x" & $g_iAndroidClientHeight)
 		IniWrite($sConfig, "setting", "h_dpi", "160")
