@@ -247,6 +247,8 @@ Func InitNox($bCheckOnly = False)
 			EndIf
 		Next
 
+		UpdateHWnD($g_hAndroidWindow, False) ; Ensure $g_sAppClassInstance is properly set
+
 		; Update Android Screen and Window
 		;UpdateNoxConfig()
 	EndIf

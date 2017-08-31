@@ -874,7 +874,7 @@ Func SaveConfig_600_30()
 	_Ini_Add("shareattack", "minGold", $g_iShareMinGold)
 	_Ini_Add("shareattack", "minElixir", $g_iShareMinElixir)
 	_Ini_Add("shareattack", "minDark", $g_iShareMinDark)
-	_Ini_Add("shareattack", "Message", StringReplace($g_sShareMessage, @CRLF, "|"))
+	_Ini_Add("shareattack", "Message", $g_sShareMessage)
 	_Ini_Add("attack", "TakeLootSnapShot", $g_bTakeLootSnapShot ? 1 : 0)
 	_Ini_Add("attack", "ScreenshotLootInfo", $g_bScreenshotLootInfo ? 1 : 0)
 EndFunc   ;==>SaveConfig_600_30

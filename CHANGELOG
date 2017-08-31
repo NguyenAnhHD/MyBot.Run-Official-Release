@@ -6,7 +6,11 @@
  * Add Ability to Disable Bot Notifications suggested By HarchH
  * Fix Bad Pixel Check in Training when Bot runs while Troops change
  * Fix closing WerFault Message
+ * Fix Share Replay Function
+ * Fix SmartWait for Heroes
+ * Update DropTrophy Drop Location to drop Troops/Heroes further into the grass
  * Update Azerbaijan and Turkish Language By Z E C K
+ * Update Vietnamese Language by NguyenAnhHD
 
 * **V7.2.3**
  * Fix Main Screen Locating & Troop Training for August 4th Update

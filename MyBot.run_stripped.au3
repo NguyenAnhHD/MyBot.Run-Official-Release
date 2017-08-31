@@ -5941,7 +5941,7 @@ Global $g_abPlannedattackHours[24] = [True, True, True, True, True, True, True, 
 Global $g_bPlannedDropCCHoursEnable = False, $g_bUseCCBalanced = False, $g_iCCDonated = 0, $g_iCCReceived = 0
 Global $g_abPlannedDropCCHours[24] = [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True]
 Global $g_bSmartZapEnable = False, $g_bEarthQuakeZap = False, $g_bNoobZap = False, $g_bSmartZapDB = True, $g_bSmartZapSaveHeroes = True, $g_bSmartZapFTW = False, $g_iSmartZapMinDE = 350, $g_iSmartZapExpectedDE = 320, $g_bDebugSmartZap = False
-Global $g_bShareAttackEnable = 0, $g_iShareMinGold = 300000, $g_iShareMinElixir = 300000, $g_iShareMinDark = 0, $g_sShareMessage = StringReplace("Nice|Good|Thanks|Wowwww", "|", @CRLF), $g_bTakeLootSnapShot = True, $g_bScreenshotLootInfo = False, $g_bShareAttackEnableNow = False
+Global $g_bShareAttackEnable = 0, $g_iShareMinGold = 300000, $g_iShareMinElixir = 300000, $g_iShareMinDark = 0, $g_sShareMessage = "Nice|Good|Thanks|Wowwww", $g_bTakeLootSnapShot = True, $g_bScreenshotLootInfo = False, $g_bShareAttackEnableNow = False
 Global $g_bDropTrophyEnable = False, $g_iDropTrophyMax = 1200, $g_iDropTrophyMin = 800, $g_bDropTrophyUseHeroes = False, $g_iDropTrophyHeroesPriority = 0, $g_bDropTrophyAtkDead = 0, $g_iDropTrophyArmyMinPct = 70
 Global $g_sLanguage = "English"
 Global $g_bDisableSplash = False
@@ -6049,10 +6049,10 @@ Global $g_sTHLoc = "In"
 Global $g_sImglocRedline
 Global $g_iImglocTHLevel = 0
 Global $g_aiTownHallDetails[4] = [-1, -1, -1, -1]
-Global Const $g_aaiTopLeftDropPoints[5][2] = [[83, 306], [174, 238], [240, 188], [303, 142], [390, 76]]
-Global Const $g_aaiTopRightDropPoints[5][2] = [[466, 66], [556, 134], [622, 184], [684, 231], [775, 300]]
-Global Const $g_aaiBottomLeftDropPoints[5][2] = [[81, 363], [174, 434], [235, 481], [299, 530], [390, 600]]
-Global Const $g_aaiBottomRightDropPoints[5][2] = [[466, 590], [554, 523], [615, 477], [678, 430], [765, 364]]
+Global Const $g_aaiTopLeftDropPoints[5][2] = [[66, 299], [174, 210], [240, 169], [303, 127], [390, 55]]
+Global Const $g_aaiTopRightDropPoints[5][2] = [[466, 60], [556, 120], [622, 170], [684, 220], [775, 285]]
+Global Const $g_aaiBottomLeftDropPoints[5][2] = [[81, 390], [174, 475], [235, 521], [299, 570], [390, 610]]
+Global Const $g_aaiBottomRightDropPoints[5][2] = [[466, 600], [554, 555], [615, 510], [678, 460], [765, 394]]
 Global Const $g_aaiEdgeDropPoints[4] = [$g_aaiBottomRightDropPoints, $g_aaiTopLeftDropPoints, $g_aaiBottomLeftDropPoints, $g_aaiTopRightDropPoints]
 Global Const $g_aiUseAllTroops[33] = [$eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eDrag, $ePekk, $eBabyD, $eMine, $eMini, $eHogs, $eValk, $eGole, $eWitc, $eLava, $eBowl, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell]
 Global Const $g_aiUseBarracks[26] = [$eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eDrag, $ePekk, $eBabyD, $eMine, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell, $eSkSpell]
@@ -6145,7 +6145,6 @@ Global $g_bOutOfElixir = False
 Global $g_aiTimeTrain[3] = [0, 0, 0]
 Global Enum $ArmyTAB, $TrainTroopsTAB, $BrewSpellsTAB, $QuickTrainTAB
 Global $g_bCheckSpells = False
-Global Const $g_iQuickTrainButtonRetryDelay = 1000
 Global $g_avLabTroops[30][5]
 Func TranslateTroopNames()
 Dim $g_avLabTroops[30][5] = [ [-1, -1, -1, GetTranslatedFileIni("MBR Global GUI Design", "None", "None"), $eIcnBlank], [123, 340 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBarbarians", "Barbarians"), $eIcnBarbarian], [123, 447 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtArchers", "Archers"), $eIcnArcher], [230, 340 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGiants", "Giants"), $eIcnGiant], [230, 447 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGoblins", "Goblins"), $eIcnGoblin], [337, 340 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWallBreakers", "Wall Breakers"), $eIcnWallBreaker], [337, 447 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBalloons", "Balloons"), $eIcnBalloon], [443, 340 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWizards", "Wizards"), $eIcnWizard], [443, 447 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtHealers", "Healers"), $eIcnHealer], [550, 340 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtDragons", "Dragons"), $eIcnDragon], [550, 447 + $g_iMidOffsetY, 0, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtPekkas", "Pekkas"), $eIcnPekka], [319, 340 + $g_iMidOffsetY, 1, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBabyDragons", "Baby Dragons"), $eIcnBabyDragon], [319, 447 + $g_iMidOffsetY, 1, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtMiners", "Miners"), $eIcnMiner], [426, 340 + $g_iMidOffsetY, 1, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtLightningSpells", "Lightning Spell"), $eIcnLightSpell], [426, 447 + $g_iMidOffsetY, 1, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtHealingSpells", "Healing Spell"), $eIcnHealSpell], [533, 340 + $g_iMidOffsetY, 1, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtRageSpells", "Rage Spell"), $eIcnRageSpell], [533, 447 + $g_iMidOffsetY, 1, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtJumpSpells", "Jump Spell"), $eIcnJumpSpell], [640, 340 + $g_iMidOffsetY, 1, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtFreezeSpells", "Freeze Spell"), $eIcnFreezeSpell], [640, 447 + $g_iMidOffsetY, 1, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtCloneSpells", "Clone Spell"), $eIcnCloneSpell], [109, 340 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtPoisonSpells", "Poison Spell"), $eIcnPoisonSpell], [109, 447 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtEarthQuakeSpells", "EarthQuake Spell"), $eIcnEarthQuakeSpell], [216, 340 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtHasteSpells", "Haste Spell"), $eIcnHasteSpell], [216, 447 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtSkeletonSpells", "Skeleton Spell"), $eIcnSkeletonSpell], [322, 340 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtMinions", "Minions"), $eIcnMinion], [322, 447 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtHogRiders", "Hog Riders"), $eIcnHogRider], [429, 340 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtValkyries", "Valkyries"), $eIcnValkyrie], [429, 447 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGolems", "Golems"), $eIcnGolem], [536, 340 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWitches", "Witches"), $eIcnWitch], [536, 447 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtLavaHounds", "Lava Hounds"), $eIcnLavaHound], [642, 340 + $g_iMidOffsetY, 2, GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBowlers", "Bowlers"), $eIcnBowler]]
@@ -6419,8 +6418,6 @@ Global Const $DELAYTREASURY2 = 1500
 Global Const $DELAYTREASURY4 = 200
 Global Const $DELAYREPLAYSHARE1 = 250
 Global Const $DELAYREPLAYSHARE2 = 500
-Global Const $DELAYREPLAYSHARE3 = 1000
-Global Const $DELAYREPLAYSHARE4 = 2000
 Global Const $DELAYREQUESTCC1 = 1000
 Global Const $DELAYMAKEREQUEST1 = 500
 Global Const $DELAYMAKEREQUEST2 = 1500
@@ -6428,6 +6425,7 @@ Global Const $DELAYTRAIN4 = 200
 Global Const $DELAYTRAIN6 = 20
 Global Const $DELAYTRAIN8 = 5000
 Global Const $DELAYLVUP = 150
+Global Const $g_iQuickTrainButtonRetryDelay = 1000
 Global Const $DELAYISTRAINPAGE2 = 1000
 Global Const $DELAYUPGRADEBUILDING1 = 200
 Global Const $DELAYUPGRADEBUILDING2 = 500
@@ -6629,6 +6627,10 @@ Global Const $aAtkRprtDECheck2[4] = [678, 418 + $g_iMidOffsetY, 0x030000, 30]
 Global Const $aRtnHomeCheck1[4] = [363, 548 + $g_iMidOffsetY, 0x78C11C, 20]
 Global Const $aRtnHomeCheck2[4] = [497, 548 + $g_iMidOffsetY, 0x79C326, 20]
 Global Const $aIsAttackPage[4] = [70, 548 + $g_iBottomOffsetY, 0xC80000, 20]
+Global Const $aAttackLogPage[4] = [775, 125, 0xEB1115, 40]
+Global Const $aAttackLogAttackTab[4] = [437, 114, 0xF0F4F0, 30]
+Global Const $aBlueShareReplayButton[4] = [500, 156 + $g_iMidOffsetY, 0x70D4E8, 30]
+Global Const $aGrayShareReplayButton[4] = [500, 156 + $g_iMidOffsetY, 0xBBBBBB, 30]
 Global Const $ProfileRep01[4] = [600, 260, 0x71769F, 20]
 Global $aArmyTrainButtonRND[4] = [20, 540 + $g_iMidOffsetY, 55, 570 + $g_iMidOffsetY]
 Global $aAttackButtonRND[4] = [20, 610 + $g_iMidOffsetY, 100, 670 + $g_iMidOffsetY]
@@ -7422,6 +7424,7 @@ $g_bUpdateAndroidWindowTitle = False
 If $g_bAndroidAdbScreencap And IsDeclared("g_hChkBackground") Then
 chkBackground()
 EndIf
+UpdateHWnD($g_hAndroidWindow, False)
 EndFunc
 Func AndroidSupportFeaturesSet($iValue, $iIdx = $g_iAndroidConfig)
 $g_avAndroidAppConfig[$iIdx][11] = BitOR($g_avAndroidAppConfig[$iIdx][11], $iValue)
@@ -7498,9 +7501,9 @@ Local $bChanged = Execute("Update" & $g_sAndroidEmulator & "WindowState()")
 If $bChanged = "" And @error <> 0 Then Return False
 Return $bChanged
 EndFunc
-Func UpdateHWnD($hWin)
+Func UpdateHWnD($hWin, $bRestart = True)
 If $hWin = 0 Then
-If $g_hAndroidWindow <> 0 Then
+If $g_hAndroidWindow <> 0 And $bRestart Then
 $g_bRestart = True
 EndIf
 $g_hAndroidWindow = 0
@@ -7508,7 +7511,7 @@ $g_hAndroidControl = 0
 ResetAndroidProcess()
 Return False
 EndIf
-If $g_hAndroidWindow <> 0 Then
+If $g_hAndroidWindow <> 0 And $bRestart Then
 $g_bRestart = True
 EndIf
 $g_hAndroidWindow = $hWin
@@ -7659,6 +7662,9 @@ EndFunc
 Func _WinGetAndroidHandle($bFindByTitle = False)
 Local $hWin = WinGetHandle($g_hAndroidWindow)
 If $hWin > 0 And $hWin = $g_hAndroidWindow Then Return $g_hAndroidWindow
+If $g_sAppClassInstance <> $g_avAndroidAppConfig[$g_iAndroidConfig][3] Then
+SetDebugLog("Restore $g_sAppClassInstance to: " & $g_avAndroidAppConfig[$g_iAndroidConfig][3])
+EndIf
 $g_sAppClassInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][3]
 Local $i
 Local $t
@@ -9141,6 +9147,7 @@ Func AndroidAdbClickSupported()
 Return BitAND($g_iAndroidSupportFeature, 4) = 4
 EndFunc
 Func AndroidClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = True)
+ForceCaptureRegion()
 AndroidFastClick($x, $y, $times, $speed, $checkProblemAffect)
 EndFunc
 Func AndroidMoveMouseAnywhere()
@@ -22536,7 +22543,7 @@ Local $g_sLanguageIndex = _ArraySearch($aLanguageFile, $aLanguage[_GUICtrlComboB
 $g_sLanguage = $aLanguageFile[$g_sLanguageIndex][0]
 MsgBox("", "", GetTranslatedFileIni("MBR Popups", "Func_cmbLanguage", "Restart Bot to load program with new language:") & " " & $aLanguageFile[$g_sLanguageIndex][1] & " (" & $g_sLanguage & ")")
 IniWriteS($g_sProfileConfigPath, "other", "language", $g_sLanguage)
-ShellExecute(@ScriptFullPath, $g_sProfileCurrentName & " " & $g_sAndroidEmulator & " " & $g_sAndroidInstance & " /r")
+RestartBot(False, False)
 EndFunc
 Func chkBotCustomTitleBarClick()
 Local $bChecked = GUICtrlRead($g_hChkBotCustomTitleBarClick) = $GUI_CHECKED
@@ -26632,9 +26639,9 @@ $g_aiSearchTrophiesMin[$DB] = GUICtrlRead($g_hTxtDBTropiesMin)
 $g_aiSearchTrophiesMax[$DB] = GUICtrlRead($g_hTxtDBTropiesMax)
 $g_abSearchCampsEnable[$DB] =(GUICtrlRead($g_hChkDBActivateCamps) = $GUI_CHECKED)
 $g_aiSearchCampsPct[$DB] = Int(GUICtrlRead($g_hTxtDBArmyCamps))
-$g_iHeroWaitAttackNoBit[$DB][0] = GUICtrlRead($g_hChkDBKingWait) = $GUI_CHECKED ? $eHeroKing : $eHeroNone
-$g_iHeroWaitAttackNoBit[$DB][1] = GUICtrlRead($g_hChkDBQueenWait) = $GUI_CHECKED ? $eHeroQueen : $eHeroNone
-$g_iHeroWaitAttackNoBit[$DB][2] = GUICtrlRead($g_hChkDBWardenWait) = $GUI_CHECKED ? $eHeroWarden : $eHeroNone
+$g_iHeroWaitAttackNoBit[$DB][0] = GUICtrlRead($g_hChkDBKingWait) = $GUI_CHECKED ? 1 : 0
+$g_iHeroWaitAttackNoBit[$DB][1] = GUICtrlRead($g_hChkDBQueenWait) = $GUI_CHECKED ? 1 : 0
+$g_iHeroWaitAttackNoBit[$DB][2] = GUICtrlRead($g_hChkDBWardenWait) = $GUI_CHECKED ? 1 : 0
 $g_abSearchSpellsWaitEnable[$DB] =(GUICtrlRead($g_hChkDBSpellsWait) = $GUI_CHECKED)
 $g_abSearchCastleSpellsWaitEnable[$DB] =(GUICtrlRead($g_hChkDBWaitForCastleSpell) = $GUI_CHECKED)
 $g_aiSearchCastleSpellsWaitRegular[$DB] = _GUICtrlComboBox_GetCurSel($g_hCmbDBWaitForCastleSpell)
@@ -26686,9 +26693,9 @@ GUICtrlSetState($g_hChkActivebase, $g_abAttackTypeEnable[$LB] ? $GUI_CHECKED : $
 GUICtrlSetState($g_hChkABKingWait, BitAND($g_aiSearchHeroWaitEnable[$LB], $eHeroKing) = $eHeroKing ? $GUI_CHECKED : $GUI_UNCHECKED)
 GUICtrlSetState($g_hChkABQueenWait, BitAND($g_aiSearchHeroWaitEnable[$LB], $eHeroQueen) = $eHeroQueen ? $GUI_CHECKED : $GUI_UNCHECKED)
 GUICtrlSetState($g_hChkABWardenWait, BitAND($g_aiSearchHeroWaitEnable[$LB], $eHeroWarden) = $eHeroWarden ? $GUI_CHECKED : $GUI_UNCHECKED)
-$g_iHeroWaitAttackNoBit[$LB][0] = GUICtrlRead($g_hChkABKingWait) = $GUI_CHECKED ? $eHeroKing : $eHeroNone
-$g_iHeroWaitAttackNoBit[$LB][1] = GUICtrlRead($g_hChkABQueenWait) = $GUI_CHECKED ? $eHeroQueen : $eHeroNone
-$g_iHeroWaitAttackNoBit[$LB][2] = GUICtrlRead($g_hChkABWardenWait) = $GUI_CHECKED ? $eHeroWarden : $eHeroNone
+$g_iHeroWaitAttackNoBit[$LB][0] = GUICtrlRead($g_hChkABKingWait) = $GUI_CHECKED ? 1 : 0
+$g_iHeroWaitAttackNoBit[$LB][1] = GUICtrlRead($g_hChkABQueenWait) = $GUI_CHECKED ? 1 : 0
+$g_iHeroWaitAttackNoBit[$LB][2] = GUICtrlRead($g_hChkABWardenWait) = $GUI_CHECKED ? 1 : 0
 GUICtrlSetState($g_hChkABSpellsWait, $g_abSearchSpellsWaitEnable[$LB] ? $GUI_CHECKED : $GUI_UNCHECKED)
 chkABSpellsWait()
 GUICtrlSetState($g_hChkABWaitForCastleSpell, $g_abSearchCastleSpellsWaitEnable[$LB] ? $GUI_CHECKED : $GUI_UNCHECKED)
@@ -26739,9 +26746,9 @@ $g_aiSearchTrophiesMin[$LB] = GUICtrlRead($g_hTxtABTropiesMin)
 $g_aiSearchTrophiesMax[$LB] = GUICtrlRead($g_hTxtABTropiesMax)
 $g_abSearchCampsEnable[$LB] =(GUICtrlRead($g_hChkABActivateCamps) = $GUI_CHECKED)
 $g_aiSearchCampsPct[$LB] = Int(GUICtrlRead($g_hTxtABArmyCamps))
-$g_iHeroWaitAttackNoBit[$LB][0] = GUICtrlRead($g_hChkABKingWait) = $GUI_CHECKED ? $eHeroKing : $eHeroNone
-$g_iHeroWaitAttackNoBit[$LB][1] = GUICtrlRead($g_hChkABQueenWait) = $GUI_CHECKED ? $eHeroQueen : $eHeroNone
-$g_iHeroWaitAttackNoBit[$LB][2] = GUICtrlRead($g_hChkABWardenWait) = $GUI_CHECKED ? $eHeroWarden : $eHeroNone
+$g_iHeroWaitAttackNoBit[$LB][0] = GUICtrlRead($g_hChkABKingWait) = $GUI_CHECKED ? 1 : 0
+$g_iHeroWaitAttackNoBit[$LB][1] = GUICtrlRead($g_hChkABQueenWait) = $GUI_CHECKED ? 1 : 0
+$g_iHeroWaitAttackNoBit[$LB][2] = GUICtrlRead($g_hChkABWardenWait) = $GUI_CHECKED ? 1 : 0
 $g_abSearchSpellsWaitEnable[$LB] =(GUICtrlRead($g_hChkABSpellsWait) = $GUI_CHECKED)
 $g_abSearchCastleSpellsWaitEnable[$LB] =(GUICtrlRead($g_hChkABWaitForCastleSpell) = $GUI_CHECKED)
 $g_aiSearchCastleSpellsWaitRegular[$LB] = _GUICtrlComboBox_GetCurSel($g_hCmbABWaitForCastleSpell)
@@ -27268,7 +27275,8 @@ GUICtrlSetState($g_hChkShareAttack, $g_bShareAttackEnable ? $GUI_CHECKED : $GUI_
 GUICtrlSetData($g_hTxtShareMinGold, $g_iShareMinGold)
 GUICtrlSetData($g_hTxtShareMinElixir, $g_iShareMinElixir)
 GUICtrlSetData($g_hTxtShareMinDark, $g_iShareMinDark)
-GUICtrlSetData($g_hTxtShareMessage, $g_sShareMessage)
+GUICtrlSetData($g_hTxtShareMessage, StringReplace($g_sShareMessage, "|", @CRLF))
+chkShareAttack()
 GUICtrlSetState($g_hChkTakeLootSS, $g_bTakeLootSnapShot ? $GUI_CHECKED : $GUI_UNCHECKED)
 GUICtrlSetState($g_hChkScreenshotLootInfo, $g_bScreenshotLootInfo ? $GUI_CHECKED : $GUI_UNCHECKED)
 chkTakeLootSS()
@@ -27277,7 +27285,7 @@ $g_bShareAttackEnable =(GUICtrlRead($g_hChkShareAttack) = $GUI_CHECKED)
 $g_iShareMinGold = GUICtrlRead($g_hTxtShareMinGold)
 $g_iShareMinElixir = GUICtrlRead($g_hTxtShareMinElixir)
 $g_iShareMinDark = GUICtrlRead($g_hTxtShareMinDark)
-$g_sShareMessage = GUICtrlRead($g_hTxtShareMessage)
+$g_sShareMessage = StringReplace(GUICtrlRead($g_hTxtShareMessage), @CRLF, "|")
 $g_bTakeLootSnapShot =(GUICtrlRead($g_hChkTakeLootSS) = $GUI_CHECKED)
 $g_bScreenshotLootInfo =(GUICtrlRead($g_hChkScreenshotLootInfo) = $GUI_CHECKED)
 EndSwitch
@@ -28406,7 +28414,7 @@ $g_bShareAttackEnable =(IniRead($g_sProfileConfigPath, "shareattack", "ShareAtta
 $g_iShareMinGold = Int(IniRead($g_sProfileConfigPath, "shareattack", "minGold", 200000))
 $g_iShareMinElixir = Int(IniRead($g_sProfileConfigPath, "shareattack", "minElixir", 200000))
 $g_iShareMinDark = Int(IniRead($g_sProfileConfigPath, "shareattack", "minDark", 100))
-$g_sShareMessage = StringReplace(IniRead($g_sProfileConfigPath, "shareattack", "Message", "Nice|Good|Thanks|Wowwww"), "|", @CRLF)
+$g_sShareMessage = IniRead($g_sProfileConfigPath, "shareattack", "Message", "Nice|Good|Thanks|Wowwww")
 IniReadS($g_bTakeLootSnapShot, $g_sProfileConfigPath, "attack", "TakeLootSnapShot", False, "Bool")
 IniReadS($g_bScreenshotLootInfo, $g_sProfileConfigPath, "attack", "ScreenshotLootInfo", False, "Bool")
 EndFunc
@@ -29275,7 +29283,7 @@ _Ini_Add("shareattack", "ShareAttack", $g_bShareAttackEnable ? 1 : 0)
 _Ini_Add("shareattack", "minGold", $g_iShareMinGold)
 _Ini_Add("shareattack", "minElixir", $g_iShareMinElixir)
 _Ini_Add("shareattack", "minDark", $g_iShareMinDark)
-_Ini_Add("shareattack", "Message", StringReplace($g_sShareMessage, @CRLF, "|"))
+_Ini_Add("shareattack", "Message", $g_sShareMessage)
 _Ini_Add("attack", "TakeLootSnapShot", $g_bTakeLootSnapShot ? 1 : 0)
 _Ini_Add("attack", "ScreenshotLootInfo", $g_bScreenshotLootInfo ? 1 : 0)
 EndFunc
@@ -38110,7 +38118,7 @@ If _Sleep($DELAYRESPOND) Then Return
 If $aHeroResult[0] > 0 Or $aHeroResult[1] > 0 Or $aHeroResult[2] > 0 Then
 For $pTroopType = $eKing To $eWarden
 Local $iHeroIdx = $pTroopType - $eKing
-For $pMatchMode = $DB To $g_iModeCount - 1
+For $pMatchMode = $DB To $LB
 If $g_iDebugSetlogTrain = 1 Or $g_iDebugSetlog = 1 Then
 SetLog("$pTroopType: " & NameOfTroop($pTroopType) & ", $pMatchMode: " & $g_asModeText[$pMatchMode], $COLOR_DEBUG)
 Setlog("TroopToBeUsed: " & IsSpecialTroopToBeUsed($pMatchMode, $pTroopType) & ", Hero Wait Status= " & IsSearchModeActiveMini($pMatchMode) & " & " & IsSpecialTroopToBeUsed($pMatchMode, $pTroopType) & " & " &($g_iHeroUpgrading[$iHeroIdx] <> 1) & " & " &($g_iHeroWaitAttackNoBit[$pMatchMode][$iHeroIdx] = 1), $COLOR_DEBUG)
@@ -45201,6 +45209,7 @@ $g_avAndroidAppConfig[$g_iAndroidConfig][3] = $g_sAppClassInstance
 ExitLoop
 EndIf
 Next
+UpdateHWnD($g_hAndroidWindow, False)
 EndIf
 Return True
 EndFunc
@@ -54918,14 +54927,14 @@ EndIf
 EndFunc
 Func DropTrophy()
 If $g_bDropTrophyEnable Then
-If $g_iDebugSetlog = 1 Then SetLog("Drop Trophy START", $COLOR_DEBUG)
+SetDebugLog("Drop Trophy()", $COLOR_DEBUG)
 If $g_iDebugDeadBaseImage = 1 Then
 DirCreate($g_sProfileTempDebugPath & "\SkippedZombies\")
 DirCreate($g_sProfileTempDebugPath & "\Zombies\")
 setZombie()
 EndIf
 $g_aiCurrentLoot[$eLootTrophy] = getTrophyMainScreen($aTrophies[0], $aTrophies[1])
-If $g_iDebugSetlog = 1 Then SetLog("Current Trophy Count: " & $g_aiCurrentLoot[$eLootTrophy], $COLOR_DEBUG)
+SetDebugLog("Current Trophy Count: " & $g_aiCurrentLoot[$eLootTrophy], $COLOR_DEBUG)
 If Number($g_aiCurrentLoot[$eLootTrophy]) <= Number($g_iDropTrophyMax) Then Return
 Local $bHaveTroops = False
 For $i = 0 To UBound($g_avDTtroopsToBeUsed, 1) - 1
@@ -54945,19 +54954,18 @@ If $g_iDebugSetlog = 1 Then SetLog("Drop Trophy Found Hero BK|AQ|GW: " & BitOR($
 $g_bDisableDropTrophy = False
 $bHaveTroops = True
 EndIf
-If $g_bDisableDropTrophy = True Or $bHaveTroops = False Then
+If $g_bDisableDropTrophy Or Not $bHaveTroops Then
 Setlog("Drop Trophy temporarily disabled, missing proper troop type", $COLOR_ERROR)
-If $g_iDebugSetlog = 1 Then SetLog("Drop Trophy END: No troops in $g_avDTtroopsToBeUsed array", $COLOR_DEBUG)
+SetDebugLog("Drop Trophy(): No troops in $g_avDTtroopsToBeUsed array", $COLOR_DEBUG)
 Return
 EndIf
-Local $bDropSuccessful
-Local $iCount, $aRandomEdge, $iRandomXY
+Local $bDropSuccessful, $iCount, $aRandomEdge, $iRandomXY
 Local Const $DTArmyPercent = Round(Int($g_iDropTrophyArmyMinPct) / 100, 2)
 Local $g_iDropTrophyMaxNeedCheck = $g_iDropTrophyMax
 Local Const $iWaitTime = 3
 Local $iDateCalc, $sWaitToDate
 $sWaitToDate = _DateAdd('n', $iWaitTime, _NowCalc())
-If $g_iDebugSetlog = 1 Then SetLog("ChkBaseQuick delay time= " & $sWaitToDate & " Now= " & _NowCalc() & " Diff= " & _DateDiff('s', _NowCalc(), $sWaitToDate), $COLOR_DEBUG)
+SetDebugLog("ChkBaseQuick delay time= " & $sWaitToDate & " Now= " & _NowCalc() & " Diff= " & _DateDiff('s', _NowCalc(), $sWaitToDate), $COLOR_DEBUG)
 While Number($g_aiCurrentLoot[$eLootTrophy]) > Number($g_iDropTrophyMaxNeedCheck)
 $g_aiCurrentLoot[$eLootTrophy] = getTrophyMainScreen($aTrophies[0], $aTrophies[1])
 SetLog("Trophy Count : " & $g_aiCurrentLoot[$eLootTrophy], $COLOR_SUCCESS)
@@ -54965,13 +54973,13 @@ If Number($g_aiCurrentLoot[$eLootTrophy]) > Number($g_iDropTrophyMaxNeedCheck) T
 If $g_bDropTrophyAtkDead Then
 If($g_CurrentCampUtilization <=($g_iTotalCampSpace * $DTArmyPercent)) Then
 SetLog("Drop Trophy is waiting for " & $g_iDropTrophyArmyMinPct & "% full army to also attack Deadbases.", $COLOR_ACTION)
-If $g_iDebugSetlog = 1 Then SetLog("Drop Trophy END: Drop Trophy + Dead Base skipped, army < " & $g_iDropTrophyArmyMinPct & "%.", $COLOR_DEBUG)
+SetDebugLog("Drop Trophy(): Drop Trophy + Dead Base skipped, army < " & $g_iDropTrophyArmyMinPct & "%.", $COLOR_DEBUG)
 ExitLoop
 EndIf
 Else
 If($g_CurrentCampUtilization < 5) And($g_bDropTrophyUseHeroes And $g_iHeroAvailable = $eHeroNone) Then
 SetLog("No troops available to use on Drop Trophy", $COLOR_ERROR)
-If $g_iDebugSetlog = 1 Then SetLog("Drop Trophy END: Drop Trophy skipped, no army.", $COLOR_DEBUG)
+SetDebugLog("Drop Trophy(): Drop Trophy skipped, no army.", $COLOR_DEBUG)
 ExitLoop
 EndIf
 EndIf
@@ -54981,10 +54989,9 @@ If _Sleep($DELAYDROPTROPHY4) Then ExitLoop
 $bDropSuccessful = True
 ZoomOut()
 PrepareSearch()
-If $g_bOutOfGold = True Then Return
-If $g_bRestart = True Then Return
+If $g_bOutOfGold Or $g_bRestart Then Return
 WaitForClouds()
-If $g_bRestart = True Then Return
+If $g_bRestart Then Return
 If _Sleep($DELAYDROPTROPHY4) Then ExitLoop
 If $g_bDropTrophyAtkDead Then
 $g_iAimGold[$DB] = $g_aiFilterMinGold[$DB]
@@ -54992,10 +54999,10 @@ $g_iAimElixir[$DB] = $g_aiFilterMinElixir[$DB]
 $g_iAimGoldPlusElixir[$DB] = $g_aiFilterMinGoldPlusElixir[$DB]
 $g_iSearchCount = 0
 GetResources(False, $DT)
-If $g_bRestart = True Then Return
+If $g_bRestart Then Return
 SetLog("Identification of your troops:", $COLOR_INFO)
 PrepareAttack($DT)
-If $g_bRestart = True Then Return
+If $g_bRestart Then Return
 Local $G =(Number($g_iSearchGold) >= Number($g_iAimGold[$DB]))
 Local $E =(Number($g_iSearchElixir) >= Number($g_iAimElixir[$DB]))
 Local $GPE =((Number($g_iSearchElixir) + Number($g_iSearchGold)) >= Number($g_iAimGoldPlusElixir[$DB]))
@@ -55005,7 +55012,7 @@ If $g_iDebugDeadBaseImage = 1 Then setZombie()
 ForceCaptureRegion()
 _CaptureRegion2()
 If checkDeadBase() Then
-SetLog("      " & "Dead Base Found on Drop Trophy!", $COLOR_SUCCESS, "Lucida Console", 7.5)
+SetLog("      " & "Dead Base Found while dropping Trophies!", $COLOR_SUCCESS, "Lucida Console", 7.5)
 Attack()
 $g_bFirstStart = True
 ReturnHome($g_bTakeLootSnapShot)
@@ -55015,7 +55022,7 @@ $g_bRestart = True
 If $g_iDebugSetlog = 1 Then SetLog("Drop Trophy END: Dead Base was attacked, reset army and return to Village.", $COLOR_DEBUG)
 ExitLoop
 Else
-SetLog("      " & "Not a Dead Base, resuming Drop Trophy.", $COLOR_BLACK, "Lucida Console", 7.5)
+SetLog("      " & "Not a Dead Base, resuming Trophy Dropping.", $COLOR_BLACK, "Lucida Console", 7.5)
 EndIf
 EndIf
 Else
@@ -55024,7 +55031,7 @@ GetResources(False, $DT)
 If $g_bRestart = True Then Return
 SetLog("Identification of your troops:", $COLOR_INFO)
 PrepareAttack($DT)
-If $g_bRestart = True Then Return
+If $g_bRestart Then Return
 EndIf
 If _Sleep($DELAYDROPTROPHY4) Then ExitLoop
 If $g_bDropTrophyUseHeroes Then
@@ -55044,16 +55051,24 @@ $aRandomEdge = $g_aaiEdgeDropPoints[Round(Random(0, 3))]
 $iRandomXY = Round(Random(0, 4))
 If $g_iDebugSetlog = 1 Then Setlog("Hero Loc = " & $iRandomXY & ", X:Y= " & $aRandomEdge[$iRandomXY][0] & "|" & $aRandomEdge[$iRandomXY][1], $COLOR_DEBUG)
 If($g_iQueenSlot <> -1 Or $g_iKingSlot <> -1 Or $g_iWardenSlot <> -1) Then
-Local $DropHeroPriority
-If $g_iDropTrophyHeroesPriority = 0 Then $DropHeroPriority = "QKW"
-If $g_iDropTrophyHeroesPriority = 1 Then $DropHeroPriority = "QWK"
-If $g_iDropTrophyHeroesPriority = 2 Then $DropHeroPriority = "KQW"
-If $g_iDropTrophyHeroesPriority = 3 Then $DropHeroPriority = "KWQ"
-If $g_iDropTrophyHeroesPriority = 4 Then $DropHeroPriority = "WKQ"
-If $g_iDropTrophyHeroesPriority = 5 Then $DropHeroPriority = "WQK"
+Local $sHeroPriority
+Switch $g_iDropTrophyHeroesPriority
+Case 0
+$sHeroPriority = "QKW"
+Case 1
+$sHeroPriority = "QWK"
+Case 2
+$sHeroPriority = "KQW"
+Case 3
+$sHeroPriority = "KWQ"
+Case 4
+$sHeroPriority = "WKQ"
+Case 5
+$sHeroPriority = "WQK"
+EndSwitch
 Local $t
 For $i = 1 To 3
-$t = StringMid($DropHeroPriority, $i, 1)
+$t = StringMid($sHeroPriority, $i, 1)
 Switch $t
 Case "Q"
 If $g_iQueenSlot <> -1 Then
@@ -55063,7 +55078,7 @@ Click(GetXPosOfArmySlot($g_iQueenSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#017
 If _Sleep($DELAYDROPTROPHY1) Then ExitLoop
 Click($aRandomEdge[$iRandomXY][0], $aRandomEdge[$iRandomXY][1], 1, 0, "#0180")
 If _Sleep($DELAYDROPTROPHY4) Then ExitLoop
-If IsAttackPage() Then SelectDropTroop($g_iQueenSlot)
+SelectDropTroop($g_iQueenSlot)
 ReturnHome(False, False)
 If _Sleep($DELAYDROPTROPHY1) Then ExitLoop
 ExitLoop
@@ -55076,7 +55091,7 @@ Click(GetXPosOfArmySlot($g_iKingSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#0177
 If _Sleep($DELAYDROPTROPHY1) Then ExitLoop
 Click($aRandomEdge[$iRandomXY][0], $aRandomEdge[$iRandomXY][1], 1, 0, "#0178")
 If _Sleep($DELAYDROPTROPHY4) Then ExitLoop
-If IsAttackPage() Then SelectDropTroop($g_iKingSlot)
+SelectDropTroop($g_iKingSlot)
 ReturnHome(False, False)
 If _Sleep($DELAYDROPTROPHY1) Then ExitLoop
 ExitLoop
@@ -55089,7 +55104,7 @@ Click(GetXPosOfArmySlot($g_iWardenSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#00
 If _Sleep($DELAYDROPTROPHY1) Then ExitLoop
 Click($aRandomEdge[$iRandomXY][0], $aRandomEdge[$iRandomXY][1], 1, 0, "#0000")
 If _Sleep($DELAYDROPTROPHY4) Then ExitLoop
-If IsAttackPage() Then SelectDropTroop($g_iWardenSlot)
+SelectDropTroop($g_iWardenSlot)
 ReturnHome(False, False)
 If _Sleep($DELAYDROPTROPHY1) Then ExitLoop
 ExitLoop
@@ -55098,7 +55113,7 @@ EndSwitch
 Next
 EndIf
 EndIf
-If($g_iQueenSlot = -1 And $g_iKingSlot = -1 And $g_iWardenSlot = -1) Or $g_bDropTrophyUseHeroes = False Then
+If($g_iQueenSlot = -1 And $g_iKingSlot = -1 And $g_iWardenSlot = -1) Or Not $g_bDropTrophyUseHeroes Then
 $aRandomEdge = $g_aaiEdgeDropPoints[Round(Random(0, 3))]
 $iRandomXY = Round(Random(0, 4))
 If $g_iDebugSetlog = 1 Then Setlog("Troop Loc = " & $iRandomXY & ", X:Y= " & $aRandomEdge[$iRandomXY][0] & "|" & $aRandomEdge[$iRandomXY][1], $COLOR_DEBUG)
@@ -55150,7 +55165,7 @@ Else
 SetLog("Trophy Drop Complete", $COLOR_INFO)
 EndIf
 WEnd
-If $g_iDebugSetlog = 1 Then SetLog("Drop Trophy END", $COLOR_DEBUG)
+If $g_iDebugSetlog = 1 Then SetLog("DropTrophy(): End", $COLOR_DEBUG)
 Else
 If $g_iDebugSetlog = 1 Then SetLog("Drop Trophy SKIP", $COLOR_DEBUG)
 EndIf
@@ -58569,163 +58584,57 @@ SetLog("_GetPixelColor(+3, +19): " & _GetPixelColor($g_avLabTroops[$i][0] + 3, $
 SetLog("_GetPixelColor(+8, +59): " & _GetPixelColor($g_avLabTroops[$i][0] + 23, $g_avLabTroops[$i][1] + 60, True) & ":FFC360 =Max troop", $COLOR_DEBUG)
 Next
 EndFunc
-Func ReplayShare($last = 1)
-Local $dtLocal = _Date_Time_GetLocalTime()
-Local $dLastShareDate = _DateAdd("n", -60, _Date_Time_SystemTimeToDateTimeStr($dtLocal, 1))
-Local $txtMessage, $tNew
-If $g_bShareAttackEnable = False Then Return
-If $last = 1 Then
+Func ReplayShare($bShareLastReplay)
+If Not $g_bShareAttackEnable Or Not $bShareLastReplay Then Return
+Local Static $sLastTimeShared = ""
+If $sLastTimeShared = "" Or _DateDiff("m", $sLastTimeShared, _NowCalc()) > 30 Then
+SetLog("Going to share the last Attack!")
 ClickP($aAway, 1, 0, "#0235")
 If _Sleep($DELAYREPLAYSHARE2) Then Return
-SetLog("Share Replay: Opening Messages Page...", $COLOR_INFO)
-If $g_iDebugSetlog = 1 Then Setlog("$last= " & $last, $COLOR_DEBUG)
 ClickP($aMessageButton, 1, 0, "#0236")
-If _Sleep($DELAYREPLAYSHARE3) Then Return
-Click(380, 94 + $g_iMidOffsetY, 1, 0, "#0237")
-If _Sleep($DELAYREPLAYSHARE3) Then Return
-_CaptureRegion()
-Local $FileListQueueName = _FileListToArray($g_sProfileTempPath, "Village*.png", 1)
-If $g_iDebugSetlog = 1 Then Setlog("Top share button pixel color 70D4E8 or BBBBBB: " & _GetPixelColor(500, 156 + $g_iMidOffsetY), $COLOR_DEBUG)
-If _ColorCheck(_GetPixelColor(500, 156 + $g_iMidOffsetY), Hex(0x70D4E8, 6), 10) = True And Not(IsArray($FileListQueueName)) Then
-Setlog("Ok, sharing!")
-Click(500, 156 + $g_iMidOffsetY, 1, 0, "#0238")
+If Not _WaitForCheckPixel($aAttackLogPage, $g_bCapturePixel) Then
+SetLog("Error while checking if the Attack Log Page opened up", $COLOR_ERROR)
+ClickP($aAway, 1, 0, "#0235")
+Return
+EndIf
+Click(380, 90 + $g_iMidOffsetY, 1, 0, "#0237")
+If Not _WaitForCheckPixel($aAttackLogAttackTab, $g_bCapturePixel) Then
+SetLog("Error while trying to open Attacks Page", $COLOR_ERROR)
+ClickP($aAway, 1, 0, "#0235")
+Return
+EndIf
+Local $asReplayText = StringSplit($g_sShareMessage, "|")
+Local $sRndMessage
+If @error Then
+$sRndMessage = $asReplayText[1]
+Else
+$sRndMessage = $asReplayText[Random(1, $asReplayText[0], 1)]
+EndIf
+If _CheckPixel($aBlueShareReplayButton) Then
+ClickP($aBlueShareReplayButton, 1, 0, "#0238")
 If _Sleep($DELAYREPLAYSHARE1) Then Return
 Click(300, 120, 1, 0, "#0239")
 If _Sleep($DELAYREPLAYSHARE1) Then Return
-Local $smessage = $g_sShareMessage
-$smessage = StringReplace($smessage, @LF, "")
-$smessage = StringReplace($smessage, @CR, "|")
-While StringInStr($smessage, "||")
-$smessage = StringReplace($smessage, "||", "|")
-WEnd
-Local $smessagearray = StringSplit($smessage, "|")
-If @error Then
-$txtMessage = $smessagearray[1]
-Else
-$txtMessage = $smessagearray[Random(1, $smessagearray[0], 1)]
+If Not $g_bChkBackgroundMode And Not $g_bNoFocusTampering Then ControlFocus($g_hAndroidWindow, "", "")
+AndroidSendText($sRndMessage, True)
+If _Sleep($DELAYREPLAYSHARE1) Then Return
+If SendText($sRndMessage) = 0 Then
+Setlog("Failed to insert Share Replay Text!", $COLOR_ERROR)
+Return
 EndIf
-$txtMessage = StringReplace($txtMessage, "<n>", StringFormat("%s", $g_iSearchCount))
-ControlSend($g_hAndroidWindow, "", "", $txtMessage, 0)
 If _Sleep($DELAYREPLAYSHARE1) Then Return
 Click(530, 210 + $g_iMidOffsetY, 1, 0, "#0240")
-$tNew = _Date_Time_GetLocalTime()
-$dLastShareDate = _Date_Time_SystemTimeToDateTimeStr($tNew, 1)
+$sLastTimeShared = _NowCalc
+ElseIf _CheckPixel($aGrayShareReplayButton) Then
+SetLog("Sharing latest Attack is not enabled right now, storing it and share later!")
+ClickP($aAway, 1, 0, "#0235")
 Else
-If _ColorCheck(_GetPixelColor(500, 156 + $g_iMidOffsetY), Hex(0xbbbbbb, 6), 6) = True Or IsArray($FileListQueueName) Then
-If IsArray($FileListQueueName) Then
-SetLog("Others replay in queue, Share Later Last Replay")
-Else
-Setlog("Cannot Share Now... retry later.")
-EndIf
-_CaptureRegion(87, 149 + $g_iMidOffsetY, 87 + 100, 149 + 20 + $g_iMidOffsetY)
-Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
-Local $Time = @HOUR & "." & @MIN
-Local $iSaveFile = _GDIPlus_ImageSaveToFile($g_hBitmap, $g_sProfileTempPath & "Village_" & $Date & "_" & $Time & "^" & StringFormat("%s", $g_iSearchCount) & ".png")
-If Not($iSaveFile) Then SetLog("An error occurred putting screenshot in queue", $COLOR_ERROR)
-Click(763, 86 + $g_iMidOffsetY, 1, 0, "#0241")
-If _Sleep($DELAYREPLAYSHARE2) Then Return
-Else
-Setlog("Cannot Share Now... retry later.", $COLOR_ERROR)
-EndIf
-EndIf
-$g_bShareAttackEnableNow = False
-Else
-$tNew = _Date_Time_GetLocalTime()
-If _DateDiff("n", $dLastShareDate, _Date_Time_SystemTimeToDateTimeStr($tNew, 1)) > 30 Then
-Local $FileListName = _FileListToArray($g_sProfileTempPath, "Village*.png", 1)
-Local $x, $t, $tmin = 0
-If Not((Not IsArray($FileListName)) Or(@error = 1)) Then
-Local $FileListDate
-For $x = 1 To $FileListName[0]
-$t = FileGetTime($g_sProfileTempPath & $FileListName[$x], 1, 1)
-If $tmin = 0 Then
-$tmin = $t
-$FileListDate = $x
-Else
-If $t < $tmin Then
-$t = $tmin
-$FileListDate = $x
-EndIf
-EndIf
-Next
-ClickP($aAway, 1, 0, "#0242")
-If _Sleep($DELAYREPLAYSHARE2) Then Return
-SetLog("Share Replay: Opening Messages Page...", $COLOR_INFO)
-If $g_iDebugSetlog = 1 Then Setlog("$last= " & $last, $COLOR_DEBUG)
-ClickP($aMessageButton, 1, 0, "#0243")
-If _Sleep($DELAYREPLAYSHARE3) Then Return
-Click(380, 94 + $g_iMidOffsetY, 1, 0, "#0244")
-If _Sleep($DELAYREPLAYSHARE3) Then Return
-_CaptureRegion()
-If $g_iDebugSetlog = 1 Then Setlog("Top share button pixel color 70D4E8 or BBBBBB: " & _GetPixelColor(500, 156 + $g_iMidOffsetY), $COLOR_DEBUG)
-If _ColorCheck(_GetPixelColor(500, 156 + $g_iMidOffsetY), Hex(0x70D4E8, 6), 10) = True Then
-Setlog("Ok, sharing!")
-Local $VilLoc, $VilX, $VilY, $VilTol
-For $VilTol = 0 To 20
-If $VilLoc = 0 Then
-$VilLoc = _ImageSearch($g_sProfileTempPath & $FileListName[$FileListDate], 1, $VilX, $VilY, $VilTol)
-If $VilLoc = 1 And $VilX > 35 And $VilY < 610 Then
-Click(500, $VilY, 1, 0, "#0245")
-If _Sleep($DELAYREPLAYSHARE1) Then Return
-Click(300, 120, 1, 0, "#0246")
-If _Sleep($DELAYREPLAYSHARE1) Then Return
-Local $a = StringInStr($FileListName[$FileListDate], "^")
-Local $b = StringInStr($FileListName[$FileListDate], ".png")
-Local $stry = "0"
-If $a > 0 And $b > 0 Then $stry = StringMid($FileListName[$FileListDate], $a + 1, $b - $a - 1)
-$g_iSearchCount = $stry
-Local $smessage = $g_sShareMessage
-$smessage = StringReplace($smessage, @LF, "")
-$smessage = StringReplace($smessage, @CR, "|")
-While StringInStr($smessage, "||")
-$smessage = StringReplace($smessage, "||", "|")
-WEnd
-Local $smessagearray = StringSplit($smessage, "|")
-If @error Then
-$txtMessage = $smessagearray[1]
-Else
-$txtMessage = $smessagearray[Random(1, $smessagearray[0], 1)]
-EndIf
-$txtMessage = StringReplace($txtMessage, "<n>", StringFormat("%s", $g_iSearchCount))
-ControlSend($g_hAndroidWindow, "", "", $txtMessage, 0)
-If _Sleep($DELAYREPLAYSHARE1) Then Return
-Click(500, 210 + $g_iMidOffsetY, 1, 0, "#0247")
-$tNew = _Date_Time_GetLocalTime()
-$dLastShareDate = _Date_Time_SystemTimeToDateTimeStr($tNew, 1)
-Local $iCopy = FileCopy($g_sProfileTempPath & $FileListName[$FileListDate], $g_sProfileTempPath & "shared_" & $FileListName[$FileListDate])
-If Not($iCopy) Then Setlog("An error occurred copying a temporary file", $COLOR_ERROR)
-Local $iDelete = FileDelete($g_sProfileTempPath & $FileListName[$FileListDate])
-If Not($iDelete) Then Setlog("An error occurred deleting a temporary file", $COLOR_ERROR)
-If _Sleep($DELAYREPLAYSHARE4) Then Return
-Return True
-EndIf
-EndIf
-Next
-If $VilLoc = 0 Then
-Local $iCopy = FileCopy($g_sProfileTempPath & $FileListName[$FileListDate], $g_sProfileTempPath & "discard_" & $FileListName[$FileListDate])
-If Not($iCopy) Then Setlog("An error occurred copying a temporary file", $COLOR_ERROR)
-Local $iDelete = FileDelete($g_sProfileTempPath & $FileListName[$FileListDate])
-If Not($iDelete) Then Setlog("An error occurred deleting a temporary file", $COLOR_ERROR)
+SetLog("Error checking Share Button State. Replay might be not available anymore or Bot made mistakes", $COLOR_ERROR)
+ClickP($aAway, 1, 0, "#0235")
 EndIf
 Else
-If _ColorCheck(_GetPixelColor(500, 156 + $g_iMidOffsetY), Hex(0xbbbbbb, 6), 6) = True Then
-Setlog("Cannot Share Now... retry later.")
-Click(763, 86 + $g_iMidOffsetY, 1, 0, "#0248")
-$tNew = _Date_Time_GetLocalTime()
-$dLastShareDate = _DateAdd("n", -20, _Date_Time_SystemTimeToDateTimeStr($tNew, 1))
-If _Sleep($DELAYREPLAYSHARE2) Then Return
-Else
-Setlog("Button Share not found, abort.", $COLOR_ERROR)
-Click(763, 86 + $g_iMidOffsetY, 1, 0, "#0249")
-If _Sleep($DELAYREPLAYSHARE2) Then Return
+SetLog("Skip Replay Sharing because the 30 minutes cooldown is not over yet!")
 EndIf
-EndIf
-Return True
-EndIf
-EndIf
-EndIf
-If _Sleep($DELAYREPLAYSHARE2) Then Return
-checkMainScreen(False)
 EndFunc
 Func BoostKing()
 If AllowBoosting("Barbarian King", $g_iCmbBoostBarbarianKing) = False Then Return

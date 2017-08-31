@@ -1032,7 +1032,7 @@ Global $g_bSmartZapEnable = False, $g_bEarthQuakeZap = False, $g_bNoobZap = Fals
 		$g_bSmartZapFTW = False, $g_iSmartZapMinDE = 350, $g_iSmartZapExpectedDE = 320, $g_bDebugSmartZap = False
 
 ; <><><><> Attack Plan / Search & Attack / Options / End Battle <><><><>
-Global $g_bShareAttackEnable = 0, $g_iShareMinGold = 300000, $g_iShareMinElixir = 300000, $g_iShareMinDark = 0, $g_sShareMessage = StringReplace("Nice|Good|Thanks|Wowwww", "|", @CRLF), _
+Global $g_bShareAttackEnable = 0, $g_iShareMinGold = 300000, $g_iShareMinElixir = 300000, $g_iShareMinDark = 0, $g_sShareMessage = "Nice|Good|Thanks|Wowwww", _
 		$g_bTakeLootSnapShot = True, $g_bScreenshotLootInfo = False, $g_bShareAttackEnableNow = False
 
 ; <><><><> Attack Plan / Search & Attack / Options / Trophy Settings <><><><>
@@ -1198,10 +1198,10 @@ Global $g_iImglocTHLevel = 0
 Global $g_aiTownHallDetails[4] = [-1, -1, -1, -1] ; [LocX, LocY, BldgLvl, Quantity]
 
 ; Attack
-Global Const $g_aaiTopLeftDropPoints[5][2] = [[83, 306], [174, 238], [240, 188], [303, 142], [390, 76]]
-Global Const $g_aaiTopRightDropPoints[5][2] = [[466, 66], [556, 134], [622, 184], [684, 231], [775, 300]]
-Global Const $g_aaiBottomLeftDropPoints[5][2] = [[81, 363], [174, 434], [235, 481], [299, 530], [390, 600]]
-Global Const $g_aaiBottomRightDropPoints[5][2] = [[466, 590], [554, 523], [615, 477], [678, 430], [765, 364]]
+Global Const $g_aaiTopLeftDropPoints[5][2] = [[66, 299], [174, 210], [240, 169], [303, 127], [390, 55]]
+Global Const $g_aaiTopRightDropPoints[5][2] = [[466, 60], [556, 120], [622, 170], [684, 220], [775, 285]]
+Global Const $g_aaiBottomLeftDropPoints[5][2] = [[81, 390], [174, 475], [235, 521], [299, 570], [390, 610]]
+Global Const $g_aaiBottomRightDropPoints[5][2] = [[466, 600], [554, 555], [615, 510], [678, 460], [765, 394]]
 Global Const $g_aaiEdgeDropPoints[4] = [$g_aaiBottomRightDropPoints, $g_aaiTopLeftDropPoints, $g_aaiBottomLeftDropPoints, $g_aaiTopRightDropPoints]
 Global Const $g_aiUseAllTroops[33] = [$eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eDrag, $ePekk, $eBabyD, $eMine, $eMini, $eHogs, $eValk, $eGole, $eWitc, $eLava, $eBowl, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell]
 Global Const $g_aiUseBarracks[26] = [$eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eDrag, $ePekk, $eBabyD, $eMine, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell, $eSkSpell]
@@ -1317,7 +1317,6 @@ Global $g_aiTimeTrain[3] = [0, 0, 0] ; [Troop remaining time], [Spells remaining
 Global Enum $ArmyTAB, $TrainTroopsTAB, $BrewSpellsTAB, $QuickTrainTAB
 Global $g_bCheckSpells = False
 Global $g_bCheckClanCastleTroops = False
-Global Const $g_iQuickTrainButtonRetryDelay = 1000
 ; Array to hold Laboratory Troop information [LocX of upper left corner of image, LocY of upper left corner of image, PageLocation, Troop "name", Icon # in DLL file]
 Global $g_avLabTroops[30][5]
 

@@ -68,6 +68,8 @@ Func InitAndroidConfig($bRestart = False)
 		; when GUI is initialized, update background checkbox
 		chkBackground()
 	EndIf
+	
+	UpdateHWnD($g_hAndroidWindow, False) ; Ensure $g_sAppClassInstance is properly set
 EndFunc   ;==>InitAndroidConfig
 
 Func AndroidSupportFeaturesSet($iValue, $iIdx = $g_iAndroidConfig)
@@ -184,9 +186,9 @@ Func UpdateAndroidWindowState()
 	Return $bChanged
 EndFunc   ;==>UpdateAndroidWindowState
 
-Func UpdateHWnD($hWin)
+Func UpdateHWnD($hWin, $bRestart = True)
 	If $hWin = 0 Then
-		If $g_hAndroidWindow <> 0 Then
+		If $g_hAndroidWindow <> 0 And $bRestart Then
 			$g_bRestart = True ; Android likely crashed
 			;$g_bIsClientSyncError = True ; quick restart search
 		EndIf
@@ -195,7 +197,7 @@ Func UpdateHWnD($hWin)
 		ResetAndroidProcess()
 		Return False
 	EndIf
-	If $g_hAndroidWindow <> 0 Then
+	If $g_hAndroidWindow <> 0 And $bRestart Then
 		$g_bRestart = True ; Android likely crashed
 		;$g_bIsClientSyncError = True ; quick restart search
 	EndIf
@@ -382,6 +384,9 @@ Func _WinGetAndroidHandle($bFindByTitle = False)
 	If $hWin > 0 And $hWin = $g_hAndroidWindow Then Return $g_hAndroidWindow
 
 	; Window not found, reset $g_sAppClassInstance as it might have replaced with handle
+	If $g_sAppClassInstance <> $g_avAndroidAppConfig[$g_iAndroidConfig][3] Then
+		SetDebugLog("Restore $g_sAppClassInstance to: " & $g_avAndroidAppConfig[$g_iAndroidConfig][3])
+	EndIf
 	$g_sAppClassInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][3]
 
 	; Find all controls by title and check which contains the android control (required for Nox)
@@ -2269,6 +2274,7 @@ Func AndroidAdbClickSupported()
 EndFunc   ;==>AndroidAdbClickSupported
 
 Func AndroidClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = True)
+	ForceCaptureRegion()
 	;AndroidSlowClick($x, $y, $times, $speed)
 	AndroidFastClick($x, $y, $times, $speed, $checkProblemAffect)
 EndFunc   ;==>AndroidClick
