@@ -410,9 +410,14 @@ Func EmbedNox($bEmbed = Default)
 		Local $c = $aWin[$i][1]
 		If $c = "Qt5QWindowToolSaveBits" Then
 			Local $aPos = WinGetPos($h)
-			If UBound($aPos) > 2 Then
-				; found toolbar
-				$hToolbar = $h
+			If UBound($aPos) > 3 Then
+				If $hToolbar = 0 And $aPos[2] > 7 And $aPos[3] > 7 Then
+					; found toolbar
+					$hToolbar = $h
+				ElseIf $aPos[2] = 7 Or $aPos[3] = 7 Then
+					; found border, always hide it
+					WinMove2($h, "", -1, -1, -1, -1, $HWND_NOTOPMOST, $SWP_HIDEWINDOW, False)
+				EndIf
 			EndIf
 		EndIf
 	Next
@@ -426,8 +431,8 @@ Func EmbedNox($bEmbed = Default)
 		Next
 	Else
 		SetDebugLog("EmbedNox(" & $bEmbed & "): $hToolbar=" & $hToolbar, Default, True)
-		WinMove2($hToolbar, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
-		_WinAPI_ShowWindow($hToolbar, ($bEmbed ? @SW_HIDE : @SW_SHOWNOACTIVATE))
+		WinMove2($hToolbar, "", -1, -1, -1, -1, $HWND_NOTOPMOST, ($bEmbed ? $SWP_HIDEWINDOW : $SWP_SHOWWINDOW), False)
+		;_WinAPI_ShowWindow($hToolbar, ($bEmbed ? @SW_HIDE : @SW_SHOWNOACTIVATE))
 	EndIf
 
 EndFunc   ;==>EmbedNox

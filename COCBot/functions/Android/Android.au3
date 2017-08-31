@@ -211,12 +211,17 @@ Func UpdateHWnD($hWin)
 		If GetProcessDpiAwareness(GetAndroidPid()) = 0 Then	AndroidDpiAwareness()
 		EndIf
 	#ce
-	Local $hCtrl = ControlGetHandle2($hWin, $g_sAppPaneName, $g_sAppClassInstance)
+	Local $hCtrl = ControlGetHandle2($hWin, $g_sAppPaneName, $g_sAppClassInstance, 100, 100)
 	If $hCtrl = 0 Then
 		$g_hAndroidControl = 0
 		Return False
 	EndIf
-	$g_sAppClassInstance = $g_sControlGetHandle2_Classname
+	Local $AppClass = $g_sControlGetHandle2_Classname
+	If BitAND($g_iAndroidSupportFeature, 256) > 0 Then $AppClass = $hCtrl
+	If $g_sAppClassInstance <> $AppClass Then
+		SetDebugLog("Update $g_sAppClassInstance to: " & $AppClass)
+	EndIf
+	$g_sAppClassInstance = $AppClass
 	Local $hWinParent = __WinAPI_GetParent($hCtrl)
 	If $hWinParent = 0 Then
 		$g_hAndroidControl = 0
@@ -750,6 +755,17 @@ Func InitAndroid($bCheckOnly = False, $bLogChangesOnly = True)
 
 	Local $successful = @error = 0, $process_killed
 	If Not $bCheckOnly And $Result Then
+
+		; exclude Android for WerFault reporting
+		If $b_sAndroidProgramWerFaultExcluded = True Then
+			Local $sFileOnly = StringMid($g_sAndroidProgramPath, StringInStr($g_sAndroidProgramPath, "\", 0, -1) + 1)
+			Local $aResult = DllCall("Wer.dll", "int", "WerAddExcludedApplication", "wstr", $sFileOnly, "bool", True)
+			If (UBound($aResult) > 0 And $aResult[0] = $S_OK) Or RegWrite($g_sHKLM & "\Software\Microsoft\Windows\Windows Error Reporting\ExcludedApplications", $sFileOnly, "REG_DWORD", "1") = 1 Then
+				SetDebugLog("Disabled WerFault for " & $sFileOnly)
+			Else
+				SetDebugLog("Cannot disable WerFault for " & $sFileOnly)
+			EndIf
+		EndIf
 
 		; update Virtualbox properties
 		If FileExists($__VBoxManage_Path) Then
@@ -2998,6 +3014,7 @@ Func OpenPlayStore($sPackage)
 		SetLog("Cannot open Play Store, ADB connection not available", $COLOR_ERROR)
 		Return 0
 	EndIf
+	SetLog("Open Play Store App '" & $sPackage & "'", $COLOR_INFO)
 	AndroidAdbSendShellCommand("am start -a android.intent.action.VIEW -d 'market://details?id=" & $sPackage & "'")
 EndFunc   ;==>OpenPlayStore
 
@@ -3070,7 +3087,16 @@ Func UpdateAndroidBackgroundMode()
 				SetDebugLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") is using OpenGL, disable WinAPI for Background Mode")
 				AndroidSupportFeaturesRemove(1) ; disabled DirectX Background Mode
 			Case Else
-				SetLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") unsupported Graphics Engine / Render Mode", $COLOR_WARNING)
+				; using default mode
+				$iMode = $g_iAndroidBackgroundModeDefault
+				Local $sMode = "Unknown"
+				Switch $iMode
+					Case $g_iAndroidBackgroundModeDirectX
+						$sMode = "DirectX/WinAPI"
+					Case $g_iAndroidBackgroundModeOpenGL
+						$sMode = "OpenGL/ADB screencap"
+				EndSwitch
+				SetLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") unsupported Graphics Engine / Render Mode, using " & $sMode, $COLOR_WARNING)
 		EndSwitch
 	EndIf
 

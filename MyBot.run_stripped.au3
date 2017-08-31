@@ -286,6 +286,7 @@ Global Const $GWL_STYLE = 0xFFFFFFF0
 Global Const $GWL_EXSTYLE = 0xFFFFFFEC
 Global Const $IMAGE_ICON = 1
 Global Const $LOAD_LIBRARY_AS_DATAFILE = 0x02
+Global Const $S_OK = 0x00000000
 Global Const $LR_DEFAULTCOLOR = 0x0000
 Global Const $LR_LOADFROMFILE = 0x0010
 Global $__g_aInProcess_WinAPI[64][2] = [[0, 0]]
@@ -5528,8 +5529,8 @@ Global $__MEmu_SystemBar = 36
 Global $__MEmu_PhoneLayout = "2"
 Global $__MEmu_Window[4][5] = [ ["3.0.8", $g_iDEFAULT_WIDTH + 40, $g_iDEFAULT_HEIGHT - 14, 36, "-1"], ["2.6.2", $g_iDEFAULT_WIDTH + 48, $g_iDEFAULT_HEIGHT - 10, 40, "2"], ["2.5.0", $g_iDEFAULT_WIDTH + 51, $g_iDEFAULT_HEIGHT - 12, 45, "0"], ["2.2.1", $g_iDEFAULT_WIDTH + 51, $g_iDEFAULT_HEIGHT - 12, 45, "0"] ]
 Global $__Droid4X_Window[3][3] = [ ["0.10.0", $g_iDEFAULT_WIDTH + 6, $g_iDEFAULT_HEIGHT + 53], ["0.8.6", $g_iDEFAULT_WIDTH + 10, $g_iDEFAULT_HEIGHT + 50] ]
-Global $__Nox_Config[2][2] = [ ["3.8.1.3", "[CLASS:subWin; INSTANCE:1]|[CLASS:Qt5QWindowIcon; INSTANCE:5]"], ["3.1.0", "[CLASS:Qt5QWindowIcon; INSTANCE:4]"] ]
-Global $g_avAndroidAppConfig[8][16] = [ ["MEmu", "MEmu", "MEmu ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 51,$g_iDEFAULT_HEIGHT - 12,0, "127.0.0.1:21503", 2 + 4 + 8 + 16 + 32, '# ', 'Microvirt Virtual Input', 0, 2], ["BlueStacks2","Android", "BlueStacks ", "[CLASS:BlueStacksApp; INSTANCE:1]","_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "127.0.0.1:5555", 1 + 2 + 8 + 16 + 32 + 128,'$ ', 'BlueStacks Virtual Touch', 0, 1], ["BlueStacks", "Android", "BlueStacks App Player","[CLASS:BlueStacksApp; INSTANCE:1]","_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "127.0.0.1:5555", 1 + 8 + 16 + 32 + 128,'$ ', 'BlueStacks Virtual Touch', 0, 1], ["KOPLAYER", "KOPLAYER","KOPLAYER", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 64,$g_iDEFAULT_HEIGHT - 8, 0, "127.0.0.1:6555", 1 + 2 + 4 + 8 + 16 + 32, '# ', 'ttVM Virtual Input', 0, 2], ["LeapDroid", "vm1", "Leapd", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "emulator-5554", 1 + 8 + 16 + 32, '# ', 'qwerty2', 1, 1], ["iTools", "iToolsVM","iTools ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 2, $g_iDEFAULT_HEIGHT - 13,0, "127.0.0.1:54001", 1 + 2 + 8 + 16 + 32 + 64, '# ', 'iTools Virtual PassThrough Input', 0, 1], ["Droid4X", "droid4x", "Droid4X ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 10,$g_iDEFAULT_HEIGHT + 50,0, "127.0.0.1:26944", 2 + 4 + 8 + 16 + 32, '# ', 'droid4x Virtual Input', 0, 2], ["Nox", "nox", "No", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 4, $g_iDEFAULT_HEIGHT - 10,0, "127.0.0.1:62001", 1 + 2 + 4 + 8 + 16 + 32, '# ', '(nox Virtual Input|Android Input)',-1, 2] ]
+Global $__Nox_Config[1][2] = [ ["3.3.0", "[CLASS:subWin; INSTANCE:1]|[TEXT:QWidgetClassWindow; CLASS:Qt5QWindowIcon]"] ]
+Global $g_avAndroidAppConfig[8][16] = [ ["MEmu", "MEmu", "MEmu ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 51,$g_iDEFAULT_HEIGHT - 12,0, "127.0.0.1:21503", 2 + 4 + 8 + 16 + 32, '# ', 'Microvirt Virtual Input', 0, 2], ["BlueStacks2","Android", "BlueStacks ", "[CLASS:BlueStacksApp; INSTANCE:1]","_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "127.0.0.1:5555", 1 + 2 + 8 + 16 + 32 + 128,'$ ', 'BlueStacks Virtual Touch', 0, 1], ["BlueStacks", "Android", "BlueStacks App Player","[CLASS:BlueStacksApp; INSTANCE:1]","_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "127.0.0.1:5555", 1 + 8 + 16 + 32 + 128,'$ ', 'BlueStacks Virtual Touch', 0, 1], ["KOPLAYER", "KOPLAYER","KOPLAYER", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 64,$g_iDEFAULT_HEIGHT - 8, 0, "127.0.0.1:6555", 1 + 2 + 4 + 8 + 16 + 32, '# ', 'ttVM Virtual Input', 0, 2], ["LeapDroid", "vm1", "Leapd", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,0, "emulator-5554", 1 + 8 + 16 + 32, '# ', 'qwerty2', 1, 1], ["iTools", "iToolsVM","iTools ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 2, $g_iDEFAULT_HEIGHT - 13,0, "127.0.0.1:54001", 1 + 2 + 8 + 16 + 32 + 64, '# ', 'iTools Virtual PassThrough Input', 0, 1], ["Droid4X", "droid4x", "Droid4X ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 10,$g_iDEFAULT_HEIGHT + 50,0, "127.0.0.1:26944", 2 + 4 + 8 + 16 + 32, '# ', 'droid4x Virtual Input', 0, 2], ["Nox", "nox", "No", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 4, $g_iDEFAULT_HEIGHT - 10,0, "127.0.0.1:62001", 1 + 2 + 4 + 8 + 16 + 32 + 256,'# ', '(nox Virtual Input|Android Input)', 0, 2] ]
 Global $g_bOnlyInstance = True
 Global $g_bFoundRunningAndroid = False
 Global $g_bFoundInstalledAndroid = False
@@ -5571,6 +5572,7 @@ Global $g_iAndroidControlClickMode = 0
 Global $g_bInitAndroidActive = False
 Global $g_sAndroidPath = ""
 Global $g_sAndroidProgramPath = ""
+Global $b_sAndroidProgramWerFaultExcluded = True
 Global $g_avAndroidProgramFileVersionInfo = 0
 Global $g_bAndroidHasSystemBar = False
 Global $g_iAndroidLaunchWaitSec = 240
@@ -5957,6 +5959,7 @@ Global $g_bScreenshotPNGFormat = False, $g_bScreenshotHideName = True
 Global $g_iAnotherDeviceWaitTime = 120
 Global $g_bForceSinglePBLogoff = 0, $g_iSinglePBForcedLogoffTime = 18, $g_iSinglePBForcedEarlyExitTime = 15
 Global $g_bAutoResumeEnable = 0, $g_iAutoResumeTime = 5
+Global $g_bDisableNotifications = False
 Global $g_bForceClanCastleDetection = 0
 Global $g_iFrmBotPosX = -1
 Global $g_iFrmBotPosY = -1
@@ -7512,12 +7515,17 @@ $g_hAndroidWindow = $hWin
 CheckDpiAwareness()
 InitAndroidTimeLag()
 ResetAndroidProcess()
-Local $hCtrl = ControlGetHandle2($hWin, $g_sAppPaneName, $g_sAppClassInstance)
+Local $hCtrl = ControlGetHandle2($hWin, $g_sAppPaneName, $g_sAppClassInstance, 100, 100)
 If $hCtrl = 0 Then
 $g_hAndroidControl = 0
 Return False
 EndIf
-$g_sAppClassInstance = $g_sControlGetHandle2_Classname
+Local $AppClass = $g_sControlGetHandle2_Classname
+If BitAND($g_iAndroidSupportFeature, 256) > 0 Then $AppClass = $hCtrl
+If $g_sAppClassInstance <> $AppClass Then
+SetDebugLog("Update $g_sAppClassInstance to: " & $AppClass)
+EndIf
+$g_sAppClassInstance = $AppClass
 Local $hWinParent = __WinAPI_GetParent($hCtrl)
 If $hWinParent = 0 Then
 $g_hAndroidControl = 0
@@ -7941,6 +7949,15 @@ SetLog("Android support for " & $g_sAndroidEmulator & " is not available", $COLO
 EndIf
 Local $successful = @error = 0, $process_killed
 If Not $bCheckOnly And $Result Then
+If $b_sAndroidProgramWerFaultExcluded = True Then
+Local $sFileOnly = StringMid($g_sAndroidProgramPath, StringInStr($g_sAndroidProgramPath, "\", 0, -1) + 1)
+Local $aResult = DllCall("Wer.dll", "int", "WerAddExcludedApplication", "wstr", $sFileOnly, "bool", True)
+If(UBound($aResult) > 0 And $aResult[0] = $S_OK) Or RegWrite($g_sHKLM & "\Software\Microsoft\Windows\Windows Error Reporting\ExcludedApplications", $sFileOnly, "REG_DWORD", "1") = 1 Then
+SetDebugLog("Disabled WerFault for " & $sFileOnly)
+Else
+SetDebugLog("Cannot disable WerFault for " & $sFileOnly)
+EndIf
+EndIf
 If FileExists($__VBoxManage_Path) Then
 If $__VBoxGuestProperties = "" Then $__VBoxGuestProperties = LaunchConsole($__VBoxManage_Path, "guestproperty enumerate " & $g_sAndroidInstance, $process_killed)
 If $__VBoxExtraData = "" Then $__VBoxExtraData = LaunchConsole($__VBoxManage_Path, "getextradata " & $g_sAndroidInstance & " enumerate", $process_killed)
@@ -9699,6 +9716,7 @@ If ConnectAndroidAdb(True, True) = False Then
 SetLog("Cannot open Play Store, ADB connection not available", $COLOR_ERROR)
 Return 0
 EndIf
+SetLog("Open Play Store App '" & $sPackage & "'", $COLOR_INFO)
 AndroidAdbSendShellCommand("am start -a android.intent.action.VIEW -d 'market://details?id=" & $sPackage & "'")
 EndFunc
 Func OpenPlayStoreGame()
@@ -9759,7 +9777,15 @@ $sGraphicsEngine = "OpenGL"
 SetDebugLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") is using OpenGL, disable WinAPI for Background Mode")
 AndroidSupportFeaturesRemove(1)
 Case Else
-SetLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") unsupported Graphics Engine / Render Mode", $COLOR_WARNING)
+$iMode = $g_iAndroidBackgroundModeDefault
+Local $sMode = "Unknown"
+Switch $iMode
+Case $g_iAndroidBackgroundModeDirectX
+$sMode = "DirectX/WinAPI"
+Case $g_iAndroidBackgroundModeOpenGL
+$sMode = "OpenGL/ADB screencap"
+EndSwitch
+SetLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") unsupported Graphics Engine / Render Mode, using " & $sMode, $COLOR_WARNING)
 EndSwitch
 EndIf
 Switch $iMode
@@ -16570,7 +16596,7 @@ Global $g_hChkDisableSplash = 0, $g_hChkForMBRUpdates = 0, $g_hChkDeleteLogs = 0
 Global $g_hChkAutostart = 0, $g_hTxtAutostartDelay = 0, $g_hChkCheckGameLanguage = 0, $g_hChkAutoAlign = 0, $g_hTxtAlignOffsetX = 0, $g_hTxtAlignOffsetY = 0, $g_hCmbAlignmentOptions = 0
 Global $g_hTxtGlobalActiveBotsAllowed = 0, $g_hTxtGlobalThreads = 0, $g_hTxtThreads = 0
 Global $g_hChkBotCustomTitleBarClick = 0, $g_hChkBotAutoSlideClick = 0, $g_hChkHideWhenMinimized = 0, $g_hChkUseRandomClick = 0, $g_hChkScreenshotType = 0, $g_hChkScreenshotHideName = 0, $g_hTxtTimeAnotherDevice = 0
-Global $g_hChkSinglePBTForced = 0, $g_hTxtSinglePBTimeForced = 0, $g_hTxtPBTimeForcedExit = 0, $g_hChkFixClanCastle = 0, $g_hChkAutoResume = 0, $g_hTxtAutoResumeTime = 0
+Global $g_hChkSinglePBTForced = 0, $g_hTxtSinglePBTimeForced = 0, $g_hTxtPBTimeForcedExit = 0, $g_hChkFixClanCastle = 0, $g_hChkAutoResume = 0, $g_hTxtAutoResumeTime = 0, $g_hChkDisableNotifications = 0
 Func CreateBotOptions()
 Local $sTxtTip = ""
 Local $x = 25, $y = 45
@@ -16654,15 +16680,15 @@ GUICtrlSetData(-1, GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "C
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "CmbAlignmentOptions_Info_01", "0,0: Reposition Android Emulator screen to position 0,0 on windows desktop and align Bot window right or left to it.") & @CRLF & GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "CmbAlignmentOptions_Info_02", "SNAP: Only reorder windows, Align Bot window to Android Emulator window at Top Right, Top Left, Bottom Right or Bottom Left.\r\n" & "DOCK: Integrate Android Screen into bot window."))
 GUICtrlSetState(-1, $GUI_DISABLE)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
-$y += 85
-GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "Group_08", "Processor/Thread Advanced"), $x - 20, $y - 20, 330, 85)
+$y += 52
+GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "Group_08", "Processor/Thread Advanced"), $x - 20, $y - 20, 210, 85)
 $y -= 2
 $g_hTxtGlobalActiveBotsAllowed = GUICtrlCreateInput($g_iGlobalActiveBotsAllowed, $x, $y + 2, 25, 16, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "TxtGlobalActiveBotsAllowed_Info_01", "When running multiple bots, specify how many can run at the same time.\r\nThis reduces your CPU utilization significantly.\r\nHalf of available logical processors is a good number.\r\nThis configuration is shared across all profiles/instances and a restart of all bots is required (close all, wait, and start all again!).")
 GUICtrlSetOnEvent(-1, "txtGlobalActiveBotsAllowed")
 GUICtrlSetLimit(-1, 2)
 _GUICtrlSetTip(-1, $sTxtTip)
-GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblGlobalActiveBotsAllowed_Info_01", "Bots can run parallel at the same time"), $x + 30, $y + 4)
+GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblGlobalActiveBotsAllowed_Info_01", "Bots can run at the same time"), $x + 30, $y + 3)
 _GUICtrlSetTip(-1, $sTxtTip)
 $y += 20
 $g_hTxtGlobalThreads = GUICtrlCreateInput($g_iGlobalThreads, $x, $y + 2, 25, 16, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
@@ -16670,7 +16696,7 @@ $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "TxtGlobal
 GUICtrlSetOnEvent(-1, "txtGlobalThreads")
 GUICtrlSetLimit(-1, 2)
 _GUICtrlSetTip(-1, $sTxtTip)
-GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblGlobalThreads_Info_01", "Global image processing threads will be used for all bots"), $x + 30, $y + 4)
+GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblGlobalThreads_Info_01", "Img processing threads for all bots"), $x + 30, $y + 3)
 _GUICtrlSetTip(-1, $sTxtTip)
 $y += 20
 $g_hTxtThreads = GUICtrlCreateInput($g_iThreads, $x, $y + 2, 25, 16, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
@@ -16678,11 +16704,11 @@ $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "TxtThread
 GUICtrlSetOnEvent(-1, "txtThreads")
 GUICtrlSetLimit(-1, 2)
 _GUICtrlSetTip(-1, $sTxtTip)
-GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblThreads_Info_01", "Image processing threads will be used for this bot"), $x + 30, $y + 4)
+GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblThreads_Info_01", "Img processing threads for this bot"), $x + 30, $y + 3)
 _GUICtrlSetTip(-1, $sTxtTip)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 Local $x = 240, $y = 45, $yGroup = $y
-Local $hGroup = GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "Group_04", "Advanced"), $x - 20, $y - 20, 0, 0)
+Local $hGroup = GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "Group_04", "Advanced"), $x - 20, $y - 20, 225, 140)
 $g_hChkBotCustomTitleBarClick = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "ChkBotCustomTitleBarClick", "My Bot design Title Bar"), $x, $y, -1, -1)
 If BitAND($g_iBotDesignFlags, 1) Then GUICtrlSetState(-1, $GUI_CHECKED)
 GUICtrlSetOnEvent(-1, "chkBotCustomTitleBarClick")
@@ -16704,12 +16730,14 @@ GUICtrlSetOnEvent(-1, "chkAutoResume")
 $g_hTxtAutoResumeTime = GUICtrlCreateInput("5",$x + 132, $y + 5, 30, 16, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 GUICtrlCreateLabel(GetTranslatedFileIni("MBR Global GUI Design", "min.", -1), $x + 167, $y + 6, 27, 15)
 $y += 19
+$g_hChkDisableNotifications = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "ChkDisableNotifications", "Disable Notifications"), $x, $y, -1, -1)
+_GUICtrlSetTip(-1,GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "ChkDisableNotifications_Info_01", "Disable Notifications sent by the Bot"))
+GUICtrlSetOnEvent(-1, "chkDisableNotifications")
+$y += 19
 $g_hChkUseRandomClick = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "ChkUseRandomClick", "Random Click"), $x, $y, -1, -1)
 GUICtrlSetOnEvent(-1, "chkUseRandomClick")
-$y += 19
-GUICtrlSetPos($hGroup, $x - 20, $yGroup - 20, 255,(($y - $yGroup) / 19) * 25)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
-$y += 30
+$y += 45
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "Group_05", "Photo Screenshot Options"), $x - 20, $y - 17, 225, 60)
 $g_hChkScreenshotType = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "ChkScreenshotType", "Make in PNG format"), $x, $y, -1, -1)
 GUICtrlSetState(-1, $GUI_CHECKED)
@@ -22518,6 +22546,9 @@ Func chkBotAutoSlideClick()
 Local $bChecked = GUICtrlRead($g_hChkBotAutoSlideClick) = $GUI_CHECKED
 $g_iBotDesignFlags = BitOR(BitAND($g_iBotDesignFlags, BitNOT(2)),(($bChecked) ? 2 : 0))
 EndFunc
+Func chkDisableNotifications()
+$g_bDisableNotifications =(GUICtrlRead($g_hChkDisableNotifications) = $GUI_CHECKED)
+EndFunc
 Func chkUseRandomClick()
 $g_bUseRandomClick =(GUICtrlRead($g_hChkUseRandomClick) = $GUI_CHECKED)
 EndFunc
@@ -27429,6 +27460,7 @@ GUICtrlSetData($g_hTxtSinglePBTimeForced, $g_iSinglePBForcedLogoffTime)
 GUICtrlSetData($g_hTxtPBTimeForcedExit, $g_iSinglePBForcedEarlyExitTime)
 chkSinglePBTForced()
 GUICtrlSetState($g_hChkAutoResume, $g_bAutoResumeEnable ? $GUI_CHECKED : $GUI_UNCHECKED)
+GUICtrlSetState($g_hChkDisableNotifications, $g_bDisableNotifications ? $GUI_CHECKED : $GUI_UNCHECKED)
 GUICtrlSetData($g_hTxtAutoResumeTime, $g_iAutoResumeTime)
 GUICtrlSetState($g_hChkFixClanCastle, $g_bForceClanCastleDetection ? $GUI_CHECKED : $GUI_UNCHECKED)
 Case "Save"
@@ -27459,6 +27491,7 @@ $g_iSinglePBForcedLogoffTime = GUICtrlRead($g_hTxtSinglePBTimeForced)
 $g_iSinglePBForcedEarlyExitTime = GUICtrlRead($g_hTxtPBTimeForcedExit)
 $g_bAutoResumeEnable =(GUICtrlRead($g_hChkAutoResume) = $GUI_CHECKED)
 $g_iAutoResumeTime = GUICtrlRead($g_hTxtAutoResumeTime)
+$g_bDisableNotifications =(GUICtrlRead($g_hChkDisableNotifications) = $GUI_CHECKED)
 $g_bForceClanCastleDetection =(GUICtrlRead($g_hChkFixClanCastle) = $GUI_CHECKED)
 EndSwitch
 EndFunc
@@ -28469,6 +28502,7 @@ $g_iSinglePBForcedLogoffTime = Int(IniRead($g_sProfileConfigPath, "other", "Valu
 $g_iSinglePBForcedEarlyExitTime = Int(IniRead($g_sProfileConfigPath, "other", "ValuePBTimeForcedExit", 15))
 $g_bAutoResumeEnable =(IniRead($g_sProfileConfigPath, "other", "ChkAutoResume", "0") = "1")
 $g_iAutoResumeTime = Int(IniRead($g_sProfileConfigPath, "other", "AutoResumeTime", 5))
+IniReadS($g_bDisableNotifications, $g_sProfileConfigPath, "other", "ChkDisableNotifications", False, "Bool")
 $g_bForceClanCastleDetection =(IniRead($g_sProfileConfigPath, "other", "ChkFixClanCastle", "0") = "1")
 EndFunc
 Func ReadConfig_600_52_1()
@@ -29338,6 +29372,7 @@ _Ini_Add("other", "ValueSinglePBTimeForced", $g_iSinglePBForcedLogoffTime)
 _Ini_Add("other", "ValuePBTimeForcedExit", $g_iSinglePBForcedEarlyExitTime)
 _Ini_Add("other", "ChkAutoResume", $g_bAutoResumeEnable ? 1 : 0)
 _Ini_Add("other", "AutoResumeTime", $g_iAutoResumeTime)
+_Ini_Add("other", "ChkDisableNotifications", $g_bDisableNotifications)
 _Ini_Add("other", "ChkFixClanCastle", $g_bForceClanCastleDetection ? 1 : 0)
 EndFunc
 Func SaveConfig_600_52_1()
@@ -43862,6 +43897,21 @@ EndIf
 EndIf
 Return $bInstalled
 EndFunc
+Func GetBlueStacksBackgroundMode()
+Return $g_iAndroidBackgroundModeDirectX
+EndFunc
+Func GetBlueStacks2BackgroundMode()
+Local $GlRenderMode = RegRead($g_sHKLM & "\SOFTWARE\BlueStacks\Guests\" & $g_sAndroidInstance & "\Config\", "GlRenderMode")
+Switch $GlRenderMode
+Case 4
+Return $g_iAndroidBackgroundModeDirectX
+Case 1
+Return $g_iAndroidBackgroundModeOpenGL
+Case Else
+SetLog($g_sAndroidEmulator & " unsupported render mode " & $GlRenderMode, $COLOR_WARNING)
+Return 0
+EndSwitch
+EndFunc
 Func RestartBlueStacksXCoC()
 If Not $g_bRunState Then Return False
 Local $cmdOutput
@@ -44247,6 +44297,9 @@ Local $adbPath = GetDroid4XPath() & "adb.exe"
 If FileExists($adbPath) Then Return $adbPath
 Return ""
 EndFunc
+Func GetDroid4XBackgroundMode()
+Return $g_iAndroidBackgroundModeOpenGL
+EndFunc
 Func InitDroid4X($bCheckOnly = False)
 Local $process_killed, $aRegExResult, $VirtualBox_Path, $g_sAndroidAdbDeviceHost, $g_sAndroidAdbDevicePort, $oops = 0
 $__Droid4X_Version = RegRead($g_sHKLM & "\SOFTWARE" & $g_sWow6432Node & "\Microsoft\Windows\CurrentVersion\Uninstall\Droid4X\", "DisplayVersion")
@@ -44484,6 +44537,9 @@ Func GetMEmuAdbPath()
 Local $adbPath = GetMEmuPath() & "adb.exe"
 If FileExists($adbPath) Then Return $adbPath
 Return ""
+EndFunc
+Func GetMEmuBackgroundMode()
+Return $g_iAndroidBackgroundModeOpenGL
 EndFunc
 Func InitMEmu($bCheckOnly = False)
 Local $process_killed, $aRegExResult, $g_sAndroidAdbDeviceHost, $g_sAndroidAdbDevicePort, $oops = 0
@@ -45038,6 +45094,21 @@ Local $adbPath = GetNoxPath() & "nox_adb.exe"
 If FileExists($adbPath) Then Return $adbPath
 Return ""
 EndFunc
+Func GetNoxBackgroundMode()
+Local $sConfig = GetNoxConfigFile()
+If $sConfig Then
+Local $graphic_engine_type = IniRead($sConfig, "setting", "graphic_engine_type", "")
+Switch $graphic_engine_type
+Case "0"
+Return $g_iAndroidBackgroundModeOpenGL
+Case "1"
+Return $g_iAndroidBackgroundModeDirectX
+Case Else
+SetLog($g_sAndroidEmulator & " unsupported Graphics Engine Type " & $graphic_engine_type, $COLOR_WARNING)
+EndSwitch
+EndIf
+Return 0
+EndFunc
 Func InitNox($bCheckOnly = False)
 Local $process_killed, $aRegExResult, $g_sAndroidAdbDeviceHost, $g_sAndroidAdbDevicePort, $oops = 0
 Local $Version = RegRead($g_sHKLM & "\SOFTWARE" & $g_sWow6432Node & "\Microsoft\Windows\CurrentVersion\Uninstall\Nox\", "DisplayVersion")
@@ -45239,8 +45310,12 @@ Local $h = $aWin[$i][0]
 Local $c = $aWin[$i][1]
 If $c = "Qt5QWindowToolSaveBits" Then
 Local $aPos = WinGetPos($h)
-If UBound($aPos) > 2 Then
+If UBound($aPos) > 3 Then
+If $hToolbar = 0 And $aPos[2] > 7 And $aPos[3] > 7 Then
 $hToolbar = $h
+ElseIf $aPos[2] = 7 Or $aPos[3] = 7 Then
+WinMove2($h, "", -1, -1, -1, -1, $HWND_NOTOPMOST, $SWP_HIDEWINDOW, False)
+EndIf
 EndIf
 EndIf
 Next
@@ -45253,8 +45328,7 @@ SetDebugLog("EmbedNox(" & $bEmbed & "): Handle = " & $h & ", Class = " & $c, Def
 Next
 Else
 SetDebugLog("EmbedNox(" & $bEmbed & "): $hToolbar=" & $hToolbar, Default, True)
-WinMove2($hToolbar, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
-_WinAPI_ShowWindow($hToolbar,($bEmbed ? @SW_HIDE : @SW_SHOWNOACTIVATE))
+WinMove2($hToolbar, "", -1, -1, -1, -1, $HWND_NOTOPMOST,($bEmbed ? $SWP_HIDEWINDOW : $SWP_SHOWWINDOW), False)
 EndIf
 EndFunc
 Func OpenKOPLAYER($bRestart = False)
@@ -45388,6 +45462,22 @@ SetLog($g_sAndroidEmulator & " Background Mode is not available", $COLOR_RED)
 EndIf
 EndIf
 Return True
+EndFunc
+Func GetKOPLAYERBackgroundMode()
+Local $aRegExResult = StringRegExp($__VBoxExtraData, "Key: GUI/RenderMode, Value: (.*)", $STR_REGEXPARRAYMATCH)
+Local $sRenderMode = "Unknown"
+If Not @error Then
+$sRenderMode = $aRegExResult[0]
+Switch $sRenderMode
+Case "DirectX"
+Return $g_iAndroidBackgroundModeDirectX
+Case "Opengl"
+Return $g_iAndroidBackgroundModeOpenGL
+Case Else
+SetLog($g_sAndroidEmulator & " unsupported Render Mode " & $sRenderMode, $COLOR_WARNING)
+EndSwitch
+EndIf
+Return 0
 EndFunc
 Func SetScreenKOPLAYER()
 If Not InitAndroid() Then Return False
@@ -46262,7 +46352,6 @@ _WinAPI_SetWindowLong($g_hAndroidWindow, $GWL_EXSTYLE, $lCurExStyle)
 _WinAPI_EnableWindow($g_hAndroidWindow, True)
 _WinAPI_EnableWindow($hCtrlTarget, True)
 WinMove2(($targetIsHWnD ? $hCtrl : $hCtrlTarget), "", $aPosCtl[0], $aPosCtl[1], $aPosCtl[2], $aPosCtl[3], 0, 0, False)
-Execute("Embed" & $g_sAndroidEmulator & "(False)")
 WinMove($g_hAndroidWindow, "", $aPos[0], $aPos[1], $aPos[2], $aPos[3])
 If $g_iAndroidEmbedMode = 1 Then
 WinMove2($g_hAndroidWindow, "", $aPos[0], $aPos[1], $aPos[2], $aPos[3], $HWND_TOPMOST)
@@ -46271,6 +46360,7 @@ EndIf
 If $bNoAndroidScreenSizeCheck = False Then
 getBSPos()
 EndIf
+Execute("Embed" & $g_sAndroidEmulator & "(False)")
 EndIf
 SetDebugLog("Undocked Android Window")
 $g_hProcShieldInput[3] = False
@@ -46326,10 +46416,10 @@ $lCurExStyle = _WinAPI_GetWindowLong($g_hAndroidWindow, $GWL_EXSTYLE)
 $HWnDParent = __WinAPI_GetParent($g_hAndroidWindow)
 $hCtrl = ControlGetHandle(GetCurrentAndroidHWnD(), $g_sAppPaneName, $g_sAppClassInstance)
 $hCtrlTarget = __WinAPI_GetParent($hCtrl)
+$targetIsHWnD = $hCtrlTarget = $g_hAndroidWindow
 $lCurStyleTarget = _WinAPI_GetWindowLong($hCtrlTarget, $GWL_STYLE)
 $hCtrlTargetParent = __WinAPI_GetParent($hCtrlTarget)
 SetDebugLog("AndroidEmbed: $hCtrl=" & $hCtrl & ", $hCtrlTarget=" & $hCtrlTarget & ", $hCtrlTargetParent=" & $hCtrlTargetParent & ", $g_hAndroidWindow=" & $g_hAndroidWindow, Default, True)
-$targetIsHWnD = $hCtrlTarget = $g_hAndroidWindow
 Local $adjustPosCtrl = False
 If $bAlreadyEmbedded = True Then
 $g_hProcShieldInput[3] = True
@@ -46947,14 +47037,14 @@ Return False
 EndFunc
 Func WerFaultClose($programFile, $tryCountMax = 10, $tryCount = 0)
 Local $WinTitleMatchMode = Opt("WinTitleMatchMode", -3)
-Local $g_sAndroidTitle = $programFile
-Local $iLastBS = StringInStr($g_sAndroidTitle, "\", 0, -1)
-If $iLastBS > 0 Then $g_sAndroidTitle = StringMid($g_sAndroidTitle, $iLastBS + 1)
-Local $aList = WinList($g_sAndroidTitle)
+Local $sTitle = $programFile
+Local $iLastBS = StringInStr($sTitle, "\", 0, -1)
+If $iLastBS > 0 Then $sTitle = StringMid($sTitle, $iLastBS + 1)
+Local $aList = WinList($sTitle)
 Opt("WinTitleMatchMode", $WinTitleMatchMode)
 Local $closed = 0
 Local $i
-SetDebugLog("Found " & $aList[0][0] & " WerFault Windows with title '" & $g_sAndroidTitle & "'")
+SetDebugLog("Found " & $aList[0][0] & " WerFault Windows with title '" & $sTitle & "'")
 If $aList[0][0] > 0 Then
 For $i = 1 To $aList[0][0]
 Local $HWnD = $aList[$i][1]
@@ -46987,8 +47077,11 @@ Next
 ElseIf FileExists($programFile) = 1 Then
 Local $pFileVersionInfo
 If _WinAPI_GetFileVersionInfo($programFile, $pFileVersionInfo) Then
-Local $FileDescription = _WinAPI_VerQueryValue($pFileVersionInfo, $FV_FILEDESCRIPTION)
-If $FileDescription <> "" Then Return WerFaultClose($FileDescription, $tryCountMax, $tryCount)
+Local $aFileDescription = _WinAPI_VerQueryValue($pFileVersionInfo, $FV_FILEDESCRIPTION)
+If UBound($aFileDescription) > 1 And UBound($aFileDescription, 2) > 1 Then
+Local $sFileDescription = $aFileDescription[1][1]
+If $sFileDescription Then Return WerFaultClose($sFileDescription, $tryCountMax, $tryCount)
+EndIf
 EndIf
 EndIf
 If $closed > 0 And $tryCount < $tryCountMax Then
@@ -47903,8 +47996,8 @@ $g_bTogglePauseUpdateState = False
 If $g_bBotPaused Then
 AndroidShield("TogglePauseImpl paused", False)
 TrayTip($g_sBotTitle, "", 1)
-TrayTip($g_sBotTitle, "was Paused!", 1, $TIP_ICONEXCLAMATION)
-Setlog("Bot was Paused!", $COLOR_ERROR)
+If Not $g_bDisableNotifications Then TrayTip($g_sBotTitle, "was Paused!", 1, $TIP_ICONEXCLAMATION)
+SetLog("Bot was Paused!", $COLOR_ERROR)
 If Not $g_bSearchMode Then
 $g_iTimePassed += Int(__TimerDiff($g_hTimerSinceStarted))
 EndIf
@@ -47914,7 +48007,7 @@ GUICtrlSetState($g_hBtnResume, $GUI_SHOW)
 Else
 AndroidShield("TogglePauseImpl resumed")
 TrayTip($g_sBotTitle, "", 1)
-TrayTip($g_sBotTitle, "was Resumed.", 1, $TIP_ICONASTERISK)
+If Not $g_bDisableNotifications Then TrayTip($g_sBotTitle, "was Resumed.", 1, $TIP_ICONASTERISK)
 Setlog("Bot was Resumed.", $COLOR_SUCCESS)
 If Not $g_bSearchMode Then
 $g_hTimerSinceStarted = __TimerInit()
@@ -48228,12 +48321,26 @@ EndIf
 EndIf
 Return $hWin
 EndFunc
-Func ControlGetHandle2($title, $text, $controlID)
+Func ControlGetHandle2($title, $text, $controlID, $iMinWidth = Default, $iMinHeight = Default)
 For $sClass In StringSplit($controlID, "|", $STR_NOCOUNT)
 Local $hCtrl = ControlGetHandle($title, $text, $sClass)
 If $hCtrl Then
+If $iMinWidth <> Default Or $iMinHeight <> Default Then
+Local $aPos = WinGetPos($hCtrl)
+If UBound($aPos) > 3 Then
+If($iMinWidth = Default Or $aPos[2] >= $iMinWidth) And($iMinHeight = Default Or $aPos[2] >= $iMinHeight) Then
 $g_sControlGetHandle2_Classname = $sClass
 Return $hCtrl
+EndIf
+Else
+SetDebugLog("ControlGetHandle2 cannot validate window dimension")
+$g_sControlGetHandle2_Classname = $sClass
+Return $hCtrl
+EndIf
+Else
+$g_sControlGetHandle2_Classname = $sClass
+Return $hCtrl
+EndIf
 EndIf
 Next
 $g_sControlGetHandle2_Classname = ""
@@ -49996,7 +50103,6 @@ Local $query = "Select " & GetWmiSelectFields() & " from Win32_Process where Han
 For $Process In WmiQuery($query)
 SetDebugLog($Process[0] & " = " & $Process[2])
 SetError(0, 0, 0)
-$Process = 0
 CloseWmiObject()
 Return $Process
 Next
@@ -61007,6 +61113,12 @@ returnAllMatches(0)
 returnLowestLevelSingleMatch(0)
 updateGlobalVillageOffset(0, 0)
 GemClickR(0, 0, 0)
+GetBlueStacksBackgroundMode()
+GetBlueStacks2BackgroundMode()
+GetDroid4XBackgroundMode()
+GetKOPLAYERBackgroundMode()
+GetMEmuBackgroundMode()
+GetNoxBackgroundMode()
 EndFunc
 Func ReferenceGlobals()
 If True Then Return

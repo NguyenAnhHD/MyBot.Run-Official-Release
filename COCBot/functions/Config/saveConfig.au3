@@ -985,6 +985,7 @@ Func SaveConfig_600_35()
 	_Ini_Add("other", "ValuePBTimeForcedExit", $g_iSinglePBForcedEarlyExitTime)
 	_Ini_Add("other", "ChkAutoResume", $g_bAutoResumeEnable ? 1 : 0)
 	_Ini_Add("other", "AutoResumeTime", $g_iAutoResumeTime)
+	_Ini_Add("other", "ChkDisableNotifications", $g_bDisableNotifications)
 	_Ini_Add("other", "ChkFixClanCastle", $g_bForceClanCastleDetection ? 1 : 0)
 EndFunc   ;==>SaveConfig_600_35
 

@@ -1,8 +1,12 @@
 * **V7.2.4**
+ * Add Bot / Android Option to select preferred Android Background Mode
+ * Add BlueStacks2/3 and iTools support for ADB screencap Background Mode
+ * Add KOPLAYER and Nox WinAPI/DirectX support for Background Mode
+ * Add Nox Dock Mode support
+ * Add Ability to Disable Bot Notifications suggested By HarchH
  * Fix Bad Pixel Check in Training when Bot runs while Troops change
- * Added Bot / Android Option to select preferred Android Background Mode
- * Added BlueStacks2/3 and iTools support for ADB screencap Background Mode
- * Added KOPLAYER and Nox WinAPI/DirectX support for Background Mode
+ * Fix closing WerFault Message
+ * Update Azerbaijan and Turkish Language By Z E C K
 
 * **V7.2.3**
  * Fix Main Screen Locating & Troop Training for August 4th Update
