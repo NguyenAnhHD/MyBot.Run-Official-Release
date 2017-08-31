@@ -7659,6 +7659,7 @@ EndFunc
 Func _WinGetAndroidHandle($bFindByTitle = False)
 Local $hWin = WinGetHandle($g_hAndroidWindow)
 If $hWin > 0 And $hWin = $g_hAndroidWindow Then Return $g_hAndroidWindow
+$g_sAppClassInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][3]
 Local $i
 Local $t
 Local $ReInitAndroid = $g_hAndroidWindow <> 0
@@ -38006,7 +38007,7 @@ If $g_iDebugSetlogTrain = 1 Or $g_iDebugSetlog = 1 Then Setlog("Begin SmartWait4
 If $g_bCloseWhileTrainingEnable = False Then Return
 Local $iExitCount = 0
 If _Sleep($DELAYSMARTWAIT) Then Return
-While IsMainPage() = False
+While IsMainPage(1) = False
 If _Sleep($DELAYIDLE1) Then Return
 $iExitCount += 1
 If $iExitCount > 25 Then
@@ -39501,7 +39502,7 @@ Local $iCount = 0
 While IsArmyWindow(False, $ArmyTAB) = False
 If _sleep($DELAYTRAIN4) Then Return
 $iCount += 1
-If $iCount = 5 And IsMainPage() Then
+If $iCount = 5 And IsMainPage(1) Then
 If _Sleep($DELAYTRAIN4) Then Return
 If $g_iDebugSetlogTrain Then SetLog("Click $aArmyTrainButton", $COLOR_DEBUG)
 If Not $g_bUseRandomClick Then
@@ -45042,14 +45043,20 @@ SetLog($g_sAndroidEmulator & " Loaded, took " & Round(__TimerDiff($hTimer) / 100
 Return True
 EndFunc
 Func IsNoxCommandLine($CommandLine)
-SetDebugLog($CommandLine)
-$CommandLine = StringReplace($CommandLine, GetNoxRtPath(), "")
-$CommandLine = StringReplace($CommandLine, "Nox.exe", "")
-Local $param1 = StringReplace(GetNoxProgramParameter(), """", "")
-Local $param2 = StringReplace(GetNoxProgramParameter(True), """", "")
-If StringInStr($CommandLine, $param1 & " ") > 0 Or StringRight($CommandLine, StringLen($param1)) = $param1 Then Return True
-If StringInStr($CommandLine, $param2 & " ") > 0 Or StringRight($CommandLine, StringLen($param2)) = $param2 Then Return True
-If StringInStr($CommandLine, "-clone:") = 0 And $param2 = "" Then Return True
+Local $aRegexResult = StringRegExp($CommandLine, "-clone:(\b.+\b)", $STR_REGEXPARRAYMATCH)
+If Not @error Then
+Local $sInstance = $aRegexResult[0]
+If $sInstance = $g_sAndroidInstance Or($g_sAndroidInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][1] And $sInstance = 'Nox_0') Then
+SetDebugLog("IsNoxCommandLine, instance " & $g_sAndroidInstance & ", returns True for: " & $CommandLine)
+Return True
+EndIf
+Else
+If $g_sAndroidInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][1] Then
+SetDebugLog("IsNoxCommandLine, instance " & $g_sAndroidInstance & ", returns True for: " & $CommandLine)
+Return True
+EndIf
+EndIf
+SetDebugLog("IsNoxCommandLine, instance " & $g_sAndroidInstance & ", returns False for: " & $CommandLine)
 Return False
 EndFunc
 Func GetNoxProgramParameter($bAlternative = False)
@@ -45190,6 +45197,7 @@ Local $v2 = GetVersionNormalized($__Nox_Config[$i][0])
 If $v >= $v2 Then
 SetDebugLog("Using Android Config of " & $g_sAndroidEmulator & " " & $__Nox_Config[$i][0])
 $g_sAppClassInstance = $__Nox_Config[$i][1]
+$g_avAndroidAppConfig[$g_iAndroidConfig][3] = $g_sAppClassInstance
 ExitLoop
 EndIf
 Next
@@ -45311,7 +45319,7 @@ Local $c = $aWin[$i][1]
 If $c = "Qt5QWindowToolSaveBits" Then
 Local $aPos = WinGetPos($h)
 If UBound($aPos) > 3 Then
-If $hToolbar = 0 And $aPos[2] > 7 And $aPos[3] > 7 Then
+If $hToolbar = 0 And(($aPos[2] >= $g_iAndroidClientWidth And $aPos[3] > 7) Or($aPos[2] > 7 And $aPos[3] >= $g_iAndroidClientHeight)) Then
 $hToolbar = $h
 ElseIf $aPos[2] = 7 Or $aPos[3] = 7 Then
 WinMove2($h, "", -1, -1, -1, -1, $HWND_NOTOPMOST, $SWP_HIDEWINDOW, False)
@@ -59541,15 +59549,18 @@ If Not $bToReturn Then ClickP($aAway, 1, 0, "#0332")
 Return $bToReturn
 EndFunc
 Func SwitchBetweenBases($bCheckMainScreen = True)
-Local $sSwitchTo, $bIsOnBuilderBase = False, $aButtonCoords
+Local $sSwitchFrom, $sSwitchTo, $sBack = "", $bIsOnBuilderBase = False, $aButtonCoords
 Local $sTile, $sTilePath, $sRegionToSearch
 If Not $g_bRunState Then Return
 If isOnBuilderIsland(True) Then
+$sSwitchFrom = "Builder Base"
 $sSwitchTo = "Normal Village"
+$sBack = " back"
 $bIsOnBuilderBase = True
 $sTile = "BoatBuilderBase_0_89.xml"
 $sRegionToSearch = "487,44,708,242"
 Else
+$sSwitchFrom = "Normal Village"
 $sSwitchTo = "Builder Base"
 $bIsOnBuilderBase = False
 $sTile = "BoatNormalVillage_0_89.xml"
@@ -59561,22 +59572,19 @@ If UBound($aButtonCoords) > 1 Then
 SetLog("Going to " & $sSwitchTo, $COLOR_INFO)
 ClickP($aButtonCoords)
 If _Sleep($DELAYSWITCHBASES1) Then Return
-If $bIsOnBuilderBase Then
-If isOnBuilderIsland(True) Then
-SetLog("Failed to go back to the normal Village!", $COLOR_ERROR)
-Else
-SetLog("Successfully went back to the normal Village!", $COLOR_SUCCESS)
-If $bCheckMainScreen = True Then checkMainScreen(True, False)
+Local $hTimerHandle = __TimerInit()
+Local $bSwitched = False
+While __TimerDiff($hTimerHandle) < 3000 And Not $bSwitched
+_Sleep(250)
+ForceCaptureRegion()
+$bSwitched = isOnBuilderIsland(True) <> $bIsOnBuilderBase
+WEnd
+If $bSwitched Then
+SetLog("Successfully went" & $sBack & " to the " & $sSwitchTo & "!", $COLOR_SUCCESS)
+If $bCheckMainScreen = True Then checkMainScreen(True, Not $bIsOnBuilderBase)
 Return True
-EndIf
 Else
-If Not isOnBuilderIsland(True) Then
-SetLog("Failed to go to the Builder Base!", $COLOR_ERROR)
-Else
-SetLog("Successfully went to the Builder Base!", $COLOR_SUCCESS)
-If $bCheckMainScreen = True Then checkMainScreen(True, True)
-Return True
-EndIf
+SetLog("Failed to go" & $sBack & " to the " & $sSwitchTo & "!", $COLOR_ERROR)
 EndIf
 Else
 If $bIsOnBuilderBase Then

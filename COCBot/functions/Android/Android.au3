@@ -380,6 +380,10 @@ Func _WinGetAndroidHandle($bFindByTitle = False)
 	; Default WinTitleMatchMode should be 3 (exact match)
 	Local $hWin = WinGetHandle($g_hAndroidWindow)
 	If $hWin > 0 And $hWin = $g_hAndroidWindow Then Return $g_hAndroidWindow
+
+	; Window not found, reset $g_sAppClassInstance as it might have replaced with handle
+	$g_sAppClassInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][3]
+
 	; Find all controls by title and check which contains the android control (required for Nox)
 	Local $i
 	Local $t

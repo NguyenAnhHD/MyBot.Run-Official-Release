@@ -59,14 +59,21 @@ Func OpenNox($bRestart = False)
 EndFunc   ;==>OpenNox
 
 Func IsNoxCommandLine($CommandLine)
-	SetDebugLog($CommandLine)
-	$CommandLine = StringReplace($CommandLine, GetNoxRtPath(), "")
-	$CommandLine = StringReplace($CommandLine, "Nox.exe", "")
-	Local $param1 = StringReplace(GetNoxProgramParameter(), """", "")
-	Local $param2 = StringReplace(GetNoxProgramParameter(True), """", "")
-	If StringInStr($CommandLine, $param1 & " ") > 0 Or StringRight($CommandLine, StringLen($param1)) = $param1 Then Return True
-	If StringInStr($CommandLine, $param2 & " ") > 0 Or StringRight($CommandLine, StringLen($param2)) = $param2 Then Return True
-	If StringInStr($CommandLine, "-clone:") = 0 And $param2 = "" Then Return True
+	; find instance in command line
+	Local $aRegexResult = StringRegExp($CommandLine, "-clone:(\b.+\b)", $STR_REGEXPARRAYMATCH)
+	If Not @error Then
+		Local $sInstance = $aRegexResult[0]
+		If $sInstance = $g_sAndroidInstance Or ($g_sAndroidInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][1] And $sInstance = 'Nox_0') Then ; 'Nox_0' is MultiPlayerManager.exe launch support
+			SetDebugLog("IsNoxCommandLine, instance " & $g_sAndroidInstance & ", returns True for: " & $CommandLine)
+			Return True
+		EndIf
+	Else
+		If $g_sAndroidInstance = $g_avAndroidAppConfig[$g_iAndroidConfig][1] Then
+			SetDebugLog("IsNoxCommandLine, instance " & $g_sAndroidInstance & ", returns True for: " & $CommandLine)
+			Return True
+		EndIf
+	EndIf
+	SetDebugLog("IsNoxCommandLine, instance " & $g_sAndroidInstance & ", returns False for: " & $CommandLine)
 	Return False
 EndFunc   ;==>IsNoxCommandLine
 
@@ -235,6 +242,7 @@ Func InitNox($bCheckOnly = False)
 			If $v >= $v2 Then
 				SetDebugLog("Using Android Config of " & $g_sAndroidEmulator & " " & $__Nox_Config[$i][0])
 				$g_sAppClassInstance = $__Nox_Config[$i][1]
+				$g_avAndroidAppConfig[$g_iAndroidConfig][3] = $g_sAppClassInstance
 				ExitLoop
 			EndIf
 		Next
@@ -411,7 +419,7 @@ Func EmbedNox($bEmbed = Default)
 		If $c = "Qt5QWindowToolSaveBits" Then
 			Local $aPos = WinGetPos($h)
 			If UBound($aPos) > 3 Then
-				If $hToolbar = 0 And $aPos[2] > 7 And $aPos[3] > 7 Then
+				If $hToolbar = 0 And (($aPos[2] >= $g_iAndroidClientWidth And $aPos[3] > 7) Or ($aPos[2] > 7 And $aPos[3] >= $g_iAndroidClientHeight)) Then
 					; found toolbar
 					$hToolbar = $h
 				ElseIf $aPos[2] = 7 Or $aPos[3] = 7 Then
