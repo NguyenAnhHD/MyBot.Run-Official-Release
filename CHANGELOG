@@ -1,3 +1,9 @@
+* **V7.2.5**
+ * Add Inferno Lvl 5 to Weak Base Images/GUI settings, lowered tolerance
+ * Fix Weak Base
+ * Fix Wait for Heroes Queen and Warden
+ * Update Arabic Language By @awssaad
+
 * **V7.2.4**
  * Add Bot / Android Option to select preferred Android Background Mode
  * Add BlueStacks2/3 and iTools support for ADB screencap Background Mode

@@ -2,12 +2,12 @@
 #pragma compile(Icon, "Images\MyBot.ico")
 #pragma compile(FileDescription, Clash of Clans Bot - A Free Clash of Clans bot - https://mybot.run)
 #pragma compile(ProductName, My Bot)
-#pragma compile(ProductVersion, 7.2.4)
-#pragma compile(FileVersion, 7.2.4)
+#pragma compile(ProductVersion, 7.2.5)
+#pragma compile(FileVersion, 7.2.5)
 #pragma compile(LegalCopyright, © https://mybot.run)
 #pragma compile(Out, MyBot.run.exe) ; Required
 Opt("MustDeclareVars", 1)
-Global $g_sBotVersion = "v7.2.4"
+Global $g_sBotVersion = "v7.2.5"
 Global $g_sBotTitle = ""
 Global $g_hFrmBot = 0
 Global Const $WAIT_TIMEOUT = 258
@@ -5505,6 +5505,7 @@ Global $g_bAndroidEmbedEnabled = True
 Global $g_bAndroidEmbedded = False
 Global $g_aiAndroidEmbeddedCtrlTarget[10] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_avAndroidShieldStatus[5] = [Default, 0, 0, Default, Default]
+Global $g_bPoliteCloseCoC = False
 Global Const $g_bAndroidBackgroundLaunchEnabled = False
 Global $g_bAndroidCheckTimeLagEnabled = True
 Global $g_iAndroidAdbAutoTerminate = 0
@@ -5567,6 +5568,8 @@ Global $g_bAndroidEmbed
 Global $g_iAndroidEmbedMode
 Global $g_bAndroidBackgroundLaunch
 Global $g_bAndroidBackgroundLaunched
+Global $g_iAndroidControlClickDelay = 10
+Global $g_iAndroidControlClickDownDelay = 0
 Global $g_iAndroidControlClickWindow = 0
 Global $g_iAndroidControlClickMode = 0
 Global $g_bInitAndroidActive = False
@@ -6214,7 +6217,7 @@ Local Const $aBldgDarkStorage[11] = [0, 0, 0, 0, 0, 0, 2, 4, 6, 6, 6]
 $g_oBldgLevels.add($eBldgDarkS, $aBldgDarkStorage)
 Local Const $aBldgEagle[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]
 $g_oBldgLevels.add($eBldgEagle, $aBldgEagle)
-Local Const $aBldgInferno[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4]
+Local Const $aBldgInferno[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5]
 $g_oBldgLevels.add($eBldgInferno, $aBldgInferno)
 Local Const $aBldgMortar[11] = [0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
 $g_oBldgLevels.add($eBldgMortar, $aBldgMortar)
@@ -14275,7 +14278,7 @@ GUICtrlSetOnEvent(-1, "chkDBWeakBase")
 $g_ahCmbWeakInferno[$DB] = GUICtrlCreateCombo("", $x + 19, $y, 50, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
 $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "CmbMaxInferno_Info_01", "Set the Max. level of the Inferno Tower to search for on a village to attack.")
 _GUICtrlSetTip(-1, $sTxtTip)
-GUICtrlSetData(-1, "-|Lvl 1|Lvl 2|Lvl 3|Lvl 4", "Lvl 2")
+GUICtrlSetData(-1, "-|Lvl 1|Lvl 2|Lvl 3|Lvl 4|Lvl 5", "Lvl 2")
 GUICtrlSetState(-1, $GUI_DISABLE)
 $g_ahPicWeakInferno[$DB] = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnInferno4, $x + 75, $y - 2, 24, 24)
 _GUICtrlSetTip(-1, $sTxtTip)
@@ -15075,7 +15078,7 @@ GUICtrlSetOnEvent(-1, "chkABWeakBase")
 $g_ahCmbWeakInferno[$LB] = GUICtrlCreateCombo("", $x + 19, $y, 50, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
 $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "CmbMaxInferno_Info_01", -1)
 _GUICtrlSetTip(-1, $sTxtTip)
-GUICtrlSetData(-1, "-|Lvl 1|Lvl 2|Lvl 3|Lvl 4", "Lvl 2")
+GUICtrlSetData(-1, "-|Lvl 1|Lvl 2|Lvl 3|Lvl 4|Lvl 5", "Lvl 2")
 GUICtrlSetState(-1, $GUI_DISABLE)
 $g_ahPicWeakInferno[$LB] = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnInferno4, $x + 75, $y - 2, 24, 24)
 _GUICtrlSetTip(-1, $sTxtTip)
@@ -16863,7 +16866,7 @@ Global $g_hChkdebugAttackCSV = 0, $g_hChkMakeIMGCSV = 0, $g_hChkDebugDisableZoom
 Global $g_hBtnTestTrain = 0, $g_hBtnTestDonateCC = 0, $g_hBtnTestRequestCC = 0, $g_hBtnTestSendText = 0, $g_hBtnTestAttackBar = 0, $g_hBtnTestClickDrag = 0, $g_hBtnTestImage = 0
 Global $g_hBtnTestVillageSize = 0, $g_hBtnTestDeadBase = 0, $g_hBtnTestTHimgloc = 0, $g_hBtnTestTrainsimgloc = 0, $g_hBtnTestQuickTrainsimgloc = 0, $g_hTxtTestFindButton = 0
 Global $g_hBtnTestFindButton = 0, $g_hBtnTestDeadBaseFolder = 0, $g_hBtnTestCleanYard = 0, $g_hBtnTestAttackCSV = 0, $g_hBtnTestimglocTroopBar = 0, $g_hBtnTestBuildingLocation = 0
-Global $g_hBtnTestConfigSave = 0, $g_hBtnTestConfigApply = 0, $g_hBtnTestConfigRead = 0, $g_hBtnTestOcrMemory = 0
+Global $g_hBtnTestConfigSave = 0, $g_hBtnTestConfigApply = 0, $g_hBtnTestConfigRead = 0, $g_hBtnTestOcrMemory = 0, $g_hBtnTestWeakBase = 0
 Func CreateBotDebug()
 Local $x = 25, $y = 45
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Bot - Debug", "Group_01", "Debug"), $x - 20, $y - 20, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2)
@@ -16974,6 +16977,8 @@ $y -= $yNext
 $g_hBtnTestConfigRead = GUICtrlCreateButton("Config Read", $x + 20, $y, 120, 25)
 $y -= $yNext
 $g_hBtnTestSendText = GUICtrlCreateButton("Send Text", $x + 20, $y, 120, 25)
+$y -= $yNext
+$g_hBtnTestWeakBase = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Child Bot - Debug", "TestWeakBase", "Test Weak Base"), $x + 20, $y, 120, 25)
 $y -= $yNext
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
@@ -18765,6 +18770,7 @@ $oAlwaysEnabledControls($g_hLblSmartEarthQuakeUsed) = 1
 $oAlwaysEnabledControls($g_hBtnTestConfigSave) = 1
 $oAlwaysEnabledControls($g_hBtnTestConfigRead) = 1
 $oAlwaysEnabledControls($g_hBtnTestConfigApply) = 1
+$oAlwaysEnabledControls($g_hBtnTestWeakBase) = 1
 $oAlwaysEnabledControls($g_hBtnMakeScreenshot) = 1
 $oAlwaysEnabledControls($g_hDivider) = 1
 $oAlwaysEnabledControls($g_hTabMain) = 1
@@ -23191,6 +23197,14 @@ For $i = 1 To 5000
 DllCall($g_hLibMyBot, "str", "ocr", "ptr", $g_hHBitmap2, "str", "coc-DonTroops", "int", $g_iDebugOcr)
 Next
 EndFunc
+Func btnTestWeakBase()
+Local $currentRunState = $g_bRunState
+$g_bRunState = True
+BeginImageTest()
+IsWeakBase()
+EndImageTest()
+$g_bRunState = $currentRunState
+EndFunc
 Func PopulatePresetComboBox()
 Dim $FileSearch, $NewFile
 $FileSearch = FileFindFirstFile($g_sProfilePresetPath & "\*.ini")
@@ -24434,6 +24448,8 @@ Case $g_hBtnTestConfigRead
 readConfig()
 Case $g_hBtnTestConfigApply
 applyConfig()
+Case $g_hBtnTestWeakBase
+btnTestWeakBase()
 EndSwitch
 If $lParam = $g_hCmbGUILanguage Then
 If $nNotifyCode = $CBN_SELCHANGE Then cmbLanguage()
@@ -28151,7 +28167,7 @@ Local $temp1, $temp2, $temp3
 IniReadS($temp1, $g_sProfileConfigPath, "attack", "DBKingWait", $eHeroNone)
 IniReadS($temp2, $g_sProfileConfigPath, "attack", "DBQueenWait", $eHeroNone)
 IniReadS($temp3, $g_sProfileConfigPath, "attack", "DBWardenWait", $eHeroNone)
-$g_aiSearchHeroWaitEnable[$DB] = BitOR(Int($temp1), Int($temp2), Int($temp3))
+$g_aiSearchHeroWaitEnable[$DB] = BitOR(Int($temp1 > $eHeroNone ? $eHeroKing : 0), Int($temp2 > $eHeroNone ? $eHeroQueen : 0), Int($temp3 > $eHeroNone ? $eHeroWarden : 0))
 $g_iHeroWaitAttackNoBit[$DB][0] =($temp1 > $eHeroNone) ? 1 : 0
 $g_iHeroWaitAttackNoBit[$DB][1] =($temp2 > $eHeroNone) ? 1 : 0
 $g_iHeroWaitAttackNoBit[$DB][2] =($temp3 > $eHeroNone) ? 1 : 0
@@ -28200,7 +28216,7 @@ Local $temp1, $temp2, $temp3
 IniReadS($temp1, $g_sProfileConfigPath, "attack", "ABKingWait", $eHeroNone)
 IniReadS($temp2, $g_sProfileConfigPath, "attack", "ABQueenWait", $eHeroNone)
 IniReadS($temp3, $g_sProfileConfigPath, "attack", "ABWardenWait", $eHeroNone)
-$g_aiSearchHeroWaitEnable[$LB] = BitOR(Int($temp1), Int($temp2), Int($temp3))
+$g_aiSearchHeroWaitEnable[$LB] = BitOR(Int($temp1 > $eHeroNone ? $eHeroKing : 0), Int($temp2 > $eHeroNone ? $eHeroQueen : 0), Int($temp3 > $eHeroNone ? $eHeroWarden : 0))
 $g_iHeroWaitAttackNoBit[$LB][0] =($temp1 > $eHeroNone) ? 1 : 0
 $g_iHeroWaitAttackNoBit[$LB][1] =($temp2 > $eHeroNone) ? 1 : 0
 $g_iHeroWaitAttackNoBit[$LB][2] =($temp3 > $eHeroNone) ? 1 : 0
@@ -40200,7 +40216,7 @@ Func TrainIt($iIndex, $iQuantity = 1, $iSleep = 400)
 If $g_iDebugSetlogTrain = 1 Then SetLog("Func TrainIt $iIndex=" & $iIndex & " $howMuch=" & $iQuantity & " $iSleep=" & $iSleep, $COLOR_DEBUG)
 Local $bDark =($iIndex >= $eMini And $iIndex <= $eBowl)
 Local $iErrors = 0
-Do
+For $i = 1 To 5
 Local $aTrainPos = GetTrainPos($iIndex)
 If IsArray($aTrainPos) And $aTrainPos[0] <> -1 Then
 If _ColorCheck(_GetPixelColor($aTrainPos[0], $aTrainPos[1], $g_bCapturePixel), Hex($aTrainPos[2], 6), $aTrainPos[3]) Then
@@ -40219,9 +40235,11 @@ EndIf
 Return True
 Else
 Setlog("TrainIt position " & GetTroopName($iIndex) & " - RNDName did not return array?", $COLOR_ERROR)
+Return False
 EndIf
 Else
 Setlog("TrainIt " & GetTroopName($iIndex) & " - FullName did not return array?", $COLOR_ERROR)
+Return False
 EndIf
 Else
 Local $sBadPixelColor = _GetPixelColor($aTrainPos[0], $aTrainPos[1], $g_bCapturePixel)
@@ -40242,9 +40260,14 @@ EndIf
 EndIf
 EndIf
 Else
+If UBound($aTrainPos) > 0 And $aTrainPos[0] = -1 Then
+If $g_iDebugSetlogTrain = 1 Then DebugImageSave("TroopIconNotFound_" & GetTroopName($iIndex))
+Setlog("TrainIt troop position " & GetTroopName($iIndex) & " did not find icon", $COLOR_ERROR)
+Else
 Setlog("Impossible happened? TrainIt troop position " & GetTroopName($iIndex) & " did not return array", $COLOR_ERROR)
 EndIf
-Until $iErrors = 0
+EndIf
+Next
 EndFunc
 Func GetTrainPos(Const $iIndex)
 If $g_iDebugSetlogTrain = 1 Then SetLog("GetTrainPos($iIndex=" & $iIndex & ")", $COLOR_DEBUG)
@@ -43195,8 +43218,9 @@ Else
 waitMainScreen()
 EndIf
 EndFunc
-Func PoliteCloseCoC($sSource = "Unknown_")
+Func PoliteCloseCoC($sSource = "Unknown_", $bPoliteCloseCoC = $g_bPoliteCloseCoC)
 $g_bSkipFirstZoomout = False
+If $bPoliteCloseCoC Then
 If $g_sAndroidGameDistributor = $g_sGoogle Then
 Local $i = 0
 While 1
@@ -43267,6 +43291,9 @@ ExitLoop
 EndIf
 $i += 1
 WEnd
+EndIf
+Else
+CloseCoC()
 EndIf
 ResetAndroidProcess()
 ReduceBotMemory()
@@ -47398,13 +47425,16 @@ $x += $g_aiBSrpos[0]
 $y += $g_aiBSrpos[1]
 EndIf
 If $g_iAndroidControlClickMode = 0 Then
+Opt("MouseClickDelay", $g_iAndroidControlClickDelay)
+Opt("MouseClickDownDelay", $g_iAndroidControlClickDownDelay)
 Return ControlClick($hWin, "", "", "left", "1", $x, $y)
 EndIf
 Local $WM_LBUTTONDOWN = 0x0201, $WM_LBUTTONUP = 0x0202
 Local $lParam = BitOR(Int($y) * 0x10000, BitAND(Int($x), 0xFFFF))
 _SendMessage($hWin, $WM_LBUTTONDOWN, 0x0001, $lParam)
+_SleepMicro($g_iAndroidControlClickDownDelay * 1000)
 _SendMessage($hWin, $WM_LBUTTONUP, 0x0000, $lParam)
-_SleepMicro(25000)
+_SleepMicro($g_iAndroidControlClickDelay * 1000)
 Return 1
 EndFunc
 Func isProblemAffectBeforeClick($iCount = 0)
@@ -51375,6 +51405,7 @@ _GDIPlus_StringFormatDispose($hFormat)
 _GDIPlus_BrushDispose($hBrush)
 EndFunc
 Func captureDebugImage($aResult, $subDirectory)
+If TestCapture() Then Return
 Local $coords
 If IsArray($aResult) Then
 DirCreate($g_sProfileTempDebugPath & $subDirectory)
@@ -51565,16 +51596,17 @@ Func getIsWeak($aResults, $searchType)
 Return $aResults[$eWeakEagle][2] <= Number($g_aiFilterMaxEagleLevel[$searchType]) And $aResults[$eWeakInferno][2] <= Number($g_aiFilterMaxInfernoLevel[$searchType]) And $aResults[$eWeakXBow][2] <= Number($g_aiFilterMaxXBowLevel[$searchType]) And $aResults[$eWeakWizard][2] <= Number($g_aiFilterMaxWizTowerLevel[$searchType]) And $aResults[$eWeakMortar][2] <= Number($g_aiFilterMaxMortarLevel[$searchType])
 EndFunc
 Func IsWeakBaseActive($type)
-Return($g_abFilterMaxEagleEnable[$type] Or $g_abFilterMaxInfernoEnable[$type] Or $g_abFilterMaxXBowEnable[$type] Or $g_abFilterMaxWizTowerEnable[$type] Or $g_abFilterMaxMortarEnable[$type] Or $g_abFilterMaxAirDefenseEnable[$type]) And IsSearchModeActive($type, False, True)
+Return($g_abFilterMaxEagleEnable[$type] Or $g_abFilterMaxInfernoEnable[$type] Or $g_abFilterMaxXBowEnable[$type] Or $g_abFilterMaxWizTowerEnable[$type] Or $g_abFilterMaxMortarEnable[$type] Or $g_abFilterMaxAirDefenseEnable[$type]) And IsSearchModeActiveMini($type)
 EndFunc
 Func defenseSearch(ByRef $aResult, $directory, $townHallLevel, $settingArray, $iDefenseType, ByRef $performSearch, $guiEnabledArray, $bForceCaptureRegion = True)
 Local $defaultCoords[1][2] = [[0, 0]]
 Local $aDefenseResult[7] = ["Skipped", "Skipped", $g_oBldgLevels.Item($iDefenseType + 7), 0, 0, $defaultCoords, ""]
 Local $aNotNecessary[7] = ["None", "None", 0, 0, 0, $defaultCoords, ""]
+If $performSearch Then
 Local $minSearchLevel = getMinUISetting($settingArray, $iDefenseType) + 1
 Local $maxSearchLevel = getTHDefenseMax($townHallLevel, $iDefenseType)
-Local $guiCheckDefense = IsArray($guiEnabledArray) And((IsSearchModeActive($DB, False, True) And $guiEnabledArray[$DB]) Or(IsSearchModeActive($LB, False, True) And $guiEnabledArray[$LB]))
-If $performSearch Then
+Local $bGuiEnableArray = IsArray($guiEnabledArray), $bIsSearchModeActiveDB = IsSearchModeActiveMini($DB), $bIsSearchModeActiveLB = IsSearchModeActiveMini($LB)
+Local $guiCheckDefense = $bGuiEnableArray And(($bIsSearchModeActiveDB And $guiEnabledArray[$DB]) Or($bIsSearchModeActiveLB And $guiEnabledArray[$LB]))
 Local $defenseTimer = __TimerInit()
 If $guiCheckDefense And $maxSearchLevel >= $minSearchLevel Then
 Local $sDefenseName = StringSplit($directory, "\", $STR_NOCOUNT)
@@ -51582,10 +51614,15 @@ If $g_iDebugSetlog Then SetLog("checkDefense :" & $sDefenseName[UBound($sDefense
 $aDefenseResult = DefenseSearchMultiMatch($iDefenseType, $directory, $aResult[0][0], $g_sProfileBuildingStatsPath, $minSearchLevel, $maxSearchLevel, $bForceCaptureRegion)
 If $aResult[0][0] = "" Then $aResult[0][0] = $aDefenseResult[6]
 If Number($aDefenseResult[2]) > getMaxUISetting($settingArray, $iDefenseType) Then $performSearch = False
-If $g_iDebugSetlog = 1 Then SetLog("checkDefense: " & $g_aWeakDefenseNames[$iDefenseType] & " - " & Round(__TimerDiff($defenseTimer) / 1000, 2) & " seconds")
+If $g_iDebugSetlog = 1 Then
+SetLog("checkDefense: " & $g_aWeakDefenseNames[$iDefenseType] & " - " & Round(__TimerDiff($defenseTimer) / 1000, 2) & " seconds")
+For $i = 0 To UBound($aDefenseResult) - 2
+SetLog("$aDefenseResult[" & $i & "]: " & $aDefenseResult[$i])
+Next
+EndIf
 Else
 $aDefenseResult = $aNotNecessary
-If $g_iDebugSetlog = 1 Then SetLog("checkDefense: " & $g_aWeakDefenseNames[$iDefenseType] & " not necessary!")
+If $g_iDebugSetlog = 1 Then SetLog("checkDefense: " & $g_aWeakDefenseNames[$iDefenseType] & " not necessary! $bGuiEnableArray=" & $bGuiEnableArray & ", $bIsSearchModeActiveDB=" & $bIsSearchModeActiveDB & ", $bIsSearchModeActiveLB=" & $bIsSearchModeActiveLB & ", $maxSearchLevel=" & $maxSearchLevel & ", $minSearchLevel=" & $minSearchLevel)
 EndIf
 EndIf
 Return $aDefenseResult
@@ -51671,11 +51708,7 @@ If @error Then
 _ObjErrMsg("_ObjGetValue $g_oBldgMaxQty", @error)
 EndIf
 Local $fullCocAreas = "DCD"
-If isScriptedAttackActive() Then
-$maxLevelSearch = 100
-Else
 $maxLevelSearch = $maxLevel
-EndIf
 If $redlines = "" Or $redlines = "DCD" Then
 If _ObjSearch($g_oBldgAttackInfo, $eBldgRedLine & "_OBJECTPOINTS") = True Then
 If _ObjGetValue($g_oBldgAttackInfo, $eBldgRedLine & "_COUNT") > 50 Then
@@ -51683,11 +51716,9 @@ $redlines = $g_oBldgAttackInfo.item($eBldgRedLine & "_LOCATION")
 If IsString($redlines) And $redlines <> "" And $redlines <> "DCD" Then
 $bRedLineExists = True
 Else
-$redlines = "DCD"
 $bRedLineExists = False
 EndIf
 Else
-$redlines = "DCD"
 $bRedLineExists = False
 EndIf
 Else
@@ -51710,15 +51741,17 @@ EndIf
 EndIf
 EndIf
 Else
-$redlines = "DCD"
 $bRedLineExists = False
 EndIf
+If $bRedLineExists = False Then
+$redlines = "DCD"
+EndIf
 If $g_iDebugSetlog = 1 Then
-SetLog("> " & $g_sBldgNames[$iDefenseType + 7] & " Max Level: " & $maxLevelSearch, $COLOR_DEBUG)
+SetLog("> " & $g_sBldgNames[$iDefenseType + 7] & " Max Level: " & $maxLevel & " Max Search Level: " & $maxLevelSearch, $COLOR_DEBUG)
 Setlog("> Max return points: " & $maxReturnPoints, $COLOR_DEBUG)
 SetLog("> Red Line Exists:" & $bRedLineExists & " , redlines=" & $redlines, $COLOR_DEBUG)
 EndIf
-If _Sleep($DELAYCHECKARMYCAMP6) Then Return
+If _Sleep($DELAYCHECKARMYCAMP6) Then Return $return
 If $bForceCaptureRegion = True Then _CaptureRegion2()
 Local $res = DllCall($g_hLibImgLoc, "str", "SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $directory, "str", $fullCocAreas, "Int", $maxReturnPoints, "str", $redlines, "Int", $minLevel, "Int", $maxLevelSearch)
 If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
@@ -51752,10 +51785,9 @@ $iTmpObjectLevel = Int(RetrieveImglocProperty($aKeys[$i], "objectlevel"))
 $sTempCoord = RetrieveImglocProperty($aKeys[$i], "objectpoints")
 If $i = 0 And StringLen($sTempCoord) > 7 Then
 $iCountUpdate = RemoveDupNearby($sTempCoord)
-If $iTmpObjectLevel <> $iCountUpdate And $iCountUpdate <> "" Then $iTmpObjectLevel = $iCountUpdate
 EndIf
 $iTmpBldTotal = RetrieveImglocProperty($aKeys[$i], "totalobjects")
-If $iTmpObjectLevel > Number($return[2]) And(Int($maxLevel) <= $iTmpObjectLevel) Then
+If $iTmpObjectLevel > Number($return[2]) Then
 $return[0] = $aStatData[$i + 1][0]
 $return[1] = RetrieveImglocProperty($aKeys[$i], "objectname")
 $return[2] = $iTmpObjectLevel
@@ -51805,10 +51837,10 @@ Local $sText
 Select
 Case UBound($aBldgCoord, 1) > 1 And IsArray($aBldgCoord[1])
 $sText = PixelArrayToString($aBldgCoord, ",")
-Case IsArray($aBldgCoord[0])
+Case UBound($aBldgCoord) > 0 And IsArray($aBldgCoord[0])
 Local $aPixelb = $aBldgCoord[0]
 $sText = PixelToString($aPixelb, ":")
-Case IsArray($aBldgCoord[0]) = 0
+Case UBound($aBldgCoord) > 0 And IsArray($aBldgCoord[0]) = 0
 $sText = PixelToString($aBldgCoord, ":")
 Case Else
 $sText = "Monkey ate bad banana!"
@@ -51816,7 +51848,7 @@ EndSelect
 Setlog($g_sBldgNames[$iDefenseType + 7] & " $aBldgCoord Array Contents: " & $sText, $COLOR_DEBUG)
 EndIf
 If isScriptedAttackActive() Then
-If $return[2] <> "" Or $return[2] <> 0 Then
+If $return[2] <> 0 Then
 _ObjAdd($g_oBldgAttackInfo, $iDefenseType + 7 & "_MAXLVLFOUND", $return[2])
 If @error Then _ObjErrMsg("_ObjAdd " & $g_sBldgNames[$iDefenseType + 7] & " _MAXLVLFOUND", @error)
 EndIf
@@ -52605,7 +52637,7 @@ Return False
 EndIf
 EndFunc
 Func IsSearchModeActiveMini(Const $iMatchMode)
-Return $g_abAttackTypeEnable[$DB] Or $g_abAttackTypeEnable[$LB] Or $g_abAttackTypeEnable[$TS]
+Return $g_abAttackTypeEnable[$iMatchMode]
 EndFunc
 Func IsWaitforSpellsActive()
 For $i = $DB To $g_iModeCount - 1
