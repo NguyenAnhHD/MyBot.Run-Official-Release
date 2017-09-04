@@ -5859,7 +5859,7 @@ Global $g_sAttackFile = ""
 Global $g_bNotifyPBEnable = False, $g_sNotifyPBToken = ""
 Global $g_bNotifyTGEnable = False, $g_sNotifyTGToken = ""
 Global $g_bNotifyRemoteEnable = False, $g_sNotifyOrigin = "", $g_bNotifyDeleteAllPushesOnStart = False, $g_bNotifyDeletePushesOlderThan = False, $g_iNotifyDeletePushesOlderThanHours = 4
-Global $g_bNotifyAlertMatchFound = False, $g_bNotifyAlerLastRaidIMG = False, $g_bNotifyAlerLastRaidTXT = False, $g_bNotifyAlertCampFull = False, $g_bNotifyAlertUpgradeWalls = False, $g_bNotifyAlertOutOfSync = False, $g_bNotifyAlertTakeBreak = False, $g_bNotifyAlertBulderIdle = False, $g_bNotifyAlertVillageReport = False, $g_bNotifyAlertLastAttack = False, $g_bNotifyAlertAnotherDevice = False, $g_bNotifyAlertMaintenance = False, $g_bNotifyAlertBAN = False, $g_bNotifyAlertBOTUpdate = False
+Global $g_bNotifyAlertMatchFound = False, $g_bNotifyAlerLastRaidIMG = False, $g_bNotifyAlerLastRaidTXT = False, $g_bNotifyAlertCampFull = False, $g_bNotifyAlertUpgradeWalls = False, $g_bNotifyAlertOutOfSync = False, $g_bNotifyAlertTakeBreak = False, $g_bNotifyAlertBulderIdle = False, $g_bNotifyAlertVillageReport = False, $g_bNotifyAlertLastAttack = False, $g_bNotifyAlertAnotherDevice = False, $g_bNotifyAlertMaintenance = False, $g_bNotifyAlertBAN = False, $g_bNotifyAlertBOTUpdate = False, $g_bNotifyAlertSmartWaitTime = False
 Global $g_bNotifyScheduleHoursEnable = False, $g_bNotifyScheduleWeekDaysEnable = False
 Global $g_abNotifyScheduleHours[24] = [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
 Global $g_abNotifyScheduleWeekDays[7] = [False, False, False, False, False, False, False]
@@ -12483,7 +12483,7 @@ Global $g_hGUI_NOTIFY = 0, $g_hGUI_NOTIFY_TAB = 0, $g_hGUI_NOTIFY_TAB_ITEM2 = 0,
 Global $g_hGrpNotify = 0
 Global $g_hChkNotifyPBEnable = 0, $g_hTxtNotifyPBToken = 0, $g_hChkNotifyTGEnable = 0, $g_hTxtNotifyTGToken = 0
 Global $g_hChkNotifyRemote = 0, $g_hTxtNotifyOrigin = 0
-Global $g_hChkNotifyDeleteAllPBPushes = 0, $g_hBtnNotifyDeleteMessages = 0, $g_hChkNotifyDeleteOldPBPushes = 0, $g_hCmbNotifyPushHours = 0, $g_hChkNotifyAlertMatchFound = 0, $g_hChkNotifyAlertLastRaidIMG = 0, $g_hChkNotifyAlertLastRaidTXT = 0, $g_hChkNotifyAlertCampFull = 0, $g_hChkNotifyAlertUpgradeWall = 0, $g_hChkNotifyAlertOutOfSync = 0, $g_hChkNotifyAlertTakeBreak = 0, $g_hChkNotifyAlertBuilderIdle = 0, $g_hChkNotifyAlertVillageStats = 0, $g_hChkNotifyAlertLastAttack = 0, $g_hChkNotifyAlertAnotherDevice = 0, $g_hChkNotifyAlertMaintenance = 0, $g_hChkNotifyAlertBAN = 0, $g_hChkNotifyBOTUpdate = 0
+Global $g_hChkNotifyDeleteAllPBPushes = 0, $g_hBtnNotifyDeleteMessages = 0, $g_hChkNotifyDeleteOldPBPushes = 0, $g_hCmbNotifyPushHours = 0, $g_hChkNotifyAlertMatchFound = 0, $g_hChkNotifyAlertLastRaidIMG = 0, $g_hChkNotifyAlertLastRaidTXT = 0, $g_hChkNotifyAlertCampFull = 0, $g_hChkNotifyAlertUpgradeWall = 0, $g_hChkNotifyAlertOutOfSync = 0, $g_hChkNotifyAlertTakeBreak = 0, $g_hChkNotifyAlertBuilderIdle = 0, $g_hChkNotifyAlertVillageStats = 0, $g_hChkNotifyAlertLastAttack = 0, $g_hChkNotifyAlertAnotherDevice = 0, $g_hChkNotifyAlertMaintenance = 0, $g_hChkNotifyAlertBAN = 0, $g_hChkNotifyBOTUpdate = 0, $g_hChkNotifyAlertSmartWaitTime = 0
 Global $g_hChkNotifyOnlyHours = 0, $g_hChkNotifyOnlyWeekDays = 0, $g_hChkNotifyhours[24] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], $g_hChkNotifyWeekdays[7] = [0,0,0,0,0,0,0]
 GLobal $g_hLblNotifyhour = 0, $g_ahLblNotifyhoursE = 0, $g_hChkNotifyhoursE1 = 0, $g_hChkNotifyhoursE2 = 0, $g_hLblNotifyhoursAM = 0, $g_hLblNotifyhoursPM = 0
 GLobal $g_hLblNotifyhours[12] = [0,0,0,0,0,0,0,0,0,0,0,0]
@@ -12588,6 +12588,9 @@ _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Village - Notify",
 GUICtrlSetState(-1, $GUI_DISABLE)
 $g_hChkNotifyAlertAnotherDevice = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Village - Notify", "ChkNotifyAlertAnotherDevice", "Another device"), $x + 210, $y, -1, -1)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Village - Notify", "ChkNotifyAlertAnotherDevice_Info_01", "Send an Alert when your village is connected to from another device."))
+GUICtrlSetState(-1, $GUI_DISABLE)
+$g_hChkNotifyAlertSmartWaitTime = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Village - Notify", "ChkNotifyAlertSmartWaitTime", "Smart Wait Time"), $x + 315, $y, -1, -1)
+_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Village - Notify", "ChkNotifyAlertSmartWaitTime_Info_02", "Send an Alert when your village take wait troops."))
 GUICtrlSetState(-1, $GUI_DISABLE)
 $y += 20
 $g_hChkNotifyAlertMaintenance = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Village - Notify", "ChkNotifyAlertMaintenance", "Maintenance"), $x + 10, $y, -1, -1)
@@ -16707,7 +16710,7 @@ $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "TxtGlobal
 GUICtrlSetOnEvent(-1, "txtGlobalThreads")
 GUICtrlSetLimit(-1, 2)
 _GUICtrlSetTip(-1, $sTxtTip)
-GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblGlobalThreads_Info_01", "Img processing threads for all bots"), $x + 30, $y + 3)
+GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblGlobalThreads_Info_01", "Image Threads for all bots"), $x + 30, $y + 3)
 _GUICtrlSetTip(-1, $sTxtTip)
 $y += 20
 $g_hTxtThreads = GUICtrlCreateInput($g_iThreads, $x, $y + 2, 25, 16, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
@@ -16715,7 +16718,7 @@ $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "TxtThread
 GUICtrlSetOnEvent(-1, "txtThreads")
 GUICtrlSetLimit(-1, 2)
 _GUICtrlSetTip(-1, $sTxtTip)
-GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblThreads_Info_01", "Img processing threads for this bot"), $x + 30, $y + 3)
+GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "LblThreads_Info_01", "Image Threads for this bot"), $x + 30, $y + 3)
 _GUICtrlSetTip(-1, $sTxtTip)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 Local $x = 240, $y = 45, $yGroup = $y
@@ -21976,6 +21979,7 @@ GUICtrlSetState($g_hChkNotifyAlertBuilderIdle, $GUI_ENABLE)
 GUICtrlSetState($g_hChkNotifyAlertMaintenance, $GUI_ENABLE)
 GUICtrlSetState($g_hChkNotifyAlertBAN, $GUI_ENABLE)
 GUICtrlSetState($g_hChkNotifyBOTUpdate, $GUI_ENABLE)
+GUICtrlSetState($g_hChkNotifyAlertSmartWaitTime, $GUI_ENABLE)
 Else
 GUICtrlSetState($g_hChkNotifyRemote, $GUI_DISABLE)
 GUICtrlSetState($g_hTxtNotifyOrigin, $GUI_DISABLE)
@@ -21997,6 +22001,7 @@ GUICtrlSetState($g_hCmbNotifyPushHours, $GUI_DISABLE)
 GUICtrlSetState($g_hChkNotifyDeleteAllPBPushes, $GUI_DISABLE)
 GUICtrlSetState($g_hChkNotifyDeleteOldPBPushes, $GUI_DISABLE)
 GUICtrlSetState($g_hBtnNotifyDeleteMessages, $GUI_DISABLE)
+GUICtrlSetState($g_hChkNotifyAlertSmartWaitTime, $GUI_DISABLE)
 EndIf
 EndFunc
 Func chkDeleteOldPBPushes()
@@ -26456,6 +26461,7 @@ GUICtrlSetState($g_hChkNotifyAlertBuilderIdle, $g_bNotifyAlertBulderIdle ? $GUI_
 GUICtrlSetState($g_hChkNotifyAlertMaintenance, $g_bNotifyAlertMaintenance ? $GUI_CHECKED : $GUI_UNCHECKED)
 GUICtrlSetState($g_hChkNotifyAlertBAN, $g_bNotifyAlertBAN ? $GUI_CHECKED : $GUI_UNCHECKED)
 GUICtrlSetState($g_hChkNotifyBOTUpdate, $g_bNotifyAlertBOTUpdate ? $GUI_CHECKED : $GUI_UNCHECKED)
+GUICtrlSetState($g_hChkNotifyAlertSmartWaitTime, $g_bNotifyAlertSmartWaitTime ? $GUI_CHECKED : $GUI_UNCHECKED)
 Case "Save"
 $g_bNotifyPBEnable =(GUICtrlRead($g_hChkNotifyPBEnable) = $GUI_CHECKED)
 $g_bNotifyTGEnable =(GUICtrlRead($g_hChkNotifyTGEnable) = $GUI_CHECKED)
@@ -26480,6 +26486,7 @@ $g_bNotifyAlertBulderIdle =(GUICtrlRead($g_hChkNotifyAlertBuilderIdle) = $GUI_CH
 $g_bNotifyAlertMaintenance =(GUICtrlRead($g_hChkNotifyAlertMaintenance) = $GUI_CHECKED)
 $g_bNotifyAlertBAN =(GUICtrlRead($g_hChkNotifyAlertBAN) = $GUI_CHECKED)
 $g_bNotifyAlertBOTUpdate =(GUICtrlRead($g_hChkNotifyBOTUpdate) = $GUI_CHECKED)
+$g_bNotifyAlertSmartWaitTime =(GUICtrlRead($g_hChkNotifyAlertSmartWaitTime) = $GUI_CHECKED)
 EndSwitch
 EndFunc
 Func ApplyConfig_600_19($TypeReadSave)
@@ -28112,6 +28119,7 @@ IniReadS($g_bNotifyAlertAnotherDevice, $g_sProfileConfigPath, "notify", "AlertPB
 IniReadS($g_bNotifyAlertMaintenance, $g_sProfileConfigPath, "notify", "AlertPBMaintenance", False, "Bool")
 IniReadS($g_bNotifyAlertBAN, $g_sProfileConfigPath, "notify", "AlertPBBAN", False, "Bool")
 IniReadS($g_bNotifyAlertBOTUpdate, $g_sProfileConfigPath, "notify", "AlertPBUpdate", False, "Bool")
+IniReadS($g_bNotifyAlertSmartWaitTime, $g_sProfileConfigPath, "notify", "AlertSmartWaitTime", False, "Bool")
 EndFunc
 Func ReadConfig_600_19()
 $g_bNotifyScheduleHoursEnable =(IniRead($g_sProfileConfigPath, "notify", "NotifyHoursEnable", "0") = "1")
@@ -28956,6 +28964,7 @@ _Ini_Add("notify", "AlertBuilderIdle", $g_bNotifyAlertBulderIdle ? 1 : 0)
 _Ini_Add("notify", "AlertPBMaintenance", $g_bNotifyAlertMaintenance ? 1 : 0)
 _Ini_Add("notify", "AlertPBBAN", $g_bNotifyAlertBAN ? 1 : 0)
 _Ini_Add("notify", "AlertPBUpdate", $g_bNotifyAlertBOTUpdate ? 1 : 0)
+_Ini_Add("notify", "AlertSmartWaitTime", $g_bNotifyAlertSmartWaitTime ? 1 : 0)
 EndFunc
 Func SaveConfig_600_19()
 ApplyConfig_600_19("Save")
@@ -38235,17 +38244,20 @@ If($iTrainWaitTime >= $MinimumTimeClose) Then
 If $iShieldTime > 0 Then
 If $iDiffTime <= 0 Then
 Setlog("Smart wait while shield time = " & StringFormat("%.2f", $iShieldTime / 60) & " Minutes", $COLOR_INFO)
+If($g_bNotifyPBEnable = True Or $g_bNotifyTGEnable = True) And $g_bNotifyAlertSmartWaitTime = True Then NotifyPushToBoth($g_sNotifyOrigin & " : " & "\n" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_01", "Smart Wait While Shield Time = ") & StringFormat("%.2f", $iShieldTime / 60) & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_02", " Minutes") & "\n" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_03", "Wait For Troops Ready"))
 UniversalCloseWaitOpenCoC($iShieldTime * 1000, "SmartWait4Train_", $StopEmulator, $bFullRestart, $bSuspendComputer)
 $g_bRestart = True
 ResetTrainTimeArray()
 Else
 Setlog("Smart wait train time = " & StringFormat("%.2f", $iTrainWaitTime / 60) & " Minutes", $COLOR_INFO)
+If($g_bNotifyPBEnable = True Or $g_bNotifyTGEnable = True) And $g_bNotifyAlertSmartWaitTime = True Then NotifyPushToBoth($g_sNotifyOrigin & " : " & "\n" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_04", "Smart Wait Train Time = ") & StringFormat("%.2f", $iTrainWaitTime / 60) & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_02", " Minutes") & "\n" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_03", "Wait For Troops Ready"))
 UniversalCloseWaitOpenCoC($iTrainWaitTime * 1000, "SmartWait4Train_", $StopEmulator, $bFullRestart, $bSuspendComputer)
 $g_bRestart = True
 ResetTrainTimeArray()
 EndIf
 ElseIf($g_bCloseWithoutShield = True And $g_aiTimeTrain[0] > 0) Or($ichkCloseWaitSpell = 1 And $g_aiTimeTrain[1] > 0) Or($ichkCloseWaitHero = 1 And $g_aiTimeTrain[2] > 0) Then
 Setlog("Smart Wait time = " & StringFormat("%.2f", $iTrainWaitTime / 60) & " Minutes", $COLOR_INFO)
+If($g_bNotifyPBEnable = True Or $g_bNotifyTGEnable = True) And $g_bNotifyAlertSmartWaitTime = True Then NotifyPushToBoth($g_sNotifyOrigin & " : " & "\n" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_05", "Smart Wait Time = ") & StringFormat("%.2f", $iTrainWaitTime / 60) & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_02", " Minutes") & "\n" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_03", "Wait For Troops Ready"))
 UniversalCloseWaitOpenCoC($iTrainWaitTime * 1000, "SmartWait4TrainNoShield_", $StopEmulator, $bFullRestart, $bSuspendComputer)
 $g_bRestart = True
 ResetTrainTimeArray()
@@ -60728,10 +60740,12 @@ Local $Count = 1
 Local $aKey = IniReadSection($ini_file, $iSection)
 If IsArray($aKey) Then
 For $i = 1 To $aKey[0][0]
+If _ArraySearch($aSection, $aKey[$i][0], 0, 0, 0, 0, 1, 0) = -1 Then
 $Count += 1
 ReDim $aSection[$Count][2]
 $aSection[$Count - 1][0] = $aKey[$i][0]
 $aSection[$Count - 1][1] = $aKey[$i][1]
+EndIf
 Next
 EndIf
 _ArraySort($aSection, 0, 0, 0, 0)
@@ -60789,10 +60803,12 @@ Local $Count = 1
 Local $aKey = IniReadSection($ini_file, $iSection)
 If IsArray($aKey) Then
 For $i = 1 To $aKey[0][0]
+If _ArraySearch($aSection, $aKey[$i][0], 0, 0, 0, 0, 1, 0) = -1 Then
 $Count += 1
 ReDim $aSection[$Count][2]
 $aSection[$Count - 1][0] = $aKey[$i][0]
 $aSection[$Count - 1][1] = $aKey[$i][1]
+EndIf
 Next
 EndIf
 _ArraySort($aSection, 0, 0, 0, 0)
@@ -60828,9 +60844,11 @@ Local $aKey = IniReadSection($ini_file, $aSection[$i])
 If IsArray($aKey) Then
 ReDim $aNewLanguage[$Count + UBound($aKey) - 1][2]
 For $j = 1 To Ubound($aKey) - 1
+If _ArraySearch($aNewLanguage, $aSection[$i] & "§" & $aKey[$j][0], 0, 0, 0, 0, 1, 0) = -1 Then
 $aNewLanguage[$Count][0] = $aSection[$i] & "§" & $aKey[$j][0]
 $aNewLanguage[$Count][1] = $aKey[$j][1]
 $Count += 1
+EndIf
 Next
 Else
 ReDim $aNewLanguage[$Count + 1][2]
