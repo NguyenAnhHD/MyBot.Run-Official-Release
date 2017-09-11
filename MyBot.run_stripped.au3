@@ -30051,7 +30051,12 @@ EndIf
 EndFunc
 Func PrepareAttack($pMatchMode, $Remaining = False)
 If($pMatchMode = $DB And $g_aiAttackAlgorithm[$DB] = 1) Or($pMatchMode = $LB And $g_aiAttackAlgorithm[$LB] = 1) Then
-If $g_iDebugMakeIMGCSV = 1 And $Remaining = False And TestCapture() = 0 Then DebugImageSave("clean", False)
+If $g_iDebugMakeIMGCSV = 1 And $Remaining = False And TestCapture() = 0 Then
+If $g_iSearchTH = "-" Then
+imglocTHSearch(True, False, False)
+EndIf
+DebugImageSave("clean", False, Default, Default, "TH" & $g_iSearchTH & "-")
+EndIf
 EndIf
 If $Remaining = False Then
 $g_bDropKing = False
@@ -34756,6 +34761,7 @@ Local $colorVariation = 40
 Local $xSkip = 1
 Local $ySkip = 5
 Local $result = 0
+Local $listPixelBySide
 If $g_iMatchMode = $LB And $g_aiAttackAlgorithm[$LB] = 0 And $g_aiAttackStdDropSides[$LB] = 4 Then
 $result = DllCall($g_hLibMyBot, "str", "getRedAreaSideBuilding", "ptr", $g_hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation, "int", $eSideBuildingDES)
 If $g_iDebugSetlog Then Setlog("Debug: Redline with DES Side chosen")
@@ -34765,21 +34771,22 @@ If $g_iDebugSetlog Then Setlog("Debug: Redline with TH Side chosen")
 Else
 Switch $iMode
 Case $REDLINE_NONE
-Local $listPixelBySide = ["NoRedLine", "", "", "", ""]
+Local $a = ["NoRedLine", "", "", "", ""]
+$listPixelBySide = $a
 Case $REDLINE_IMGLOC_RAW
 SearchRedLinesMultipleTimes()
-Local $listPixelBySide = getRedAreaSideBuilding()
+$listPixelBySide = getRedAreaSideBuilding()
 Case $REDLINE_IMGLOC
 SearchRedLinesMultipleTimes()
 Local $dropPoints = GetOffSetRedline("TL") & "|" & GetOffSetRedline("BL") & "|" & GetOffSetRedline("BR") & "|" & GetOffSetRedline("TR")
-Local $listPixelBySide = getRedAreaSideBuilding($dropPoints)
+$listPixelBySide = getRedAreaSideBuilding($dropPoints)
 Case $REDLINE_ORIGINAL
 Local $result = DllCall($g_hLibMyBot, "str", "getRedArea", "ptr", $g_hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation)
 EndSwitch
 If $g_iDebugSetlog Then Setlog("Debug: Redline chosen")
 EndIf
 If IsArray($result) Then
-Local $listPixelBySide = StringSplit($result[0], "#")
+$listPixelBySide = StringSplit($result[0], "#")
 EndIf
 $g_aiPixelTopLeft = GetPixelSide($listPixelBySide, 1)
 $g_aiPixelBottomLeft = GetPixelSide($listPixelBySide, 2)
@@ -40273,8 +40280,12 @@ EndIf
 EndIf
 Else
 If UBound($aTrainPos) > 0 And $aTrainPos[0] = -1 Then
+If $i < 5 Then
+ForceCaptureRegion()
+Else
 If $g_iDebugSetlogTrain = 1 Then DebugImageSave("TroopIconNotFound_" & GetTroopName($iIndex))
 Setlog("TrainIt troop position " & GetTroopName($iIndex) & " did not find icon", $COLOR_ERROR)
+EndIf
 Else
 Setlog("Impossible happened? TrainIt troop position " & GetTroopName($iIndex) & " did not return array", $COLOR_ERROR)
 EndIf
@@ -47878,7 +47889,10 @@ Local $sAttackLogPath = $g_sProfileLogsPath & $sAttackLogFName
 $g_hAttackLogFile = FileOpen($sAttackLogPath, $FO_APPEND)
 SetDebugLog("Created attack log file: " & $sAttackLogPath)
 EndFunc
-Func DebugImageSave($TxtName = "Unknown", $capturenew = True, $extensionpng = "png", $makesubfolder = True)
+Func DebugImageSave($TxtName = "Unknown", $capturenew = Default, $extensionpng = Default, $makesubfolder = Default, $sTag = "")
+If $capturenew = Default Then $capturenew = True
+If $extensionpng = Default Then $extensionpng = "png"
+If $makesubfolder = Default Then $makesubfolder = True
 Local $Date = @MDAY & "." & @MON & "." & @YEAR
 Local $Time = @HOUR & "." & @MIN & "." & @SEC
 Local $savefolder = $g_sProfileTempDebugPath
@@ -47899,14 +47913,14 @@ Local $filename = ""
 While $exist
 If $first Then
 $first = False
-$filename = $savefolder & $TxtName & $Date & " at " & $Time & "." & $extension
+$filename = $savefolder & $TxtName & $sTag & $Date & " at " & $Time & "." & $extension
 If FileExists($filename) = 1 Then
 $exist = True
 Else
 $exist = False
 EndIf
 Else
-$filename = $savefolder & $TxtName & $Date & " at " & $Time & " (" & $i & ")." & $extension
+$filename = $savefolder & $TxtName & $sTag & $Date & " at " & $Time & " (" & $i & ")." & $extension
 If FileExists($filename) = 1 Then
 $i +=1
 Else
@@ -55292,6 +55306,12 @@ EndIf
 Return False
 EndFunc
 Func LocateUpgrades()
+If $g_bBotPaused Then
+_ExtMsgBoxSet(1 + 64, $SS_CENTER, 0x004080, 0xFFFF00, 12, "Comic Sans MS", 500)
+Local $stext = GetTranslatedFileIni("MBR Popups", "Func_Locate_Building_BotPaused", "Cannot locate Upgrades when bot is paused!")
+Local $MsgBox = _ExtMsgBox(48, GetTranslatedFileIni("MBR Popups", "Ok", "Ok"), GetTranslatedFileIni("MBR Popups", "Notice", "Notice"), $stext, 15, $g_hFrmBot)
+Return
+EndIf
 WinGetAndroidHandle()
 If $g_hAndroidWindow <> 0 And $g_bAndroidBackgroundLaunched = True Then
 Setlog("Reboot " & $g_sAndroidEmulator & " for Window access", $COLOR_ERROR)

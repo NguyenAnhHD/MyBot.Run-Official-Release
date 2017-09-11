@@ -67,9 +67,13 @@ Func TrainIt($iIndex, $iQuantity = 1, $iSleep = 400)
 				EndIf
 			EndIf
 		Else
-			If UBound($aTrainPos) > 0 And $aTrainPos[0] = -1 Then 
-				If $g_iDebugSetlogTrain = 1 Then DebugImageSave("TroopIconNotFound_" & GetTroopName($iIndex))
-				Setlog("TrainIt troop position " & GetTroopName($iIndex) & " did not find icon", $COLOR_ERROR)
+			If UBound($aTrainPos) > 0 And $aTrainPos[0] = -1 Then
+				If $i < 5 Then
+					ForceCaptureRegion()
+				Else
+					If $g_iDebugSetlogTrain = 1 Then DebugImageSave("TroopIconNotFound_" & GetTroopName($iIndex))
+					Setlog("TrainIt troop position " & GetTroopName($iIndex) & " did not find icon", $COLOR_ERROR)
+				EndIf
 			Else
 				Setlog("Impossible happened? TrainIt troop position " & GetTroopName($iIndex) & " did not return array", $COLOR_ERROR)
 			EndIf
