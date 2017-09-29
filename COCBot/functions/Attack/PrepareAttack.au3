@@ -187,3 +187,39 @@ Func IsSpecialTroopToBeUsed($pMatchMode, $pTroopType)
 		Return False
 	EndIf
 EndFunc   ;==>IsSpecialTroopToBeUsed
+
+Func AttackRemainingTime($bInitialze = Default)
+	If $bInitialze = True Then
+		$g_hAttackTimer = __TimerInit()
+		$g_iAttackTimerOffset = Default
+		SuspendAndroidTime(True) ; Reset suspend Android time for compensation when Android is suspended
+		Return
+	EndIf
+
+	Local $iPrepareTime = 29 * 1000
+
+	If $g_iAttackTimerOffset = Default Then
+
+		; now attack is really starting (or it has already after 30 Seconds)
+
+		; set offset
+		$g_iAttackTimerOffset = __TimerDiff($g_hAttackTimer) - SuspendAndroidTime()
+
+		If $g_iAttackTimerOffset > $iPrepareTime Then
+			; adjust offset by remove "lost" attack time
+			$g_iAttackTimerOffset = $iPrepareTime - $g_iAttackTimerOffset
+		EndIf
+
+	EndIf
+
+	If $bInitialze = False Then Return
+
+	; Return remaining attack time
+	Local $iAttackTime = 3 * 60 * 1000
+	Local $iRemaining = $iAttackTime - (__TimerDiff($g_hAttackTimer) - SuspendAndroidTime() - $g_iAttackTimerOffset)
+	If $iRemaining < 0 Then Return 0
+	Return $iRemaining
+
+EndFunc   ;==>AttackRemainingTime
+
+

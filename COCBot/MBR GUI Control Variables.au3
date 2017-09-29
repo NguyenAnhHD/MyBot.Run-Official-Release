@@ -264,6 +264,10 @@ Func InitializeControlVariables()
 	$oAlwaysEnabledControls($g_hBtnTestConfigApply) = 1
 	$oAlwaysEnabledControls($g_hBtnTestWeakBase) = 1
 
+	$oAlwaysEnabledControls($g_hBtnAndroidAdbShell) = 1
+	$oAlwaysEnabledControls($g_hBtnAndroidHome) = 1
+	$oAlwaysEnabledControls($g_hBtnAndroidBack) = 1
+
 	$oAlwaysEnabledControls($g_hBtnMakeScreenshot) = 1
 	$oAlwaysEnabledControls($g_hDivider) = 1
 

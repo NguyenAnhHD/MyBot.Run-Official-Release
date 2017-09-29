@@ -101,6 +101,19 @@ EndFunc   ;==>GetMEmuAdbPath
 
 Func GetMEmuBackgroundMode()
 	; Only OpenGL is supported up to version 3.1.2.5
+
+	; get OpenGL/DirectX config
+	Local $aRegExResult = StringRegExp($__VBoxGuestProperties, "Name: graphics_render_mode, value: (.+), timestamp:", $STR_REGEXPARRAYMATCH)
+	If @error = 0 Then
+		Local $graphics_render_mode = $aRegExResult[0]
+		Switch $graphics_render_mode
+			Case "1"
+				Return $g_iAndroidBackgroundModeDirectX
+			Case Else
+				Return $g_iAndroidBackgroundModeOpenGL
+		EndSwitch
+	EndIf
+
 	Return $g_iAndroidBackgroundModeOpenGL
 EndFunc   ;==>GetMEmuBackgroundMode
 

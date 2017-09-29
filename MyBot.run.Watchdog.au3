@@ -17,12 +17,8 @@
 #Au3Stripper_Parameters=/rsln
 #AutoIt3Wrapper_Change2CUI=y
 #pragma compile(Console, true)
-#pragma compile(Icon, "Images\MyBot.ico")
-#pragma compile(FileDescription, Clash of Clans Bot - A Free Clash of Clans bot - https://mybot.run)
+#include "MyBot.run.version.au3"
 #pragma compile(ProductName, My Bot Watchdog)
-#pragma compile(ProductVersion, 7.2.3)
-#pragma compile(FileVersion, 7.2.3)
-#pragma compile(LegalCopyright, © https://mybot.run)
 #pragma compile(Out, MyBot.run.Watchdog.exe) ; Required
 
 ; Enforce variable declarations
@@ -58,6 +54,7 @@ Global $iTimeoutCheckBot = 5000 ; Milliseconds bots are checked if restart requi
 Global $iTimeoutRestartBot = 120000 ; Milliseconds un-responsive bot is launched again
 Global $iTimeoutAutoClose = 60000 ; Milliseconds watchdog automatically closed when no bot available, -1 = disabled
 Global $hTimeoutAutoClose = 0 ; Timer Handle for $iTimeoutAutoClose
+Global $g_bBotLaunchOption_NoBotSlot = True
 
 Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)

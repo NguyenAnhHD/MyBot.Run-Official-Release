@@ -44,7 +44,7 @@ Func dropHeroes($x, $y, $KingSlot = -1, $QueenSlot = -1, $WardenSlot = -1) ;Drop
 		SetLog("Dropping King", $COLOR_INFO)
 		Click(GetXPosOfArmySlot($KingSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#0092") ;Select King 860x780
 		If _Sleep($DELAYDROPHEROES2) Then Return
-		Click($x, $y, 1, 0, "#0093")
+		AttackClick($x, $y, 1, 0, 0, "#0093")
 		If $g_bDropKing = False Then ; check global flag, only begin hero health check on 1st hero drop as flag is reset to false after activation
 			$g_bCheckKingPower = True
 		Else
@@ -60,7 +60,7 @@ Func dropHeroes($x, $y, $KingSlot = -1, $QueenSlot = -1, $WardenSlot = -1) ;Drop
 		SetLog("Dropping Queen", $COLOR_INFO)
 		Click(GetXPosOfArmySlot($QueenSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#0094") ;Select Queen 860x780
 		If _Sleep($DELAYDROPHEROES2) Then Return
-		Click($x, $y, 1, 0, "#0095")
+		AttackClick($x, $y, 1, 0, 0, "#0095")
 		If $g_bDropQueen = False Then ; check global flag, only begin hero health check on 1st hero drop as flag is reset to false after activation
 			$g_bCheckQueenPower = True
 		Else
@@ -76,7 +76,7 @@ Func dropHeroes($x, $y, $KingSlot = -1, $QueenSlot = -1, $WardenSlot = -1) ;Drop
 		SetLog("Dropping Grand Warden", $COLOR_INFO)
 		Click(GetXPosOfArmySlot($WardenSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#X998") ;Select Warden 860x780
 		If _Sleep($DELAYDROPHEROES2) Then Return
-		Click($x, $y, 1, 0, "#x999")
+		AttackClick($x, $y, 1, 0, 0, "#x999")
 		If $g_bDropWarden = False Then ; check global flag, only begin hero health check on 1st hero drop as flag is reset to false after activation
 			$g_bCheckWardenPower = True
 		Else

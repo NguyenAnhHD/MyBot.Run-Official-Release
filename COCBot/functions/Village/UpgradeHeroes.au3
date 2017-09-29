@@ -4,86 +4,92 @@
 ; Syntax ........:
 ; Parameters ....: None
 ; Return values .: None
-; Author ........: @z0mbie (2015)
-; Modified ......: Master1st (Set2015) - ProMac (Oct2015), MonkeyHunter (6-2016)
+; Author ........: z0mbie (2015)
+; Modified ......: Master1st (09-2015), ProMac (10-2015), MonkeyHunter (06-2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-
-
 Func UpgradeHeroes()
 
-	If $g_bUpgradeKingEnable = False And $g_bUpgradeQueenEnable = False And $g_bUpgradeWardenEnable = False Then Return
-	If _Sleep(500) Then Return
-	checkMainScreen(False)
-	If $g_bRestart = True Then Return
+	If Not $g_bUpgradeKingEnable And Not $g_bUpgradeQueenEnable And Not $g_bUpgradeWardenEnable Then Return
 
-	If $g_bUpgradeKingEnable = True Then
-		If isInsideDiamond($g_aiKingAltarPos) = False Then LocateKingAltar()
+	If _Sleep(500) Then Return
+
+	checkMainScreen(False)
+
+	If $g_bRestart Then Return
+
+	If $g_bUpgradeKingEnable Then
+		If Not isInsideDiamond($g_aiKingAltarPos) Then LocateKingAltar()
 		If $g_aiKingAltarPos[0] = -1 Or $g_aiKingAltarPos[1] = -1 Then LocateKingAltar()
 		SaveConfig()
 	EndIf
 
-	If $g_bUpgradeQueenEnable = True Then
-		If isInsideDiamond($g_aiQueenAltarPos) = False Then LocateQueenAltar()
+	If $g_bUpgradeQueenEnable Then
+		If Not isInsideDiamond($g_aiQueenAltarPos) Then LocateQueenAltar()
 		If $g_aiQueenAltarPos[0] = -1 Or $g_aiQueenAltarPos[1] = -1 Then LocateQueenAltar()
 		SaveConfig()
 	EndIf
 
-	If $g_bUpgradeWardenEnable = True Then
-		If isInsideDiamond($g_aiWardenAltarPos) = False Then LocateWardenAltar()
+	If $g_bUpgradeWardenEnable Then
+		If Not isInsideDiamond($g_aiWardenAltarPos) Then LocateWardenAltar()
 		If $g_aiWardenAltarPos[0] = -1 Or $g_aiWardenAltarPos[1] = -1 Then LocateWardenAltar()
 	EndIf
 
-	;##### Verify the Upgrade troop kind in Laboratory , if is a Dark Spell/Troop , the Lab haves priority #####;
-	If $g_bAutoLabUpgradeEnable = True And $g_iCmbLaboratory >= 19 Then
+	;Check if Auto Lab Upgrade is enabled and if a Dark Troop is selected for Upgrade. If yes, it has priority!
+	If $g_bAutoLabUpgradeEnable And $g_iCmbLaboratory >= 19 Then
 		Setlog("Laboratory needs DE to Upgrade :  " & $g_avLabTroops[$g_iCmbLaboratory][3])
 		SetLog("Skipping the Heroes Upgrade!")
 		Return
 	EndIf
 
 	SetLog("Upgrading Heroes", $COLOR_INFO)
-	;;;;;;;;;;;;;;;;;;;;;;;;##### Archer Queen #####;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;##### Verify Builders available #####;
-	If getBuilderCount() = False Then Return ; update builder data, return if problem
-	If _Sleep($DELAYRESPOND) Then Return
-	If $g_iFreeBuilderCount < 1 + ($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
-		SetLog("Not Enough Builders for Queen", $COLOR_ERROR)
-		Return
+
+	; ### Archer Queen ###
+	If $g_bUpgradeQueenEnable Then
+		If Not getBuilderCount() Then Return ; update builder data, return if problem
+		If _Sleep($DELAYRESPOND) Then Return
+		If $g_iFreeBuilderCount < 1 + ($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
+			SetLog("Not enough Builders available to upgrade the Archer Queen", $COLOR_ERROR)
+			Return
+		EndIf
+		QueenUpgrade()
+
+		If _Sleep($DELAYUPGRADEHERO1) Then Return
 	EndIf
-	;#### upgrade queen ####;
-	QueenUpgrade()
-	If _Sleep($DELAYUPGRADEHERO1) Then Return
-	;;;;;;;;;;;;;;;;;;;;;;;;##### Barbarian King #####;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;##### Verify Builders available #####;
-	If getBuilderCount() = False Then Return ; update builder data, return if problem
-	If _Sleep($DELAYRESPOND) Then Return
-	If $g_iFreeBuilderCount < 1 + ($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
-		SetLog("Not Enough Builders for King", $COLOR_ERROR)
-		Return
+
+	; ### Barbarian King ###
+	If $g_bUpgradeKingEnable Then
+		If Not getBuilderCount() Then Return ; update builder data, return if problem
+		If _Sleep($DELAYRESPOND) Then Return
+		If $g_iFreeBuilderCount < 1 + ($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
+			SetLog("Not enough Builders available to upgrade the Barbarian King", $COLOR_ERROR)
+			Return
+		EndIf
+		KingUpgrade()
+
+		If _Sleep($DELAYUPGRADEHERO1) Then Return
 	EndIf
-	;##### Upgrade King #####;
-	KingUpgrade()
-	If _Sleep($DELAYUPGRADEHERO1) Then Return
-	;;;;;;;;;;;;;;;;;;;;;;;;##### Grand Warden #####;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;##### Verify Builders available
-	If getBuilderCount() = False Then Return ; update builder data, return if problem
-	If _Sleep($DELAYRESPOND) Then Return
-	If $g_iFreeBuilderCount < 1 + ($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
-		SetLog("Not Enough Builder for Warden", $COLOR_ERROR)
-		Return
+
+	; ### Grand Warden ###
+	If $g_bUpgradeWardenEnable Then
+		If Not getBuilderCount() Then Return ; update builder data, return if problem
+		If _Sleep($DELAYRESPOND) Then Return
+		If $g_iFreeBuilderCount < 1 + ($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
+			SetLog("Not enough Builders available to upgrade the Grand Warden", $COLOR_ERROR)
+			Return
+		EndIf
+		WardenUpgrade()
 	EndIf
-	;##### Upg Warden
-	WardenUpgrade()
 
 EndFunc   ;==>UpgradeHeroes
 
 Func QueenUpgrade()
 
-	If $g_bUpgradeQueenEnable = False Then Return
+	If Not $g_bUpgradeQueenEnable Then Return
 	Local $aHeroLevel = 0
 
 	SetLog("Upgrade Queen")
@@ -108,15 +114,15 @@ Func QueenUpgrade()
 
 	If $sInfo[0] > 1 Or $sInfo[0] = "" Then
 		If StringInStr($sInfo[1], "Quee") = 0 Then
-			SetLog("Bad AQ location", $COLOR_ACTION)
+			SetLog("Bad Archer Queen location", $COLOR_ACTION)
 			Return
 		Else
 			If $sInfo[2] <> "" Then
 				$aHeroLevel = Number($sInfo[2]) ; grab hero level from building info array
-				SetLog("Your Queen Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
+				SetLog("Your Archer Queen level read as: " & $aHeroLevel, $COLOR_SUCCESS)
 				If $aHeroLevel = $g_iMaxQueenLevel Then ; max hero
-					SetLog("Your AQ is max, cannot upgrade!", $COLOR_INFO)
-					$g_bUpgradeQueenEnable = False ; turn Off the Queen�s upgrade
+					SetLog("Your Archer Queen is at max level, cannot upgrade anymore!", $COLOR_INFO)
+					$g_bUpgradeQueenEnable = False ; turn Off the Queens upgrade
 					Return
 				EndIf
 			Else
@@ -188,7 +194,7 @@ EndFunc   ;==>QueenUpgrade
 
 Func KingUpgrade()
 	;upgradeking
-	If $g_bUpgradeKingEnable = False Then Return
+	If Not $g_bUpgradeKingEnable Then Return
 	Local $aHeroLevel = 0
 
 	SetLog("Upgrade King")
@@ -211,19 +217,19 @@ Func KingUpgrade()
 
 	If $sInfo[0] > 1 Or $sInfo[0] = "" Then
 		If StringInStr($sInfo[1], "Barbarian") = 0 Then
-			SetLog("Bad King location", $COLOR_ACTION)
+			SetLog("Bad Barbarian King location", $COLOR_ACTION)
 			Return
 		Else
 			If $sInfo[2] <> "" Then
 				$aHeroLevel = Number($sInfo[2]) ; grab hero level from building info array
 				SetLog("Your King Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
 				If $aHeroLevel = $g_iMaxKingLevel Then ; max hero
-					SetLog("Your BK is max, cannot upgrade!", $COLOR_INFO)
+					SetLog("Your Babarian King is at max level, cannot upgrade anymore!", $COLOR_INFO)
 					$g_bUpgradeKingEnable = False ; Turn Off the King's Upgrade
 					Return
 				EndIf
 			Else
-				SetLog("Your King Level was not found!", $COLOR_INFO)
+				SetLog("Your Barbarian King Level was not found!", $COLOR_INFO)
 				Return
 			EndIf
 		EndIf
@@ -292,7 +298,7 @@ EndFunc   ;==>KingUpgrade
 
 Func WardenUpgrade()
 
-	If $g_bUpgradeWardenEnable = False Then Return
+	If Not $g_bUpgradeWardenEnable Then Return
 
 	If Number($g_iTownHallLevel) <= 10 Then
 		Setlog("Must have TH 11 for Grand Warden upgrade", $COLOR_ERROR)
@@ -326,14 +332,14 @@ Func WardenUpgrade()
 		Else
 			If $sInfo[2] <> "" Then
 				$aHeroLevel = Number($sInfo[2]) ; grab hero level from building info array
-				SetLog("Your Warden Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
+				SetLog("Your Grand Warden Warden Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
 				If $aHeroLevel = $g_iMaxWardenLevel Then ; max hero
-					SetLog("Your Warden is max, cannot upgrade!", $COLOR_INFO)
+					SetLog("Your Grand Warden is at max level, cannot upgrade anymore!", $COLOR_INFO)
 					$g_bUpgradeWardenEnable = False ; turn OFF the Wardn's Upgrade
 					Return
 				EndIf
 			Else
-				SetLog("Your Warden Level was not found!", $COLOR_INFO)
+				SetLog("Your Grand Warden Level was not found!", $COLOR_INFO)
 				Return
 			EndIf
 		EndIf

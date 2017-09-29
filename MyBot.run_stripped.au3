@@ -1,13 +1,8 @@
 ﻿#RequireAdmin
-#pragma compile(Icon, "Images\MyBot.ico")
-#pragma compile(FileDescription, Clash of Clans Bot - A Free Clash of Clans bot - https://mybot.run)
 #pragma compile(ProductName, My Bot)
-#pragma compile(ProductVersion, 7.2.5)
-#pragma compile(FileVersion, 7.2.5)
-#pragma compile(LegalCopyright, © https://mybot.run)
 #pragma compile(Out, MyBot.run.exe) ; Required
+Global $g_sBotVersion = "v7.2.6"
 Opt("MustDeclareVars", 1)
-Global $g_sBotVersion = "v7.2.5"
 Global $g_sBotTitle = ""
 Global $g_hFrmBot = 0
 Global Const $WAIT_TIMEOUT = 258
@@ -5600,8 +5595,10 @@ Global $g_iAndroidAdbScreencapHeight = 0
 Global $g_iAndroidAdbClickGroup = 10
 Global Const $g_iAndroidAdbClickGroupDelay = 50
 Global $g_bAndroidAdbKeepClicksActive = False
-Global $g_aiAndroidTimeLag[4] = [0, 0, 0, 0]
+Global $g_aiAndroidTimeLag[6] = [0, 0, 0, 0, 0, 0]
 Global Const $g_iAndroidTimeLagThreshold = 5
+Global Const $g_iAndroidTimeLagRebootThreshold = 2
+Global Const $g_iAndroidTimeLagResetProblemCountMinutes = 5
 Global Const $g_iAndroidRebootPageErrorCount = 5
 Global Const $g_iAndroidRebootPageErrorPerMinutes = 10
 Global $g_hProcShieldInput[5] = [0, 0, False, False, 0]
@@ -5680,7 +5677,7 @@ Global Const $g_sLibIconPath = $g_sLibPath & "\MBRBOT.dll"
 Global Const $g_sTHSnipeAttacksPath = @ScriptDir & "\CSV\THSnipe"
 Global Const $g_sCSVAttacksPath = @ScriptDir & "\CSV\Attack"
 Global $g_iRedrawBotWindowMode = 2
-Global Enum $eIcnArcher = 1, $eIcnDonArcher, $eIcnBalloon, $eIcnDonBalloon, $eIcnBarbarian, $eIcnDonBarbarian, $eBtnTest, $eIcnBuilder, $eIcnCC, $eIcnGUI, $eIcnDark, $eIcnDragon, $eIcnDonDragon, $eIcnDrill, $eIcnElixir, $eIcnCollector, $eIcnFreezeSpell, $eIcnGem, $eIcnGiant, $eIcnDonGiant, $eIcnTrap, $eIcnGoblin, $eIcnDonGoblin, $eIcnGold, $eIcnGolem, $eIcnDonGolem, $eIcnHealer, $eIcnDonHealer, $eIcnHogRider, $eIcnDonHogRider, $eIcnHealSpell, $eIcnInferno, $eIcnJumpSpell, $eIcnLavaHound, $eIcnDonLavaHound, $eIcnLightSpell, $eIcnMinion, $eIcnDonMinion, $eIcnPekka, $eIcnDonPekka, $eIcnTreasury, $eIcnRageSpell, $eIcnTroops, $eIcnHourGlass, $eIcnTH1, $eIcnTH10, $eIcnTrophy, $eIcnValkyrie, $eIcnDonValkyrie, $eIcnWall, $eIcnWallBreaker, $eIcnDonWallBreaker, $eIcnWitch, $eIcnDonWitch, $eIcnWizard, $eIcnDonWizard, $eIcnXbow, $eIcnBarrackBoost, $eIcnMine, $eIcnCamp, $eIcnBarrack, $eIcnSpellFactory, $eIcnDonBlacklist, $eIcnSpellFactoryBoost, $eIcnMortar, $eIcnWizTower, $eIcnPayPal, $eIcnNotify, $eIcnGreenLight, $eIcnLaboratory, $eIcnRedLight, $eIcnBlank, $eIcnYellowLight, $eIcnDonCustom, $eIcnTombstone, $eIcnSilverStar, $eIcnGoldStar, $eIcnDarkBarrack, $eIcnCollectorLocate, $eIcnDrillLocate, $eIcnMineLocate, $eIcnBarrackLocate, $eIcnDarkBarrackLocate, $eIcnDarkSpellFactoryLocate, $eIcnDarkSpellFactory, $eIcnEarthQuakeSpell, $eIcnHasteSpell, $eIcnPoisonSpell, $eIcnBldgTarget, $eIcnBldgX, $eIcnRecycle, $eIcnHeroes, $eIcnBldgElixir, $eIcnBldgGold, $eIcnMagnifier, $eIcnWallElixir, $eIcnWallGold, $eIcnKing, $eIcnQueen, $eIcnDarkSpellBoost, $eIcnQueenBoostLocate, $eIcnKingBoostLocate, $eIcnKingUpgr, $eIcnQueenUpgr, $eIcnWardenUpgr, $eIcnWarden, $eIcnWardenBoostLocate, $eIcnKingBoost, $eIcnQueenBoost, $eIcnWardenBoost, $eEmpty3, $eIcnReload, $eIcnCopy, $eIcnAddcvs, $eIcnEdit, $eIcnTreeSnow, $eIcnSleepingQueen, $eIcnSleepingKing, $eIcnGoldElixir, $eIcnBowler, $eIcnDonBowler, $eIcnCCDonate, $eIcnEagleArt, $eIcnGembox, $eIcnInferno4, $eIcnInfo, $eIcnMain, $eIcnTree, $eIcnProfile, $eIcnCCRequest, $eIcnTelegram, $eIcnTiles, $eIcnXbow3, $eIcnBark, $eIcnDailyProgram, $eIcnLootCart, $eIcnSleepMode, $eIcnTH11, $eIcnTrainMode, $eIcnSleepingWarden, $eIcnCloneSpell, $eIcnSkeletonSpell, $eIcnBabyDragon, $eIcnDonBabyDragon, $eIcnMiner, $eIcnDonMiner, $eIcnNoShield, $eIcnDonCustomB, $eIcnAirdefense, $eIcnDarkBarrackBoost, $eIcnDarkElixirStorage, $eIcnSpellsCost, $eIcnTroopsCost, $eIcnResetButton, $eIcnNewSmartZap, $eIcnTrain, $eIcnAttack, $eIcnDelay, $eIcnReOrder, $eIcn2Arrow, $eIcnArrowLeft, $eIcnArrowRight, $eIcnAndroid, $eHdV04, $eHdV05, $eHdV06, $eHdV07, $eHdV08, $eHdV09, $eHdV10, $eHdV11, $eUnranked, $eBronze, $eSilver, $eGold, $eCrystal, $eMaster, $eChampion, $eTitan, $eLegend, $eWall04, $eWall05, $eWall06, $eWall07, $eWall08, $eWall09, $eWall10, $eWall11, $eIcnPBNotify, $eIcnCCTroops, $eIcnCCSpells, $eIcnSpellsGroup, $eBahasaIND, $eChinese_S, $eChinese_T, $eEnglish, $eFrench, $eGerman, $eItalian, $ePersian, $eRussian, $eSpanish, $eTurkish, $eMissingLangIcon, $eWall12, $ePortuguese, $eIcnDonPoisonSpell, $eIcnDonEarthQuakeSpell, $eIcnDonHasteSpell, $eIcnDonSkeletonSpell, $eVietnamese, $eKorean, $eAzerbaijani, $eArabic, $eIcnElixirCollectorL5, $eIcnClockTower, $eIcnBuilderHall, $eIcnGoldMineL5, $eIcnGemMine
+Global Enum $eIcnArcher = 1, $eIcnDonArcher, $eIcnBalloon, $eIcnDonBalloon, $eIcnBarbarian, $eIcnDonBarbarian, $eBtnTest, $eIcnBuilder, $eIcnCC, $eIcnGUI, $eIcnDark, $eIcnDragon, $eIcnDonDragon, $eIcnDrill, $eIcnElixir, $eIcnCollector, $eIcnFreezeSpell, $eIcnGem, $eIcnGiant, $eIcnDonGiant, $eIcnTrap, $eIcnGoblin, $eIcnDonGoblin, $eIcnGold, $eIcnGolem, $eIcnDonGolem, $eIcnHealer, $eIcnDonHealer, $eIcnHogRider, $eIcnDonHogRider, $eIcnHealSpell, $eIcnInferno, $eIcnJumpSpell, $eIcnLavaHound, $eIcnDonLavaHound, $eIcnLightSpell, $eIcnMinion, $eIcnDonMinion, $eIcnPekka, $eIcnDonPekka, $eIcnTreasury, $eIcnRageSpell, $eIcnTroops, $eIcnHourGlass, $eIcnTH1, $eIcnTH10, $eIcnTrophy, $eIcnValkyrie, $eIcnDonValkyrie, $eIcnWall, $eIcnWallBreaker, $eIcnDonWallBreaker, $eIcnWitch, $eIcnDonWitch, $eIcnWizard, $eIcnDonWizard, $eIcnXbow, $eIcnBarrackBoost, $eIcnMine, $eIcnCamp, $eIcnBarrack, $eIcnSpellFactory, $eIcnDonBlacklist, $eIcnSpellFactoryBoost, $eIcnMortar, $eIcnWizTower, $eIcnPayPal, $eIcnNotify, $eIcnGreenLight, $eIcnLaboratory, $eIcnRedLight, $eIcnBlank, $eIcnYellowLight, $eIcnDonCustom, $eIcnTombstone, $eIcnSilverStar, $eIcnGoldStar, $eIcnDarkBarrack, $eIcnCollectorLocate, $eIcnDrillLocate, $eIcnMineLocate, $eIcnBarrackLocate, $eIcnDarkBarrackLocate, $eIcnDarkSpellFactoryLocate, $eIcnDarkSpellFactory, $eIcnEarthQuakeSpell, $eIcnHasteSpell, $eIcnPoisonSpell, $eIcnBldgTarget, $eIcnBldgX, $eIcnRecycle, $eIcnHeroes, $eIcnBldgElixir, $eIcnBldgGold, $eIcnMagnifier, $eIcnWallElixir, $eIcnWallGold, $eIcnKing, $eIcnQueen, $eIcnDarkSpellBoost, $eIcnQueenBoostLocate, $eIcnKingBoostLocate, $eIcnKingUpgr, $eIcnQueenUpgr, $eIcnWardenUpgr, $eIcnWarden, $eIcnWardenBoostLocate, $eIcnKingBoost, $eIcnQueenBoost, $eIcnWardenBoost, $eEmpty3, $eIcnReload, $eIcnCopy, $eIcnAddcvs, $eIcnEdit, $eIcnTreeSnow, $eIcnSleepingQueen, $eIcnSleepingKing, $eIcnGoldElixir, $eIcnBowler, $eIcnDonBowler, $eIcnCCDonate, $eIcnEagleArt, $eIcnGembox, $eIcnInferno4, $eIcnInfo, $eIcnMain, $eIcnTree, $eIcnProfile, $eIcnCCRequest, $eIcnTelegram, $eIcnTiles, $eIcnXbow3, $eIcnBark, $eIcnDailyProgram, $eIcnLootCart, $eIcnSleepMode, $eIcnTH11, $eIcnTrainMode, $eIcnSleepingWarden, $eIcnCloneSpell, $eIcnSkeletonSpell, $eIcnBabyDragon, $eIcnDonBabyDragon, $eIcnMiner, $eIcnDonMiner, $eIcnNoShield, $eIcnDonCustomB, $eIcnAirdefense, $eIcnDarkBarrackBoost, $eIcnDarkElixirStorage, $eIcnSpellsCost, $eIcnTroopsCost, $eIcnResetButton, $eIcnNewSmartZap, $eIcnTrain, $eIcnAttack, $eIcnDelay, $eIcnReOrder, $eIcn2Arrow, $eIcnArrowLeft, $eIcnArrowRight, $eIcnAndroid, $eHdV04, $eHdV05, $eHdV06, $eHdV07, $eHdV08, $eHdV09, $eHdV10, $eHdV11, $eUnranked, $eBronze, $eSilver, $eGold, $eCrystal, $eMaster, $eChampion, $eTitan, $eLegend, $eWall04, $eWall05, $eWall06, $eWall07, $eWall08, $eWall09, $eWall10, $eWall11, $eIcnPBNotify, $eIcnCCTroops, $eIcnCCSpells, $eIcnSpellsGroup, $eBahasaIND, $eChinese_S, $eChinese_T, $eEnglish, $eFrench, $eGerman, $eItalian, $ePersian, $eRussian, $eSpanish, $eTurkish, $eMissingLangIcon, $eWall12, $ePortuguese, $eIcnDonPoisonSpell, $eIcnDonEarthQuakeSpell, $eIcnDonHasteSpell, $eIcnDonSkeletonSpell, $eVietnamese, $eKorean, $eAzerbaijani, $eArabic, $eIcnBuilderHall, $eIcnClockTower, $eIcnElixirCollectorL5, $eIcnGemMine, $eIcnGoldMineL5
 Global $eIcnDonBlank = $eIcnDonBlacklist
 Global $eIcnOptions = $eIcnDonBlacklist
 Global $eIcnAchievements = $eIcnMain
@@ -5709,6 +5706,8 @@ Global $g_bGForcePBTUpdate = False
 Global $g_bQuicklyFirstStart = True
 Global $g_bQuickAttack = False
 Global $g_sTimeBeforeTrain = ""
+Global $g_hAttackTimer = 0
+Global $g_iAttackTimerOffset = Default
 Global Const $REDLINE_IMGLOC_RAW = 0
 Global Const $REDLINE_IMGLOC = 1
 Global Const $REDLINE_ORIGINAL = 2
@@ -6556,7 +6555,7 @@ Global $aAttackButton[2] = [60, 614 + $g_iBottomOffsetY]
 Global $aFindMatchButton[4] = [195, 480 + $g_iBottomOffsetY, 0xFFBF43, 10]
 Global $aFindMatchButton2[4] = [195, 480 + $g_iBottomOffsetY, 0xE75D0D, 10]
 Global $aIsAttackShield[4] = [250, 415 + $g_iMidOffsetY, 0xE8E8E0, 10]
-Global $aAway[2] = [1, 40]
+Global $aAway[2] = [0, 10]
 Global $aNoShield[4] = [448, 20, 0x43484B, 15]
 Global $aHaveShield[4] = [455, 19, 0xF0F8FB, 15]
 Global $aHavePerGuard[4] = [455, 19, 0x10100D, 15]
@@ -6634,7 +6633,7 @@ Global Const $aAttackLogPage[4] = [775, 125, 0xEB1115, 40]
 Global Const $aAttackLogAttackTab[4] = [437, 114, 0xF0F4F0, 30]
 Global Const $aBlueShareReplayButton[4] = [500, 156 + $g_iMidOffsetY, 0x70D4E8, 30]
 Global Const $aGrayShareReplayButton[4] = [500, 156 + $g_iMidOffsetY, 0xBBBBBB, 30]
-Global Const $ProfileRep01[4] = [600, 260, 0x71769F, 20]
+Global Const $aProfileReport[4] = [619, 344, 0x4E4D79, 20]
 Global $aArmyTrainButtonRND[4] = [20, 540 + $g_iMidOffsetY, 55, 570 + $g_iMidOffsetY]
 Global $aAttackButtonRND[4] = [20, 610 + $g_iMidOffsetY, 100, 670 + $g_iMidOffsetY]
 Global $aFindMatchButtonRND[4] = [200, 510 + $g_iMidOffsetY, 300, 530 + $g_iMidOffsetY]
@@ -7395,6 +7394,9 @@ Global $g_bWinGetAndroidHandleActive = False
 Global $g_bAndroidSuspended = False
 Global $g_bAndroidQueueReboot = False
 Global $g_iAndroidSuspendedTimer = 0
+Global $g_iSuspendAndroidTime = 0
+Global $g_hSuspendAndroidTimer = 0
+Global $g_aiMouseOffset = [0, 0]
 Func InitAndroidConfig($bRestart = False)
 If $bRestart = False Then
 $g_sAndroidEmulator = $g_avAndroidAppConfig[$g_iAndroidConfig][0]
@@ -9114,6 +9116,10 @@ AndroidAdbSendShellCommandScript($scriptFile, $variablesArray, Default, $timeout
 Return SetError(@error, @extended,(@error = 0 ? 1 : 0))
 EndFunc
 Func AndroidClickDrag($x1, $y1, $x2, $y2, $wasRunState = $g_bRunState)
+$x1 = Int($x1) + $g_aiMouseOffset[0]
+$y1 = Int($y1) + $g_aiMouseOffset[1]
+$x2 = Int($x2) + $g_aiMouseOffset[0]
+$y2 = Int($y2) + $g_aiMouseOffset[1]
 Execute($g_sAndroidEmulator & "AdjustClickCoordinates($x1,$y1)")
 Execute($g_sAndroidEmulator & "AdjustClickCoordinates($x2,$y2)")
 Local $swipe_coord[4][2] = [["{$x1}", $x1], ["{$y1}", $y1], ["{$x2}", $x2], ["{$y2}", $y2]]
@@ -9137,7 +9143,7 @@ Return False
 EndIf
 If $g_aiAndroidAdbClicks[0] > 0 And $g_bRunState = True Then
 If $g_aiAndroidAdbClicks[0] >= $minClicksToRelease Then
-AndroidClick(-1, -1, $g_aiAndroidAdbClicks[0], 0)
+AndroidClick(Default, Default, $g_aiAndroidAdbClicks[0], 0)
 Else
 Return False
 EndIf
@@ -9150,6 +9156,8 @@ Func AndroidAdbClickSupported()
 Return BitAND($g_iAndroidSupportFeature, 4) = 4
 EndFunc
 Func AndroidClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = True)
+If Not($x = Default) Then $x = Int($x) + $g_aiMouseOffset[0]
+If Not($x = Default) Then $y = Int($y) + $g_aiMouseOffset[1]
 ForceCaptureRegion()
 AndroidFastClick($x, $y, $times, $speed, $checkProblemAffect)
 EndFunc
@@ -9209,7 +9217,7 @@ Local $hDuration = __TimerInit()
 If $times < 1 Then Return SetError(0, 0)
 Local $i = 0, $j = 0
 Local $Click = [$x, $y, "down-up"]
-Local $ReleaseClicks =($x = -1 And $y = -1 And $g_aiAndroidAdbClicks[0] > 0)
+Local $ReleaseClicks =($x = Default And $y = Default And $g_aiAndroidAdbClicks[0] > 0)
 If $ReleaseClicks = False And $g_aiAndroidAdbClicks[0] > -1 Then
 Local $pos = $g_aiAndroidAdbClicks[0]
 $g_aiAndroidAdbClicks[0] = $pos + $times
@@ -9483,6 +9491,25 @@ $g_bAndroidAdbInput = False
 Return SetError($error, 0)
 EndIf
 EndFunc
+Func SuspendAndroidTime($Action = False)
+If IsBool($Action) And $Action = True Then
+Local $iTime = $g_iSuspendAndroidTime
+$g_iSuspendAndroidTime = 0
+$g_hSuspendAndroidTimer = 0
+Return $iTime
+ElseIf $Action = False Then
+Return $g_iSuspendAndroidTime
+EndIf
+If $g_hSuspendAndroidTimer = 0 Then
+Else
+$g_iSuspendAndroidTime += _HPTimerDiff($g_hSuspendAndroidTimer)
+$g_hSuspendAndroidTimer = 0
+EndIf
+If IsString($Action) And $Action = "Start" Then
+$g_hSuspendAndroidTimer = _HPTimerInit()
+EndIf
+Return $g_iSuspendAndroidTime
+EndFunc
 Func SuspendAndroid($SuspendMode = True, $bDebugLog = Default, $bForceSuspendAndroid = False)
 If $bDebugLog = Default Then $bDebugLog = $g_iDebugSetlog > 0
 If($g_bAndroidSuspendedEnabled = False Or $g_iAndroidSuspendModeFlags = 0 Or $g_bMainWindowOk = False) And $bForceSuspendAndroid = False Then Return False
@@ -9491,22 +9518,32 @@ If $g_bAndroidSuspended = True Then Return True
 Local $bSuspendProcess = BitAND($g_iAndroidSuspendModeFlags, 4) = 0
 If $bSuspendProcess = True Then
 If $g_iAndroidCoCPid = 0 Then $g_iAndroidCoCPid = GetAndroidProcessPID(Default, False)
-If $g_iAndroidCoCPid = 0 Then Return False
+If $g_iAndroidCoCPid = 0 Then
+SuspendAndroidTime(True)
+Return False
+EndIf
 Local $s = AndroidAdbSendShellCommand("kill -STOP " & $g_iAndroidCoCPid)
 If StringInStr($s, "No such process") > 0 Then
 $g_iAndroidCoCPid = GetAndroidProcessPID(Default, False)
-If $g_iAndroidCoCPid = 0 Then Return False
+If $g_iAndroidCoCPid = 0 Then
+SuspendAndroidTime(True)
+Return False
+EndIf
 $s = AndroidAdbSendShellCommand("kill -STOP " & $g_iAndroidCoCPid)
 EndIf
 $g_bAndroidSuspended = True
 Else
 Local $pid = GetAndroidSvcPid()
 If $pid = -1 Or $pid = 0 Then $pid = GetAndroidPid()
-If $pid = -1 Or $pid = 0 Then Return False
+If $pid = -1 Or $pid = 0 Then
+SuspendAndroidTime(True)
+Return False
+EndIf
 $g_bAndroidSuspended = True
 _ProcessSuspendResume($pid, True)
 $g_iAndroidSuspendedTimer = __TimerInit()
 EndIf
+SuspendAndroidTime("Start")
 If $bDebugLog = True Then SetDebugLog("Android Suspended")
 Return False
 EndFunc
@@ -9515,21 +9552,31 @@ If $bDebugLog = Default Then $bDebugLog = $g_iDebugSetlog > 0
 If($g_bAndroidSuspendedEnabled = False Or $g_iAndroidSuspendModeFlags = 0) And $bForceSuspendAndroid = False Then Return False
 If $g_bAndroidSuspended = False Then Return False
 Local $bSuspendProcess = BitAND($g_iAndroidSuspendModeFlags, 4) = 0
+SuspendAndroidTime("Stop")
 If $bSuspendProcess = True Then
 $g_bAndroidSuspended = False
 If $g_iAndroidCoCPid = 0 Then $g_iAndroidCoCPid = GetAndroidProcessPID(Default, False)
-If $g_iAndroidCoCPid = 0 Then Return False
+If $g_iAndroidCoCPid = 0 Then
+SuspendAndroidTime(True)
+Return False
+EndIf
 Local $s = AndroidAdbSendShellCommand("kill -CONT " & $g_iAndroidCoCPid)
 If StringInStr($s, "No such process") > 0 Then
 $g_iAndroidCoCPid = GetAndroidProcessPID(Default, False)
-If $g_iAndroidCoCPid = 0 Then Return False
+If $g_iAndroidCoCPid = 0 Then
+SuspendAndroidTime(True)
+Return False
+EndIf
 $s = AndroidAdbSendShellCommand("kill -CONT " & $g_iAndroidCoCPid)
 EndIf
 If $bDebugLog = True Then SetDebugLog("Android Resumed")
 Else
 Local $pid = GetAndroidSvcPid()
 If $pid = -1 Or $pid = 0 Then $pid = GetAndroidPid()
-If $pid = -1 Or $pid = 0 Then Return False
+If $pid = -1 Or $pid = 0 Then
+SuspendAndroidTime(True)
+Return False
+EndIf
 $g_bAndroidSuspended = False
 _ProcessSuspendResume($pid, False)
 $g_aiAndroidTimeLag[3] += __TimerDiff($g_iAndroidSuspendedTimer)
@@ -9601,8 +9648,8 @@ Return True
 EndIf
 Return False
 EndFunc
-Func checkAndroidReboot($bRebootAndroid = True)
-If checkAndroidTimeLag($bRebootAndroid) = True Or checkAndroidPageError($bRebootAndroid) = True Then
+Func CheckAndroidReboot($bRebootAndroid = True)
+If CheckAndroidTimeLag($bRebootAndroid) = True Or CheckAndroidPageError($bRebootAndroid) = True Then
 Local $_NoFocusTampering = $g_bNoFocusTampering
 $g_bNoFocusTampering = True
 RebootAndroid()
@@ -16799,7 +16846,7 @@ _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "C
 GUICtrlSetState(-1, $GUI_UNCHECKED)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
-Global $g_hCmbCOCDistributors = 0, $g_hCmbAndroidBackgroundMode = 0, $g_hCmbSuspendAndroid = 0, $g_hChkAndroidAdbClickDragScript = 0
+Global $g_hCmbCOCDistributors = 0, $g_hCmbAndroidBackgroundMode = 0, $g_hCmbSuspendAndroid = 0, $g_hChkAndroidAdbClickDragScript = 0, $g_hBtnAndroidAdbShell = 0, $g_hBtnAndroidHome = 0, $g_hBtnAndroidBack = 0
 Func CreateBotAndroid()
 Local $x = 25, $y = 45, $y2, $w = 210, $h = 50
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR Distributors", "Group_01", "Distributors"), $x - 20, $y - 20, $w, $h)
@@ -16844,12 +16891,12 @@ $w = 240
 $h = 80
 GUICtrlCreateGroup(GetTranslatedFileIni("Android Control", "Group_03", "Android Control"), $x - 20, $y - 20, $w, $h)
 $y -= 2
-GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "BtnAndroidAdbShell", "Start ADB Shell in new Console Window"), $x - 8, $y, 220, 25)
+$g_hBtnAndroidAdbShell = GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "BtnAndroidAdbShell", "Start ADB Shell in new Console Window"), $x - 8, $y, 220, 25)
 GUICtrlSetOnEvent(-1, "OpenAdbShell")
 $y += 30
-GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "BtnAndroidHome", "Send Home"), $x - 8, $y, 105, 25)
+$g_hBtnAndroidHome = GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "BtnAndroidHome", "Send Home"), $x - 8, $y, 105, 25)
 GUICtrlSetOnEvent(-1, "AndroidHomeButton")
-GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "BtnAndroidBack", "Send Back"), $x - 8 + 115, $y, 105, 25)
+$g_hBtnAndroidBack = GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "BtnAndroidBack", "Send Back"), $x - 8 + 115, $y, 105, 25)
 GUICtrlSetOnEvent(-1, "AndroidBackButton")
 $x = 25 + 240 + 10 + 30
 $y = $y2
@@ -16869,7 +16916,7 @@ Global $g_hChkdebugAttackCSV = 0, $g_hChkMakeIMGCSV = 0, $g_hChkDebugDisableZoom
 Global $g_hBtnTestTrain = 0, $g_hBtnTestDonateCC = 0, $g_hBtnTestRequestCC = 0, $g_hBtnTestSendText = 0, $g_hBtnTestAttackBar = 0, $g_hBtnTestClickDrag = 0, $g_hBtnTestImage = 0
 Global $g_hBtnTestVillageSize = 0, $g_hBtnTestDeadBase = 0, $g_hBtnTestTHimgloc = 0, $g_hBtnTestTrainsimgloc = 0, $g_hBtnTestQuickTrainsimgloc = 0, $g_hTxtTestFindButton = 0
 Global $g_hBtnTestFindButton = 0, $g_hBtnTestDeadBaseFolder = 0, $g_hBtnTestCleanYard = 0, $g_hBtnTestAttackCSV = 0, $g_hBtnTestimglocTroopBar = 0, $g_hBtnTestBuildingLocation = 0
-Global $g_hBtnTestConfigSave = 0, $g_hBtnTestConfigApply = 0, $g_hBtnTestConfigRead = 0, $g_hBtnTestOcrMemory = 0, $g_hBtnTestWeakBase = 0
+Global $g_hBtnTestConfigSave = 0, $g_hBtnTestConfigApply = 0, $g_hBtnTestConfigRead = 0, $g_hBtnTestOcrMemory = 0, $g_hBtnTestWeakBase = 0, $g_hBtnTestClickAway = 0
 Func CreateBotDebug()
 Local $x = 25, $y = 45
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Bot - Debug", "Group_01", "Debug"), $x - 20, $y - 20, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2)
@@ -16982,6 +17029,8 @@ $y -= $yNext
 $g_hBtnTestSendText = GUICtrlCreateButton("Send Text", $x + 20, $y, 120, 25)
 $y -= $yNext
 $g_hBtnTestWeakBase = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Child Bot - Debug", "TestWeakBase", "Test Weak Base"), $x + 20, $y, 120, 25)
+$y -= $yNext
+$g_hBtnTestClickAway = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Child Bot - Debug", "TestClickAway", "Test Click Away"), $x + 20, $y, 120, 25)
 $y -= $yNext
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
@@ -18774,6 +18823,9 @@ $oAlwaysEnabledControls($g_hBtnTestConfigSave) = 1
 $oAlwaysEnabledControls($g_hBtnTestConfigRead) = 1
 $oAlwaysEnabledControls($g_hBtnTestConfigApply) = 1
 $oAlwaysEnabledControls($g_hBtnTestWeakBase) = 1
+$oAlwaysEnabledControls($g_hBtnAndroidAdbShell) = 1
+$oAlwaysEnabledControls($g_hBtnAndroidHome) = 1
+$oAlwaysEnabledControls($g_hBtnAndroidBack) = 1
 $oAlwaysEnabledControls($g_hBtnMakeScreenshot) = 1
 $oAlwaysEnabledControls($g_hDivider) = 1
 $oAlwaysEnabledControls($g_hTabMain) = 1
@@ -22883,9 +22935,11 @@ Local $currentRunState = $g_bRunState
 $g_bRunState = True
 _CaptureRegion()
 _CaptureRegion2Sync()
-SetLog("Testing GetVillageSize()", $COLOR_INFO)
+Local $a[2][2] = [["stone", "tree"], ["2stone", "2tree"]]
+For $i = 0 To 1
+SetLog("Testing GetVillageSize(True, """ & $a[$i][0] & """, """ & $a[$i][1] & """)", $COLOR_INFO)
 Local $hTimer = __TimerInit()
-Local $village = GetVillageSize(True)
+Local $village = GetVillageSize(True, $a[$i][0], $a[$i][1])
 Local $ms = __TimerDiff($hTimer)
 If $village = 0 Then
 SetLog("Village not found (" & Round($ms, 0) & " ms.)", $COLOR_WARNING)
@@ -22898,6 +22952,7 @@ SetLog("Village offset y: " & $village[3])
 SetLog("Village stone " & $village[6] & ": " & $village[4] & ", " & $village[5])
 SetLog("Village tree " & $village[9] & ": " & $village[7] & ", " & $village[8])
 EndIf
+Next
 EndImageTest()
 $g_bRunState = $currentRunState
 EndFunc
@@ -23159,7 +23214,6 @@ Local $hBMP = 0, $hHBMP = 0
 Local $sImageFile = FileOpenDialog("Select CoC screenshot to test, cancel to use live screenshot", $directory, "Image (*.png)", $FD_FILEMUSTEXIST, "", $g_hFrmBot)
 If @error <> 0 Then
 SetLog("Testing image cancelled, taking screenshot from " & $g_sAndroidEmulator, $COLOR_INFO)
-ZoomOut()
 _CaptureRegion()
 $hHBMP = $g_hHBitmap
 TestCapture($hHBMP)
@@ -23209,6 +23263,9 @@ BeginImageTest()
 IsWeakBase()
 EndImageTest()
 $g_bRunState = $currentRunState
+EndFunc
+Func btnTestClickAway()
+ClickP($aAway, 2, 0)
 EndFunc
 Func PopulatePresetComboBox()
 Dim $FileSearch, $NewFile
@@ -24239,25 +24296,21 @@ Case $WM_LBUTTONDOWN, $WM_LBUTTONUP, $WM_RBUTTONDOWN, $WM_RBUTTONUP
 Local $hInput = GUICtrlGetHandle($g_hFrmBotEmbeddedShieldInput)
 _WinAPI_SetFocus($hInput)
 EndSwitch
+Local $x = BitAND($lParam, 0xFFFF)
+Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 Switch $iMSG
 Case $WM_MOUSEMOVE
 If $g_iDebugClick And AndroidShieldHasFocus() Then
-Local $x = BitAND($lParam, 0xFFFF)
-Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 Local $c = GetPixelFromWindow($x, $y, $g_hAndroidControl)
 _GUICtrlStatusBar_SetText($g_hStatusBar, StringFormat("Mouse %03i,%03i Color %s", $x, $y, $c))
 EndIf
 Case $WM_LBUTTONDOWN
 If $g_iDebugClick And AndroidShieldHasFocus() Then
-Local $x = BitAND($lParam, 0xFFFF)
-Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 Local $c = GetPixelFromWindow($x, $y, $g_hAndroidControl)
 SetLog(StringFormat("Mouse LBUTTONDOWN %03i,%03i Color %s", $x, $y, $c), $COLOR_DEBUG)
 EndIf
 Case $WM_LBUTTONUP, $WM_RBUTTONUP
 If $g_iDebugWindowMessages Then
-Local $x = BitAND($lParam, 0xFFFF)
-Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 SetDebugLog("GUIControl_WM_MOUSE: " &($iMSG = $WM_LBUTTONUP ? "$WM_LBUTTONUP" : "$WM_RBUTTONUP") & " $hWin=" & $hWin & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam & ", X=" & $x & ", Y=" & $y, Default, True)
 EndIf
 If AndroidShieldHasFocus() = False Then
@@ -24276,6 +24329,7 @@ Return $GUI_RUNDEFMSG
 EndIf
 Local $hCtrlTarget = $g_aiAndroidEmbeddedCtrlTarget[0]
 If $iMSG <> $WM_MOUSEMOVE Or $g_iAndroidEmbedMode <> 0 Then
+$lParam = $y * 0x10000 + $x
 Local $Result = _WinAPI_PostMessage($hCtrlTarget, $iMsg, $wParam, $lParam)
 EndIf
 $g_bTogglePauseAllowed = $wasAllowed
@@ -24455,6 +24509,8 @@ Case $g_hBtnTestConfigApply
 applyConfig()
 Case $g_hBtnTestWeakBase
 btnTestWeakBase()
+Case $g_hBtnTestClickAway
+btnTestClickAway()
 EndSwitch
 If $lParam = $g_hCmbGUILanguage Then
 If $nNotifyCode = $CBN_SELCHANGE Then cmbLanguage()
@@ -25545,7 +25601,7 @@ Func frmBot_WNDPROC($hWin, $iMsg, $wParam, $lParam)
 Local $wasCritical = SetCriticalMessageProcessing(True)
 If $g_iDebugWindowMessages > 0 Then SetDebugLog("frmBot_WNDPROC: FORWARD $hWin=" & $hWin & ", $iMsg=" & Hex($iMsg) & ", $wParam=" & Hex($wParam) & ", $lParam=" & $lParam, Default, True)
 Switch $iMsg
-Case $WM_KEYDOWN, $WM_KEYUP, $WM_SYSKEYDOWN, $WM_SYSKEYUP, $WM_MOUSEWHEEL, $WM_MOUSEHWHEEL
+Case $WM_KEYDOWN, $WM_KEYUP, $WM_SYSKEYDOWN, $WM_SYSKEYUP, $WM_MOUSEHWHEEL
 GUIControl_AndroidEmbedded($hWin, $iMsg, $wParam, $lParam)
 EndSwitch
 Local $wndproc = $g_hFrmBot_WNDPROC
@@ -29884,7 +29940,7 @@ Else
 If $g_abStopAtkNoLoot1Enable[$g_iMatchMode] Then
 $z = $x
 Else
-$z = 60 * 3 * 1000
+$z = AttackRemainingTime()
 EndIf
 EndIf
 If $g_abStopAtkTwoStars[$g_iMatchMode] And _CheckPixel($aWonTwoStar, True) Then
@@ -29903,7 +29959,12 @@ $z = 0
 EndIf
 Local $NoResourceOCR = False
 Local $iBegin = __TimerInit()
-While __TimerDiff($iBegin) < $z
+Local $iSuspendAndroidTimeOffset = SuspendAndroidTime()
+SetDebugLog("GoldElixirChangeEBO: Start waiting for battle end, Wait: " & $z & ", Offset: " & $iSuspendAndroidTimeOffset)
+Local $iTime = 0
+Local $bOneLoop = True
+While $bOneLoop Or($iTime < $z And $z > 0 And $iTime >= 0)
+$bOneLoop = False
 CheckHeroesHealth()
 If $g_iMatchMode = $LB And $g_aiAttackStdDropSides[$LB] = 4 And $g_bDESideEndEnable Then
 If $g_bDropQueen Or $g_bDropKing Then DELow()
@@ -29931,13 +29992,17 @@ $Trophies = getTrophyVillageSearch(48, 69 + 69)
 EndIf
 $CurDamage = getOcrOverAllDamage(780, 527 + $g_iBottomOffsetY)
 CheckHeroesHealth()
-$txtDiff = Round(($z - __TimerDiff($iBegin)) / 1000, 1)
+$txtDiff = Round(($z -(__TimerDiff($iBegin) - SuspendAndroidTime() + $iSuspendAndroidTimeOffset)) / 1000, 1)
 If Number($txtDiff) < 0 Then $txtDiff = 0
 $NoResourceOCR = StringLen($Gold2) = 0 And StringLen($Elixir2) = 0 And StringLen($DarkElixir2) = 0
 If $NoResourceOCR Then
-SetLog("detected [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & " |  Exit now ", $COLOR_INFO)
+SetLog("Exit now, [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
 Else
-SetLog("detected [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & " |  Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & " sec.", $COLOR_INFO)
+If $g_iDebugSetlog = 1 Then
+SetLog("Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & ", Suspend: " & SuspendAndroidTime() & ", Offset: " & $iSuspendAndroidTimeOffset, $COLOR_INFO)
+Else
+SetLog("Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
+EndIf
 EndIf
 If Number($CurDamage) >= 92 Then
 If($g_bCheckKingPower = True Or $g_bCheckQueenPower = True Or $g_bCheckWardenPower = True) And $g_iActivateKQCondition = "Auto" Then
@@ -29993,6 +30058,7 @@ If $g_abStopAtkPctNoChangeEnable[$g_iMatchMode] And(Number($Damage) <> Number($C
 SetLog("Overall Damage Percentage change detected, waiting...", $COLOR_SUCCESS)
 Return True
 EndIf
+$iTime = __TimerDiff($iBegin) - SuspendAndroidTime() + $iSuspendAndroidTimeOffset
 WEnd
 If $g_iMatchMode = $LB And $g_aiAttackStdDropSides[$LB] = 4 And $g_bDESideEndEnable And $g_iDarkLow = 1 Then
 SetLog("Returning Now -DE-", $COLOR_SUCCESS)
@@ -30191,6 +30257,26 @@ EndSwitch
 Return False
 EndIf
 EndFunc
+Func AttackRemainingTime($bInitialze = Default)
+If $bInitialze = True Then
+$g_hAttackTimer = __TimerInit()
+$g_iAttackTimerOffset = Default
+SuspendAndroidTime(True)
+Return
+EndIf
+Local $iPrepareTime = 29 * 1000
+If $g_iAttackTimerOffset = Default Then
+$g_iAttackTimerOffset = __TimerDiff($g_hAttackTimer) - SuspendAndroidTime()
+If $g_iAttackTimerOffset > $iPrepareTime Then
+$g_iAttackTimerOffset = $iPrepareTime - $g_iAttackTimerOffset
+EndIf
+EndIf
+If $bInitialze = False Then Return
+Local $iAttackTime = 3 * 60 * 1000
+Local $iRemaining = $iAttackTime -(__TimerDiff($g_hAttackTimer) - SuspendAndroidTime() - $g_iAttackTimerOffset)
+If $iRemaining < 0 Then Return 0
+Return $iRemaining
+EndFunc
 Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True)
 If $g_iDebugSetlog = 1 Then Setlog("ReturnHome function... (from matchmode=" & $g_iMatchMode & " - " & $g_asModeText[$g_iMatchMode] & ")", $COLOR_DEBUG)
 Local $counter = 0
@@ -30278,7 +30364,7 @@ If $g_iDebugSetlog = 1 Then Setlog("Battle already over.", $COLOR_DEBUG)
 EndIf
 If _Sleep($DELAYRETURNHOME2) Then Return
 TrayTip($g_sBotTitle, "", BitOR($TIP_ICONASTERISK, $TIP_NOSOUND))
-checkAndroidReboot(False)
+CheckAndroidReboot(False)
 If $GoldChangeCheck = True Then
 If IsAttackPage() Then
 $counter = 0
@@ -36158,7 +36244,7 @@ If Number(Number($g_iTroopsDonated) / Number($g_iTroopsReceived)) >=(Number($g_i
 SetLog("Dropping Clan Castle, donated (" & $g_iTroopsDonated & ") / received (" & $g_iTroopsReceived & ") >= " & $g_iCCDonated & "/" & $g_iCCReceived, $COLOR_INFO)
 Click(GetXPosOfArmySlot($slot, 68), 595 + $g_iBottomOffsetY, 1, $DELAYDROPCC2, "#0086")
 If _Sleep($DELAYDROPCC1) Then Return
-Click($x, $y, 1, 0, "#0087")
+AttackClick($x, $y, 1, 0, 0, "#0087")
 Else
 SetLog("No Dropping Clan Castle, donated  (" & $g_iTroopsDonated & ") / received (" & $g_iTroopsReceived & ") < " & $g_iCCDonated & "/" & $g_iCCReceived, $COLOR_INFO)
 EndIf
@@ -36167,7 +36253,7 @@ If Number(Number($g_iTroopsDonated) / 1) >=(Number($g_iCCDonated) / Number($g_iC
 SetLog("Dropping Clan Castle, donated (" & $g_iTroopsDonated & ") / received (" & $g_iTroopsReceived & ") >= " & $g_iCCDonated & "/" & $g_iCCReceived, $COLOR_INFO)
 Click(GetXPosOfArmySlot($slot, 68), 595 + $g_iBottomOffsetY, 1, $DELAYDROPCC2, "#0088")
 If _Sleep($DELAYDROPCC1) Then Return
-Click($x, $y, 1, 0, "#0089")
+AttackClick($x, $y, 1, 0, 0, "#0089")
 Else
 SetLog("No Dropping Clan Castle, donated  (" & $g_iTroopsDonated & ") / received (" & $g_iTroopsReceived & ") < " & $g_iCCDonated & "/" & $g_iCCReceived, $COLOR_INFO)
 EndIf
@@ -36176,7 +36262,7 @@ Else
 SetLog("Dropping Clan Castle", $COLOR_INFO)
 Click(GetXPosOfArmySlot($slot, 68), 595 + $g_iBottomOffsetY, 1, $DELAYDROPCC2, "#0090")
 If _Sleep($DELAYDROPCC1) Then Return
-Click($x, $y, 1, 0, "#0091")
+AttackClick($x, $y, 1, 0, 0, "#0091")
 EndIf
 EndIf
 EndFunc
@@ -36202,7 +36288,7 @@ If $bDropKing Then
 SetLog("Dropping King", $COLOR_INFO)
 Click(GetXPosOfArmySlot($KingSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#0092")
 If _Sleep($DELAYDROPHEROES2) Then Return
-Click($x, $y, 1, 0, "#0093")
+AttackClick($x, $y, 1, 0, 0, "#0093")
 If $g_bDropKing = False Then
 $g_bCheckKingPower = True
 Else
@@ -36216,7 +36302,7 @@ If $bDropQueen Then
 SetLog("Dropping Queen", $COLOR_INFO)
 Click(GetXPosOfArmySlot($QueenSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#0094")
 If _Sleep($DELAYDROPHEROES2) Then Return
-Click($x, $y, 1, 0, "#0095")
+AttackClick($x, $y, 1, 0, 0, "#0095")
 If $g_bDropQueen = False Then
 $g_bCheckQueenPower = True
 Else
@@ -36230,7 +36316,7 @@ If $bDropWarden Then
 SetLog("Dropping Grand Warden", $COLOR_INFO)
 Click(GetXPosOfArmySlot($WardenSlot, 68), 595 + $g_iBottomOffsetY, 1, 0, "#X998")
 If _Sleep($DELAYDROPHEROES2) Then Return
-Click($x, $y, 1, 0, "#x999")
+AttackClick($x, $y, 1, 0, 0, "#x999")
 If $g_bDropWarden = False Then
 $g_bCheckWardenPower = True
 Else
@@ -43614,7 +43700,13 @@ Local $x, $y, $z, $stone[2]
 Local $villageSize = 0
 If $CaptureRegion = True Then _CaptureRegion2()
 Local $aResult = ["", 0, 0, 0, 0]
-Local $village = GetVillageSize($DebugLog)
+Local $village
+If $g_aiSearchZoomOutCounter[0] = 10 Then SetLog("Try secondary village measuring...", $COLOR_INFO)
+If $g_aiSearchZoomOutCounter[0] < 10 Then
+$village = GetVillageSize($DebugLog, "stone", "tree")
+Else
+$village = GetVillageSize($DebugLog, "2stone", "2tree")
+EndIf
 If $g_aiSearchZoomOutCounter[0] > 0 Then
 If _Sleep(1000) Then Return $aResult
 EndIf
@@ -43679,13 +43771,17 @@ $g_bSkipFirstZoomout = True
 EndIf
 Return $aResult
 EndFunc
-Func InitAndroidTimeLag()
+Func InitAndroidTimeLag($bResetProblemCounter = True)
 $g_aiAndroidTimeLag[0] = 0
 $g_aiAndroidTimeLag[1] = 0
 $g_aiAndroidTimeLag[2] = 0
 $g_aiAndroidTimeLag[3] = 0
+If $bResetProblemCounter = True Then
+$g_aiAndroidTimeLag[4] = 0
+$g_aiAndroidTimeLag[5] = 0
+EndIf
 EndFunc
-Func checkAndroidTimeLag($bRebootAndroid = True)
+Func CheckAndroidTimeLag($bRebootAndroid = True)
 SetError(0, 0)
 If $g_bAndroidCheckTimeLagEnabled = False Then Return SetError(1, 0, False)
 Local $androidUTC = $g_aiAndroidTimeLag[1]
@@ -43693,12 +43789,17 @@ Local $hostTimer = $g_aiAndroidTimeLag[2]
 If $hostTimer <> 0 And __TimerDiff($hostTimer) / 1000 < 60 Then
 Return SetError(3, 0, False)
 EndIf
+If $g_aiAndroidTimeLag[4] > 0 And $g_aiAndroidTimeLag[5] <> 0 And __TimerDiff($g_aiAndroidTimeLag[5]) > $g_iAndroidTimeLagResetProblemCountMinutes * 60000 Then
+SetDebugLog("Time lag problems count of " & $g_aiAndroidTimeLag[4] & " reset to 0 due to " & Round(__TimerDiff($g_aiAndroidTimeLag[5]) / 1000, 0) & " Seconds with an incident")
+$g_aiAndroidTimeLag[4] = 0
+$g_aiAndroidTimeLag[5] = 0
+EndIf
 Local $s = AndroidAdbSendShellCommand("date +%s")
 If @error <> 0 Then Return SetError(4, 0, False)
 Local $curr_androidUTC = Number($s)
 Local $curr_hostTimer = __TimerInit()
 If $curr_androidUTC < 1 Then
-InitAndroidTimeLag()
+InitAndroidTimeLag(False)
 Return SetError(5, 0, False)
 EndIf
 If $androidUTC = 0 Or $hostTimer = 0 Then
@@ -43716,7 +43817,7 @@ $lagTotal -= $lagComp
 Local $lagPerMin = Int($lagTotal / $hostMinutes)
 SetDebugLog($g_sAndroidEmulator & " time lag is " &($lagPerMin > 0 ? "> " : "") & $lagPerMin & " sec/min (avg for " & $hostSeconds & " sec, Android suspend time was " & $lagComp & " sec)")
 If $androidSeconds <= 0 Then
-InitAndroidTimeLag()
+InitAndroidTimeLag(False)
 Return SetError(6, 0, False)
 EndIf
 If $lagPerMin < 0 Then $lagPerMin = 0
@@ -43724,21 +43825,25 @@ $g_aiAndroidTimeLag[0] = $lagPerMin
 $g_aiAndroidTimeLag[1] = $curr_androidUTC
 $g_aiAndroidTimeLag[2] = $curr_hostTimer
 $g_aiAndroidTimeLag[3] = 0
-Local $bRebooted = False
 If $lagPerMin > $g_iAndroidTimeLagThreshold Then
-If $bRebootAndroid = True Then
-SetLog("Rebooting " & $g_sAndroidEmulator & " due to time lag problem of " & $lagPerMin & " sec/min", $COLOR_ERROR)
-$bRebooted = True
+$g_aiAndroidTimeLag[4] += 1
+$g_aiAndroidTimeLag[5] = __TimerInit()
+SetLog($g_aiAndroidTimeLag[4] & ". Time lag detected of " & $lagPerMin & " sec/min for " & $g_sAndroidEmulator, $COLOR_ERROR)
+InitAndroidTimeLag(False)
 EndIf
+Local $bReboot = False
+If $bRebootAndroid And $g_aiAndroidTimeLag[4] >= $g_iAndroidTimeLagRebootThreshold Then
+SetLog("Rebooting " & $g_sAndroidEmulator & " due to " & $g_aiAndroidTimeLag[4] & " time lag problems", $COLOR_ERROR)
+$bReboot = True
 EndIf
-Return SetError(0, $lagPerMin, $bRebooted)
+Return SetError(0, $lagPerMin, $bReboot)
 EndFunc
 Global $g_aiAndroidPageError[2] = [0, 0]
 Func InitAndroidPageError()
 $g_aiAndroidPageError[0] = 0
 $g_aiAndroidPageError[1] = 0
 EndFunc
-Func checkAndroidPageError($bRebootAndroid = True)
+Func CheckAndroidPageError($bRebootAndroid = True)
 If $g_aiAndroidPageError[1] = 0 Then Return False
 Local $bResetTimer = __TimerDiff($g_aiAndroidPageError[1]) > $g_iAndroidRebootPageErrorPerMinutes * 60 * 1000
 If $g_aiAndroidPageError[0] >= $g_iAndroidRebootPageErrorCount And $bResetTimer = False Then
@@ -44598,6 +44703,16 @@ If FileExists($adbPath) Then Return $adbPath
 Return ""
 EndFunc
 Func GetMEmuBackgroundMode()
+Local $aRegExResult = StringRegExp($__VBoxGuestProperties, "Name: graphics_render_mode, value: (.+), timestamp:", $STR_REGEXPARRAYMATCH)
+If @error = 0 Then
+Local $graphics_render_mode = $aRegExResult[0]
+Switch $graphics_render_mode
+Case "1"
+Return $g_iAndroidBackgroundModeDirectX
+Case Else
+Return $g_iAndroidBackgroundModeOpenGL
+EndSwitch
+EndIf
 Return $g_iAndroidBackgroundModeOpenGL
 EndFunc
 Func InitMEmu($bCheckOnly = False)
@@ -45259,6 +45374,11 @@ $g_avAndroidAppConfig[$g_iAndroidConfig][3] = $g_sAppClassInstance
 ExitLoop
 EndIf
 Next
+If $v >= GetVersionNormalized("5.0.0.0") Then
+$g_aiMouseOffset[0] = 6
+$g_aiMouseOffset[1] = 7
+SetDebugLog("Update Android Mouse Offset to " & $g_aiMouseOffset[0] & ", " & $g_aiMouseOffset[1])
+EndIf
 UpdateHWnD($g_hAndroidWindow, False)
 EndIf
 Return True
@@ -46863,7 +46983,6 @@ $g_avAndroidShieldDelay[0] = __TimerInit()
 $g_avAndroidShieldDelay[1] = $iDelay
 $g_avAndroidShieldDelay[2] = $Enable
 $g_avAndroidShieldDelay[3] = $AndroidHasFocus
-SetDebugLog("ShieldAndroid: Delayed update $iDelay=" & $iDelay & ", $Enable=" & $Enable & ", $AndroidHasFocus=" & $AndroidHasFocus & ", caller: " & $sCaller, Default, True)
 Return False
 EndIf
 $g_avAndroidShieldDelay[0] = 0
@@ -47376,6 +47495,16 @@ Local $aRet = DllCall('user32.dll', 'INT', 'MapVirtualKeyExW', 'uint', $iCode, '
 If @error Then Return SetError(@error, @extended, 0)
 Return $aRet[0]
 EndFunc
+Func _WinAPI_QueryPerformanceCounter()
+Local $aRet = DllCall('kernel32.dll', 'bool', 'QueryPerformanceCounter', 'int64*', 0)
+If @error Or Not $aRet[0] Then Return SetError(@error, @extended, 0)
+Return $aRet[1]
+EndFunc
+Func _WinAPI_QueryPerformanceFrequency()
+Local $aRet = DllCall('kernel32.dll', 'bool', 'QueryPerformanceFrequency', 'int64*', 0)
+If @error Or Not $aRet[0] Then Return SetError(@error + 10, @extended, 0)
+Return $aRet[1]
+EndFunc
 Func _WinAPI_SetActiveWindow($hWnd)
 Local $aRet = DllCall('user32.dll', 'int', 'SetActiveWindow', 'hwnd', $hWnd)
 If @error Then Return SetError(@error, @extended, 0)
@@ -47441,8 +47570,8 @@ EndFunc
 Func _ControlClick($x, $y)
 Local $useHWnD = $g_iAndroidControlClickWindow = 1 And $g_bAndroidEmbedded = False
 Local $hWin =(($useHWnD) ?($g_hAndroidWindow) :($g_hAndroidControl))
-$x = Int($x)
-$y = Int($y)
+$x = Int($x) + $g_aiMouseOffset[0]
+$y = Int($y) + $g_aiMouseOffset[1]
 If $hWin = $g_hAndroidWindow Then
 $x += $g_aiBSrpos[0]
 $y += $g_aiBSrpos[1]
@@ -47572,6 +47701,7 @@ EndFunc
 Func AttackClick($x, $y, $times = 1, $speed = 0, $afterDelay = 0, $debugtxt = "")
 Local $timer = __TimerInit()
 If $y > 555 + $g_iBottomOffsetY Then $y = 555 + $g_iBottomOffsetY
+AttackRemainingTime(False)
 Local $result = PureClick($x, $y, $times, $speed, $debugtxt)
 Local $delay = $times * $speed + $afterDelay - __TimerDiff($timer)
 If IsKeepClicksActive() = False And $delay > 0 Then _Sleep($delay, False)
@@ -48048,6 +48178,52 @@ If $iCurrentTimeMSec < $iTimeMsec Then
 $iTimeMsec = $iTimeMsec - 4294967296
 EndIf
 Return $iCurrentTimeMSec - $iTimeMsec
+EndFunc
+Global $g_iHPTimerFreq = 0
+Func _HPTimerInit()
+Local $iTimerCount = _WinAPI_QueryPerformanceCounter()
+If $iTimerCount = 0 Then
+Local $err = _WinAPI_GetLastError()
+Setlog("QueryPerformanceCounter error code: " & $err, $COLOR_ERROR)
+SetError(1, $err, 0)
+Return
+EndIf
+If $g_iHPTimerFreq = 0 Then
+$g_iHPTimerFreq = _WinAPI_QueryPerformanceFrequency()
+If $g_iHPTimerFreq = 0 Then
+Local $err = _WinAPI_GetLastError()
+Setlog("QueryPerformanceFrequency error code: " & $err, $COLOR_ERROR)
+Else
+SetDebugLog("QueryPerformanceFrequency is: " & $g_iHPTimerFreq)
+EndIf
+EndIf
+Return $iTimerCount
+EndFunc
+Func _HPTimerDiff($iOldTimerCount)
+Static $iCompensation = [10, 0, 0, 0]
+If $iOldTimerCount = 0 Then
+SetLog("Bad parameter data passed to _HPTimerDiff", $COLOR_ERROR)
+SetError(1, 0, 0)
+Return
+EndIf
+Local $iNewTimerCount = _WinAPI_QueryPerformanceCounter()
+If $iNewTimerCount = 0 Then
+Local $err = _WinAPI_GetLastError()
+SetLog("QueryPerformanceCounter error code: " & $err, $COLOR_ERROR)
+SetError(1, $err, 0)
+Return
+EndIf
+If $g_iHPTimerFreq = 0 Then
+Setlog("QueryPerformanceFrequency error code: " & $err & " ,Abort timer check", $COLOR_ERROR)
+Return 0
+EndIf
+If $iCompensation[1] < $iCompensation[0] Then
+$iCompensation[1] += 1
+$iCompensation[2] += _WinAPI_QueryPerformanceCounter() - $iNewTimerCount
+$iCompensation[3] = $iCompensation[2] / $iCompensation[1]
+If $iCompensation[1] = $iCompensation[0] Then SetDebugLog("QueryPerformanceCounter compensation is: " & $iCompensation[3])
+EndIf
+Return(($iNewTimerCount - $iOldTimerCount - $iCompensation[3] * 4) / $g_iHPTimerFreq) * 1000
 EndFunc
 Func TogglePause()
 TogglePauseImpl("Button")
@@ -48584,10 +48760,10 @@ EndIf
 EndFunc
 Func _PostMessage_ClickDrag($X1, $Y1, $X2, $Y2, $Button = "left", $Delay = 50)
 Local $hWin = $g_hAndroidControl
-$X1 = Int($X1)
-$Y1 = Int($Y1)
-$X2 = Int($X2)
-$Y2 = Int($Y2)
+$X1 = Int($X1) + $g_aiMouseOffset[0]
+$Y1 = Int($Y1) + $g_aiMouseOffset[1]
+$X2 = Int($X2) + $g_aiMouseOffset[0]
+$Y2 = Int($Y2) + $g_aiMouseOffset[1]
 If $hWin = $g_hAndroidWindow Then
 $X1 += $g_aiBSrpos[0]
 $Y1 += $g_aiBSrpos[1]
@@ -50962,7 +51138,7 @@ Func getBuilders($x_start, $y_start)
 Return getOcrAndCapture("coc-Builders", $x_start, $y_start, 40, 18, True)
 EndFunc
 Func getProfile($x_start, $y_start)
-Return getOcrAndCapture("coc-profile", $x_start, $y_start, 46, 11, True)
+Return getOcrAndCapture("coc-profile", $x_start, $y_start, 50, 12, True)
 EndFunc
 Func getTroopCountSmall($x_start, $y_start)
 Return getOcrAndCapture("coc-t-s", $x_start, $y_start, 53, 15, True)
@@ -52189,6 +52365,7 @@ $g_bBtnAttackNowPressed = False
 $g_iSearchTHLResult = -1
 If $g_bRestart = True Then Return
 WaitForClouds()
+AttackRemainingTime(True)
 If $g_bRestart = True Then Return
 $g_bCloudsActive = False
 GetResources(False)
@@ -52344,7 +52521,7 @@ If Not($logwrited) Then
 SetLog($GetResourcesTXT, $COLOR_BLACK, "Lucida Console", 7.5)
 EndIf
 If SearchLimit($iSkipped + 1) Then Return True
-If checkAndroidReboot() = True Then
+If CheckAndroidReboot() = True Then
 $g_bRestart = True
 $g_bIsClientSyncError = True
 Return
@@ -54245,7 +54422,6 @@ EndIf
 DonateWindow($bClose)
 $bDonate = True
 $y = $g_aiDonatePixel[1] + 50
-ClickP($aAway, 1, 0, "#0171")
 If _Sleep($DELAYDONATECC2) Then ExitLoop
 EndIf
 ForceCaptureRegion()
@@ -54267,7 +54443,6 @@ ContinueLoop
 EndIf
 $bDonate = False
 WEnd
-ClickP($aAway, 1, 0, "#0176")
 If _Sleep($DELAYDONATECC2) Then Return
 $i = 0
 While 1
@@ -56315,53 +56490,51 @@ IniWrite($g_sProfileBuildingPath, "other", "xWardenAltarPos", $g_aiWardenAltarPo
 IniWrite($g_sProfileBuildingPath, "other", "yWardenAltarPos", $g_aiWardenAltarPos[1])
 EndFunc
 Func ProfileReport()
-Local $AttacksWon = 0, $DefensesWon = 0
+Local $iAttacksWon = 0, $iDefensesWon = 0
 Local $iCount
 ClickP($aAway, 1, 0, "#0221")
 If _Sleep($DELAYPROFILEREPORT1) Then Return
 SetLog("Profile Report", $COLOR_INFO)
-SetLog("Opening Profile page to read atk, def, donated and received...", $COLOR_INFO)
+SetLog("Opening Profile page to read Attacks, Defenses, Donations and Recieved Troops", $COLOR_INFO)
 Click(30, 40, 1, 0, "#0222")
 If _Sleep($DELAYPROFILEREPORT2) Then Return
-While _ColorCheck(_GetPixelColor(400, 104 + $g_iMidOffsetY, True), Hex(0xA2A6BE, 6), 20) = False
-If $g_iDebugSetlog = 1 Then Setlog("Profile wait time: " & $iCount & ", color= " & _GetPixelColor(400, 104 + $g_iMidOffsetY, True) & " pos (400," & 104 + $g_iMidOffsetY & ")", $COLOR_DEBUG)
+While Not _ColorCheck(_GetPixelColor(200, 345, True), Hex(0x2E2C62, 6), 20)
 $iCount += 1
 If _Sleep($DELAYPROFILEREPORT1) Then Return
 If $iCount >= 25 Then ExitLoop
 WEnd
-If $g_iDebugSetlog = 1 And $iCount >= 25 Then Setlog("Excess wait time for profile to open: " & $iCount, $COLOR_DEBUG)
+If $iCount >= 25 Then SetDebugLog("Profile Page did not open after " & $iCount & " Loops", $COLOR_DEBUG)
 If _Sleep($DELAYPROFILEREPORT1) Then Return
-$AttacksWon = ""
-If _ColorCheck(_GetPixelColor($ProfileRep01[0], $ProfileRep01[1], True), Hex($ProfileRep01[2], 6), $ProfileRep01[3]) = True Then
-If $g_iDebugSetlog = 1 Then Setlog("Village have no attack and no defenses " & $ProfileRep01[0] & "," & $ProfileRep01[1] + $g_iMidOffsetY, $COLOR_DEBUG)
-$AttacksWon = 0
-$DefensesWon = 0
+$iAttacksWon = ""
+If _ColorCheck(_GetPixelColor($aProfileReport[0], $aProfileReport[1], True), Hex($aProfileReport[2], 6), $aProfileReport[3]) Then
+SetDebugLog("Profile seems to be currently unranked", $COLOR_DEBUG)
+$iAttacksWon = 0
+$iDefensesWon = 0
 Else
-$AttacksWon = getProfile(578, 268 + $g_iMidOffsetY)
-If $g_iDebugSetlog = 1 Then Setlog("$AttacksWon 1st read: " & $AttacksWon, $COLOR_DEBUG)
+$iAttacksWon = getProfile(578, 347)
+If $g_iDebugSetlog = 1 Then Setlog("$iAttacksWon: " & $iAttacksWon, $COLOR_DEBUG)
 $iCount = 0
-While $AttacksWon = ""
+While $iAttacksWon = ""
 If _Sleep($DELAYPROFILEREPORT1) Then Return
-$AttacksWon = getProfile(578, 268 + $g_iMidOffsetY)
-If $g_iDebugSetlog = 1 Then Setlog("Read Loop $AttacksWon: " & $AttacksWon & ", Count: " & $iCount, $COLOR_DEBUG)
+$iAttacksWon = getProfile(578, 347)
+If $g_iDebugSetlog = 1 Then Setlog("Read Loop $iAttacksWon: " & $iAttacksWon & ", Count: " & $iCount, $COLOR_DEBUG)
 $iCount += 1
 If $iCount >= 20 Then ExitLoop
 WEnd
-If $g_iDebugSetlog = 1 And $iCount >= 20 Then Setlog("Excess wait time for reading $AttacksWon: " & getProfile(578, 268 + $g_iMidOffsetY), $COLOR_DEBUG)
-$DefensesWon = getProfile(790, 268 + $g_iMidOffsetY)
+If $g_iDebugSetlog = 1 And $iCount >= 20 Then Setlog("Excess wait time for reading $AttacksWon: " & getProfile(578, 347), $COLOR_DEBUG)
+$iDefensesWon = getProfile(790, 347)
 EndIf
-$g_iTroopsDonated = getProfile(158, 268 + $g_iMidOffsetY)
-$g_iTroopsReceived = getProfile(360, 268 + $g_iMidOffsetY)
-SetLog(" [ATKW]: " & _NumberFormat($AttacksWon) & " [DEFW]: " & _NumberFormat($DefensesWon) & " [TDON]: " & _NumberFormat($g_iTroopsDonated) & " [TREC]: " & _NumberFormat($g_iTroopsReceived), $COLOR_SUCCESS)
+$g_iTroopsDonated = getProfile(158, 347)
+$g_iTroopsReceived = getProfile(360, 347)
+SetLog(" [ATKW]: " & _NumberFormat($iAttacksWon) & " [DEFW]: " & _NumberFormat($iDefensesWon) & " [TDON]: " & _NumberFormat($g_iTroopsDonated) & " [TREC]: " & _NumberFormat($g_iTroopsReceived), $COLOR_SUCCESS)
 Click(830, 80, 1, 0, "#0223")
 If _Sleep($DELAYPROFILEREPORT3) Then Return
 $iCount = 0
-While _CheckPixel($aIsMain, $g_bCapturePixel) = False
+While Not _CheckPixel($aIsMain, $g_bCapturePixel)
 If _Sleep($DELAYPROFILEREPORT3) Then Return
 $iCount += 1
-If $g_iDebugSetlog = 1 Then Setlog("End ProfileReport $iCount= " & $iCount, $COLOR_DEBUG)
 If $iCount > 50 Then
-If $g_iDebugSetlog = 1 Then Setlog("Excess wait time clearing ProfileReport window: " & $iCount, $COLOR_DEBUG)
+SetDebugLog("Main Window did not appear after " & $iCount & " Loops", $COLOR_DEBUG)
 ExitLoop
 EndIf
 WEnd
@@ -57069,7 +57242,7 @@ If $g_abBuildingUpgradeEnable[$iz] = True Then $iUpgradeAction += 1
 Next
 If $g_iFreeBuilderCount >($g_bUpgradeWallSaveBuilder ? 1 : 0) And $iUpgradeAction > 0 Then
 For $iz = 0 To UBound($g_avBuildingUpgrades, 1) - 1
-If $iAvailBuilderCount >($g_bUpgradeWallSaveBuilder ? 1 : 0) And $g_abBuildingUpgradeEnable[$iz] = True And($g_avBuildingUpgrades[$iz][7] = "" And $g_abUpgradeRepeatEnable[$iz]) Then
+If $iAvailBuilderCount >($g_bUpgradeWallSaveBuilder ? 1 : 0) And $g_abBuildingUpgradeEnable[$iz] = True And $g_avBuildingUpgrades[$iz][7] = "" Then
 Switch $g_avBuildingUpgrades[$iz][3]
 Case "Gold"
 $iBuildingsNeedGold += Number($g_avBuildingUpgrades[$iz][2])
@@ -58737,56 +58910,62 @@ If _Sleep($DELAYBOOSTBARRACKS5) Then Return
 checkMainScreen(False)
 EndFunc
 Func UpgradeHeroes()
-If $g_bUpgradeKingEnable = False And $g_bUpgradeQueenEnable = False And $g_bUpgradeWardenEnable = False Then Return
+If Not $g_bUpgradeKingEnable And Not $g_bUpgradeQueenEnable And Not $g_bUpgradeWardenEnable Then Return
 If _Sleep(500) Then Return
 checkMainScreen(False)
-If $g_bRestart = True Then Return
-If $g_bUpgradeKingEnable = True Then
-If isInsideDiamond($g_aiKingAltarPos) = False Then LocateKingAltar()
+If $g_bRestart Then Return
+If $g_bUpgradeKingEnable Then
+If Not isInsideDiamond($g_aiKingAltarPos) Then LocateKingAltar()
 If $g_aiKingAltarPos[0] = -1 Or $g_aiKingAltarPos[1] = -1 Then LocateKingAltar()
 SaveConfig()
 EndIf
-If $g_bUpgradeQueenEnable = True Then
-If isInsideDiamond($g_aiQueenAltarPos) = False Then LocateQueenAltar()
+If $g_bUpgradeQueenEnable Then
+If Not isInsideDiamond($g_aiQueenAltarPos) Then LocateQueenAltar()
 If $g_aiQueenAltarPos[0] = -1 Or $g_aiQueenAltarPos[1] = -1 Then LocateQueenAltar()
 SaveConfig()
 EndIf
-If $g_bUpgradeWardenEnable = True Then
-If isInsideDiamond($g_aiWardenAltarPos) = False Then LocateWardenAltar()
+If $g_bUpgradeWardenEnable Then
+If Not isInsideDiamond($g_aiWardenAltarPos) Then LocateWardenAltar()
 If $g_aiWardenAltarPos[0] = -1 Or $g_aiWardenAltarPos[1] = -1 Then LocateWardenAltar()
 EndIf
-If $g_bAutoLabUpgradeEnable = True And $g_iCmbLaboratory >= 19 Then
+If $g_bAutoLabUpgradeEnable And $g_iCmbLaboratory >= 19 Then
 Setlog("Laboratory needs DE to Upgrade :  " & $g_avLabTroops[$g_iCmbLaboratory][3])
 SetLog("Skipping the Heroes Upgrade!")
 Return
 EndIf
 SetLog("Upgrading Heroes", $COLOR_INFO)
-If getBuilderCount() = False Then Return
+If $g_bUpgradeQueenEnable Then
+If Not getBuilderCount() Then Return
 If _Sleep($DELAYRESPOND) Then Return
 If $g_iFreeBuilderCount < 1 +($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
-SetLog("Not Enough Builders for Queen", $COLOR_ERROR)
+SetLog("Not enough Builders available to upgrade the Archer Queen", $COLOR_ERROR)
 Return
 EndIf
 QueenUpgrade()
 If _Sleep($DELAYUPGRADEHERO1) Then Return
-If getBuilderCount() = False Then Return
+EndIf
+If $g_bUpgradeKingEnable Then
+If Not getBuilderCount() Then Return
 If _Sleep($DELAYRESPOND) Then Return
 If $g_iFreeBuilderCount < 1 +($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
-SetLog("Not Enough Builders for King", $COLOR_ERROR)
+SetLog("Not enough Builders available to upgrade the Barbarian King", $COLOR_ERROR)
 Return
 EndIf
 KingUpgrade()
 If _Sleep($DELAYUPGRADEHERO1) Then Return
-If getBuilderCount() = False Then Return
+EndIf
+If $g_bUpgradeWardenEnable Then
+If Not getBuilderCount() Then Return
 If _Sleep($DELAYRESPOND) Then Return
 If $g_iFreeBuilderCount < 1 +($g_bUpgradeWallSaveBuilder ? 1 : 0) Then
-SetLog("Not Enough Builder for Warden", $COLOR_ERROR)
+SetLog("Not enough Builders available to upgrade the Grand Warden", $COLOR_ERROR)
 Return
 EndIf
 WardenUpgrade()
+EndIf
 EndFunc
 Func QueenUpgrade()
-If $g_bUpgradeQueenEnable = False Then Return
+If Not $g_bUpgradeQueenEnable Then Return
 Local $aHeroLevel = 0
 SetLog("Upgrade Queen")
 ClickP($aTopLeftClient, 1, 0, "#0166")
@@ -58806,14 +58985,14 @@ If $g_iDebugSetlog = 1 Then SetLog(_ArrayToString($sInfo, " "), $COLOR_DEBUG)
 If @error Then Return SetError(0, 0, 0)
 If $sInfo[0] > 1 Or $sInfo[0] = "" Then
 If StringInStr($sInfo[1], "Quee") = 0 Then
-SetLog("Bad AQ location", $COLOR_ACTION)
+SetLog("Bad Archer Queen location", $COLOR_ACTION)
 Return
 Else
 If $sInfo[2] <> "" Then
 $aHeroLevel = Number($sInfo[2])
-SetLog("Your Queen Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
+SetLog("Your Archer Queen level read as: " & $aHeroLevel, $COLOR_SUCCESS)
 If $aHeroLevel = $g_iMaxQueenLevel Then
-SetLog("Your AQ is max, cannot upgrade!", $COLOR_INFO)
+SetLog("Your Archer Queen is at max level, cannot upgrade anymore!", $COLOR_INFO)
 $g_bUpgradeQueenEnable = False
 Return
 EndIf
@@ -58875,7 +59054,7 @@ EndIf
 ClickP($aAway, 2, 0, "#0312")
 EndFunc
 Func KingUpgrade()
-If $g_bUpgradeKingEnable = False Then Return
+If Not $g_bUpgradeKingEnable Then Return
 Local $aHeroLevel = 0
 SetLog("Upgrade King")
 BuildingClickP($g_aiKingAltarPos)
@@ -58894,19 +59073,19 @@ If $g_iDebugSetlog = 1 Then SetLog(_ArrayToString($sInfo, " "), $COLOR_DEBUG)
 If @error Then Return SetError(0, 0, 0)
 If $sInfo[0] > 1 Or $sInfo[0] = "" Then
 If StringInStr($sInfo[1], "Barbarian") = 0 Then
-SetLog("Bad King location", $COLOR_ACTION)
+SetLog("Bad Barbarian King location", $COLOR_ACTION)
 Return
 Else
 If $sInfo[2] <> "" Then
 $aHeroLevel = Number($sInfo[2])
 SetLog("Your King Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
 If $aHeroLevel = $g_iMaxKingLevel Then
-SetLog("Your BK is max, cannot upgrade!", $COLOR_INFO)
+SetLog("Your Babarian King is at max level, cannot upgrade anymore!", $COLOR_INFO)
 $g_bUpgradeKingEnable = False
 Return
 EndIf
 Else
-SetLog("Your King Level was not found!", $COLOR_INFO)
+SetLog("Your Barbarian King Level was not found!", $COLOR_INFO)
 Return
 EndIf
 EndIf
@@ -58964,7 +59143,7 @@ EndIf
 ClickP($aAway, 2, 0, "#0312")
 EndFunc
 Func WardenUpgrade()
-If $g_bUpgradeWardenEnable = False Then Return
+If Not $g_bUpgradeWardenEnable Then Return
 If Number($g_iTownHallLevel) <= 10 Then
 Setlog("Must have TH 11 for Grand Warden upgrade", $COLOR_ERROR)
 Return
@@ -58992,14 +59171,14 @@ Return
 Else
 If $sInfo[2] <> "" Then
 $aHeroLevel = Number($sInfo[2])
-SetLog("Your Warden Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
+SetLog("Your Grand Warden Warden Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
 If $aHeroLevel = $g_iMaxWardenLevel Then
-SetLog("Your Warden is max, cannot upgrade!", $COLOR_INFO)
+SetLog("Your Grand Warden is at max level, cannot upgrade anymore!", $COLOR_INFO)
 $g_bUpgradeWardenEnable = False
 Return
 EndIf
 Else
-SetLog("Your Warden Level was not found!", $COLOR_INFO)
+SetLog("Your Grand Warden Level was not found!", $COLOR_INFO)
 Return
 EndIf
 EndIf
@@ -59094,7 +59273,7 @@ Setlog("Waiting, Add random delay of " & $iTimeToWait & " seconds.", $COLOR_INFO
 If _SleepStatus($iTimeToWait * 1000) Then Return
 _GUICtrlStatusBar_SetText($g_hStatusBar, "")
 EndFunc
-Func GetVillageSize($DebugLog = False, $sStonePrefix = Default, $sTreePrefix = "tree")
+Func GetVillageSize($DebugLog = False, $sStonePrefix = Default, $sTreePrefix = Default)
 If $sStonePrefix = Default Then $sStonePrefix = "stone"
 If $sTreePrefix = Default Then $sTreePrefix = "tree"
 Local $aResult = 0
@@ -59126,7 +59305,7 @@ If @error Then
 SetLog("Error: Missing tree files", $COLOR_ERROR)
 Return $aResult
 EndIf
-local $i, $findImage, $sArea, $a
+Local $i, $findImage, $sArea, $a
 For $i = 1 To $aStoneFiles[0]
 $findImage = $aStoneFiles[$i]
 $a = StringRegExp($findImage, ".*-(\d+)-(\d+)-(\d*,*\d+)_.*[.](xml|png|bmp)$", $STR_REGEXPARRAYMATCH)
@@ -59203,8 +59382,8 @@ Dim $aResult[10]
 $aResult[0] = $c
 $aResult[1] = $z
 $aResult[2] = $x
-$aResult[3] = $y
 $aResult[4] = $stone[0]
+$aResult[3] = $y
 $aResult[5] = $stone[1]
 $aResult[6] = $stone[5]
 $aResult[7] = $tree[0]
@@ -59212,7 +59391,7 @@ $aResult[8] = $tree[1]
 $aResult[9] = $tree[5]
 Return $aResult
 EndFunc
-Func updateGlobalVillageOffset($x, $y)
+Func UpdateGlobalVillageOffset($x, $y)
 Local $updated = False
 If $g_sImglocRedline <> "" Then
 Local $newReadLine = ""
@@ -61781,7 +61960,7 @@ $g_bQuicklyFirstStart = False
 Else
 $g_bQuickAttack = QuickAttack()
 EndIf
-If checkAndroidReboot() = True Then ContinueLoop
+If CheckAndroidReboot() = True Then ContinueLoop
 If $g_bIsClientSyncError = False And $g_bIsSearchLimit = False And($g_bQuickAttack = False) Then
 If BotCommand() Then btnStop()
 If _Sleep($DELAYRUNBOT2) Then Return
@@ -61834,7 +62013,7 @@ Else
 _RunFunction($aRndFuncList[0])
 ExitLoop
 EndIf
-If checkAndroidReboot() = True Then ContinueLoop 2
+If CheckAndroidReboot() = True Then ContinueLoop 2
 WEnd
 If $g_bRunState = False Then Return
 If $g_bRestart = True Then ContinueLoop
@@ -61855,7 +62034,7 @@ Else
 _RunFunction($aRndFuncList[0])
 ExitLoop
 EndIf
-If checkAndroidReboot() = True Then ContinueLoop 2
+If CheckAndroidReboot() = True Then ContinueLoop 2
 WEnd
 If $g_bRunState = False Then Return
 If $g_bRestart = True Then ContinueLoop
@@ -61914,7 +62093,7 @@ Static $iCollectCounter = 0
 Local $TimeIdle = 0
 If $g_iDebugSetlog = 1 Then SetLog("Func Idle ", $COLOR_DEBUG)
 While $g_bIsFullArmywithHeroesAndSpells = False
-checkAndroidReboot()
+CheckAndroidReboot()
 NotifyPendingActions()
 If _Sleep($DELAYIDLE1) Then Return
 If $g_iCommandStop = -1 Then SetLog("====== Waiting for full army ======", $COLOR_SUCCESS)
@@ -61931,7 +62110,7 @@ DonateCC(True)
 EndIf
 If _Sleep($DELAYIDLE2) Then ExitLoop
 If $g_bRestart = True Then ExitLoop
-If checkAndroidReboot() Then ContinueLoop 2
+If CheckAndroidReboot() Then ContinueLoop 2
 WEnd
 EndIF
 If _Sleep($DELAYIDLE1) Then ExitLoop
@@ -61953,7 +62132,7 @@ Local $aRndFuncList = ['Collect', 'CheckTombs', 'DonateCC', 'CleanYard']
 While 1
 If $g_bRunState = False Then Return
 If $g_bRestart = True Then ExitLoop
-If checkAndroidReboot() Then ContinueLoop 2
+If CheckAndroidReboot() Then ContinueLoop 2
 If UBound($aRndFuncList) > 1 Then
 Local $Index = Random(0, UBound($aRndFuncList), 1)
 If $Index > UBound($aRndFuncList) - 1 Then $Index = UBound($aRndFuncList) - 1

@@ -115,7 +115,7 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 
 	TrayTip($g_sBotTitle, "", BitOR($TIP_ICONASTERISK, $TIP_NOSOUND)) ; clear village search match found message
 
-	checkAndroidReboot(False)
+	CheckAndroidReboot(False)
 
 	If $GoldChangeCheck = True Then
 		If IsAttackPage() Then

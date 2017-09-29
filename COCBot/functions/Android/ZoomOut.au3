@@ -404,7 +404,14 @@ Func SearchZoomOut($CenterVillageBoolOrScrollPos = $aCenterHomeVillageClickDrag,
 
 	Local $aResult = ["", 0, 0, 0, 0] ; expected dummy value
 
-	Local $village = GetVillageSize($DebugLog)
+	Local $village
+	If $g_aiSearchZoomOutCounter[0] = 10 Then SetLog("Try secondary village measuring...", $COLOR_INFO)
+	If $g_aiSearchZoomOutCounter[0] < 10 Then
+		$village = GetVillageSize($DebugLog, "stone", "tree")
+	Else
+		; try secondary images
+		$village = GetVillageSize($DebugLog, "2stone", "2tree")
+	EndIf
 
 	; compare other stone measures
 	;GetVillageSize(True, "stoneBlueStacks2A")

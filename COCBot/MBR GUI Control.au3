@@ -298,25 +298,21 @@ Func GUIControl_WM_MOUSE($hWin, $iMsg, $wParam, $lParam)
 			_WinAPI_SetFocus($hInput)
 	EndSwitch
 
+	Local $x = BitAND($lParam, 0xFFFF)
+	Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 	Switch $iMSG
 		Case $WM_MOUSEMOVE
 			If $g_iDebugClick And AndroidShieldHasFocus() Then
-				Local $x = BitAND($lParam, 0xFFFF)
-				Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 				Local $c = GetPixelFromWindow($x, $y, $g_hAndroidControl)
 				_GUICtrlStatusBar_SetText($g_hStatusBar, StringFormat("Mouse %03i,%03i Color %s", $x, $y, $c))
 			EndIf
 		Case $WM_LBUTTONDOWN
 			If $g_iDebugClick And AndroidShieldHasFocus() Then
-				Local $x = BitAND($lParam, 0xFFFF)
-				Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 				Local $c = GetPixelFromWindow($x, $y, $g_hAndroidControl)
 				SetLog(StringFormat("Mouse LBUTTONDOWN %03i,%03i Color %s", $x, $y, $c), $COLOR_DEBUG)
 			EndIf
 		Case $WM_LBUTTONUP, $WM_RBUTTONUP
 			If $g_iDebugWindowMessages Then
-				Local $x = BitAND($lParam, 0xFFFF)
-				Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 				SetDebugLog("GUIControl_WM_MOUSE: " & ($iMSG = $WM_LBUTTONUP ? "$WM_LBUTTONUP" : "$WM_RBUTTONUP") & " $hWin=" & $hWin & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam & ", X=" & $x & ", Y=" & $y, Default, True)
 			EndIf
 			If AndroidShieldHasFocus() = False Then
@@ -344,6 +340,10 @@ Func GUIControl_WM_MOUSE($hWin, $iMsg, $wParam, $lParam)
 	EndIf
 	Local $hCtrlTarget = $g_aiAndroidEmbeddedCtrlTarget[0]
 	If $iMSG <> $WM_MOUSEMOVE Or $g_iAndroidEmbedMode <> 0 Then
+		; not all message got thru here, so disabled
+		;$x += $g_aiMouseOffset[0]
+		;$y += $g_aiMouseOffset[1]
+		$lParam = $y * 0x10000 + $x
 		Local $Result = _WinAPI_PostMessage($hCtrlTarget, $iMsg, $wParam, $lParam)
 	EndIf
 	;Local $Result = _SendMessage($hCtrlTarget, $iMsg, $wParam, $lParam)
@@ -555,6 +555,8 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			applyConfig()
 		Case $g_hBtnTestWeakBase
 			btnTestWeakBase()
+		Case $g_hBtnTestClickAway
+			btnTestClickAway()
 	EndSwitch
 
 		If $lParam = $g_hCmbGUILanguage Then
@@ -1967,7 +1969,7 @@ Func frmBot_WNDPROC($hWin, $iMsg, $wParam, $lParam)
 		Case $WM_MOVE
 			GUIControl_WM_MOVE($hWin, $iMsg, $wParam, $lParam)
 #ce
-		Case $WM_KEYDOWN, $WM_KEYUP, $WM_SYSKEYDOWN, $WM_SYSKEYUP, $WM_MOUSEWHEEL, $WM_MOUSEHWHEEL
+		Case $WM_KEYDOWN, $WM_KEYUP, $WM_SYSKEYDOWN, $WM_SYSKEYUP, $WM_MOUSEHWHEEL
 			GUIControl_AndroidEmbedded($hWin, $iMsg, $wParam, $lParam)
 	EndSwitch
 

@@ -485,22 +485,24 @@ Func btnTestVillageSize()
 	_CaptureRegion()
 	_CaptureRegion2Sync()
 
-	SetLog("Testing GetVillageSize()", $COLOR_INFO)
-	Local $hTimer = __TimerInit()
-	Local $village = GetVillageSize(True)
-	Local $ms = __TimerDiff($hTimer)
-	If $village = 0 Then
-		SetLog("Village not found (" & Round($ms, 0) & " ms.)", $COLOR_WARNING)
-	Else
-		SetLog("Village found (" & Round($ms, 0) & " ms.)", $COLOR_WARNING)
-		SetLog("Village size: " & $village[0])
-		SetLog("Village zoom level: " & $village[1])
-		SetLog("Village offset x: " & $village[2])
-		SetLog("Village offset y: " & $village[3])
-		SetLog("Village stone " & $village[6] & ": " & $village[4] & ", " & $village[5])
-		SetLog("Village tree " & $village[9] & ": " & $village[7] & ", " & $village[8])
-	EndIf
-
+	Local $a[2][2] = [["stone", "tree"], ["2stone", "2tree"]]
+	For $i = 0 To 1
+		SetLog("Testing GetVillageSize(True, """ & $a[$i][0] & """, """ & $a[$i][1] & """)", $COLOR_INFO)
+		Local $hTimer = __TimerInit()
+		Local $village = GetVillageSize(True, $a[$i][0], $a[$i][1])
+		Local $ms = __TimerDiff($hTimer)
+		If $village = 0 Then
+			SetLog("Village not found (" & Round($ms, 0) & " ms.)", $COLOR_WARNING)
+		Else
+			SetLog("Village found (" & Round($ms, 0) & " ms.)", $COLOR_WARNING)
+			SetLog("Village size: " & $village[0])
+			SetLog("Village zoom level: " & $village[1])
+			SetLog("Village offset x: " & $village[2])
+			SetLog("Village offset y: " & $village[3])
+			SetLog("Village stone " & $village[6] & ": " & $village[4] & ", " & $village[5])
+			SetLog("Village tree " & $village[9] & ": " & $village[7] & ", " & $village[8])
+		EndIf
+	Next
 	EndImageTest()
 
 	$g_bRunState = $currentRunState
@@ -841,7 +843,7 @@ Func BeginImageTest($directory = $g_sProfileTempPath)
 	Local $sImageFile = FileOpenDialog("Select CoC screenshot to test, cancel to use live screenshot", $directory, "Image (*.png)", $FD_FILEMUSTEXIST, "", $g_hFrmBot)
 	If @error <> 0 Then
 		SetLog("Testing image cancelled, taking screenshot from " & $g_sAndroidEmulator, $COLOR_INFO)
-		ZoomOut()
+		;ZoomOut()
 		_CaptureRegion()
 		$hHBMP = $g_hHBitmap
 		TestCapture($hHBMP)
@@ -907,3 +909,7 @@ Func btnTestWeakBase()
 	EndImageTest()
 	$g_bRunState = $currentRunState
 EndFunc   ;==>btnTestWeakBase
+
+Func btnTestClickAway()
+	ClickP($aAway, 2, 0)
+EndFunc   ;==>btnTestClickAway

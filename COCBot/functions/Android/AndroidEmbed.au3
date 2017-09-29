@@ -850,7 +850,7 @@ Func _AndroidShield($sCaller, $Enable = Default, $CallWinGetAndroidHandle = True
 		$g_avAndroidShieldDelay[1] = $iDelay
 		$g_avAndroidShieldDelay[2] = $Enable
 		$g_avAndroidShieldDelay[3] = $AndroidHasFocus
-		SetDebugLog("ShieldAndroid: Delayed update $iDelay=" & $iDelay & ", $Enable=" & $Enable & ", $AndroidHasFocus=" & $AndroidHasFocus & ", caller: " & $sCaller, Default, True)
+		;SetDebugLog("ShieldAndroid: Delayed update $iDelay=" & $iDelay & ", $Enable=" & $Enable & ", $AndroidHasFocus=" & $AndroidHasFocus & ", caller: " & $sCaller, Default, True)
 		Return False
 	EndIf
 

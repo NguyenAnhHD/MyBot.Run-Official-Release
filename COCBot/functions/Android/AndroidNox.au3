@@ -246,6 +246,11 @@ Func InitNox($bCheckOnly = False)
 				ExitLoop
 			EndIf
 		Next
+		If $v >= GetVersionNormalized("5.0.0.0") Then
+			$g_aiMouseOffset[0] = 6
+			$g_aiMouseOffset[1] = 7
+			SetDebugLog("Update Android Mouse Offset to " & $g_aiMouseOffset[0] & ", " & $g_aiMouseOffset[1])
+		EndIf
 
 		UpdateHWnD($g_hAndroidWindow, False) ; Ensure $g_sAppClassInstance is properly set
 

@@ -61,8 +61,8 @@ Func _ControlClick($x, $y)
 	;Local $hWin = ($g_bAndroidEmbedded = False ? $g_hAndroidWindow : $g_aiAndroidEmbeddedCtrlTarget[1])
 	Local $useHWnD = $g_iAndroidControlClickWindow = 1 And $g_bAndroidEmbedded = False
 	Local $hWin = (($useHWnD) ? ($g_hAndroidWindow) : ($g_hAndroidControl))
-	$x = Int($x)
-	$y = Int($y)
+	$x = Int($x) + $g_aiMouseOffset[0]
+	$y = Int($y) + $g_aiMouseOffset[1]
 	If $hWin = $g_hAndroidWindow Then
 		$x += $g_aiBSrpos[0]
 		$y += $g_aiBSrpos[1]
@@ -212,6 +212,7 @@ Func AttackClick($x, $y, $times = 1, $speed = 0, $afterDelay = 0, $debugtxt = ""
 	Local $timer = __TimerInit()
 	; Protect the Attack Bar
 	If $y > 555 + $g_iBottomOffsetY Then $y = 555 + $g_iBottomOffsetY
+	AttackRemainingTime(False) ; flag attack started
 	Local $result = PureClick($x, $y, $times, $speed, $debugtxt)
 	Local $delay = $times * $speed + $afterDelay - __TimerDiff($timer)
 	If IsKeepClicksActive() = False And $delay > 0 Then _Sleep($delay, False)

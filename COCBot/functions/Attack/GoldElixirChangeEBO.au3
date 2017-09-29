@@ -51,7 +51,7 @@ Func GoldElixirChangeEBO()
 		If $g_abStopAtkNoLoot1Enable[$g_iMatchMode] Then
 			$z = $x
 		Else
-			$z = 60 * 3 * 1000
+			$z = AttackRemainingTime()
 		EndIf
 	EndIf
 
@@ -80,7 +80,14 @@ Func GoldElixirChangeEBO()
 
 	;MAIN LOOP
 	Local $iBegin = __TimerInit()
-	While __TimerDiff($iBegin) < $z
+
+	Local $iSuspendAndroidTimeOffset = SuspendAndroidTime()
+	SetDebugLog("GoldElixirChangeEBO: Start waiting for battle end, Wait: " & $z & ", Offset: " & $iSuspendAndroidTimeOffset)
+
+	Local $iTime = 0
+	Local $bOneLoop = True
+	While $bOneLoop Or ($iTime < $z And $z > 0 And $iTime >= 0)
+		$bOneLoop = False
 		;HEALTH HEROES
 		CheckHeroesHealth()
 
@@ -118,13 +125,17 @@ Func GoldElixirChangeEBO()
 		CheckHeroesHealth()
 
 		;WRITE LOG
-		$txtDiff = Round(($z - __TimerDiff($iBegin)) / 1000, 1)
+		$txtDiff = Round(($z - (__TimerDiff($iBegin) - SuspendAndroidTime() + $iSuspendAndroidTimeOffset)) / 1000, 1)
 		If Number($txtDiff) < 0 Then $txtDiff = 0
 		$NoResourceOCR = StringLen($Gold2) = 0 And StringLen($Elixir2) = 0 And StringLen($DarkElixir2) = 0
 		If $NoResourceOCR Then
-			SetLog("detected [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & " |  Exit now ", $COLOR_INFO)
+			SetLog("Exit now, [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
 		Else
-			SetLog("detected [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & " |  Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & " sec.", $COLOR_INFO)
+			If $g_iDebugSetlog = 1 Then
+				SetLog("Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & ", Suspend: " & SuspendAndroidTime() &  ", Offset: " & $iSuspendAndroidTimeOffset, $COLOR_INFO)
+			Else
+				SetLog("Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
+			EndIf
 		EndIf
 
 		If Number($CurDamage) >= 92 Then
@@ -198,6 +209,7 @@ Func GoldElixirChangeEBO()
 			Return True
 		EndIf
 
+		$iTime = __TimerDiff($iBegin) - SuspendAndroidTime() + $iSuspendAndroidTimeOffset
 	WEnd ; END MAIN LOOP
 
 	;Priority Check... Exit To protect Hero Health

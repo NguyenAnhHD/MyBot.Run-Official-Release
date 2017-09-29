@@ -101,6 +101,7 @@ Func _VillageSearch() ;Control for searching a village that meets conditions
 
 		; ----------------- READ ENEMY VILLAGE RESOURCES  -----------------------------------
 		WaitForClouds() ; Wait for clouds to disappear
+		AttackRemainingTime(True) ; Timer for knowing when attack starts, in 30 Sec. attack automatically starts and lasts for 3 Minutes
 		If $g_bRestart = True Then Return ; exit func
 
 		$g_bCloudsActive = False
@@ -303,7 +304,7 @@ Func _VillageSearch() ;Control for searching a village that meets conditions
 		; Return Home on Search limit
 		If SearchLimit($iSkipped + 1) Then Return True
 
-		If checkAndroidReboot() = True Then
+		If CheckAndroidReboot() = True Then
 			$g_bRestart = True
 			$g_bIsClientSyncError = True
 			Return

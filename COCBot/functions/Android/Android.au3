@@ -32,6 +32,9 @@ Global $g_bWinGetAndroidHandleActive = False ; Prevent recursion in WinGetAndroi
 Global $g_bAndroidSuspended = False ; Android window is suspended flag
 Global $g_bAndroidQueueReboot = False ; Reboot Android as soon as possible
 Global $g_iAndroidSuspendedTimer = 0 ; Android Suspended Timer
+Global $g_iSuspendAndroidTime = 0
+Global $g_hSuspendAndroidTimer = 0
+Global $g_aiMouseOffset = [0, 0]
 
 Func InitAndroidConfig($bRestart = False)
 	If $bRestart = False Then
@@ -68,7 +71,7 @@ Func InitAndroidConfig($bRestart = False)
 		; when GUI is initialized, update background checkbox
 		chkBackground()
 	EndIf
-	
+
 	UpdateHWnD($g_hAndroidWindow, False) ; Ensure $g_sAppClassInstance is properly set
 EndFunc   ;==>InitAndroidConfig
 
@@ -2232,6 +2235,10 @@ Func AndroidAdbScript($scriptTag, $variablesArray = Default, $timeout = Default,
 EndFunc   ;==>AndroidAdbScript
 
 Func AndroidClickDrag($x1, $y1, $x2, $y2, $wasRunState = $g_bRunState)
+	$x1 = Int($x1) + $g_aiMouseOffset[0]
+	$y1 = Int($y1) + $g_aiMouseOffset[1]
+	$x2 = Int($x2) + $g_aiMouseOffset[0]
+	$y2 = Int($y2) + $g_aiMouseOffset[1]
 	Execute($g_sAndroidEmulator & "AdjustClickCoordinates($x1,$y1)")
 	Execute($g_sAndroidEmulator & "AdjustClickCoordinates($x2,$y2)")
 	Local $swipe_coord[4][2] = [["{$x1}", $x1], ["{$y1}", $y1], ["{$x2}", $x2], ["{$y2}", $y2]]
@@ -2259,7 +2266,7 @@ Func ReleaseClicks($minClicksToRelease = 0, $ReleaseClicksEnabled = $g_bAndroidA
 	EndIf
 	If $g_aiAndroidAdbClicks[0] > 0 And $g_bRunState = True Then
 		If $g_aiAndroidAdbClicks[0] >= $minClicksToRelease Then
-			AndroidClick(-1, -1, $g_aiAndroidAdbClicks[0], 0)
+			AndroidClick(Default, Default, $g_aiAndroidAdbClicks[0], 0)
 		Else
 			Return False
 		EndIf
@@ -2274,14 +2281,14 @@ Func AndroidAdbClickSupported()
 EndFunc   ;==>AndroidAdbClickSupported
 
 Func AndroidClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = True)
+	If Not ($x = Default) Then $x = Int($x) + $g_aiMouseOffset[0]
+	If Not ($x = Default) Then $y = Int($y) + $g_aiMouseOffset[1]
 	ForceCaptureRegion()
 	;AndroidSlowClick($x, $y, $times, $speed)
 	AndroidFastClick($x, $y, $times, $speed, $checkProblemAffect)
 EndFunc   ;==>AndroidClick
 
 Func AndroidSlowClick($x, $y, $times = 1, $speed = 0)
-	$x = Int($x)
-	$y = Int($y)
 	Local $wasRunState = $g_bRunState
 	Local $cmd = ""
 	Local $i = 0
@@ -2367,7 +2374,7 @@ Func _AndroidFastClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = Tru
 	If $times < 1 Then Return SetError(0, 0)
 	Local $i = 0, $j = 0
 	Local $Click = [$x, $y, "down-up"]
-	Local $ReleaseClicks = ($x = -1 And $y = -1 And $g_aiAndroidAdbClicks[0] > 0)
+	Local $ReleaseClicks = ($x = Default And $y = Default And $g_aiAndroidAdbClicks[0] > 0)
 	If $ReleaseClicks = False And $g_aiAndroidAdbClicks[0] > -1 Then
 		Local $pos = $g_aiAndroidAdbClicks[0]
 		$g_aiAndroidAdbClicks[0] = $pos + $times
@@ -2742,6 +2749,27 @@ Func AndroidInputSwipe($x1, $y1, $x2, $y2, $wasRunState = $g_bRunState) ; Only u
 	EndIf
 EndFunc   ;==>AndroidInputSwipe
 
+Func SuspendAndroidTime($Action = False)
+	If IsBool($Action) And $Action = True Then
+		Local $iTime = $g_iSuspendAndroidTime
+		$g_iSuspendAndroidTime = 0
+		$g_hSuspendAndroidTimer = 0
+		Return $iTime
+	ElseIf $Action = False Then
+		Return $g_iSuspendAndroidTime
+	EndIf
+	If $g_hSuspendAndroidTimer = 0 Then
+		; nothing to add
+	Else
+		$g_iSuspendAndroidTime += _HPTimerDiff($g_hSuspendAndroidTimer)
+		$g_hSuspendAndroidTimer = 0
+	EndIf
+	If IsString($Action) And $Action = "Start" Then
+		$g_hSuspendAndroidTimer = _HPTimerInit()
+	EndIf
+	Return $g_iSuspendAndroidTime
+EndFunc   ;==>SuspendAndroidTime
+
 Func SuspendAndroid($SuspendMode = True, $bDebugLog = Default, $bForceSuspendAndroid = False)
 	If $bDebugLog = Default Then $bDebugLog = $g_iDebugSetlog > 0
 	If ($g_bAndroidSuspendedEnabled = False Or $g_iAndroidSuspendModeFlags = 0 Or $g_bMainWindowOk = False) And $bForceSuspendAndroid = False Then Return False
@@ -2751,11 +2779,17 @@ Func SuspendAndroid($SuspendMode = True, $bDebugLog = Default, $bForceSuspendAnd
 	If $bSuspendProcess = True Then
 		; Suspend CoC Process
 		If $g_iAndroidCoCPid = 0 Then $g_iAndroidCoCPid = GetAndroidProcessPID(Default, False)
-		If $g_iAndroidCoCPid = 0 Then Return False
+		If $g_iAndroidCoCPid = 0 Then
+			SuspendAndroidTime(True) ; reset timer
+			Return False
+		EndIf
 		Local $s = AndroidAdbSendShellCommand("kill -STOP " & $g_iAndroidCoCPid) ; suspend CoC
 		If StringInStr($s, "No such process") > 0 Then
 			$g_iAndroidCoCPid = GetAndroidProcessPID(Default, False)
-			If $g_iAndroidCoCPid = 0 Then Return False
+			If $g_iAndroidCoCPid = 0 Then
+				SuspendAndroidTime(True) ; reset timer
+				Return False
+			EndIf
 			$s = AndroidAdbSendShellCommand("kill -STOP " & $g_iAndroidCoCPid) ; suspend CoC
 		EndIf
 		$g_bAndroidSuspended = True
@@ -2763,12 +2797,16 @@ Func SuspendAndroid($SuspendMode = True, $bDebugLog = Default, $bForceSuspendAnd
 		; Suspend entire Android
 		Local $pid = GetAndroidSvcPid()
 		If $pid = -1 Or $pid = 0 Then $pid = GetAndroidPid()
-		If $pid = -1 Or $pid = 0 Then Return False
+		If $pid = -1 Or $pid = 0 Then
+			SuspendAndroidTime(True) ; reset timer
+			Return False
+		EndIf
 		;AndroidAdbSendShellCommand("input keyevent 26") ; sleep android
 		$g_bAndroidSuspended = True
 		_ProcessSuspendResume($pid, True) ; suspend Android
 		$g_iAndroidSuspendedTimer = __TimerInit()
 	EndIf
+	SuspendAndroidTime("Start")
 	If $bDebugLog = True Then SetDebugLog("Android Suspended")
 	Return False
 EndFunc   ;==>SuspendAndroid
@@ -2778,15 +2816,22 @@ Func ResumeAndroid($bDebugLog = Default, $bForceSuspendAndroid = False)
 	If ($g_bAndroidSuspendedEnabled = False Or $g_iAndroidSuspendModeFlags = 0) And $bForceSuspendAndroid = False Then Return False
 	If $g_bAndroidSuspended = False Then Return False
 	Local $bSuspendProcess = BitAND($g_iAndroidSuspendModeFlags, 4) = 0
+	SuspendAndroidTime("Stop")
 	If $bSuspendProcess = True Then
 		; Resume CoC Process
 		$g_bAndroidSuspended = False
 		If $g_iAndroidCoCPid = 0 Then $g_iAndroidCoCPid = GetAndroidProcessPID(Default, False)
-		If $g_iAndroidCoCPid = 0 Then Return False
+		If $g_iAndroidCoCPid = 0 Then
+			SuspendAndroidTime(True) ; reset timer
+			Return False
+		EndIf
 		Local $s = AndroidAdbSendShellCommand("kill -CONT " & $g_iAndroidCoCPid) ; suspend CoC
 		If StringInStr($s, "No such process") > 0 Then
 			$g_iAndroidCoCPid = GetAndroidProcessPID(Default, False)
-			If $g_iAndroidCoCPid = 0 Then Return False
+			If $g_iAndroidCoCPid = 0 Then
+				SuspendAndroidTime(True) ; reset timer
+				Return False
+			EndIf
 			$s = AndroidAdbSendShellCommand("kill -CONT " & $g_iAndroidCoCPid) ; suspend CoC
 		EndIf
 		If $bDebugLog = True Then SetDebugLog("Android Resumed")
@@ -2794,7 +2839,10 @@ Func ResumeAndroid($bDebugLog = Default, $bForceSuspendAndroid = False)
 		; Resume entire Android
 		Local $pid = GetAndroidSvcPid()
 		If $pid = -1 Or $pid = 0 Then $pid = GetAndroidPid()
-		If $pid = -1 Or $pid = 0 Then Return False
+		If $pid = -1 Or $pid = 0 Then
+			SuspendAndroidTime(True) ; reset timer
+			Return False
+		EndIf
 		$g_bAndroidSuspended = False
 		_ProcessSuspendResume($pid, False) ; resume Android
 		;AndroidAdbSendShellCommand("input keyevent 26") ; wake android
@@ -2875,10 +2923,10 @@ Func AndroidInvalidState()
 	Return False
 EndFunc   ;==>AndroidInvalidState
 
-Func checkAndroidReboot($bRebootAndroid = True)
+Func CheckAndroidReboot($bRebootAndroid = True)
 
-	If checkAndroidTimeLag($bRebootAndroid) = True _
-			Or checkAndroidPageError($bRebootAndroid) = True Then
+	If CheckAndroidTimeLag($bRebootAndroid) = True _
+			Or CheckAndroidPageError($bRebootAndroid) = True Then
 
 		; Reboot Android
 		Local $_NoFocusTampering = $g_bNoFocusTampering
@@ -2891,7 +2939,7 @@ Func checkAndroidReboot($bRebootAndroid = True)
 
 	Return False
 
-EndFunc   ;==>checkAndroidReboot
+EndFunc   ;==>CheckAndroidReboot
 
 Func GetAndroidProcessPID($sPackage = Default, $bForeground = True)
 	If $sPackage = Default Then $sPackage = $g_sAndroidGamePackage
@@ -3148,3 +3196,4 @@ Func UpdateAndroidBackgroundMode()
 		chkBackground()
 	EndIf
 EndFunc   ;==>UpdateAndroidBackgroundMode
+
