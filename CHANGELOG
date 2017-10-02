@@ -1,5 +1,8 @@
 * **V7.2.6**
  * Add MEmu 3.5.0.2 DirectX support
+ * Add Clash Of Magic support, https://www.clashofmagic.net/
+   Server 3: http://download825.mediafireuserdownload.com/g29mv74piaqg/jeab7w484b77n86/Magic-CoC_S3-9.105-R1.apk
+   http://www.tomzpot.com/android-games/clash-of-magic-9-105-10-private-server-september-2017/
  * Lower Eagle Lvl 2 tolerance and add additional tile for better Weak Base detection
  * Lower Dead Base Collector Lvl 11 tolerance to improve detection
  * Fix wall upgrade not saving resources for enabled non-repeated building upgrades when a builder is available
@@ -8,7 +11,6 @@
  * Improve remaing attack time calculation
  * Improve Android reboot on time lag after 2 detections
  * Update ProfileReport Code & OCR
- * Fix Donate CC opening clan
  * Fix Log Messages when Heroes are not enabled to auto Upgrade
 
 * **V7.2.5**

@@ -454,7 +454,7 @@ Func DonateCC($Check = False)
 
 			$bDonate = True
 			$y = $g_aiDonatePixel[1] + 50
-			;ClickP($aAway, 1, 0, "#0171")
+			ClickP($aAway, 1, 0, "#0171")
 			If _Sleep($DELAYDONATECC2) Then ExitLoop
 		EndIf
 		;ck for more donate buttons
@@ -484,7 +484,7 @@ Func DonateCC($Check = False)
 		$bDonate = False
 	WEnd
 
-	;ClickP($aAway, 1, 0, "#0176") ; click away any possible open window
+	ClickP($aAway, 1, 0, "#0176") ; click away any possible open window
 	If _Sleep($DELAYDONATECC2) Then Return
 
 	$i = 0
