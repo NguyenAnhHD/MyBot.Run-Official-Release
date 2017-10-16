@@ -17,6 +17,7 @@
 #include <APIErrorsConstants.au3>
 #include <WindowsConstants.au3>
 #include <WinAPI.au3>
+#include <WinAPISys.au3>
 #include <Process.au3>
 #include <Math.au3> ; Added for Weak Base
 #include <ButtonConstants.au3>
@@ -53,6 +54,7 @@
 #include <GuiListView.au3>
 #include <GUIToolTip.au3>
 #include <Crypt.au3>
+#include <Timers.au3>
 
 Global Const $g_sLogoPath = @ScriptDir & "\Images\Logo.png"
 Global Const $g_sLogoUrlPath = @ScriptDir & "\Images\LogoURL.png"
@@ -181,6 +183,9 @@ Global $g_hHBitmap ; Handle Image for pixel functions
 Global $g_hHBitmap2 ; handle to Device Context (DC) with graphics captured by _captureregion2()
 Global $g_bOcrForceCaptureRegion = True ; When True take new $g_hHBitmap2 screenshot of OCR area otherwise create area from existing (fullscreen!) $g_hHBitmap2
 
+Global $g_iGuiMode = 1 ; GUI Mode: 1 = normal, main form and all controls created, 2 = mini, main form only with buttons, 0 = GUI less, without any form
+Global $g_bGuiRemote = False ; GUI Remote flag
+Global $g_iGuiPID = @AutoItPID
 Global $g_iDpiAwarenessMode = 1 ; 0 = Disable new DPI Desktop handling, 1 = Enable and set DPI Awareness as needed
 
 ;Global $sFile = @ScriptDir & "\Icons\logo.gif"
@@ -200,6 +205,9 @@ Global $g_sAndroidGameClass = ".GameApp" ; Default CoC Game Class, loaded from c
 Global $g_sUserGameDistributor = "Google" ; User Added CoC Game Distributor, loaded from config.ini
 Global $g_sUserGamePackage = "com.supercell.clashofclans" ; User Added CoC Game Package, loaded from config.ini
 Global $g_sUserGameClass = ".GameApp" ; User Added CoC Game Class, loaded from config.ini
+
+Global $g_hAndroidLaunchTime = 0 ; __TimerInit() when Android was last launched
+Global $g_iAndroidRebootHours = 24 ; Default hours when Android gets automatically rebooted
 
 ; embed
 Global Const $g_bAndroidShieldPreWin8 = (_WinAPI_GetVersion() < 6.2) ; Layered Child Window only support for WIN_8 and later
@@ -412,9 +420,6 @@ Global $__VBoxExtraData ; Virtualbox extra data details of android instance
 #Tidy_On
 #EndRegion Android.au3
 
-; Tooltips
-Global $g_hToolTip = 0
-
 ; set ImgLoc threads use
 Global $g_iGlobalActiveBotsAllowed = EnvGet("NUMBER_OF_PROCESSORS") ; Number of parallel running bots allowed
 If IsNumber($g_iGlobalActiveBotsAllowed) = 0 Or $g_iGlobalActiveBotsAllowed < 1 Then $g_iGlobalActiveBotsAllowed = 2 ; ensure that multiple bots can run
@@ -468,6 +473,7 @@ Global $g_hMutex_MyBot = 0
 
 ; Detected Bot Instance thru watchdog registration
 Global $g_BotInstanceCount = 0
+Global $g_WatchOnlyClientPID = Default
 
 ; Arrays to hold stat information
 Global $g_aiWeakBaseStats
@@ -528,6 +534,7 @@ Global $g_bBotMoveRequested = False ; should the bot be moved
 Global $g_bBotShrinkExpandToggleRequested = False ; should the bot be slided
 Global $g_bRestart = False
 Global $g_bRunState = False
+Global $g_bIdleState = False ; bot is in Idle() routine waiting for things to finish
 Global $g_bBtnAttackNowPressed = False ; Set to true if any of the 3 attack now buttons are pressed
 Global $g_iCommandStop = -1
 Global $g_bMeetCondStop = False
@@ -1058,6 +1065,7 @@ Global $g_bDeleteLogs = True, $g_iDeleteLogsDays = 2, $g_bDeleteTemp = True, $g_
 Global $g_bAutoStart = False, $g_iAutoStartDelay = 10
 Global $b_iAutoRestartDelay = 0 ; Automatically restart bot after so many Seconds, 0 = disabled
 Global $g_bCheckGameLanguage = True
+Global $g_bAutoUpdateGame = False
 Global $g_bAutoAlignEnable = True, $g_iAutoAlignPosition = 0, $g_iAutoAlignOffsetX = 10, $g_iAutoAlignOffsetY = 10
 Global $g_bUpdatingWhenMinimized = True ; Alternative Minimize Window routine for bot that enables window updates when minimized
 Global $g_bHideWhenMinimized = False ; Hide bot window in taskbar when minimized

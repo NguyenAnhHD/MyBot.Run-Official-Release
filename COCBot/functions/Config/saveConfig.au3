@@ -14,6 +14,9 @@
 ; ===============================================================================================================================
 
 Func saveConfig()
+
+	If $g_iGuiMode = 0 Then Return
+
 	Local $t = __TimerInit()
 
 	Static $iSaveConfigCount = 0
@@ -254,6 +257,8 @@ Func SaveConfig_Android()
 	_Ini_Add("android", "suspend.mode", $g_iAndroidSuspendModeFlags)
 	_Ini_Add("android", "emulator", $g_sAndroidEmulator)
 	_Ini_Add("android", "instance", $g_sAndroidInstance)
+	_Ini_Add("android", "reboot.hours", $g_iAndroidRebootHours)
+
 EndFunc   ;==>SaveConfig_Android
 
 Func SaveConfig_Debug()

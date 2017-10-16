@@ -148,6 +148,7 @@
 #include "functions\Android\ZoomOut.au3"
 #include "functions\Android\CheckAndroidTimeLag.au3"
 #include "functions\Android\CheckAndroidPageError.au3"
+#include "functions\Android\CheckAndroidRebootCondition.au3"
 #include "functions\Android\AndroidBlueStacks.au3"
 #include "functions\Android\AndroidDroid4X.au3"
 #include "functions\Android\AndroidMEmu.au3"
@@ -159,6 +160,7 @@
 #include "functions\Android\UniversalCloseWaitOpenCoC.au3"
 #include "functions\Android\AndroidEmbed.au3"
 
+#include "functions\Other\WmiAPI.au3"
 #include "functions\Other\WerFaultClose.au3"
 #include "functions\Other\_NumberFormat.au3"
 #include "functions\Other\_PadStringCenter.au3"

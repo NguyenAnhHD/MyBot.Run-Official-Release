@@ -24,6 +24,7 @@ Global $g_hFrmBot_WNDPROC_ptr = 0
 ;~ Control Tab Files
 ;~ ------------------------------------------------------
 ;~ #include "GUI\InitializeVariables.au3"
+#cs
 #include "MBR GUI Control Variables.au3"
 #include "GUI\MBR GUI Control Bottom.au3"
 #include "GUI\MBR GUI Control Tab General.au3"
@@ -47,6 +48,7 @@ Global $g_hFrmBot_WNDPROC_ptr = 0
 #include "GUI\MBR GUI Control Child Misc.au3"
 #include "GUI\MBR GUI Control Android.au3"
 #include "MBR GUI Action.au3"
+#ce
 
 Func InitializeMainGUI()
    InitializeControlVariables()
@@ -65,6 +67,7 @@ Func InitializeMainGUI()
 	   ;applyConfig()
 	   setupProfileComboBox()
    EndIf
+
    selectProfile() ; Choose the profile
 
    ; Read saved settings
@@ -132,7 +135,6 @@ Func SetCriticalMessageProcessing($bEnterCritical = Default)
 EndFunc   ;==>SetCriticalMessageProcessing
 
 Func UpdateFrmBotStyle()
-	If $g_iGuiMode = 0 Then Return False
 	#cs Works but causes bot window not to get activated anymore
 	Local $ShowMinimize = $g_bAndroidBackgroundLaunched = True Or $g_bAndroidEmbedded = False Or ($g_bAndroidEmbedded = True And $g_bAndroidAdbScreencap = True And $g_bChkBackgroundMode = True)
 	WindowSystemMenu($g_hFrmBot, $SC_MINIMIZE, $ShowMinimize, "Minimize")
@@ -167,7 +169,6 @@ EndFunc   ;==>IsAlwaysEnabledControl
 
 ; Accelerator Key, more responsive than buttons in run-mode
 Func SetAccelerators($bDockedUnshieledFocus = False)
-	If $g_iGuiMode = 0 Then Return
    Local $aAccelKeys[2][2] = [["{ESC}", $g_hBtnStop], ["{PAUSE}", $g_hBtnPause]]
    Local $aAccelKeys_DockedUnshieldedFocus[3][2] = [["{ESC}", $g_hFrmBotEmbeddedShieldInput], ["{ENTER}", $g_hFrmBotEmbeddedShieldInput], ["{PAUSE}", $g_hBtnPause]] ; used in docked mode when android has focus to support ESC for android
 
@@ -471,17 +472,7 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 				PushMsg("DeleteAllPBMessages") ; call directly when bot is stopped
 			EndIf
 		Case $g_hBtnMakeScreenshot
-			If $g_bRunState Then
-				; call with flag when bot is running to execute on _sleep() idle
-				btnMakeScreenshot()
-			Else
-				; call directly when bot is stopped
-				If $g_bScreenshotPNGFormat = False Then
-					MakeScreenshot($g_sProfileTempPath, "jpg")
-				Else
-					MakeScreenshot($g_sProfileTempPath, "png")
-				EndIf
-			EndIf
+			btnMakeScreenshot()
 		Case $g_hPicTwoArrowShield
 			btnVillageStat()
 		Case $g_hPicArrowLeft, $g_hPicArrowRight
@@ -1371,7 +1362,6 @@ Func SetTime($bForceUpdate = False)
 EndFunc   ;==>SetTime
 
 Func tabMain()
-	If $g_iGuiMode = 0 Then Return
 	Local $tabidx = GUICtrlRead($g_hTabMain)
 		Select
 			Case $tabidx = 0 ; Log

@@ -13,9 +13,12 @@
 #include-once
 
 Global $sWatchdogMutex = "MyBot.run/ManageFarm"
-Global $tagSTRUCT_BOT_STATE = "struct;hwnd frmBot;hwnd HWnD;boolean RunState;boolean TPaused;endstruct"
+Global $tagSTRUCT_BOT_STATE = "struct;hwnd BotHWnd;hwnd AndroidHWnd;boolean RunState;boolean Paused;boolean Launched;char Profile[64];char AndroidEmulator[32];char AndroidInstance[32];int StructType;ptr StructPtr;endstruct"
+Global Enum $g_eSTRUCT_NONE = 0, $g_eSTRUCT_STATUS_BAR
+Global $tagSTRUCT_STATUS_BAR = "struct;char Text[255];endstruct"
 Global $tBotState = DllStructCreate($tagSTRUCT_BOT_STATE)
-Global $WM_MYBOTRUN_API_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/API/1.0")
+Global $tStatusBar = DllStructCreate($tagSTRUCT_STATUS_BAR)
+Global $WM_MYBOTRUN_API_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/API/1.1")
 ;SetDebugLog("MyBot.run/API/1.0 Message = " & $WM_MYBOTRUN_API_1_0)
-Global $WM_MYBOTRUN_STATE_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/1.0")
+Global $WM_MYBOTRUN_STATE_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/1.1")
 ;SetDebugLog("MyBot.run/STATE/1.0 Message = " & $WM_MYBOTRUN_STATE_1_0)

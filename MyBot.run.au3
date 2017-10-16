@@ -11,14 +11,13 @@
 ; ===============================================================================================================================
 
 ; AutoIt pragmas
+#NoTrayIcon
 #RequireAdmin
 #AutoIt3Wrapper_UseX64=7n
 ;#AutoIt3Wrapper_Res_HiDpi=Y ; HiDpi will be set during run-time!
 #AutoIt3Wrapper_Run_Au3Stripper=y
 #Au3Stripper_Parameters=/rsln /MI=3
 ;/SV=0
-
-;#AutoIt3Wrapper_Change2CUI=y
 ;#pragma compile(Console, true)
 #include "MyBot.run.version.au3"
 #pragma compile(ProductName, My Bot)
@@ -64,11 +63,11 @@ InitializeBot()
 MainLoop()
 
 Func UpdateBotTitle()
-	Local $sTitle = "My Bot " & $g_sBotVersion & " "
+	Local $sTitle = "My Bot " & $g_sBotVersion
 	If $g_sBotTitle = "" Then
 		$g_sBotTitle = $sTitle
 	Else
-		$g_sBotTitle = $sTitle & "(" & ($g_sAndroidInstance <> "" ? $g_sAndroidInstance : $g_sAndroidEmulator) & ")" ;Do not change this. If you do, multiple instances will not work.
+		$g_sBotTitle = $sTitle & " (" & ($g_sAndroidInstance <> "" ? $g_sAndroidInstance : $g_sAndroidEmulator) & ")" ;Do not change this. If you do, multiple instances will not work.
 	EndIf
 	If $g_hFrmBot <> 0 Then
 		; Update Bot Window Title also
@@ -84,8 +83,6 @@ Func UpdateBotTitle()
 EndFunc   ;==>UpdateBotTitle
 
 Func InitializeBot()
-
-	TraySetIcon($g_sLibIconPath, $eIcnGUI)
 
 	ProcessCommandLine()
 
@@ -112,15 +109,12 @@ Func InitializeBot()
 	_Crypt_Startup()
 	__GDIPlus_Startup() ; Start GDI+ Engine (incl. a new thread)
 
-	; initialize bot title
-	UpdateBotTitle()
-
 	InitAndroidConfig()
 
-	If FileExists(@ScriptDir & "\EnableMBRDebug.txt") Then  ; Set developer mode
+	If FileExists(@ScriptDir & "\EnableMBRDebug.txt") Then ; Set developer mode
 		$g_bDevMode = True
 		Local $aText = FileReadToArray(@ScriptDir & "\EnableMBRDebug.txt") ; check if special debug flags set inside EnableMBRDebug.txt file
-		If Not @error  Then
+		If Not @error Then
 			For $l = 0 To UBound($aText) - 1
 				If StringInStr($aText[$l], "DISABLEWATCHDOG", $STR_NOCASESENSEBASIC) <> 0 Then
 					$g_bBotLaunchOption_NoWatchdog = True
@@ -203,11 +197,26 @@ Func ProcessCommandLine()
 					$g_iBotLaunchOption_Dock = 2
 				Case "/nobotslot", "/nbs", "-nobotslot", "-nbs"
 					$g_bBotLaunchOption_NoBotSlot = True
+				Case "/debug", "/debugmode", "/dev", "-debug", "-dev"
+					$g_bDevMode = True
+				Case "/minigui", "/mg", "-minigui", "-mg"
+					$g_iGuiMode = 2
+				Case "/nogui", "/ng", "-nogui", "-ng"
+					$g_iGuiMode = 0
 				Case Else
-					$bOptionDetected = False
-					$g_asCmdLine[0] += 1
-					ReDim $g_asCmdLine[$g_asCmdLine[0] + 1]
-					$g_asCmdLine[$g_asCmdLine[0]] = $CmdLine[$i]
+					If StringInStr($CmdLine[$i], "/guipid=") Then
+						Local $guidpid = Int(StringMid($CmdLine[$i], 9))
+						If ProcessExists($guidpid) Then
+							$g_iGuiPID = $guidpid
+						Else
+							SetDebugLog("GUI Process doesn't exist: " & $guidpid)
+						EndIf
+					Else
+						$bOptionDetected = False
+						$g_asCmdLine[0] += 1
+						ReDim $g_asCmdLine[$g_asCmdLine[0] + 1]
+						$g_asCmdLine[$g_asCmdLine[0]] = $CmdLine[$i]
+					EndIf
 			EndSwitch
 			If $bOptionDetected Then SetDebugLog("Command Line Option detected: " & $CmdLine[$i])
 		Next
@@ -242,6 +251,7 @@ EndFunc   ;==>ProcessCommandLine
 ; Example .......: No
 ; ===============================================================================================================================
 Func InitializeAndroid()
+
 	Local $s = GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_06", "Initializing Android...")
 	SplashStep($s)
 
@@ -503,6 +513,7 @@ Func FinalInitialization(Const $sAI)
 	If CheckPrerequisites(True) Then
 		MBRFunc(True) ; start MyBot.run.dll, after this point .net is initialized and threads popup all the time
 		setAndroidPID() ; set Android PID
+		SetBotGuiPID(); set GUI PID
 	EndIf
 
 	If $g_bFoundRunningAndroid Then
@@ -755,6 +766,15 @@ Func runBot() ;Bot that runs everything in order
 EndFunc   ;==>runBot
 
 Func Idle() ;Sequence that runs until Full Army
+
+	$g_bIdleState = True
+	Local $Result = _Idle()
+	$g_bIdleState = False
+	Return $Result
+
+EndFunc   ;==>Idle
+
+Func _Idle() ;Sequence that runs until Full Army
 	Static $iCollectCounter = 0 ; Collect counter, when reaches $g_iCollectAtCount, it will collect
 
 	Local $TimeIdle = 0 ;In Seconds
@@ -786,7 +806,7 @@ Func Idle() ;Sequence that runs until Full Army
 				If $g_bRestart = True Then ExitLoop
 				If CheckAndroidReboot() Then ContinueLoop 2
 			WEnd
-		EndIF
+		EndIf
 		If _Sleep($DELAYIDLE1) Then ExitLoop
 		checkObstacles() ; trap common error messages also check for reconnecting animation
 		checkMainScreen(False) ; required here due to many possible exits
@@ -886,7 +906,7 @@ Func Idle() ;Sequence that runs until Full Army
 		EndIf
 
 	WEnd
-EndFunc   ;==>Idle
+EndFunc   ;==>_Idle
 
 Func AttackMain() ;Main control for attack functions
 	;LoadAmountOfResourcesImages() ; for debug
@@ -1016,7 +1036,7 @@ Func _RunFunction($action)
 				;If $g_bDonateSkipNearFullEnable = True and $g_bFirstStart = False Then getArmyCapacity(True, True)
 				If SkipDonateNearFullTroops(True) = False And BalanceDonRec(True) Then DonateCC()
 				If _Sleep($DELAYRUNBOT1) = False Then checkMainScreen(False)
-			EndIF
+			EndIf
 		Case "DonateCC,Train"
 			If $g_iActiveDonate And $g_bChkDonate Then
 				If $g_bFirstStart Then
@@ -1024,7 +1044,7 @@ Func _RunFunction($action)
 					getArmySpellCapacity(False, True)
 				EndIf
 				If SkipDonateNearFullTroops(True) = False And BalanceDonRec(True) Then DonateCC()
-			EndIF
+			EndIf
 			If _Sleep($DELAYRUNBOT1) = False Then checkMainScreen(False)
 			If $g_bTrainEnabled Then ; check for training enabled in halt mode
 				If $g_iActualTrainSkip < $g_iMaxTrainSkip Then
@@ -1038,8 +1058,8 @@ Func _RunFunction($action)
 						$g_iActualTrainSkip = 0
 					EndIf
 					CheckOverviewFullArmy(True, False) ; use true parameter to open train overview window
-					If ISArmyWindow(False, $ArmyTAB) then CheckExistentArmy("Spells") ; Imgloc Method
-					getArmyHeroCount(False, TRue)
+					If ISArmyWindow(False, $ArmyTAB) Then CheckExistentArmy("Spells") ; Imgloc Method
+					getArmyHeroCount(False, True)
 				EndIf
 			Else
 				If $g_iDebugSetlogTrain = 1 Then Setlog("Halt mode - training disabled", $COLOR_DEBUG)

@@ -162,8 +162,21 @@ Func _checkObstacles($bBuilderBase = False) ;Checks if something is in the way f
 				EndIf
 				$Result = getOcrMaintenanceTime(171, 325 + $g_iMidOffsetY, "Check Obstacles OCR 'Good News!'=") ; OCR text for "Good News!"
 				If StringInStr($Result, "new", $STR_NOCASESENSEBASIC) Then
-					$msg = "Game Update is required, Bot must stop!!"
-					Return checkObstacles_StopBot($msg) ; stop bot
+					If Not $g_bAutoUpdateGame Then
+						$msg = "Game Update is required, Bot must stop!!"
+						Return checkObstacles_StopBot($msg) ; stop bot
+					Else
+						; CoC update required
+						Switch UpdateGame()
+							Case True, Default
+								; Update completed or not required
+								Return checkObstacles_ReloadCoC()
+							Case False
+								; Update failed
+								$msg = "Game Update failed, Bot must stop!!"
+								Return checkObstacles_StopBot($msg) ; stop bot
+						EndSwitch
+					EndIf
 				ElseIf StringInStr($Result, "rate", $STR_NOCASESENSEBASIC) Then ; back up check for rate CoC reload window
 					SetLog("Clash feedback window found, permanently closed!", $COLOR_ERROR)
 					PureClick(248, 408 + $g_iMidOffsetY, 1, 0, "#9999") ; Click on never to close window and stop reappear. Never=248,408 & Later=429,408
@@ -343,3 +356,32 @@ Func checkObstacles_Network($bForceCapture = False, $bReloadCoC = True)
 
 	Return False
 EndFunc   ;==>checkObstacles_Network
+
+Func UpdateGame()
+	; launch Play Store
+	SetLog("Open Play Store for Game Update...")
+	OpenPlayStoreGame()
+#cs Finish that when time permits ;)
+	; wait 1 Minute to open
+
+	; Check for Update button
+		SetLog("Play Store Game update available"
+
+	; Check for Open button
+		SetLog("Play Store Game update not required"
+		Return Default
+
+	; press update button
+
+	; press accept button
+
+	; track progress, area 17,317 - 805,335
+
+	; Check for Open button
+		SetLog("Game updated"
+		Return True
+
+	SetLog("Game updated failed"
+	Return False
+#ce
+EndFunc   ;==>UpdateGame

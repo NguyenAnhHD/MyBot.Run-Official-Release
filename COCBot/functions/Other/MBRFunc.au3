@@ -101,6 +101,27 @@ Func setAndroidPID($pid = GetAndroidPid())
 	EndIf
 EndFunc   ;==>setAndroidPID
 
+Func SetBotGuiPID($pid = $g_iGuiPID)
+	If $g_hLibMyBot = -1 Then Return ; Bot didn't finish launch yet
+	SetDebugLog("SetBotGuiPID: $pid=" & $pid)
+	Local $result = DllCall($g_hLibMyBot, "str", "SetBotGuiPID", "int", $pid)
+	If @error Then
+		_logErrorDLLCall($g_sLibMyBotPath & ", SetBotGuiPID:", @error)
+		Return SetError(@error)
+	EndIf
+	;dll return 0 on success, -1 on error
+	If IsArray($result) Then
+		If $result[0] = "" Then
+			SetDebugLog($g_sMBRLib & " error setting Android PID.")
+		Else
+			SetDebugLog("Bot GUI PID=" & $pid & " initialized: " & $result[0])
+			;debugMBRFunctions($g_iDebugSearchArea, $g_iDebugRedArea, $g_iDebugOcr) ; set debug levels
+		EndIf
+	Else
+		SetDebugLog($g_sMBRLib & " not found.", $COLOR_ERROR)
+	EndIf
+EndFunc   ;==>setAndroidPID
+
 Func setVillageOffset($x, $y, $z)
 	DllCall($g_hLibMyBot, "str", "setVillageOffset", "int", $x, "int", $y, "float", $z)
 	DllCall($g_hLibImgLoc, "str", "setVillageOffset", "int", $x, "int", $y, "float", $z) ;set values in imgloc also

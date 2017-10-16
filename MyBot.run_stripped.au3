@@ -1,4 +1,5 @@
-﻿#RequireAdmin
+﻿#NoTrayIcon
+#RequireAdmin
 #pragma compile(ProductName, My Bot)
 #pragma compile(Out, MyBot.run.exe) ; Required
 Global $g_sBotVersion = "v7.2.6"
@@ -867,6 +868,264 @@ If @error Then Return SetError(@error, @extended, False)
 $iWritten = $aResult[4]
 Return $aResult[0]
 EndFunc
+Global Const $HANDLE_FLAG_INHERIT = 0x00000001
+Global Const $MAPVK_VK_TO_CHAR = 2
+Global $__g_vEnum, $__g_vExt = 0
+Global $__g_hHeap = 0, $__g_iRGBMode = 1
+Global Const $tagOSVERSIONINFO = 'struct;dword OSVersionInfoSize;dword MajorVersion;dword MinorVersion;dword BuildNumber;dword PlatformId;wchar CSDVersion[128];endstruct'
+Global Const $__WINVER = __WINVER()
+Func _WinAPI_CreatePoint($iX, $iY)
+Local $tPOINT = DllStructCreate($tagPOINT)
+DllStructSetData($tPOINT, 1, $iX)
+DllStructSetData($tPOINT, 2, $iY)
+Return $tPOINT
+EndFunc
+Func _WinAPI_CreateRect($iLeft, $iTop, $iRight, $iBottom)
+Local $tRECT = DllStructCreate($tagRECT)
+DllStructSetData($tRECT, 1, $iLeft)
+DllStructSetData($tRECT, 2, $iTop)
+DllStructSetData($tRECT, 3, $iRight)
+DllStructSetData($tRECT, 4, $iBottom)
+Return $tRECT
+EndFunc
+Func _WinAPI_CreateRectEx($iX, $iY, $iWidth, $iHeight)
+Local $tRECT = DllStructCreate($tagRECT)
+DllStructSetData($tRECT, 1, $iX)
+DllStructSetData($tRECT, 2, $iY)
+DllStructSetData($tRECT, 3, $iX + $iWidth)
+DllStructSetData($tRECT, 4, $iY + $iHeight)
+Return $tRECT
+EndFunc
+Func _WinAPI_CreateSize($iWidth, $iHeight)
+Local $tSIZE = DllStructCreate($tagSIZE)
+DllStructSetData($tSIZE, 1, $iWidth)
+DllStructSetData($tSIZE, 2, $iHeight)
+Return $tSIZE
+EndFunc
+Func _WinAPI_FatalExit($iCode)
+DllCall('kernel32.dll', 'none', 'FatalExit', 'int', $iCode)
+If @error Then Return SetError(@error, @extended)
+EndFunc
+Func _WinAPI_GetBitmapDimension($hBitmap)
+Local Const $tagBITMAP = 'struct;long bmType;long bmWidth;long bmHeight;long bmWidthBytes;ushort bmPlanes;ushort bmBitsPixel;ptr bmBits;endstruct'
+Local $tObj = DllStructCreate($tagBITMAP)
+Local $aRet = DllCall('gdi32.dll', 'int', 'GetObject', 'handle', $hBitmap, 'int', DllStructGetSize($tObj), 'struct*', $tObj)
+If @error Or Not $aRet[0] Then Return SetError(@error + 10, @extended, 0)
+Return _WinAPI_CreateSize(DllStructGetData($tObj, 'bmWidth'), DllStructGetData($tObj, 'bmHeight'))
+EndFunc
+Func _WinAPI_IsBadReadPtr($pAddress, $iLength)
+Local $aRet = DllCall('kernel32.dll', 'bool', 'IsBadReadPtr', 'struct*', $pAddress, 'uint_ptr', $iLength)
+If @error Then Return SetError(@error, @extended, False)
+Return $aRet[0]
+EndFunc
+Func _WinAPI_IsBadWritePtr($pAddress, $iLength)
+Local $aRet = DllCall('kernel32.dll', 'bool', 'IsBadWritePtr', 'struct*', $pAddress, 'uint_ptr', $iLength)
+If @error Then Return SetError(@error, @extended, False)
+Return $aRet[0]
+EndFunc
+Func _WinAPI_MoveMemory($pDestination, $pSource, $iLength)
+If _WinAPI_IsBadReadPtr($pSource, $iLength) Then Return SetError(10, @extended, 0)
+If _WinAPI_IsBadWritePtr($pDestination, $iLength) Then Return SetError(11, @extended, 0)
+DllCall('ntdll.dll', 'none', 'RtlMoveMemory', 'struct*', $pDestination, 'struct*', $pSource, 'ulong_ptr', $iLength)
+If @error Then Return SetError(@error, @extended, 0)
+Return 1
+EndFunc
+Func _WinAPI_StrLen($pString, $bUnicode = True)
+Local $W = ''
+If $bUnicode Then $W = 'W'
+Local $aRet = DllCall('kernel32.dll', 'int', 'lstrlen' & $W, 'struct*', $pString)
+If @error Then Return SetError(@error, @extended, 0)
+Return $aRet[0]
+EndFunc
+Func _WinAPI_SwitchColor($iColor)
+If $iColor = -1 Then Return $iColor
+Return BitOR(BitAND($iColor, 0x00FF00), BitShift(BitAND($iColor, 0x0000FF), -16), BitShift(BitAND($iColor, 0xFF0000), 16))
+EndFunc
+Func _WinAPI_ZeroMemory($pMemory, $iLength)
+If _WinAPI_IsBadWritePtr($pMemory, $iLength) Then Return SetError(11, @extended, 0)
+DllCall('ntdll.dll', 'none', 'RtlZeroMemory', 'struct*', $pMemory, 'ulong_ptr', $iLength)
+If @error Then Return SetError(@error, @extended, 0)
+Return 1
+EndFunc
+Func __CheckErrorArrayBounds(Const ByRef $aData, ByRef $iStart, ByRef $iEnd, $nDim = 1, $iDim = $UBOUND_DIMENSIONS)
+If Not IsArray($aData) Then Return SetError(1, 0, 1)
+If UBound($aData, $iDim) <> $nDim Then Return SetError(2, 0, 1)
+If $iStart < 0 Then $iStart = 0
+Local $iUBound = UBound($aData) - 1
+If $iEnd < 1 Or $iEnd > $iUBound Then $iEnd = $iUBound
+If $iStart > $iEnd Then Return SetError(4, 0, 1)
+Return 0
+EndFunc
+Func __CheckErrorCloseHandle($aRet, $hFile, $bLastError = 0, $iCurErr = @error, $iCurExt = @extended)
+If Not $iCurErr And Not $aRet[0] Then $iCurErr = 10
+Local $iLastError = _WinAPI_GetLastError()
+DllCall("kernel32.dll", "bool", "CloseHandle", "handle", $hFile)
+If $iCurErr Then _WinAPI_SetLastError($iLastError)
+If $bLastError Then $iCurExt = $iLastError
+Return SetError($iCurErr, $iCurExt, $iCurErr)
+EndFunc
+Func __EnumWindowsProc($hWnd, $bVisible)
+Local $aResult
+If $bVisible Then
+$aResult = DllCall("user32.dll", "bool", "IsWindowVisible", "hwnd", $hWnd)
+If Not $aResult[0] Then
+Return 1
+EndIf
+EndIf
+__Inc($__g_vEnum)
+$__g_vEnum[$__g_vEnum[0][0]][0] = $hWnd
+$aResult = DllCall("user32.dll", "int", "GetClassNameW", "hwnd", $hWnd, "wstr", "", "int", 4096)
+$__g_vEnum[$__g_vEnum[0][0]][1] = $aResult[2]
+Return 1
+EndFunc
+Func __FatalExit($iCode, $sText = '')
+If $sText Then MsgBox($MB_SYSTEMMODAL, 'AutoIt', $sText)
+_WinAPI_FatalExit($iCode)
+EndFunc
+Func __HeapAlloc($iSize, $bAbort = False)
+Local $aRet
+If Not $__g_hHeap Then
+$aRet = DllCall('kernel32.dll', 'handle', 'HeapCreate', 'dword', 0, 'ulong_ptr', 0, 'ulong_ptr', 0)
+If @error Or Not $aRet[0] Then __FatalExit(1, 'Error allocating memory.')
+$__g_hHeap = $aRet[0]
+EndIf
+$aRet = DllCall('kernel32.dll', 'ptr', 'HeapAlloc', 'handle', $__g_hHeap, 'dword', 0x00000008, 'ulong_ptr', $iSize)
+If @error Or Not $aRet[0] Then
+If $bAbort Then __FatalExit(1, 'Error allocating memory.')
+Return SetError(@error + 30, @extended, 0)
+EndIf
+Return $aRet[0]
+EndFunc
+Func __HeapReAlloc($pMemory, $iSize, $bAmount = False, $bAbort = False)
+Local $aRet, $pRet
+If __HeapValidate($pMemory) Then
+If $bAmount And(__HeapSize($pMemory) >= $iSize) Then Return SetExtended(1, Ptr($pMemory))
+$aRet = DllCall('kernel32.dll', 'ptr', 'HeapReAlloc', 'handle', $__g_hHeap, 'dword', 0x00000008, 'ptr', $pMemory, 'ulong_ptr', $iSize)
+If @error Or Not $aRet[0] Then
+If $bAbort Then __FatalExit(1, 'Error allocating memory.')
+Return SetError(@error + 20, @extended, Ptr($pMemory))
+EndIf
+$pRet = $aRet[0]
+Else
+$pRet = __HeapAlloc($iSize, $bAbort)
+If @error Then Return SetError(@error, @extended, 0)
+EndIf
+Return $pRet
+EndFunc
+Func __HeapSize($pMemory, $bCheck = False)
+If $bCheck And(Not __HeapValidate($pMemory)) Then Return SetError(@error, @extended, 0)
+Local $aRet = DllCall('kernel32.dll', 'ulong_ptr', 'HeapSize', 'handle', $__g_hHeap, 'dword', 0, 'ptr', $pMemory)
+If @error Or($aRet[0] = Ptr(-1)) Then Return SetError(@error + 50, @extended, 0)
+Return $aRet[0]
+EndFunc
+Func __HeapValidate($pMemory)
+If(Not $__g_hHeap) Or(Not Ptr($pMemory)) Then Return SetError(9, 0, False)
+Local $aRet = DllCall('kernel32.dll', 'int', 'HeapValidate', 'handle', $__g_hHeap, 'dword', 0, 'ptr', $pMemory)
+If @error Then Return SetError(@error, @extended, False)
+Return $aRet[0]
+EndFunc
+Func __Inc(ByRef $aData, $iIncrement = 100)
+Select
+Case UBound($aData, $UBOUND_COLUMNS)
+If $iIncrement < 0 Then
+ReDim $aData[$aData[0][0] + 1][UBound($aData, $UBOUND_COLUMNS)]
+Else
+$aData[0][0] += 1
+If $aData[0][0] > UBound($aData) - 1 Then
+ReDim $aData[$aData[0][0] + $iIncrement][UBound($aData, $UBOUND_COLUMNS)]
+EndIf
+EndIf
+Case UBound($aData, $UBOUND_ROWS)
+If $iIncrement < 0 Then
+ReDim $aData[$aData[0] + 1]
+Else
+$aData[0] += 1
+If $aData[0] > UBound($aData) - 1 Then
+ReDim $aData[$aData[0] + $iIncrement]
+EndIf
+EndIf
+Case Else
+Return 0
+EndSelect
+Return 1
+EndFunc
+Func __Iif($bTest, $vTrue, $vFalse)
+Return $bTest ? $vTrue : $vFalse
+EndFunc
+Func __Init($dData)
+Local $iLength = BinaryLen($dData)
+Local $aRet = DllCall('kernel32.dll', 'ptr', 'VirtualAlloc', 'ptr', 0, 'ulong_ptr', $iLength, 'dword', 0x00001000, 'dword', 0x00000040)
+If @error Or Not $aRet[0] Then __FatalExit(1, 'Error allocating memory.')
+Local $tData = DllStructCreate('byte[' & $iLength & "]", $aRet[0])
+DllStructSetData($tData, 1, $dData)
+Return $aRet[0]
+EndFunc
+Func __RGB($iColor)
+If $__g_iRGBMode Then
+$iColor = _WinAPI_SwitchColor($iColor)
+EndIf
+Return $iColor
+EndFunc
+Func __WINVER()
+Local $tOSVI = DllStructCreate($tagOSVERSIONINFO)
+DllStructSetData($tOSVI, 1, DllStructGetSize($tOSVI))
+Local $aRet = DllCall('kernel32.dll', 'bool', 'GetVersionExW', 'struct*', $tOSVI)
+If @error Or Not $aRet[0] Then Return SetError(@error, @extended, 0)
+Return BitOR(BitShift(DllStructGetData($tOSVI, 2), -8), DllStructGetData($tOSVI, 3))
+EndFunc
+Func _WinAPI_GetActiveWindow()
+Local $aRet = DllCall('user32.dll', 'hwnd', 'GetActiveWindow')
+If @error Then Return SetError(@error, @extended, 0)
+Return $aRet[0]
+EndFunc
+Func _WinAPI_GetVersion()
+Return BitAND(BitShift($__WINVER, 8), 0xFF) & '.' & BitAND($__WINVER, 0xFF)
+EndFunc
+Func _WinAPI_IsIconic($hWnd)
+Local $aRet = DllCall('user32.dll', 'bool', 'IsIconic', 'hwnd', $hWnd)
+If @error Then Return SetError(@error, @extended, False)
+Return $aRet[0]
+EndFunc
+Func _WinAPI_MapVirtualKey($iCode, $iType, $hLocale = 0)
+Local $aRet = DllCall('user32.dll', 'INT', 'MapVirtualKeyExW', 'uint', $iCode, 'uint', $iType, 'uint_ptr', $hLocale)
+If @error Then Return SetError(@error, @extended, 0)
+Return $aRet[0]
+EndFunc
+Func _WinAPI_QueryPerformanceCounter()
+Local $aRet = DllCall('kernel32.dll', 'bool', 'QueryPerformanceCounter', 'int64*', 0)
+If @error Or Not $aRet[0] Then Return SetError(@error, @extended, 0)
+Return $aRet[1]
+EndFunc
+Func _WinAPI_QueryPerformanceFrequency()
+Local $aRet = DllCall('kernel32.dll', 'bool', 'QueryPerformanceFrequency', 'int64*', 0)
+If @error Or Not $aRet[0] Then Return SetError(@error + 10, @extended, 0)
+Return $aRet[1]
+EndFunc
+Func _WinAPI_SetActiveWindow($hWnd)
+Local $aRet = DllCall('user32.dll', 'int', 'SetActiveWindow', 'hwnd', $hWnd)
+If @error Then Return SetError(@error, @extended, 0)
+Return $aRet[0]
+EndFunc
+Func __EnumDefaultProc($pData, $lParam)
+#forceref $lParam
+Local $iLength = _WinAPI_StrLen($pData)
+__Inc($__g_vEnum)
+If $iLength Then
+$__g_vEnum[$__g_vEnum[0]] = DllStructGetData(DllStructCreate('wchar[' &($iLength + 1) & ']', $pData), 1)
+Else
+$__g_vEnum[$__g_vEnum[0]] = ''
+EndIf
+Return 1
+EndFunc
+Func __EnumPageFilesProc($iSize, $pInfo, $pFile)
+Local $tEPFI = DllStructCreate('dword;dword;ulong_ptr;ulong_ptr;ulong_ptr', $pInfo)
+__Inc($__g_vEnum)
+$__g_vEnum[$__g_vEnum[0][0]][0] = DllStructGetData(DllStructCreate('wchar[' &(_WinAPI_StrLen($pFile) + 1) & ']', $pFile), 1)
+For $i = 1 To 3
+$__g_vEnum[$__g_vEnum[0][0]][$i] = DllStructGetData($tEPFI, $i + 2) * $iSize
+Next
+Return 1
+EndFunc
 Global Const $PROCESS_VM_OPERATION = 0x00000008
 Global Const $PROCESS_VM_READ = 0x00000010
 Global Const $PROCESS_VM_WRITE = 0x00000020
@@ -1567,209 +1826,6 @@ Global Const $TCCM_FIRST = 0X2000
 Global Const $TCM_GETITEMRECT =($TCM_FIRST + 10)
 Global Const $TCM_SETCURFOCUS =($TCM_FIRST + 48)
 Global Const $TCM_SETIMAGELIST = $TCM_FIRST + 3
-Global $__g_vEnum, $__g_vExt = 0
-Global $__g_hHeap = 0, $__g_iRGBMode = 1
-Global Const $tagOSVERSIONINFO = 'struct;dword OSVersionInfoSize;dword MajorVersion;dword MinorVersion;dword BuildNumber;dword PlatformId;wchar CSDVersion[128];endstruct'
-Global Const $__WINVER = __WINVER()
-Func _WinAPI_CreatePoint($iX, $iY)
-Local $tPOINT = DllStructCreate($tagPOINT)
-DllStructSetData($tPOINT, 1, $iX)
-DllStructSetData($tPOINT, 2, $iY)
-Return $tPOINT
-EndFunc
-Func _WinAPI_CreateRect($iLeft, $iTop, $iRight, $iBottom)
-Local $tRECT = DllStructCreate($tagRECT)
-DllStructSetData($tRECT, 1, $iLeft)
-DllStructSetData($tRECT, 2, $iTop)
-DllStructSetData($tRECT, 3, $iRight)
-DllStructSetData($tRECT, 4, $iBottom)
-Return $tRECT
-EndFunc
-Func _WinAPI_CreateRectEx($iX, $iY, $iWidth, $iHeight)
-Local $tRECT = DllStructCreate($tagRECT)
-DllStructSetData($tRECT, 1, $iX)
-DllStructSetData($tRECT, 2, $iY)
-DllStructSetData($tRECT, 3, $iX + $iWidth)
-DllStructSetData($tRECT, 4, $iY + $iHeight)
-Return $tRECT
-EndFunc
-Func _WinAPI_CreateSize($iWidth, $iHeight)
-Local $tSIZE = DllStructCreate($tagSIZE)
-DllStructSetData($tSIZE, 1, $iWidth)
-DllStructSetData($tSIZE, 2, $iHeight)
-Return $tSIZE
-EndFunc
-Func _WinAPI_FatalExit($iCode)
-DllCall('kernel32.dll', 'none', 'FatalExit', 'int', $iCode)
-If @error Then Return SetError(@error, @extended)
-EndFunc
-Func _WinAPI_GetBitmapDimension($hBitmap)
-Local Const $tagBITMAP = 'struct;long bmType;long bmWidth;long bmHeight;long bmWidthBytes;ushort bmPlanes;ushort bmBitsPixel;ptr bmBits;endstruct'
-Local $tObj = DllStructCreate($tagBITMAP)
-Local $aRet = DllCall('gdi32.dll', 'int', 'GetObject', 'handle', $hBitmap, 'int', DllStructGetSize($tObj), 'struct*', $tObj)
-If @error Or Not $aRet[0] Then Return SetError(@error + 10, @extended, 0)
-Return _WinAPI_CreateSize(DllStructGetData($tObj, 'bmWidth'), DllStructGetData($tObj, 'bmHeight'))
-EndFunc
-Func _WinAPI_IsBadReadPtr($pAddress, $iLength)
-Local $aRet = DllCall('kernel32.dll', 'bool', 'IsBadReadPtr', 'struct*', $pAddress, 'uint_ptr', $iLength)
-If @error Then Return SetError(@error, @extended, False)
-Return $aRet[0]
-EndFunc
-Func _WinAPI_IsBadWritePtr($pAddress, $iLength)
-Local $aRet = DllCall('kernel32.dll', 'bool', 'IsBadWritePtr', 'struct*', $pAddress, 'uint_ptr', $iLength)
-If @error Then Return SetError(@error, @extended, False)
-Return $aRet[0]
-EndFunc
-Func _WinAPI_MoveMemory($pDestination, $pSource, $iLength)
-If _WinAPI_IsBadReadPtr($pSource, $iLength) Then Return SetError(10, @extended, 0)
-If _WinAPI_IsBadWritePtr($pDestination, $iLength) Then Return SetError(11, @extended, 0)
-DllCall('ntdll.dll', 'none', 'RtlMoveMemory', 'struct*', $pDestination, 'struct*', $pSource, 'ulong_ptr', $iLength)
-If @error Then Return SetError(@error, @extended, 0)
-Return 1
-EndFunc
-Func _WinAPI_StrLen($pString, $bUnicode = True)
-Local $W = ''
-If $bUnicode Then $W = 'W'
-Local $aRet = DllCall('kernel32.dll', 'int', 'lstrlen' & $W, 'struct*', $pString)
-If @error Then Return SetError(@error, @extended, 0)
-Return $aRet[0]
-EndFunc
-Func _WinAPI_SwitchColor($iColor)
-If $iColor = -1 Then Return $iColor
-Return BitOR(BitAND($iColor, 0x00FF00), BitShift(BitAND($iColor, 0x0000FF), -16), BitShift(BitAND($iColor, 0xFF0000), 16))
-EndFunc
-Func _WinAPI_ZeroMemory($pMemory, $iLength)
-If _WinAPI_IsBadWritePtr($pMemory, $iLength) Then Return SetError(11, @extended, 0)
-DllCall('ntdll.dll', 'none', 'RtlZeroMemory', 'struct*', $pMemory, 'ulong_ptr', $iLength)
-If @error Then Return SetError(@error, @extended, 0)
-Return 1
-EndFunc
-Func __CheckErrorArrayBounds(Const ByRef $aData, ByRef $iStart, ByRef $iEnd, $nDim = 1, $iDim = $UBOUND_DIMENSIONS)
-If Not IsArray($aData) Then Return SetError(1, 0, 1)
-If UBound($aData, $iDim) <> $nDim Then Return SetError(2, 0, 1)
-If $iStart < 0 Then $iStart = 0
-Local $iUBound = UBound($aData) - 1
-If $iEnd < 1 Or $iEnd > $iUBound Then $iEnd = $iUBound
-If $iStart > $iEnd Then Return SetError(4, 0, 1)
-Return 0
-EndFunc
-Func __CheckErrorCloseHandle($aRet, $hFile, $bLastError = 0, $iCurErr = @error, $iCurExt = @extended)
-If Not $iCurErr And Not $aRet[0] Then $iCurErr = 10
-Local $iLastError = _WinAPI_GetLastError()
-DllCall("kernel32.dll", "bool", "CloseHandle", "handle", $hFile)
-If $iCurErr Then _WinAPI_SetLastError($iLastError)
-If $bLastError Then $iCurExt = $iLastError
-Return SetError($iCurErr, $iCurExt, $iCurErr)
-EndFunc
-Func __EnumWindowsProc($hWnd, $bVisible)
-Local $aResult
-If $bVisible Then
-$aResult = DllCall("user32.dll", "bool", "IsWindowVisible", "hwnd", $hWnd)
-If Not $aResult[0] Then
-Return 1
-EndIf
-EndIf
-__Inc($__g_vEnum)
-$__g_vEnum[$__g_vEnum[0][0]][0] = $hWnd
-$aResult = DllCall("user32.dll", "int", "GetClassNameW", "hwnd", $hWnd, "wstr", "", "int", 4096)
-$__g_vEnum[$__g_vEnum[0][0]][1] = $aResult[2]
-Return 1
-EndFunc
-Func __FatalExit($iCode, $sText = '')
-If $sText Then MsgBox($MB_SYSTEMMODAL, 'AutoIt', $sText)
-_WinAPI_FatalExit($iCode)
-EndFunc
-Func __HeapAlloc($iSize, $bAbort = False)
-Local $aRet
-If Not $__g_hHeap Then
-$aRet = DllCall('kernel32.dll', 'handle', 'HeapCreate', 'dword', 0, 'ulong_ptr', 0, 'ulong_ptr', 0)
-If @error Or Not $aRet[0] Then __FatalExit(1, 'Error allocating memory.')
-$__g_hHeap = $aRet[0]
-EndIf
-$aRet = DllCall('kernel32.dll', 'ptr', 'HeapAlloc', 'handle', $__g_hHeap, 'dword', 0x00000008, 'ulong_ptr', $iSize)
-If @error Or Not $aRet[0] Then
-If $bAbort Then __FatalExit(1, 'Error allocating memory.')
-Return SetError(@error + 30, @extended, 0)
-EndIf
-Return $aRet[0]
-EndFunc
-Func __HeapReAlloc($pMemory, $iSize, $bAmount = False, $bAbort = False)
-Local $aRet, $pRet
-If __HeapValidate($pMemory) Then
-If $bAmount And(__HeapSize($pMemory) >= $iSize) Then Return SetExtended(1, Ptr($pMemory))
-$aRet = DllCall('kernel32.dll', 'ptr', 'HeapReAlloc', 'handle', $__g_hHeap, 'dword', 0x00000008, 'ptr', $pMemory, 'ulong_ptr', $iSize)
-If @error Or Not $aRet[0] Then
-If $bAbort Then __FatalExit(1, 'Error allocating memory.')
-Return SetError(@error + 20, @extended, Ptr($pMemory))
-EndIf
-$pRet = $aRet[0]
-Else
-$pRet = __HeapAlloc($iSize, $bAbort)
-If @error Then Return SetError(@error, @extended, 0)
-EndIf
-Return $pRet
-EndFunc
-Func __HeapSize($pMemory, $bCheck = False)
-If $bCheck And(Not __HeapValidate($pMemory)) Then Return SetError(@error, @extended, 0)
-Local $aRet = DllCall('kernel32.dll', 'ulong_ptr', 'HeapSize', 'handle', $__g_hHeap, 'dword', 0, 'ptr', $pMemory)
-If @error Or($aRet[0] = Ptr(-1)) Then Return SetError(@error + 50, @extended, 0)
-Return $aRet[0]
-EndFunc
-Func __HeapValidate($pMemory)
-If(Not $__g_hHeap) Or(Not Ptr($pMemory)) Then Return SetError(9, 0, False)
-Local $aRet = DllCall('kernel32.dll', 'int', 'HeapValidate', 'handle', $__g_hHeap, 'dword', 0, 'ptr', $pMemory)
-If @error Then Return SetError(@error, @extended, False)
-Return $aRet[0]
-EndFunc
-Func __Inc(ByRef $aData, $iIncrement = 100)
-Select
-Case UBound($aData, $UBOUND_COLUMNS)
-If $iIncrement < 0 Then
-ReDim $aData[$aData[0][0] + 1][UBound($aData, $UBOUND_COLUMNS)]
-Else
-$aData[0][0] += 1
-If $aData[0][0] > UBound($aData) - 1 Then
-ReDim $aData[$aData[0][0] + $iIncrement][UBound($aData, $UBOUND_COLUMNS)]
-EndIf
-EndIf
-Case UBound($aData, $UBOUND_ROWS)
-If $iIncrement < 0 Then
-ReDim $aData[$aData[0] + 1]
-Else
-$aData[0] += 1
-If $aData[0] > UBound($aData) - 1 Then
-ReDim $aData[$aData[0] + $iIncrement]
-EndIf
-EndIf
-Case Else
-Return 0
-EndSelect
-Return 1
-EndFunc
-Func __Iif($bTest, $vTrue, $vFalse)
-Return $bTest ? $vTrue : $vFalse
-EndFunc
-Func __Init($dData)
-Local $iLength = BinaryLen($dData)
-Local $aRet = DllCall('kernel32.dll', 'ptr', 'VirtualAlloc', 'ptr', 0, 'ulong_ptr', $iLength, 'dword', 0x00001000, 'dword', 0x00000040)
-If @error Or Not $aRet[0] Then __FatalExit(1, 'Error allocating memory.')
-Local $tData = DllStructCreate('byte[' & $iLength & "]", $aRet[0])
-DllStructSetData($tData, 1, $dData)
-Return $aRet[0]
-EndFunc
-Func __RGB($iColor)
-If $__g_iRGBMode Then
-$iColor = _WinAPI_SwitchColor($iColor)
-EndIf
-Return $iColor
-EndFunc
-Func __WINVER()
-Local $tOSVI = DllStructCreate($tagOSVERSIONINFO)
-DllStructSetData($tOSVI, 1, DllStructGetSize($tOSVI))
-Local $aRet = DllCall('kernel32.dll', 'bool', 'GetVersionExW', 'struct*', $tOSVI)
-If @error Or Not $aRet[0] Then Return SetError(@error, @extended, 0)
-Return BitOR(BitShift(DllStructGetData($tOSVI, 2), -8), DllStructGetData($tOSVI, 3))
-EndFunc
 Func _WinAPI_CreateStreamOnHGlobal($hGlobal = 0, $bDeleteOnRelease = True)
 Local $aReturn = DllCall('ole32.dll', 'long', 'CreateStreamOnHGlobal', 'handle', $hGlobal, 'bool', $bDeleteOnRelease, 'ptr*', 0)
 If @error Then Return SetError(@error, @extended, 0)
@@ -5475,6 +5531,9 @@ Global $g_hBitmap
 Global $g_hHBitmap
 Global $g_hHBitmap2
 Global $g_bOcrForceCaptureRegion = True
+Global $g_iGuiMode = 1
+Global $g_bGuiRemote = False
+Global $g_iGuiPID = @AutoItPID
 Global $g_iDpiAwarenessMode = 1
 Global Const $g_b64Bit = StringInStr(@OSArch, "64") > 0
 Global Const $g_sHKLM = "HKLM" &($g_b64Bit ? "64" : "")
@@ -5486,6 +5545,8 @@ Global $g_sAndroidGameClass = ".GameApp"
 Global $g_sUserGameDistributor = "Google"
 Global $g_sUserGamePackage = "com.supercell.clashofclans"
 Global $g_sUserGameClass = ".GameApp"
+Global $g_hAndroidLaunchTime = 0
+Global $g_iAndroidRebootHours = 24
 Global Const $g_bAndroidShieldPreWin8 =(_WinAPI_GetVersion() < 6.2)
 Global $g_avAndroidShieldDelay[4] = [0, 0, Default, Default]
 Global $g_bAndroidShieldForceDown = False
@@ -5622,7 +5683,6 @@ Global $__VBoxManage_Path
 Global $__VBoxVMinfo
 Global $__VBoxGuestProperties
 Global $__VBoxExtraData
-Global $g_hToolTip = 0
 Global $g_iGlobalActiveBotsAllowed = EnvGet("NUMBER_OF_PROCESSORS")
 If IsNumber($g_iGlobalActiveBotsAllowed) = 0 Or $g_iGlobalActiveBotsAllowed < 1 Then $g_iGlobalActiveBotsAllowed = 2
 Global $g_hMutextOrSemaphoreGlobalActiveBots = 0
@@ -5689,6 +5749,7 @@ Global $g_bBotMoveRequested = False
 Global $g_bBotShrinkExpandToggleRequested = False
 Global $g_bRestart = False
 Global $g_bRunState = False
+Global $g_bIdleState = False
 Global $g_bBtnAttackNowPressed = False
 Global $g_iCommandStop = -1
 Global $g_bMeetCondStop = False
@@ -5953,6 +6014,7 @@ Global $g_bDeleteLogs = True, $g_iDeleteLogsDays = 2, $g_bDeleteTemp = True, $g_
 Global $g_bAutoStart = False, $g_iAutoStartDelay = 10
 Global $b_iAutoRestartDelay = 0
 Global $g_bCheckGameLanguage = True
+Global $g_bAutoUpdateGame = False
 Global $g_bAutoAlignEnable = True, $g_iAutoAlignPosition = 0, $g_iAutoAlignOffsetX = 10, $g_iAutoAlignOffsetY = 10
 Global $g_bUpdatingWhenMinimized = True
 Global $g_bHideWhenMinimized = False
@@ -7318,6 +7380,24 @@ Else
 SetDebugLog($g_sMBRLib & " not found.", $COLOR_ERROR)
 EndIf
 EndFunc
+Func SetBotGuiPID($pid = $g_iGuiPID)
+If $g_hLibMyBot = -1 Then Return
+SetDebugLog("SetBotGuiPID: $pid=" & $pid)
+Local $result = DllCall($g_hLibMyBot, "str", "SetBotGuiPID", "int", $pid)
+If @error Then
+_logErrorDLLCall($g_sLibMyBotPath & ", SetBotGuiPID:", @error)
+Return SetError(@error)
+EndIf
+If IsArray($result) Then
+If $result[0] = "" Then
+SetDebugLog($g_sMBRLib & " error setting Android PID.")
+Else
+SetDebugLog("Bot GUI PID=" & $pid & " initialized: " & $result[0])
+EndIf
+Else
+SetDebugLog($g_sMBRLib & " not found.", $COLOR_ERROR)
+EndIf
+EndFunc
 Func setVillageOffset($x, $y, $z)
 DllCall($g_hLibMyBot, "str", "setVillageOffset", "int", $x, "int", $y, "float", $z)
 DllCall($g_hLibImgLoc, "str", "setVillageOffset", "int", $x, "int", $y, "float", $z)
@@ -7395,6 +7475,7 @@ Global $g_bAndroidSuspended = False
 Global $g_bAndroidQueueReboot = False
 Global $g_iAndroidSuspendedTimer = 0
 Global $g_iSuspendAndroidTime = 0
+Global $g_iSuspendAndroidTimeCount = 0
 Global $g_hSuspendAndroidTimer = 0
 Global $g_aiMouseOffset = [0, 0]
 Func InitAndroidConfig($bRestart = False)
@@ -7514,6 +7595,7 @@ EndIf
 $g_hAndroidWindow = 0
 $g_hAndroidControl = 0
 ResetAndroidProcess()
+InitAndroidRebootCondition(False)
 Return False
 EndIf
 If $g_hAndroidWindow <> 0 And $bRestart Then
@@ -8032,6 +8114,7 @@ Return $parameter
 EndFunc
 Func AndroidBotStartEvent()
 reHide()
+CheckAndroidRebootCondition(True, True)
 Local $Result = Execute($g_sAndroidEmulator & "BotStartEvent()")
 If $Result = "" And @error <> 0 Then $Result = ""
 Return $Result
@@ -8079,7 +8162,9 @@ If $g_bAndroidBackgroundLaunch = False And WinGetAndroidHandle(Default, True) <>
 CloseAndroid("_OpenAndroid")
 If _Sleep(1000) Then Return False
 EndIf
+InitAndroidRebootCondition(False)
 If Not Execute("Open" & $g_sAndroidEmulator & "(" & $bRestart & ")") Then Return False
+InitAndroidRebootCondition(True)
 If $bStartOnlyAndroid Then
 Return True
 EndIf
@@ -9495,19 +9580,24 @@ Func SuspendAndroidTime($Action = False)
 If IsBool($Action) And $Action = True Then
 Local $iTime = $g_iSuspendAndroidTime
 $g_iSuspendAndroidTime = 0
+$g_iSuspendAndroidTimeCount = 0
 $g_hSuspendAndroidTimer = 0
 Return $iTime
 ElseIf $Action = False Then
 Return $g_iSuspendAndroidTime
 EndIf
 If $g_hSuspendAndroidTimer = 0 Then
+ElseIf $Action = "Stats" Then
+SetDebugLog("SuspendAndroidTime: Time = " & $g_iSuspendAndroidTime & ", Count = " & $g_iSuspendAndroidTimeCount)
 Else
-$g_iSuspendAndroidTime += _HPTimerDiff($g_hSuspendAndroidTimer)
+Local $iSuspendTime =(_HPTimerDiff($g_hSuspendAndroidTimer) - 50)
+If $iSuspendTime > 0 Then
+$g_iSuspendAndroidTime += $iSuspendTime
+$g_iSuspendAndroidTimeCount += 1
+EndIf
 $g_hSuspendAndroidTimer = 0
 EndIf
-If IsString($Action) And $Action = "Start" Then
-$g_hSuspendAndroidTimer = _HPTimerInit()
-EndIf
+If $Action = "Start" Then $g_hSuspendAndroidTimer = _HPTimerInit()
 Return $g_iSuspendAndroidTime
 EndFunc
 Func SuspendAndroid($SuspendMode = True, $bDebugLog = Default, $bForceSuspendAndroid = False)
@@ -9649,7 +9739,7 @@ EndIf
 Return False
 EndFunc
 Func CheckAndroidReboot($bRebootAndroid = True)
-If CheckAndroidTimeLag($bRebootAndroid) = True Or CheckAndroidPageError($bRebootAndroid) = True Then
+If CheckAndroidTimeLag($bRebootAndroid) = True Or CheckAndroidPageError($bRebootAndroid) = True Or CheckAndroidRebootCondition($bRebootAndroid) = True Then
 Local $_NoFocusTampering = $g_bNoFocusTampering
 $g_bNoFocusTampering = True
 RebootAndroid()
@@ -10064,6 +10154,7 @@ Local $aRet = DllCall('Shell32.dll', 'LONG', 'SHGetPropertyStoreForWindow', 'HWN
 If @error Then Return SetError(@error, @extended, False)
 Return SetExtended($aRet[0],($aRet[0] = 0))
 EndFunc
+Global $g_hToolTip = 0
 Func _GUICtrlSetTip($controlID, $tiptext, $title = Default, $icon = Default, $options = Default, $useControlID = True)
 If $g_hToolTip = 0 Then
 SetDebugLog("_GUICtrlSetTip: Missing $hToolTip! $controlID=" & $controlID, $COLOR_ERROR)
@@ -10127,8 +10218,10 @@ Next
 EndIf
 EndFunc
 Global Const $TCM_SETITEM = 0x1306
-Global Const $_GUI_MAIN_WIDTH = 472
-Global Const $_GUI_MAIN_HEIGHT = 692
+Global $_GUI_MAIN_WIDTH = 472
+Global $_GUI_MAIN_HEIGHT = 692
+Global Const $_MINIGUI_MAIN_WIDTH = 472
+Global Const $_MINIGUI_MAIN_HEIGHT = 220
 Global $_GUI_MAIN_TOP = 23
 Global $_GUI_MAIN_BUTTON_SIZE = [25, 17]
 Global $_GUI_CHILD_TOP = 110 + $_GUI_MAIN_TOP
@@ -10152,7 +10245,7 @@ Global $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmB
 Global $g_hFrmBot_MAIN_PIC = 0, $g_hFrmBot_URL_PIC = 0, $g_hFrmBot_URL_PIC2 = 0
 Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabAbout = 0
 Global $g_hStatusBar = 0
-Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiExit = 0
+Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiStart = 0, $g_hTiStop = 0, $g_hTiPause = 0, $g_hTiExit = 0
 Global $g_aFrmBotPosInit[8] = [0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hFirstControlToHide = 0, $g_hLastControlToHide = 0, $g_aiControlPrevState[1]
 Global $g_bFrmBotMinimized = False
@@ -10208,18 +10301,19 @@ GUICtrlSetOnEvent(-1, "btnEmbed")
 $g_hChkBackgroundMode = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Bottom", "ChkBackgroundMode", "Background Mode"), $x + 1, $y + 72, 180, 24)
 GUICtrlSetFont(-1, 7)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "ChkBackgroundMode_Info_01", "Check this to ENABLE the Background Mode of the Bot.") & @CRLF & GetTranslatedFileIni("MBR GUI Design Bottom", "ChkBackgroundMode_Info_02", "With this you can also hide the Android Emulator window out of sight."))
+If $g_bGuiRemote Then GUICtrlSetState(-1, $GUI_DISABLE)
 GUICtrlSetOnEvent(-1, "chkBackground")
 GUICtrlSetState(-1,(($g_bAndroidAdbScreencap = True) ?($GUI_CHECKED) :($GUI_UNCHECKED)))
-$g_hLblDonate = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate", "Support the development"), $x + 224, $y + 80, 220, 24, $SS_RIGHT)
-GUICtrlSetCursor(-1, 0)
-GUICtrlSetFont(-1, 8.5, $FW_BOLD)
-_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate_Info_01", "Paypal Donate?"))
 $g_hBtnAttackNowDB = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "BtnAttackNowDB", "DB Attack!"), $x + 190, $y - 4, 60, -1)
 GUICtrlSetState(-1, $GUI_HIDE)
 $g_hBtnAttackNowLB = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "BtnAttackNowLB", "LB Attack!"), $x + 190, $y + 23, 60, -1)
 GUICtrlSetState(-1, $GUI_HIDE)
 $g_hBtnAttackNowTS = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "BtnAttackNowTS", "TH Snipe!"), $x + 190, $y + 50, 60, -1)
 GUICtrlSetState(-1, $GUI_HIDE)
+$g_hLblDonate = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate", "Support the development"), $x + 224, $y + 80, 220, 24, $SS_RIGHT)
+GUICtrlSetCursor(-1, 0)
+GUICtrlSetFont(-1, 8.5, $FW_BOLD)
+_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate_Info_01", "Paypal Donate?"))
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 If $g_bAndroidAdbScreencap = True Then chkBackground()
 $g_hPicTwoArrowShield = _GUICtrlCreateIcon($g_sLibIconPath, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
@@ -16847,9 +16941,9 @@ _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Bot - Options", "C
 GUICtrlSetState(-1, $GUI_UNCHECKED)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
-Global $g_hCmbCOCDistributors = 0, $g_hCmbAndroidBackgroundMode = 0, $g_hCmbSuspendAndroid = 0, $g_hChkAndroidAdbClickDragScript = 0, $g_hBtnAndroidAdbShell = 0, $g_hBtnAndroidHome = 0, $g_hBtnAndroidBack = 0
+Global $g_hCmbCOCDistributors = 0, $g_hCmbAndroidBackgroundMode = 0, $g_hCmbSuspendAndroid = 0, $g_hChkAndroidAdbClickDragScript = 0, $g_hBtnAndroidAdbShell = 0, $g_hBtnAndroidHome = 0, $g_hBtnAndroidBack = 0, $g_hTxtAndroidRebootHours = 0
 Func CreateBotAndroid()
-Local $x = 25, $y = 45, $y2, $w = 240, $h = 50
+Local $x = 25, $y = 45, $y2, $w = 240, $h = 50, $sTxtTip
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR Distributors", "Group_01", "Distributors"), $x - 20, $y - 20, $w, $h)
 $y -= 2
 $g_hCmbCOCDistributors = GUICtrlCreateCombo("", $x - 8, $y, $w - 25, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
@@ -16861,7 +16955,7 @@ GUICtrlCreateGroup("", -99, -99, 1, 1)
 $y += $h + 5
 $y2 = $y
 $w = $g_iSizeWGrpTab2 - 2
-$h = 80
+$h = 96
 GUICtrlCreateGroup(GetTranslatedFileIni("Android", "Android_Options", "Android Options"), $x - 20, $y - 20, $w, $h)
 GUICtrlCreateLabel(GetTranslatedFileIni("Android", "LblBackgroundMode", "Screencapture Background Mode"), $x - 8, $y + 5, 180, 22, $SS_RIGHT)
 $g_hCmbAndroidBackgroundMode = GUICtrlCreateCombo("", $x - 8 + 180 + 5, $y, 200, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
@@ -16874,6 +16968,14 @@ $g_hChkAndroidAdbClickDragScript = GUICtrlCreateCheckbox(GetTranslatedFileIni("A
 _GUICtrlSetTip(-1, GetTranslatedFileIni("Android", "ChkAdbClickDragScript_Info", "Use Android specific script file for Click & Drag.\r\nIf unchecked use more compatible 'input swipe'."))
 GUICtrlSetState(-1,(($g_bAndroidAdbClickDragScript) ?($GUI_CHECKED) :($GUI_UNCHECKED)))
 GUICtrlCreateGroup("", -99, -99, 1, 1)
+$y += 25
+GUICtrlCreateLabel(GetTranslatedFileIni("Android", "LblAndroidRebootHours", "Reboot Android in") & ":", $x + 17, $y + 2, -1, -1)
+$sTxtTip = GetTranslatedFileIni("Android", "LblAndroidRebootHours_Info", "Enter hours when Android will be automatically rebooted after specified run-time.")
+_GUICtrlSetTip(-1, $sTxtTip)
+$g_hTxtAndroidRebootHours = GUICtrlCreateInput($g_iAndroidRebootHours, $x + 177, $y + 1, 30, 16, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+_GUICtrlSetTip(-1, $sTxtTip)
+GUICtrlSetLimit(-1, 4)
+GUICtrlCreateLabel(GetTranslatedFileIni("MBR Global GUI Design", "hrs", -1), $x + 212, $y + 2, -1, -1)
 $y = $y2 + $h + 5
 $w = $g_iSizeWGrpTab2 - 2
 $h = 50
@@ -18420,13 +18522,48 @@ $_GUI_CHILD_TOP = 110 + $_GUI_MAIN_TOP
 Else
 $g_bCustomTitleBarActive = True
 EndIf
-$g_hFrmBot = _GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, BitOr($WS_MINIMIZEBOX, $WS_POPUP, $WS_SYSMENU, $WS_CLIPCHILDREN, $WS_CLIPSIBLINGS, $iStyle))
-_WindowAppId($g_hFrmBot, "MyBot.run")
+Switch $g_iGuiMode
+Case 0
+Case 2
+$_GUI_MAIN_WIDTH = $_MINIGUI_MAIN_WIDTH
+$_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
+EndSwitch
+$g_hFrmBot = _GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, BitOR($WS_MINIMIZEBOX, $WS_POPUP, $WS_SYSMENU, $WS_CLIPCHILDREN, $WS_CLIPSIBLINGS, $iStyle))
 GUISetIcon($g_sLibIconPath, $eIcnGUI)
+If $g_iGuiMode = 0 Then
+UpdateBotTitle()
+Return
+EndIf
+TraySetIcon($g_sLibIconPath, $eIcnGUI)
+Opt("TrayMenuMode", 3)
+Opt("TrayOnEventMode", 1)
+Opt("TrayIconHide", 0)
+UpdateBotTitle()
+_WindowAppId($g_hFrmBot, "MyBot.run")
+$g_hTiShow = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_01", "Show bot"))
+TrayItemSetOnEvent(-1, "tiShow")
+$g_hTiHide = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_02", "Hide when minimized"))
+TrayItemSetOnEvent(-1, "tiHide")
+TrayCreateItem("")
+$g_hTiDonate = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_03", "Support Development"))
+TrayItemSetOnEvent(-1, "tiDonate")
+$g_hTiAbout = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_04", "About"))
+TrayItemSetOnEvent(-1, "tiAbout")
+TrayCreateItem("")
+$g_hTiStart = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
+TrayItemSetOnEvent(-1, "btnStart")
+$g_hTiStop = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot"))
+TrayItemSetOnEvent(-1, "btnStop")
+$g_hTiPause = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
+TrayItemSetOnEvent(-1, "btnPause")
+TrayCreateItem("")
+$g_hTiExit = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_05", "Exit"))
+TrayItemSetOnEvent(-1, "tiExit")
 EndFunc
 Func CreateMainGUIControls()
 Local $aBtnSize = $_GUI_MAIN_BUTTON_SIZE
 GUISwitch($g_hFrmBot)
+If $g_iGuiMode = 0 Then Return
 SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01", "Loading Main GUI..."))
 If $g_bCustomTitleBarActive Then
 $g_hFrmBotButtons = GUICreate("My Bot Title Buttons", 3 * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_WIDTH - $aBtnSize[0] * 3, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE,($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
@@ -18473,9 +18610,9 @@ GUICtrlCreateLabel("", $_GUI_MAIN_WIDTH - 3 * $aBtnSize[0], $aBtnSize[1], 3 * $a
 GUICtrlSetOnEvent(-1, "BotMoveRequest")
 GUICtrlSetBkColor(-1, $COLOR_WHITE)
 EndIf
-$g_hFrmBot_MAIN_PIC = _GUICtrlCreatePic($g_sLogoPath, 0, $_GUI_MAIN_TOP, 472, 67)
+$g_hFrmBot_MAIN_PIC = _GUICtrlCreatePic($g_sLogoPath, 0, $_GUI_MAIN_TOP, $_GUI_MAIN_WIDTH, 67)
 GUICtrlSetOnEvent(-1, "BotMoveRequest")
-$g_hFrmBot_URL_PIC = _GUICtrlCreatePic($g_sLogoUrlPath, 0, $_GUI_MAIN_TOP + 67, 472, 13)
+$g_hFrmBot_URL_PIC = _GUICtrlCreatePic($g_sLogoUrlPath, 0, $_GUI_MAIN_TOP + 67, $_GUI_MAIN_WIDTH, 13)
 GUICtrlSetCursor(-1, 0)
 $g_hToolTip = _GUIToolTip_Create($g_hFrmBot)
 _GUIToolTip_SetMaxTipWidth($g_hToolTip, $_GUI_MAIN_WIDTH)
@@ -18488,6 +18625,13 @@ SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_02", "Lo
 GUISwitch($g_hFrmBotBottom)
 CreateBottomPanel()
 GUISwitch($g_hFrmBotEx)
+$g_hStatusBar = _GUICtrlStatusBar_Create($g_hFrmBotBottom)
+_GUICtrlStatusBar_SetSimple($g_hStatusBar)
+GUISetDefaultFont($g_hStatusBar)
+_GUICtrlStatusBar_SetText($g_hStatusBar, "Status : Idle")
+If $g_iGuiMode = 2 Then
+Return
+EndIf
 $g_hFirstControlToHide = GUICtrlCreateDummy()
 SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_03", "Loading Log tab..."))
 CreateLogTab()
@@ -18527,22 +18671,6 @@ Bind_ImageList($g_hGUI_BOT_TAB)
 Bind_ImageList($g_hGUI_STATS_TAB)
 GUICtrlSetState($g_hGUI_LOG, $GUI_SHOW)
 cmbLog()
-$g_hStatusBar = _GUICtrlStatusBar_Create($g_hFrmBotBottom)
-_GUICtrlStatusBar_SetSimple($g_hStatusBar)
-GUISetDefaultFont($g_hStatusBar)
-_GUICtrlStatusBar_SetText($g_hStatusBar, "Status : Idle")
-$g_hTiShow = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_01", "Show bot"))
-TrayItemSetOnEvent($g_hTiShow, "tiShow")
-$g_hTiHide = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_02", "Hide when minimized"))
-TrayItemSetOnEvent($g_hTiHide, "tiHide")
-TrayCreateItem("")
-$g_hTiDonate = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_03", "Support Development"))
-TrayItemSetOnEvent($g_hTiDonate, "tiDonate")
-$g_hTiAbout = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_04", "About"))
-TrayItemSetOnEvent($g_hTiAbout, "tiAbout")
-TrayCreateItem("")
-$g_hTiExit = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_05", "Exit"))
-TrayItemSetOnEvent($g_hTiExit, "tiExit")
 SetDebugLog("$g_hFrmBot=" & $g_hFrmBot, Default, True)
 SetDebugLog("$g_hFrmBotEx=" & $g_hFrmBotEx, Default, True)
 SetDebugLog("$g_hFrmBotBottom=" & $g_hFrmBotBottom, Default, True)
@@ -18551,6 +18679,7 @@ SetDebugLog("$g_hFrmBotEmbeddedShieldInput=" & $g_hFrmBotEmbeddedShieldInput, De
 SetDebugLog("$g_hFrmBotEmbeddedGraphics=" & $g_hFrmBotEmbeddedGraphics, Default, True)
 EndFunc
 Func ShowMainGUI()
+If $g_iGuiMode = 0 Then Return
 CheckDpiAwareness(False, $g_bBotLaunchOption_ForceDpiAware, True)
 If Not $g_bNoFocusTampering Then
 GUISetState(@SW_SHOW, $g_hFrmBot)
@@ -18586,7 +18715,7 @@ Static $sbDpiAlreadyChecked = False
 If $bCheckOnlyIfAlreadyAware = True Then Return $sbDpiAware
 Local $bDpiAware = False
 Local $bChanged = False
-if $sbDpiAlreadyChecked = True Or($g_iBotLaunchTime = 0 And $bForceDpiAware2 = False) Then Return $bChanged
+If $sbDpiAlreadyChecked = True Or($g_iBotLaunchTime = 0 And $bForceDpiAware2 = False) Then Return $bChanged
 If $g_iDpiAwarenessMode <> 0 And RegRead("HKCU\Control Panel\Desktop\WindowMetrics", "AppliedDPI") <> 96 Then
 $bDpiAware = $bForceDpiAware = True Or $g_bChkBackgroundMode = False Or($g_bAndroidAdbScreencap = False And GetProcessDpiAwareness(GetAndroidPid()))
 $bChanged = $bDpiAware And Not $sbDpiAware
@@ -18606,7 +18735,7 @@ SetDebugLog("SetProcessDPIAware called: " & @error &((UBound($aResult) = 0) ?(""
 If $bWasEmbedded Then AndroidEmbed(True)
 EndIf
 EndIf
-return $bChanged
+Return $bChanged
 EndFunc
 Func GetProcessDpiAwareness($iPid)
 $iPid = ProcessExists($iPid)
@@ -18615,9 +18744,9 @@ Return SetError(1, 0, 0)
 EndIf
 Local $hProcess
 If _WinAPI_GetVersion() >= 6.0 Then
-$hProcess = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $iPID)
+$hProcess = _WinAPI_OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, 0, $iPid)
 Else
-$hProcess = _WinAPI_OpenProcess($PROCESS_QUERY_INFORMATION, 0, $iPID)
+$hProcess = _WinAPI_OpenProcess($PROCESS_QUERY_INFORMATION, 0, $iPid)
 EndIf
 If @error Then
 Return SetError(2, 0, 0)
@@ -19086,7 +19215,15 @@ If @error <> 0 Then Return SetError(0, 0, 0)
 AndroidEmbed(Not $g_bAndroidEmbedded)
 EndFunc
 Func btnMakeScreenshot()
-If $g_bRunState Then $g_bMakeScreenshotNow = True
+If $g_bRunState Then
+$g_bMakeScreenshotNow = True
+Else
+If $g_bScreenshotPNGFormat = False Then
+MakeScreenshot($g_sProfileTempPath, "jpg")
+Else
+MakeScreenshot($g_sProfileTempPath, "png")
+EndIf
+EndIf
 EndFunc
 Func GetFont()
 Local $i, $sText = "", $DefaultFont
@@ -19358,6 +19495,7 @@ Func DisableGuiControls($OptimizedRedraw = True)
 Return ToggleGuiControls(False, $OptimizedRedraw)
 EndFunc
 Func ToggleGuiControls($Enable, $OptimizedRedraw = True)
+If $g_iGuiMode <> 1 Then Return
 If $OptimizedRedraw = True Then Local $bWasRedraw = SetRedrawBotWindow(False, Default, Default, Default, "ToggleGuiControls")
 If $Enable = False Then
 SetDebugLog("Disable GUI Controls")
@@ -24173,6 +24311,7 @@ $g_bCriticalMessageProcessing = $bEnterCritical
 Return $wasCritical
 EndFunc
 Func UpdateFrmBotStyle()
+If $g_iGuiMode = 0 Then Return False
 Local $bChanged = False
 Local $ShowMinimize = $g_bAndroidBackgroundLaunched = True Or $g_bAndroidEmbedded = False Or($g_bAndroidEmbedded = True And $g_bChkBackgroundMode = True)
 Local $lStyle = $WS_MINIMIZEBOX
@@ -24197,6 +24336,7 @@ Local $bAlwaysEnabled =(($oAlwaysEnabledControls.Item($controlID)) ?(True) :(Fal
 Return $bAlwaysEnabled
 EndFunc
 Func SetAccelerators($bDockedUnshieledFocus = False)
+If $g_iGuiMode = 0 Then Return
 Local $aAccelKeys[2][2] = [["{ESC}", $g_hBtnStop], ["{PAUSE}", $g_hBtnPause]]
 Local $aAccelKeys_DockedUnshieldedFocus[3][2] = [["{ESC}", $g_hFrmBotEmbeddedShieldInput], ["{ENTER}", $g_hFrmBotEmbeddedShieldInput], ["{PAUSE}", $g_hBtnPause]]
 GUISetAccelerators(0, $g_hFrmBot)
@@ -25153,6 +25293,7 @@ GUICtrlSetData($g_hLblResultRuntimeNow, StringFormat("%02i:%02i:%02i", $hour, $m
 EndIf
 EndFunc
 Func tabMain()
+If $g_iGuiMode = 0 Then Return
 Local $tabidx = GUICtrlRead($g_hTabMain)
 Select
 Case $tabidx = 0
@@ -25563,6 +25704,7 @@ Local $aItemRect = _GUICtrlListView_GetItemRect( $hListView, 0, 0 )
 Return($aItemRect[3] - $aItemRect[1] ) * $iRows + $iHdrHeight + 8
 EndFunc
 Func EnableControls($hWin, $Enable, ByRef $avArr, $bGUIControl_Disabled = True, $i = 0)
+If $hWin = 0 Or $hWin = -1 Then Return 0
 Local $initalCall = $i = 0
 If UBound($avArr, 0) <> 2 Then
 Local $avTmp[1][2] = [[0]]
@@ -25632,6 +25774,7 @@ Func SetLog($sLogMessage, $iColor = Default, $sFont = Default, $iFontSize = Defa
 If $sLogMessage <> "" Then Return _SetLog($sLogMessage, $iColor, $sFont, $iFontSize, $iStatusbar, $bConsoleWrite)
 EndFunc
 Func _SetLog($sLogMessage, $Color = Default, $Font = Default, $FontSize = Default, $statusbar = Default, $time = Default, $bConsoleWrite = Default, $LogPrefix = Default, $bPostponed = Default, $bSilentSetLog = Default, $bWriteToLogFile = Default)
+Local Static $bActive = False
 If $Color = Default Then $Color = $COLOR_BLACK
 If $Font = Default Then $Font = "Verdana"
 If $FontSize = Default Then $FontSize = 7.5
@@ -25668,9 +25811,12 @@ $a[6] =(($bSilentSetLog) ?(1) :(2))
 $a[7] = $LogPrefix & $debugTime
 EndIf
 $g_oTxtLogInitText($g_oTxtLogInitText.Count + 1) = $a
-If($g_hTxtLog <> 0 And $g_bRunState = False) Or($bPostponed = False And __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout) Then
+If $bActive Then Return
+$bActive = True
+If(($g_hTxtLog <> 0 Or $g_iGuiMode = 0) And $g_bRunState = False) Or($bPostponed = False And __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout) Then
 CheckPostponedLog()
 EndIf
+$bActive = False
 EndFunc
 Func GetLogLevel($Color)
 Local $sLevel = ""
@@ -25739,18 +25885,18 @@ Return _SetLog($sLogMessage, $Color)
 EndIf
 Return SetDebugLog($sLogMessage, $Color)
 EndFunc
-Func FlushGuiLog(ByRef $hTxtLog, ByRef $aTxtLog, $bUpdateStatus = False, $sLogMutexName = "txtLog")
+Func FlushGuiLog(ByRef $hTxtLog, ByRef $oTxtLog, $bUpdateStatus = False, $sLogMutexName = "txtLog")
 Local $wasLock = AndroidShieldLock(True)
+If $hTxtLog Then
 Local $activeBot = _WinAPI_GetActiveWindow() = $g_hFrmBot
 Local $hCtrl = _WinAPI_GetFocus()
-If $hTxtLog Then
 _SendMessage($hTxtLog, $WM_SETREDRAW, False, 0)
 _WinAPI_EnableWindow($hTxtLog, False)
 _GUICtrlRichEdit_SetSel($hTxtLog, -1, -1)
 EndIf
 Local $sLastStatus = ""
-For $i = 1 To $aTxtLog.Count
-Local $a = $aTxtLog($i)
+For $i = 1 To $oTxtLog.Count
+Local $a = $oTxtLog($i)
 Local $iSize = UBound($a)
 If $hTxtLog Then
 If $iSize = 0 And $a = 0 Then
@@ -25767,7 +25913,7 @@ If $a[6] = 1 Then
 ContinueLoop
 EndIf
 EndIf
-If $bUpdateStatus = True And $g_hStatusBar <> 0 And $a[4] = 1 Then
+If $bUpdateStatus = True And($g_hStatusBar Or $g_iGuiMode = 0) And $iSize > 4 And $a[4] = 1 Then
 $sLastStatus = $a[0]
 Local $iPosCr = StringInStr($sLastStatus, Chr(13))
 Local $iPosLf = StringInStr($sLastStatus, Chr(10))
@@ -25777,10 +25923,10 @@ If $iPos > 0 Then $sLastStatus = StringLeft($sLastStatus, $iPos - 1)
 EndIf
 Next
 If $sLastStatus Then
-_GUICtrlStatusBar_SetText($g_hStatusBar, "Status : " & $sLastStatus)
+_GUICtrlStatusBar_SetTextEx($g_hStatusBar, "Status : " & $sLastStatus)
 EndIf
-Local $iLogs = $aTxtLog.Count
-$aTxtLog.RemoveAll
+Local $iLogs = $oTxtLog.Count
+$oTxtLog.RemoveAll
 If $hTxtLog Then
 _WinAPI_EnableWindow($hTxtLog, True)
 _GUICtrlRichEdit_SetSel($hTxtLog, -1, -1)
@@ -25794,10 +25940,10 @@ EndFunc
 Func CheckPostponedLog($bNow = False)
 Local $iLogs = 0
 If $g_bCriticalMessageProcessing Or($bNow = False And __TimerDiff($g_hTxtLogTimer) < $g_iTxtLogTimerTimeout) Then Return 0
-If $g_oTxtLogInitText.Count > 0 And $g_hTxtLog <> 0 Then
+If $g_oTxtLogInitText.Count > 0 And($g_hTxtLog Or $g_iGuiMode = 0) Then
 $iLogs += FlushGuiLog($g_hTxtLog, $g_oTxtLogInitText, True, "txtLog")
 EndIf
-If $g_oTxtAtkLogInitText.Count > 0 And $g_hTxtAtkLog <> 0 Then
+If $g_oTxtAtkLogInitText.Count > 0 And($g_hTxtAtkLog Or $g_iGuiMode = 0) Then
 $iLogs += FlushGuiLog($g_hTxtAtkLog, $g_oTxtAtkLogInitText, False, "txtAtkLog")
 EndIf
 $g_hTxtLogTimer = __TimerInit()
@@ -25829,7 +25975,7 @@ SetAtkLog(GetTranslatedFileIni("MBR Func_AtkLogHead", "AtkLogHead_Text_02", '|  
 SetAtkLog(GetTranslatedFileIni("MBR Func_AtkLogHead", "AtkLogHead_Text_03", '|TIME|TROP.|SEARCH|   GOLD| ELIXIR|DARK EL|TR.|S|  GOLD|ELIXIR|  DE|L.'), "")
 EndFunc
 Func __FileWriteLog($handle, $text)
-Return FileWriteLine($handle, $text)
+Return FileWriteLine($handle, BitAND(WinGetState($g_hFrmBot), 2) & ": " & $text)
 EndFunc
 Func ClearLog($hRichEditCtrl = $g_hTxtLog)
 Switch $hRichEditCtrl
@@ -26027,11 +26173,19 @@ Func _Ini_Add($section, $key, $value)
 _Ini_AddNewKeyValue($section, $key, $value)
 EndFunc
 Func _Ini_AddNewKeyValue($section, $key, $value)
+If UBound($g_asIniTable) < $g_iIniLineCount + 1 Or UBound($g_iIniLineCount, 2) < 2 Then
+SetDebugLog("_Ini_AddNewKeyValue: Incorrect Array size on section '" & $section & "' for key '" & $key & "' value '" & $value & "'")
+Return
+EndIf
 $g_asIniTable[$g_iIniLineCount][0] = $section & "|" & $key
 $g_asIniTable[$g_iIniLineCount][1] = $value
 $g_iIniLineCount += 1
 EndFunc
 Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read")
+If $g_iGuiMode = 0 Then
+UpdateBotTitle()
+Return
+EndIf
 Static $iApplyConfigCount = 0
 $iApplyConfigCount += 1
 SetDebugLog("applyConfig(), call number " & $iApplyConfigCount)
@@ -26043,6 +26197,7 @@ If $g_iAndroidPosX > -30000 And $g_iAndroidPosY > -30000 And $g_bIsHidden = Fals
 Else
 If $g_iFrmBotDockedPosX > -30000 And $g_iFrmBotDockedPosY > -30000 And $g_bFrmBotMinimized = False Then WinMove($g_hFrmBot, "", $g_iFrmBotDockedPosX, $g_iFrmBotDockedPosY)
 EndIf
+If $g_iGuiMode <> 1 Then Return
 Local $bWasRdraw = SetRedrawBotWindow(False, Default, Default, Default, "applyConfig")
 ApplyConfig_Profile($TypeReadSave)
 ApplyConfig_Android($TypeReadSave)
@@ -26111,11 +26266,13 @@ SetCurSelCmbCOCDistributors()
 UpdateBotTitle()
 _GUICtrlComboBox_SetCurSel($g_hCmbAndroidBackgroundMode, $g_iAndroidBackgroundMode)
 GUICtrlSetState($g_hChkAndroidAdbClickDragScript, $g_bAndroidAdbClickDragScript ? $GUI_CHECKED : $GUI_UNCHECKED)
+GUICtrlSetData($g_hTxtAndroidRebootHours, $g_iAndroidRebootHours)
 _GUICtrlComboBox_SetCurSel($g_hCmbSuspendAndroid, AndroidSuspendFlagsToIndex($g_iAndroidSuspendModeFlags))
 Case "Save"
 cmbCOCDistributors()
 cmbAndroidBackgroundMode()
 $g_bAndroidAdbClickDragScript =(GUICtrlRead($g_hChkAndroidAdbClickDragScript) = $GUI_CHECKED ? True : False)
+$g_iAndroidRebootHours = Int(GUICtrlRead($g_hTxtAndroidRebootHours))
 cmbSuspendAndroid()
 EndSwitch
 EndFunc
@@ -27959,6 +28116,7 @@ $g_iAndroidActiveTransparency = Int(IniRead($g_sProfileConfigPath, "android", "a
 $g_iAndroidInactiveColor = Dec(IniRead($g_sProfileConfigPath, "android", "inactive.color", Hex($g_iAndroidInactiveColor, 6)))
 $g_iAndroidInactiveTransparency = Int(IniRead($g_sProfileConfigPath, "android", "inactive.transparency", $g_iAndroidInactiveTransparency))
 $g_iAndroidSuspendModeFlags = Int(IniRead($g_sProfileConfigPath, "android", "suspend.mode", $g_iAndroidSuspendModeFlags))
+$g_iAndroidRebootHours = Int(IniRead($g_sProfileConfigPath, "android", "reboot.hours", $g_iAndroidRebootHours))
 If $g_bBotLaunchOption_Restart = True Then
 Local $sAndroidEmulator = IniRead($g_sProfileConfigPath, "android", "emulator", "")
 Local $sAndroidInstance = IniRead($g_sProfileConfigPath, "android", "instance", "")
@@ -28706,6 +28864,7 @@ $variable = $readValue
 EndSwitch
 EndFunc
 Func saveConfig()
+If $g_iGuiMode = 0 Then Return
 Local $t = __TimerInit()
 Static $iSaveConfigCount = 0
 $iSaveConfigCount += 1
@@ -28852,6 +29011,7 @@ _Ini_Add("android", "inactive.transparency", $g_iAndroidInactiveTransparency)
 _Ini_Add("android", "suspend.mode", $g_iAndroidSuspendModeFlags)
 _Ini_Add("android", "emulator", $g_sAndroidEmulator)
 _Ini_Add("android", "instance", $g_sAndroidInstance)
+_Ini_Add("android", "reboot.hours", $g_iAndroidRebootHours)
 EndFunc
 Func SaveConfig_Debug()
 ApplyConfig_Debug("Save")
@@ -29993,16 +30153,24 @@ $Trophies = getTrophyVillageSearch(48, 69 + 69)
 EndIf
 $CurDamage = getOcrOverAllDamage(780, 527 + $g_iBottomOffsetY)
 CheckHeroesHealth()
-$txtDiff = Round(($z -(__TimerDiff($iBegin) - SuspendAndroidTime() + $iSuspendAndroidTimeOffset)) / 1000, 1)
-If Number($txtDiff) < 0 Then $txtDiff = 0
+$txtDiff = Round(($z -(__TimerDiff($iBegin) - SuspendAndroidTime() + $iSuspendAndroidTimeOffset)) / 1000, 0)
+If Number($txtDiff) < 0 Then
+$txtDiff = "0s"
+Else
+Local $m = Int($txtDiff / 60)
+Local $s = $txtDiff - $m * 60
+$txtDiff = ""
+If $m > 0 Then $txtDiff = $m & "m "
+$txtDiff &= $s & "s"
+EndIf
 $NoResourceOCR = StringLen($Gold2) = 0 And StringLen($Elixir2) = 0 And StringLen($DarkElixir2) = 0
 If $NoResourceOCR Then
 SetLog("Exit now, [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
 Else
 If $g_iDebugSetlog = 1 Then
-SetLog("Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & ", Suspend: " & SuspendAndroidTime() & ", Offset: " & $iSuspendAndroidTimeOffset, $COLOR_INFO)
+SetLog("Exit in " & $txtDiff & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & ", Suspend-Time: " & $g_iSuspendAndroidTime & ", Suspend-Count: " & $g_iSuspendAndroidTimeCount & ", Offset: " & $iSuspendAndroidTimeOffset, $COLOR_INFO)
 Else
-SetLog("Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
+SetLog("Exit in " & $txtDiff & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
 EndIf
 EndIf
 If Number($CurDamage) >= 92 Then
@@ -42514,8 +42682,18 @@ Return True
 EndIf
 $Result = getOcrMaintenanceTime(171, 325 + $g_iMidOffsetY, "Check Obstacles OCR 'Good News!'=")
 If StringInStr($Result, "new", $STR_NOCASESENSEBASIC) Then
+If Not $g_bAutoUpdateGame Then
 $msg = "Game Update is required, Bot must stop!!"
 Return checkObstacles_StopBot($msg)
+Else
+Switch UpdateGame()
+Case True, Default
+Return checkObstacles_ReloadCoC()
+Case False
+$msg = "Game Update failed, Bot must stop!!"
+Return checkObstacles_StopBot($msg)
+EndSwitch
+EndIf
 ElseIf StringInStr($Result, "rate", $STR_NOCASESENSEBASIC) Then
 SetLog("Clash feedback window found, permanently closed!", $COLOR_ERROR)
 PureClick(248, 408 + $g_iMidOffsetY, 1, 0, "#9999")
@@ -42675,6 +42853,10 @@ Else
 $hCocReconnectingTimer = 0
 EndIf
 Return False
+EndFunc
+Func UpdateGame()
+SetLog("Open Play Store for Game Update...")
+OpenPlayStoreGame()
 EndFunc
 Global Const $g_iDPI_Ratio = 1
 Func GUISetFont_DPI($isize, $iweight = "", $iattribute = "", $sfontname = "")
@@ -43873,6 +44055,33 @@ $g_aiAndroidPageError[0] += 1
 SetDebugLog("Page error count increased to " & $g_aiAndroidPageError[0] & ", source: " & $sSource)
 If $g_aiAndroidPageError[1] = 0 Then $g_aiAndroidPageError[1] = __TimerInit()
 Return $g_aiAndroidPageError[0]
+EndFunc
+Func InitAndroidRebootCondition($bLaunched = True)
+If $bLaunched = False Then
+$g_hAndroidLaunchTime = 0
+Return False
+EndIf
+$g_hAndroidLaunchTime = __TimerInit()
+Return True
+EndFunc
+Func CheckAndroidRebootCondition($bRebootAndroid = True, $bLogOnly = False)
+If $g_hAndroidLaunchTime = 0 Then InitAndroidRebootCondition(True)
+If $g_iAndroidRebootHours <= 0 Then Return False
+Local $iLaunched = __TimerDiff($g_hAndroidLaunchTime)
+If $bLogOnly = True Then
+Local $day = 0, $hour = 0, $min = 0, $sec = 0, $sTime
+_TicksToDay($g_iAndroidRebootHours * 60 * 60 * 1000 - $iLaunched, $day, $hour, $min, $sec)
+$sTime = StringFormat("%id %ih %im", $day, $hour, $min)
+SetLog($g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") will be automatically rebooted in " & $sTime)
+Return True
+EndIf
+If $g_bIdleState = False Then Return False
+Local $iRunTimeHrs = $iLaunched /(60 * 60 * 1000)
+If $iRunTimeHrs >= $g_iAndroidRebootHours Then
+SetLog("Reboot " & $g_sAndroidEmulator & " (" & $g_sAndroidInstance & ") due to configured run-time of " & $g_iAndroidRebootHours & "h")
+Return True
+EndIf
+Return False
 EndFunc
 Func OpenBS($bRestart = False)
 Return OpenAndroid($bRestart)
@@ -46387,6 +46596,7 @@ Local $h =(($g_bAndroidEmbedded = False) ? $g_hAndroidWindow : $g_hFrmBot)
 Return $h
 EndFunc
 Func AndroidEmbed($Embed = True, $CallWinGetAndroidHandle = True, $bForceEmbed = False, $bNoAndroidScreenSizeCheck = False)
+If $g_iGuiMode = 0 Then Return False
 If $g_bAndroidEmbed = False Then Return False
 Return _AndroidEmbed($Embed, $CallWinGetAndroidHandle, $bForceEmbed, $bNoAndroidScreenSizeCheck)
 EndFunc
@@ -47217,6 +47427,75 @@ EndIf
 EndIf
 Return False
 EndFunc
+Global $g_oWMI = 0
+Global $g_WmiAPI_External = False
+Global Static $g_WmiFields = ["Handle", "ExecutablePath", "CommandLine"]
+Func GetWmiSelectFields()
+Return _ArrayToString($g_WmiFields, ",")
+EndFunc
+Func GetWmiObject()
+If $g_oWMI = 0 Then $g_oWMI = ObjGet("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2")
+Return $g_oWMI
+EndFunc
+Func CloseWmiObject()
+$g_oWMI = 0
+EndFunc
+Func WmiQuery($sQuery)
+If $g_WmiAPI_External = True Then
+Local $sAppFile = @ScriptDir & "\MyBot.run.Wmi." &((@Compiled) ?("exe") :("au3"))
+If FileExists($sAppFile) Then
+Local $process_killed
+Local $cmd = """" & $sAppFile & """"
+If @Compiled = 0 Then $cmd = """" & @AutoItExe & """ /AutoIt3ExecuteScript """ & $sAppFile & """"
+Local $s = LaunchConsole($cmd, """" & $sQuery & """", $process_killed)
+Return WmiOutputToArray($s)
+EndIf
+EndIf
+Local $aProcesses[0]
+SetDebugLog("WMI Query: " & $sQuery)
+Local $oProcessColl = GetWmiObject().ExecQuery($sQuery, "WQL", 0x20 + 0x10)
+For $Process In $oProcessColl
+Local $aProcess[UBound($g_WmiFields)]
+For $i = 0 To UBound($g_WmiFields) - 1
+$aProcess[$i] = Execute("$Process." & $g_WmiFields[$i])
+Next
+ReDim $aProcesses[UBound($aProcesses) + 1]
+$aProcesses[UBound($aProcesses) - 1] = $aProcess
+Next
+Return $aProcesses
+EndFunc
+Func WmiOutputToArray(ByRef $s)
+Local $aProcesses[0]
+Local $sProcesses = StringBetween($s, "<Processes>", "</Processes>")
+If @error Then Return $aProcesses
+Local $iPos = 1
+While $iPos > 0
+Local $sProcess = StringBetween($sProcesses, "<Process>", "</Process>", $iPos)
+$iPos = @extended
+If $iPos > 0 Then
+Local $aProcess[UBound($g_WmiFields)]
+Local $iPos2 = 1
+For $i = 0 To UBound($g_WmiFields) - 1
+$aProcess[$i] = StringBetween($sProcess, "<" & $g_WmiFields[$i] & ">", "</" & $g_WmiFields[$i] & ">", $iPos2)
+$iPos2 = @extended
+Next
+ReDim $aProcesses[UBound($aProcesses) + 1]
+$aProcesses[UBound($aProcesses) - 1] = $aProcess
+EndIf
+WEnd
+Return $aProcesses
+EndFunc
+Func StringBetween(ByRef $s, $sStartTag, $sEndTag, $iStartPos = 1)
+Local $iS = StringInStr($s, $sStartTag, 0, 1, $iStartPos)
+If $iS > 0 Then
+$iS += StringLen($sStartTag)
+Local $iE = StringInStr($s, $sEndTag, 0, 1, $iS)
+If $iE > 0 Then
+Return SetError(0, $iE + StringLen($sEndTag), StringMid($s, $iS, $iE - $iS))
+EndIf
+EndIf
+Return SetError(1, 0, "")
+EndFunc
 Func WerFaultClose($programFile, $tryCountMax = 10, $tryCount = 0)
 Local $WinTitleMatchMode = Opt("WinTitleMatchMode", -3)
 Local $sTitle = $programFile
@@ -47449,7 +47728,7 @@ $sTimeWait &= StringFormat("%02u:%02u", $iMin, $iSec)
 $sTimeLeftLapse &= StringFormat("%02u:%02u", $iMinCalc, $iSecCalc)
 EndSelect
 $hLastUpdate = __TimerInit()
-_GUICtrlStatusBar_SetText($g_hStatusBar, " Status: " & $sTimeWait & $sTimeLeftLapse)
+_GUICtrlStatusBar_SetTextEx($g_hStatusBar, " Status: " & $sTimeWait & $sTimeLeftLapse)
 EndIf
 _Sleep($DELAYSLEEP)
 $bUpdate = __TimerDiff($hLastUpdate) > 750
@@ -47462,68 +47741,13 @@ Local $iCurTime = __TimerDiff($hTimer)
 Local $iMinCalc = Int($iCurTime /(60 * 1000))
 Local $iSecCalc = Int(($iCurTime -($iMinCalc * 60 * 1000)) / 1000)
 Local $sString = $sWhyWait & " Wait Time = " & StringFormat("%02u" & ":" & "%02u", $iMinCalc, $iSecCalc)
-_GUICtrlStatusBar_SetText($g_hStatusBar, " Status: " & $sString)
+_GUICtrlStatusBar_SetTextEx($g_hStatusBar, " Status: " & $sString)
 EndFunc
 Func _TicksToDay($iTicks, ByRef $iDays, ByRef $iHours, ByRef $iMins, ByRef $iSecs)
 _TicksToTime($iTicks, $iHours, $iMins, $iSecs)
 If @error Then Return SetError(1, 0, 0)
 $iDays = Int($iHours / 24)
 $iHours = Mod($iHours, 24)
-Return 1
-EndFunc
-Global Const $HANDLE_FLAG_INHERIT = 0x00000001
-Global Const $MAPVK_VK_TO_CHAR = 2
-Func _WinAPI_GetActiveWindow()
-Local $aRet = DllCall('user32.dll', 'hwnd', 'GetActiveWindow')
-If @error Then Return SetError(@error, @extended, 0)
-Return $aRet[0]
-EndFunc
-Func _WinAPI_GetVersion()
-Return BitAND(BitShift($__WINVER, 8), 0xFF) & '.' & BitAND($__WINVER, 0xFF)
-EndFunc
-Func _WinAPI_IsIconic($hWnd)
-Local $aRet = DllCall('user32.dll', 'bool', 'IsIconic', 'hwnd', $hWnd)
-If @error Then Return SetError(@error, @extended, False)
-Return $aRet[0]
-EndFunc
-Func _WinAPI_MapVirtualKey($iCode, $iType, $hLocale = 0)
-Local $aRet = DllCall('user32.dll', 'INT', 'MapVirtualKeyExW', 'uint', $iCode, 'uint', $iType, 'uint_ptr', $hLocale)
-If @error Then Return SetError(@error, @extended, 0)
-Return $aRet[0]
-EndFunc
-Func _WinAPI_QueryPerformanceCounter()
-Local $aRet = DllCall('kernel32.dll', 'bool', 'QueryPerformanceCounter', 'int64*', 0)
-If @error Or Not $aRet[0] Then Return SetError(@error, @extended, 0)
-Return $aRet[1]
-EndFunc
-Func _WinAPI_QueryPerformanceFrequency()
-Local $aRet = DllCall('kernel32.dll', 'bool', 'QueryPerformanceFrequency', 'int64*', 0)
-If @error Or Not $aRet[0] Then Return SetError(@error + 10, @extended, 0)
-Return $aRet[1]
-EndFunc
-Func _WinAPI_SetActiveWindow($hWnd)
-Local $aRet = DllCall('user32.dll', 'int', 'SetActiveWindow', 'hwnd', $hWnd)
-If @error Then Return SetError(@error, @extended, 0)
-Return $aRet[0]
-EndFunc
-Func __EnumDefaultProc($pData, $lParam)
-#forceref $lParam
-Local $iLength = _WinAPI_StrLen($pData)
-__Inc($__g_vEnum)
-If $iLength Then
-$__g_vEnum[$__g_vEnum[0]] = DllStructGetData(DllStructCreate('wchar[' &($iLength + 1) & ']', $pData), 1)
-Else
-$__g_vEnum[$__g_vEnum[0]] = ''
-EndIf
-Return 1
-EndFunc
-Func __EnumPageFilesProc($iSize, $pInfo, $pFile)
-Local $tEPFI = DllStructCreate('dword;dword;ulong_ptr;ulong_ptr;ulong_ptr', $pInfo)
-__Inc($__g_vEnum)
-$__g_vEnum[$__g_vEnum[0][0]][0] = DllStructGetData(DllStructCreate('wchar[' &(_WinAPI_StrLen($pFile) + 1) & ']', $pFile), 1)
-For $i = 1 To 3
-$__g_vEnum[$__g_vEnum[0][0]][$i] = DllStructGetData($tEPFI, $i + 2) * $iSize
-Next
 Return 1
 EndFunc
 Func Click($x, $y, $times = 1, $speed = 0, $debugtxt = "")
@@ -48196,7 +48420,6 @@ EndIf
 Return $iTimerCount
 EndFunc
 Func _HPTimerDiff($iOldTimerCount)
-Static $iCompensation = [10, 0, 0, 0]
 If $iOldTimerCount = 0 Then
 SetLog("Bad parameter data passed to _HPTimerDiff", $COLOR_ERROR)
 SetError(1, 0, 0)
@@ -48213,18 +48436,12 @@ If $g_iHPTimerFreq = 0 Then
 Setlog("QueryPerformanceFrequency error code: " & $err & " ,Abort timer check", $COLOR_ERROR)
 Return 0
 EndIf
-If $iCompensation[1] < $iCompensation[0] Then
-$iCompensation[1] += 1
-$iCompensation[2] += _WinAPI_QueryPerformanceCounter() - $iNewTimerCount
-$iCompensation[3] = $iCompensation[2] / $iCompensation[1]
-If $iCompensation[1] = $iCompensation[0] Then SetDebugLog("QueryPerformanceCounter compensation is: " & $iCompensation[3])
-EndIf
-Return(($iNewTimerCount - $iOldTimerCount - $iCompensation[3] * 4) / $g_iHPTimerFreq) * 1000
+Return(($iNewTimerCount - $iOldTimerCount) / $g_iHPTimerFreq) * 1000
 EndFunc
 Func TogglePause()
 TogglePauseImpl("Button")
 EndFunc
-Func TogglePauseImpl($Source)
+Func TogglePauseImpl($Source, $bDelayed = False)
 If Not $g_bRunState Then Return
 ResumeAndroid()
 $g_bBotPaused = Not $g_bBotPaused
@@ -48233,7 +48450,7 @@ $g_bTogglePauseUpdateState = True
 Return
 EndIf
 TogglePauseUpdateState($Source)
-TogglePauseSleep()
+If $bDelayed = False Then TogglePauseSleep()
 EndFunc
 Func TogglePauseUpdateState($Source)
 $g_iActualTrainSkip = 0
@@ -48511,6 +48728,7 @@ EndIf
 EndFunc
 Func WinMove2($WinTitle, $WinText, $x = -1, $y = -1, $w = -1, $h = -1, $hAfter = 0, $iFlags = 0, $bCheckAfterPos = True)
 Local $hWin = WinGetHandle($WinTitle, $WinText)
+If $WinTitle = $g_hFrmBot And $g_iGuiMode = 0 Then Return $hWin
 If _WinAPI_IsIconic($hWin) Then
 SetDebugLog("Window " & $WinTitle &(($WinTitle <> $hWin) ? "(" & $hWin & ")" : "") & " restored", $COLOR_ACTION)
 WinSetState($hWin, "", @SW_RESTORE)
@@ -48603,6 +48821,7 @@ Return $a
 EndFunc
 Func WinGetPos2($title, $text = "")
 Local $aPos = 0
+If $title = $g_hFrmBot And $g_iGuiMode = 0 Then Return $aPos
 If IsHWnd($title) = 0 Then $title = WinGetHandle($title, $text)
 While IsHWnd($title) And(IsArray($aPos) = 0 Or $aPos[2] < 200)
 If _WinAPI_IsIconic($title) Then WinSetState($title, "", @SW_RESTORE)
@@ -48612,6 +48831,7 @@ Return $aPos
 EndFunc
 Func ControlGetPos2($title, $text, $controlID)
 Local $aPos = 0
+If $title = $g_hFrmBot And $g_iGuiMode = 0 Then Return $aPos
 If IsHWnd($title) = 0 Then $title = WinGetHandle($title, $text)
 While IsHWnd($title) And(IsArray($aPos) = 0 Or $aPos[2] < 200)
 If _WinAPI_IsIconic($title) Then WinSetState($title, "", @SW_RESTORE)
@@ -49972,7 +50192,7 @@ If $bLogged = False Then
 $bLogged = True
 SetLog($sWaitMessage)
 EndIf
-If $g_hStatusBar Then _GUICtrlStatusBar_SetText($g_hStatusBar, $sWaitMessage)
+If $g_hStatusBar Then _GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
 EndIf
 If $bUse_Sleep Then
 _Sleep($iDelay)
@@ -50010,7 +50230,7 @@ If $bLogged = False Then
 $bLogged = True
 SetLog($sWaitMessage)
 EndIf
-If $g_hStatusBar Then _GUICtrlStatusBar_SetText($g_hStatusBar, $sWaitMessage)
+If $g_hStatusBar Then _GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
 EndIf
 _Sleep($iDelay, True, False)
 WEnd
@@ -50078,7 +50298,7 @@ If $bLogged = False Then
 $bLogged = True
 SetLog($sWaitMessage)
 EndIf
-If $g_hStatusBar Then _GUICtrlStatusBar_SetText($g_hStatusBar, $sWaitMessage)
+If $g_hStatusBar Then _GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
 EndIf
 _Sleep($iDelay, True, False)
 WEnd
@@ -50105,75 +50325,6 @@ $g_hMutextOrSemaphoreGlobalActiveBots = 0
 $bBotIsLocked = $bLock
 EndIf
 Return $bWasLocked
-EndFunc
-Global $g_oWMI = 0
-Global $g_WmiAPI_External = False
-Global Static $g_WmiFields = ["Handle", "ExecutablePath", "CommandLine"]
-Func GetWmiSelectFields()
-Return _ArrayToString($g_WmiFields, ",")
-EndFunc
-Func GetWmiObject()
-If $g_oWMI = 0 Then $g_oWMI = ObjGet("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2")
-Return $g_oWMI
-EndFunc
-Func CloseWmiObject()
-$g_oWMI = 0
-EndFunc
-Func WmiQuery($sQuery)
-If $g_WmiAPI_External = True Then
-Local $sAppFile = @ScriptDir & "\MyBot.run.Wmi." &((@Compiled) ?("exe") :("au3"))
-If FileExists($sAppFile) Then
-Local $process_killed
-Local $cmd = """" & $sAppFile & """"
-If @Compiled = 0 Then $cmd = """" & @AutoItExe & """ /AutoIt3ExecuteScript """ & $sAppFile & """"
-Local $s = LaunchConsole($cmd, """" & $sQuery & """", $process_killed)
-Return WmiOutputToArray($s)
-EndIf
-EndIf
-Local $aProcesses[0]
-SetDebugLog("WMI Query: " & $sQuery)
-Local $oProcessColl = GetWmiObject().ExecQuery($sQuery, "WQL", 0x20 + 0x10)
-For $Process In $oProcessColl
-Local $aProcess[UBound($g_WmiFields)]
-For $i = 0 To UBound($g_WmiFields) - 1
-$aProcess[$i] = Execute("$Process." & $g_WmiFields[$i])
-Next
-ReDim $aProcesses[UBound($aProcesses) + 1]
-$aProcesses[UBound($aProcesses) - 1] = $aProcess
-Next
-Return $aProcesses
-EndFunc
-Func WmiOutputToArray(ByRef $s)
-Local $aProcesses[0]
-Local $sProcesses = StringBetween($s, "<Processes>", "</Processes>")
-If @error Then Return $aProcesses
-Local $iPos = 1
-While $iPos > 0
-Local $sProcess = StringBetween($sProcesses, "<Process>", "</Process>", $iPos)
-$iPos = @extended
-If $iPos > 0 Then
-Local $aProcess[UBound($g_WmiFields)]
-Local $iPos2 = 1
-For $i = 0 To UBound($g_WmiFields) - 1
-$aProcess[$i] = StringBetween($sProcess, "<" & $g_WmiFields[$i] & ">", "</" & $g_WmiFields[$i] & ">", $iPos2)
-$iPos2 = @extended
-Next
-ReDim $aProcesses[UBound($aProcesses) + 1]
-$aProcesses[UBound($aProcesses) - 1] = $aProcess
-EndIf
-WEnd
-Return $aProcesses
-EndFunc
-Func StringBetween(ByRef $s, $sStartTag, $sEndTag, $iStartPos = 1)
-Local $iS = StringInStr($s, $sStartTag, 0, 1, $iStartPos)
-If $iS > 0 Then
-$iS += StringLen($sStartTag)
-Local $iE = StringInStr($s, $sEndTag, 0, 1, $iS)
-If $iE > 0 Then
-Return SetError(0, $iE + StringLen($sEndTag), StringMid($s, $iS, $iE - $iS))
-EndIf
-EndIf
-Return SetError(1, 0, "")
 EndFunc
 Func _NamedPipes_CreatePipe(ByRef $hReadPipe, ByRef $hWritePipe, $tSecurity = 0, $iSize = 0)
 Local $aResult = DllCall("kernel32.dll", "bool", "CreatePipe", "handle*", 0, "handle*", 0, "struct*", $tSecurity, "dword", $iSize)
@@ -53123,7 +53274,7 @@ $g_bRestart = True
 CloseCoC(True)
 Return
 EndIf
-If $g_iDebugSetlog = 1 Then _GUICtrlStatusBar_SetText($g_hStatusBar, " Status: Loop to clean screen without Clouds, # " & $iCount)
+If $g_iDebugSetlog = 1 Then _GUICtrlStatusBar_SetTextEx($g_hStatusBar, " Status: Loop to clean screen without Clouds, # " & $iCount)
 $iSearchTime = __TimerDiff($hMinuteTimer) / 60000
 If $iSearchTime >= $iLastTime + 1 Then
 Setlog("Cloud wait time " & StringFormat("%.1f", $iSearchTime) & " minute(s)", $COLOR_INFO)
@@ -59269,7 +59420,7 @@ $iTimeToWait = Random($g_iTrainAddRandomDelayMax, $g_iTrainAddRandomDelayMin, 1)
 EndIf
 Setlog("Waiting, Add random delay of " & $iTimeToWait & " seconds.", $COLOR_INFO)
 If _SleepStatus($iTimeToWait * 1000) Then Return
-_GUICtrlStatusBar_SetText($g_hStatusBar, "")
+_GUICtrlStatusBar_SetTextEx($g_hStatusBar, "")
 EndFunc
 Func GetVillageSize($DebugLog = False, $sStonePrefix = Default, $sTreePrefix = Default)
 If $sStonePrefix = Default Then $sStonePrefix = "stone"
@@ -59818,108 +59969,133 @@ ClickP($aAway, 1, 0, "#0329")
 If $bSwitchToNV Then SwitchBetweenBases()
 EndFunc
 Global $sWatchdogMutex = "MyBot.run/ManageFarm"
-Global $tagSTRUCT_BOT_STATE = "struct;hwnd frmBot;hwnd HWnD;boolean RunState;boolean TPaused;endstruct"
+Global $tagSTRUCT_BOT_STATE = "struct;hwnd BotHWnd;hwnd AndroidHWnd;boolean RunState;boolean Paused;boolean Launched;char Profile[64];char AndroidEmulator[32];char AndroidInstance[32];int StructType;ptr StructPtr;endstruct"
+Global Enum $g_eSTRUCT_NONE = 0, $g_eSTRUCT_STATUS_BAR
 Global $tBotState = DllStructCreate($tagSTRUCT_BOT_STATE)
-Global $WM_MYBOTRUN_API_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/API/1.0")
-Global $WM_MYBOTRUN_STATE_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/1.0")
+Global $WM_MYBOTRUN_API_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/API/1.1")
+Global $WM_MYBOTRUN_STATE_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/1.1")
 Global $g_ahManagedMyBotHosts[0]
 GUIRegisterMsg($WM_MYBOTRUN_API_1_0, "WM_MYBOTRUN_API_1_0_CLIENT")
 Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 If $hWind <> $g_hFrmBot Then Return 0
+If $g_iDebugWindowMessages Then SetDebugLog("API-CLIENT: $hWind=" & $hWind & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam)
 $hWind = 0
-Switch BitAND($wParam, 0xFFFF)
+Local $wParamHi = 0
+If $g_bRunState = True Then $wParamHi += 1
+If $g_bBotPaused = True Then $wParamHi += 2
+If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
+Local $wParamLo = BitAND($wParam, 0xFFFF)
+Switch $wParamLo
 Case 0x0100
 $iMsg = $WM_MYBOTRUN_STATE_1_0
 $hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 $wParam = DllStructGetPtr($tBotState)
-DllStructSetData($tBotState, "frmBot", $g_hFrmBot)
-DllStructSetData($tBotState, "HWnD", $g_hAndroidWindow)
-DllStructSetData($tBotState, "RunState", $g_bRunState)
-DllStructSetData($tBotState, "TPaused", $g_bBotPaused)
+PrepareStructBotState($tBotState)
 Case 0x1000
 $hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
-$wParam += 1
-Local $wParamHi = 0
+$wParam = $wParamLo + 1
 If $g_bRunState = False Then
 $wParamHi = 1
-$wParam += BitShift($wParamHi, -16)
-_WinAPI_PostMessage($hWind, $iMsg, $wParam, $lParam)
+If $g_bBotPaused = True Then $wParamHi += 2
+If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
 btnStart()
-Return
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case 0x1010
 $hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
-$wParam += 1
-Local $wParamHi = 0
+$wParam = $wParamLo + 1
 If $g_bRunState = True Then
-$wParamHi = 1
+$wParamHi = 0
+If $g_bBotPaused = True Then $wParamHi += 2
+If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
 btnStop()
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case 0x1020
 $hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
-$wParam += 1
-Local $wParamHi = 0
+$wParam = $wParamLo + 1
 If $g_bBotPaused = True And $g_bRunState = True Then
+$wParamHi = 0
+If $g_bRunState = True Then $wParamHi += 1
+If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
 TogglePauseImpl("ManageFarm")
-$wParamHi = 1
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case 0x1030
 $hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
-$wParam += 1
-Local $wParamHi = 0
+$wParam = $wParamLo + 1
 If $g_bBotPaused = False And $g_bRunState = True Then
-TogglePauseImpl("ManageFarm")
-$wParamHi = 1
+$wParamHi = 2
+If $g_bRunState = True Then $wParamHi += 1
+If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
+TogglePauseImpl("ManageFarm", True)
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case 0x1040
 $hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
-$wParam += 1
-Local $wParamHi = 0
+$wParam = $wParamLo + 1
+$wParamHi = 0
 BotCloseRequest()
+$wParam += BitShift($wParamHi, -16)
+Case 0x1050
+$hWind = HWnd($lParam)
+$lParam = $g_hFrmBot
+$wParam = $wParamLo + 1
+$wParamHi = 0
+If $g_bRunState = True Then $wParamHi += 1
+If $g_bBotPaused = True Then $wParamHi += 2
+If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
+btnMakeScreenshot()
 $wParam += BitShift($wParamHi, -16)
 Case Else
 If $wParam < 0x100 Then
 $hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 Local $iActiveBots = BitAND($wParam, 0xFF)
+If $iActiveBots < 255 Then
 If $g_BotInstanceCount <> $iActiveBots Then SetDebugLog($iActiveBots & " running bot instances detected")
 $g_BotInstanceCount = $iActiveBots
+EndIf
 $wParam = 1
-Local $wParamHi = 0
+$wParamHi = 0
 If $g_bRunState = True Then $wParamHi += 1
 If $g_bBotPaused = True Then $wParamHi += 2
+If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
 $wParam += BitShift($wParamHi, -16)
 EndIf
 EndSwitch
 If $hWind <> 0 Then
-Local $a = GetManagedMyBotHost($hWind)
-$a[1] = __TimerInit()
+Local $a = GetManagedMyBotHost($hWind, True)
 _WinAPI_PostMessage($hWind, $iMsg, $wParam, $lParam)
 EndIf
 Return 1
 EndFunc
-Func GetManagedMyBotHost($hFrmHost = Default)
+Func GetManagedMyBotHost($hFrmHost = Default, $bUpdateTime = False)
 If $hFrmHost = Default Then
 Return $g_ahManagedMyBotHosts
 EndIf
 If IsHWnd($hFrmHost) = 0 Then Return -1
 For $i = 0 To UBound($g_ahManagedMyBotHosts) - 1
 Local $a = $g_ahManagedMyBotHosts[$i]
-If $a[0] = $hFrmHost Then Return $a
+If $a[0] = $hFrmHost Then
+If $bUpdateTime Then
+$a[1] = __TimerInit()
+$g_ahManagedMyBotHosts[$i] = $a
+EndIf
+Return $a
+EndIf
 Next
-ReDim $g_ahManagedMyBotHosts[UBound($g_ahManagedMyBotHosts) + 1]
+Local $i = UBound($g_ahManagedMyBotHosts)
+ReDim $g_ahManagedMyBotHosts[$i + 1]
 Local $a[2]
 $a[0] = $hFrmHost
+If $bUpdateTime Then $a[1] = __TimerInit()
 $g_ahManagedMyBotHosts[$i] = $a
 SetDebugLog("New Bot Host Window Handle registered: " & $hFrmHost)
 Return $a
@@ -59945,21 +60121,69 @@ SetLog("Watchdog launched")
 EndIf
 Return $pid
 EndFunc
+Func PrepareStructBotState(ByRef $tBotState, $eStructType = $g_eSTRUCT_NONE, $pStructPtr = 0)
+DllStructSetData($tBotState, "BotHWnd", $g_hFrmBot)
+DllStructSetData($tBotState, "AndroidHWnd", $g_hAndroidWindow)
+DllStructSetData($tBotState, "RunState", $g_bRunState)
+DllStructSetData($tBotState, "Paused", $g_bBotPaused)
+DllStructSetData($tBotState, "Launched", Not $g_iBotLaunchTime = 0)
+DllStructSetData($tBotState, "Profile", $g_sProfileCurrentName)
+DllStructSetData($tBotState, "AndroidEmulator", $g_sAndroidEmulator)
+DllStructSetData($tBotState, "AndroidInstance", $g_sAndroidInstance)
+DllStructSetData($tBotState, "StructType", $eStructType)
+DllStructSetData($tBotState, "StructPtr", $pStructPtr)
+EndFunc
+Func StatusBarManagedMyBotHost($sStatusBar)
+SetDebugLog("StatusBarManagedMyBotHost: " & $sStatusBar)
+Return ManagedMyBotHostsPostMessage("PrepareStatusBarManagedMyBotHost", $sStatusBar)
+EndFunc
 Func UnregisterManagedMyBotHost()
+Local $Result = ManagedMyBotHostsPostMessage("PrepareUnregisterManagedMyBotHost")
+ReDim $g_ahManagedMyBotHosts[0]
+Return $Result
+EndFunc
+Func ManagedMyBotHostsPostMessage($sExecutePrepare, $Value1 = Default, $Value2 = Default, $Value3 = Default)
+Local $sAdditional = ""
+If $Value1 <> Default Or $Value2 <> Default Or $Value3 <> Default Then
+If $Value3 <> Default Then
+$sAdditional = ", $Value3"
+EndIf
+If $Value2 <> Default Then
+$sAdditional = ", $Value2" & $sAdditional
+ElseIf $sAdditional <> "" Then
+$sAdditional = ", Default" & $sAdditional
+EndIf
+If $Value1 <> Default Then
+$sAdditional = ", $Value1" & $sAdditional
+ElseIf $sAdditional <> "" Then
+$sAdditional = ", Default" & $sAdditional
+EndIf
+EndIf
 For $i = 0 To UBound($g_ahManagedMyBotHosts) - 1
 Local $a = $g_ahManagedMyBotHosts[$i]
 Local $hFrmHost = $a[0]
-$a[0] = 0
 $g_ahManagedMyBotHosts[$i] = $a
 If IsHWnd($hFrmHost) Then
-Local $hWind = $hFrmHost
 Local $iMsg = $WM_MYBOTRUN_API_1_0
-Local $wParam = 0x1040 + 2
+Local $wParam = 0x0000
 Local $lParam = $g_hFrmBot
-_WinAPI_PostMessage($hWind, $iMsg, $wParam, $lParam)
-SetDebugLog("Bot Host Window Handle un-registered: " & $hFrmHost)
+Local $sExecute = $sExecutePrepare & "($hFrmHost, $iMsg, $wParam, $lParam" & $sAdditional & ")"
+Local $bPostMessage = Execute($sExecute)
+If @error <> 0 And $bPostMessage = "" Then
+SetDebugLog("ManagedMyBotHostsPostMessage: Error executing " & $sExecute)
+ElseIf $bPostMessage = False Then
+SetDebugLog("ManagedMyBotHostsPostMessage: Not posting message to " & $hFrmHost)
+Else
+SetDebugLog("ManagedMyBotHostsPostMessage: Posting message to " & $hFrmHost)
+_WinAPI_PostMessage($hFrmHost, $iMsg, $wParam, $lParam)
+EndIf
 EndIf
 Next
+EndFunc
+Func _GUICtrlStatusBar_SetTextEx($hWnd, $sText = "", $iPart = 0, $iUFlag = 0)
+SetDebugLog("_GUICtrlStatusBar_SetTextEx: Entered")
+If $hWnd Then _GUICtrlStatusBar_SetText($hWnd, $sText, $iPart, $iUFlag)
+StatusBarManagedMyBotHost($sText)
 EndFunc
 Func GetTranslatedParsedText($sText, $var1 = Default, $var2 = Default, $var3 = Default)
 Local $s = StringReplace(StringReplace($sText, "\r\n", @CRLF), "\n", @CRLF)
@@ -61639,11 +61863,11 @@ Opt("TrayOnEventMode", 1)
 InitializeBot()
 MainLoop()
 Func UpdateBotTitle()
-Local $sTitle = "My Bot " & $g_sBotVersion & " "
+Local $sTitle = "My Bot " & $g_sBotVersion
 If $g_sBotTitle = "" Then
 $g_sBotTitle = $sTitle
 Else
-$g_sBotTitle = $sTitle & "(" &($g_sAndroidInstance <> "" ? $g_sAndroidInstance : $g_sAndroidEmulator) & ")"
+$g_sBotTitle = $sTitle & " (" &($g_sAndroidInstance <> "" ? $g_sAndroidInstance : $g_sAndroidEmulator) & ")"
 EndIf
 If $g_hFrmBot <> 0 Then
 WinSetTitle($g_hFrmBot, "", $g_sBotTitle)
@@ -61654,7 +61878,6 @@ TraySetToolTip($g_sBotTitle)
 SetDebugLog("Bot title updated to: " & $g_sBotTitle)
 EndFunc
 Func InitializeBot()
-TraySetIcon($g_sLibIconPath, $eIcnGUI)
 ProcessCommandLine()
 SetupProfileFolder()
 SetLogCentered(" BOT LOG ")
@@ -61670,7 +61893,6 @@ SetDebugLog("Primary Display: " & @DesktopWidth & " x " & @DesktopHeight & " - "
 Local $sAndroidInfo = ""
 _Crypt_Startup()
 __GDIPlus_Startup()
-UpdateBotTitle()
 InitAndroidConfig()
 If FileExists(@ScriptDir & "\EnableMBRDebug.txt") Then
 $g_bDevMode = True
@@ -61722,11 +61944,26 @@ Case "/dock2", "/d2", "-dock2", "-d2"
 $g_iBotLaunchOption_Dock = 2
 Case "/nobotslot", "/nbs", "-nobotslot", "-nbs"
 $g_bBotLaunchOption_NoBotSlot = True
+Case "/debug", "/debugmode", "/dev", "-debug", "-dev"
+$g_bDevMode = True
+Case "/minigui", "/mg", "-minigui", "-mg"
+$g_iGuiMode = 2
+Case "/nogui", "/ng", "-nogui", "-ng"
+$g_iGuiMode = 0
 Case Else
+If StringInStr($CmdLine[$i], "/guipid=") Then
+Local $guidpid = Int(StringMid($CmdLine[$i], 9))
+If ProcessExists($guidpid) Then
+$g_iGuiPID = $guidpid
+Else
+SetDebugLog("GUI Process doesn't exist: " & $guidpid)
+EndIf
+Else
 $bOptionDetected = False
 $g_asCmdLine[0] += 1
 ReDim $g_asCmdLine[$g_asCmdLine[0] + 1]
 $g_asCmdLine[$g_asCmdLine[0]] = $CmdLine[$i]
+EndIf
 EndSwitch
 If $bOptionDetected Then SetDebugLog("Command Line Option detected: " & $CmdLine[$i])
 Next
@@ -61887,6 +62124,7 @@ Func FinalInitialization(Const $sAI)
 If CheckPrerequisites(True) Then
 MBRFunc(True)
 setAndroidPID()
+SetBotGuiPID()
 EndIf
 If $g_bFoundRunningAndroid Then
 SetLog(GetTranslatedFileIni("MBR GUI Design - Loading", "Msg_Android_instance_03", "Found running %s %s", $g_sAndroidEmulator, $g_sAndroidVersion), $COLOR_SUCCESS)
@@ -62087,6 +62325,12 @@ EndIf
 WEnd
 EndFunc
 Func Idle()
+$g_bIdleState = True
+Local $Result = _Idle()
+$g_bIdleState = False
+Return $Result
+EndFunc
+Func _Idle()
 Static $iCollectCounter = 0
 Local $TimeIdle = 0
 If $g_iDebugSetlog = 1 Then SetLog("Func Idle ", $COLOR_DEBUG)
@@ -62110,7 +62354,7 @@ If _Sleep($DELAYIDLE2) Then ExitLoop
 If $g_bRestart = True Then ExitLoop
 If CheckAndroidReboot() Then ContinueLoop 2
 WEnd
-EndIF
+EndIf
 If _Sleep($DELAYIDLE1) Then ExitLoop
 checkObstacles()
 checkMainScreen(False)
@@ -62317,7 +62561,7 @@ Case "DonateCC"
 If $g_iActiveDonate And $g_bChkDonate Then
 If SkipDonateNearFullTroops(True) = False And BalanceDonRec(True) Then DonateCC()
 If _Sleep($DELAYRUNBOT1) = False Then checkMainScreen(False)
-EndIF
+EndIf
 Case "DonateCC,Train"
 If $g_iActiveDonate And $g_bChkDonate Then
 If $g_bFirstStart Then
@@ -62325,7 +62569,7 @@ getArmyCapacity(True, False)
 getArmySpellCapacity(False, True)
 EndIf
 If SkipDonateNearFullTroops(True) = False And BalanceDonRec(True) Then DonateCC()
-EndIF
+EndIf
 If _Sleep($DELAYRUNBOT1) = False Then checkMainScreen(False)
 If $g_bTrainEnabled Then
 If $g_iActualTrainSkip < $g_iMaxTrainSkip Then
@@ -62338,8 +62582,8 @@ If $g_iActualTrainSkip >= $g_iMaxTrainSkip Then
 $g_iActualTrainSkip = 0
 EndIf
 CheckOverviewFullArmy(True, False)
-If ISArmyWindow(False, $ArmyTAB) then CheckExistentArmy("Spells")
-getArmyHeroCount(False, TRue)
+If ISArmyWindow(False, $ArmyTAB) Then CheckExistentArmy("Spells")
+getArmyHeroCount(False, True)
 EndIf
 Else
 If $g_iDebugSetlogTrain = 1 Then Setlog("Halt mode - training disabled", $COLOR_DEBUG)

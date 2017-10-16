@@ -14,6 +14,12 @@
 ; ===============================================================================================================================
 
 Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the data from config to the controls in GUI
+
+	If $g_iGuiMode = 0 Then
+		UpdateBotTitle()
+		Return
+	EndIf
+
 	Static $iApplyConfigCount = 0
 	$iApplyConfigCount += 1
 	SetDebugLog("applyConfig(), call number " & $iApplyConfigCount)
@@ -29,9 +35,10 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 		If $g_iFrmBotDockedPosX > -30000 And $g_iFrmBotDockedPosY > -30000 And $g_bFrmBotMinimized = False Then WinMove($g_hFrmBot, "", $g_iFrmBotDockedPosX, $g_iFrmBotDockedPosY)
 	EndIf
 
+	If $g_iGuiMode <> 1 Then Return
+
 	; Move with redraw disabled causes ghost window in VMWare, so move first then disable redraw
 	Local $bWasRdraw = SetRedrawBotWindow(False, Default, Default, Default, "applyConfig")
-
 	; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 	; <><><><> Bot / Profile (global settings) <><><><>
@@ -156,11 +163,13 @@ Func ApplyConfig_Android($TypeReadSave)
 			UpdateBotTitle()
 			_GUICtrlComboBox_SetCurSel($g_hCmbAndroidBackgroundMode, $g_iAndroidBackgroundMode)
 			GUICtrlSetState($g_hChkAndroidAdbClickDragScript, $g_bAndroidAdbClickDragScript ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetData($g_hTxtAndroidRebootHours, $g_iAndroidRebootHours)
 			_GUICtrlComboBox_SetCurSel($g_hCmbSuspendAndroid, AndroidSuspendFlagsToIndex($g_iAndroidSuspendModeFlags))
 		Case "Save"
 			cmbCOCDistributors()
 			cmbAndroidBackgroundMode()
 			$g_bAndroidAdbClickDragScript = (GUICtrlRead($g_hChkAndroidAdbClickDragScript) = $GUI_CHECKED ? True : False)
+			$g_iAndroidRebootHours = Int(GUICtrlRead($g_hTxtAndroidRebootHours)) ; Hours are entered
 			cmbSuspendAndroid()
 	EndSwitch
 EndFunc   ;==>ApplyConfig_Android

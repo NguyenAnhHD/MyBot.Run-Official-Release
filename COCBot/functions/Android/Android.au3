@@ -33,6 +33,7 @@ Global $g_bAndroidSuspended = False ; Android window is suspended flag
 Global $g_bAndroidQueueReboot = False ; Reboot Android as soon as possible
 Global $g_iAndroidSuspendedTimer = 0 ; Android Suspended Timer
 Global $g_iSuspendAndroidTime = 0
+Global $g_iSuspendAndroidTimeCount = 0
 Global $g_hSuspendAndroidTimer = 0
 Global $g_aiMouseOffset = [0, 0]
 
@@ -198,6 +199,7 @@ Func UpdateHWnD($hWin, $bRestart = True)
 		$g_hAndroidWindow = 0
 		$g_hAndroidControl = 0
 		ResetAndroidProcess()
+		InitAndroidRebootCondition(False)
 		Return False
 	EndIf
 	If $g_hAndroidWindow <> 0 And $bRestart Then
@@ -852,6 +854,8 @@ Func AndroidBotStartEvent()
 	; restore Android Window hidden state
 	reHide()
 
+	CheckAndroidRebootCondition(True, True) ; Log when Android gets automatically rebooted
+
 	Local $Result = Execute($g_sAndroidEmulator & "BotStartEvent()")
 	If $Result = "" And @error <> 0 Then $Result = "" ; Not implemented
 	Return $Result
@@ -912,7 +916,9 @@ Func _OpenAndroid($bRestart = False, $bStartOnlyAndroid = False)
 		If _Sleep(1000) Then Return False
 	EndIf
 
+	InitAndroidRebootCondition(False)
 	If Not Execute("Open" & $g_sAndroidEmulator & "(" & $bRestart & ")") Then Return False
+	InitAndroidRebootCondition(True) ; Android should be running now
 
 	If $bStartOnlyAndroid Then
 		Return True
@@ -2753,6 +2759,7 @@ Func SuspendAndroidTime($Action = False)
 	If IsBool($Action) And $Action = True Then
 		Local $iTime = $g_iSuspendAndroidTime
 		$g_iSuspendAndroidTime = 0
+		$g_iSuspendAndroidTimeCount = 0
 		$g_hSuspendAndroidTimer = 0
 		Return $iTime
 	ElseIf $Action = False Then
@@ -2760,13 +2767,19 @@ Func SuspendAndroidTime($Action = False)
 	EndIf
 	If $g_hSuspendAndroidTimer = 0 Then
 		; nothing to add
+	ElseIf $Action = "Stats" Then
+		; debug stats
+		SetDebugLog("SuspendAndroidTime: Time = " & $g_iSuspendAndroidTime & ", Count = " & $g_iSuspendAndroidTimeCount)
 	Else
-		$g_iSuspendAndroidTime += _HPTimerDiff($g_hSuspendAndroidTimer)
+		; Did tests on EBO battle count-down, and fo some reason 50ms need to be removed here... hope works for other systems, too
+		Local $iSuspendTime = (_HPTimerDiff($g_hSuspendAndroidTimer) - 50)
+		If $iSuspendTime > 0 Then
+			$g_iSuspendAndroidTime += $iSuspendTime
+			$g_iSuspendAndroidTimeCount += 1
+		EndIf
 		$g_hSuspendAndroidTimer = 0
 	EndIf
-	If IsString($Action) And $Action = "Start" Then
-		$g_hSuspendAndroidTimer = _HPTimerInit()
-	EndIf
+	If $Action = "Start" Then $g_hSuspendAndroidTimer = _HPTimerInit()
 	Return $g_iSuspendAndroidTime
 EndFunc   ;==>SuspendAndroidTime
 
@@ -2926,7 +2939,8 @@ EndFunc   ;==>AndroidInvalidState
 Func CheckAndroidReboot($bRebootAndroid = True)
 
 	If CheckAndroidTimeLag($bRebootAndroid) = True _
-			Or CheckAndroidPageError($bRebootAndroid) = True Then
+		Or CheckAndroidPageError($bRebootAndroid) = True _
+		Or CheckAndroidRebootCondition($bRebootAndroid) = True Then
 
 		; Reboot Android
 		Local $_NoFocusTampering = $g_bNoFocusTampering

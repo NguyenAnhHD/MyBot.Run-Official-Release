@@ -81,7 +81,7 @@ Func WaitForClouds()
 			CloseCoC(True)
 			Return
 		EndIf
-		If $g_iDebugSetlog = 1 Then _GUICtrlStatusBar_SetText($g_hStatusBar, " Status: Loop to clean screen without Clouds, # " & $iCount)
+		If $g_iDebugSetlog = 1 Then _GUICtrlStatusBar_SetTextEx($g_hStatusBar, " Status: Loop to clean screen without Clouds, # " & $iCount)
 		$iSearchTime = __TimerDiff($hMinuteTimer) / 60000 ;get time since minute timer start in minutes
 		If $iSearchTime >= $iLastTime + 1 Then
 			Setlog("Cloud wait time " & StringFormat("%.1f", $iSearchTime) & " minute(s)", $COLOR_INFO)

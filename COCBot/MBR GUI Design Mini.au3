@@ -82,6 +82,7 @@ Global Const $_MINIGUI_MAIN_WIDTH = 472 ; changed from 470 to 472 for DPI scalin
 Global Const $_MINIGUI_MAIN_HEIGHT = 220 ; changed from 690 to 692 for DPI scaling cutting off bottom by 2 pixel
 Global $_GUI_MAIN_TOP = 23 ; Adjusted in CreateMainGUI()
 Global $_GUI_MAIN_BUTTON_SIZE = [25, 17] ; minimize/close button size
+Global $_GUI_MAIN_BUTTON_COUNT = 3
 Global $_GUI_CHILD_TOP = 110 + $_GUI_MAIN_TOP ; Adjusted in CreateMainGUI()
 Global Const $_GUI_BOTTOM_HEIGHT = 135
 Global Const $_GUI_CHILD_LEFT = 10
@@ -113,10 +114,12 @@ Global $g_bFrmBotMinimized = False ; prevents bot flickering
 Global $g_oCtrlIconData = ObjCreate("Scripting.Dictionary")
 
 #include "GUI\MBR GUI Design Bottom.au3"
-#include "GUI\MBR GUI Design Log.au3"
-#include "GUI\MBR GUI Design Village.au3"
-#include "GUI\MBR GUI Design Attack.au3"
-#include "GUI\MBR GUI Design Bot.au3"
+#cs mini
+	#include "GUI\MBR GUI Design Log.au3"
+	#include "GUI\MBR GUI Design Village.au3"
+	#include "GUI\MBR GUI Design Attack.au3"
+	#include "GUI\MBR GUI Design Bot.au3"
+#ce
 #include "GUI\MBR GUI Design About.au3"
 
 Func CreateMainGUI()
@@ -135,25 +138,16 @@ Func CreateMainGUI()
 	Else
 		$g_bCustomTitleBarActive = True
 	EndIf
-	Switch $g_iGuiMode
-		Case 0
-			; GUI less mode
-			;Opt("TrayIconHide", 1)
-		Case 2
-			; mini GUI mode
-			$_GUI_MAIN_WIDTH = $_MINIGUI_MAIN_WIDTH
-			$_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
-	EndSwitch
-
+	If $g_iGuiMode = 2 Then
+		; mini GUI mode
+		$_GUI_MAIN_WIDTH = $_MINIGUI_MAIN_WIDTH
+		$_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
+	EndIf
 	$g_hFrmBot = _GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, _
 			BitOR($WS_MINIMIZEBOX, $WS_POPUP, $WS_SYSMENU, $WS_CLIPCHILDREN, $WS_CLIPSIBLINGS, $iStyle))
 
 	; Set Main Window icon
 	GUISetIcon($g_sLibIconPath, $eIcnGUI)
-	If $g_iGuiMode = 0 Then
-		UpdateBotTitle()
-		Return
-	EndIf
 
 	; Create tray icon
 	TraySetIcon($g_sLibIconPath, $eIcnGUI)
@@ -181,8 +175,10 @@ Func CreateMainGUI()
 	$g_hTiStart = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
 	TrayItemSetOnEvent(-1, "btnStart")
 	$g_hTiStop = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot"))
+	TrayItemSetState($g_hTiStop, $TRAY_DISABLE)
 	TrayItemSetOnEvent(-1, "btnStop")
 	$g_hTiPause = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
+	TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
 	TrayItemSetOnEvent(-1, "btnPause")
 	TrayCreateItem("")
 	$g_hTiExit = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_05", "Exit"))
@@ -195,12 +191,17 @@ Func CreateMainGUIControls()
 	Local $aBtnSize = $_GUI_MAIN_BUTTON_SIZE
 	GUISwitch($g_hFrmBot)
 
-	If $g_iGuiMode = 0 Then Return
+	Switch $g_iGuiMode
+		Case 0
+			Return
+		Case 2
+			$_GUI_MAIN_BUTTON_COUNT = 2
+	EndSwitch
 
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01", "Loading Main GUI..."))
+	;mini SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01", "Loading Main GUI..."))
 
 	If $g_bCustomTitleBarActive Then
-		$g_hFrmBotButtons = GUICreate("My Bot Title Buttons", 3 * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_WIDTH - $aBtnSize[0] * 3, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
+		$g_hFrmBotButtons = GUICreate("My Bot Title Buttons", $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
 		WinSetTrans($g_hFrmBotButtons, "", 254) ; trick to hide buttons from Android Screen that is not always refreshing
 	EndIf
 	; Need $g_hFrmBotEx for embedding Android
@@ -218,7 +219,7 @@ Func CreateMainGUIControls()
 		GUICtrlSetOnEvent(-1, "BotMoveRequest")
 		GUICtrlSetBkColor(-1, $COLOR_WHITE)
 		; title
-		$g_hLblBotTitle = GUICtrlCreateLabel($g_sBotTitle, $iTitleX, 0, $_GUI_MAIN_WIDTH - 3 * $aBtnSize[0] - 25, $_GUI_MAIN_TOP) ;, $SS_CENTER)
+		$g_hLblBotTitle = GUICtrlCreateLabel($g_sBotTitle, $iTitleX, 0, $_GUI_MAIN_WIDTH - $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0] - 25, $_GUI_MAIN_TOP) ;, $SS_CENTER)
 		GUICtrlSetOnEvent(-1, "BotMoveRequest")
 		GUICtrlSetFont(-1, 11, 0, 0, "Segoe UI") ; "Verdana" "Lucida Console"
 		GUICtrlSetBkColor(-1, $COLOR_WHITE)
@@ -226,23 +227,25 @@ Func CreateMainGUIControls()
 
 		; buttons, positions are adjusted also in BotShrinkExpandToggle()
 		GUISwitch($g_hFrmBotButtons)
-		; ◄ ► docked shrink/expand
-		$g_hLblBotShrink = GUICtrlCreateLabel(ChrW(0x25C4), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
-		GUICtrlSetFont(-1, 10)
-		GUICtrlSetBkColor(-1, 0xF0F0F0)
-		GUICtrlSetColor(-1, 0xB8B8B8)
-		$g_hLblBotExpand = GUICtrlCreateLabel(ChrW(0x25BA), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
-		GUICtrlSetState(-1, $GUI_HIDE)
-		GUICtrlSetFont(-1, 10)
-		GUICtrlSetBkColor(-1, 0xF0F0F0)
-		GUICtrlSetColor(-1, 0xB8B8B8)
+		If Not $g_bGuiRemote Then
+			; ◄ ► docked shrink/expand
+			$g_hLblBotShrink = GUICtrlCreateLabel(ChrW(0x25C4), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			GUICtrlSetFont(-1, 10)
+			GUICtrlSetBkColor(-1, 0xF0F0F0)
+			GUICtrlSetColor(-1, 0xB8B8B8)
+			$g_hLblBotExpand = GUICtrlCreateLabel(ChrW(0x25BA), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			GUICtrlSetState(-1, $GUI_HIDE)
+			GUICtrlSetFont(-1, 10)
+			GUICtrlSetBkColor(-1, 0xF0F0F0)
+			GUICtrlSetColor(-1, 0xB8B8B8)
+		EndIf
 		; minimize button
-		$g_hLblBotMinimize = GUICtrlCreateLabel("̶", $aBtnSize[0], 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+		$g_hLblBotMinimize = GUICtrlCreateLabel("̶", $aBtnSize[0] * ($_GUI_MAIN_BUTTON_COUNT - 2), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
 		GUICtrlSetFont(-1, 10)
 		GUICtrlSetBkColor(-1, 0xF0F0F0)
 		GUICtrlSetColor(-1, 0xB8B8B8)
 		; close button
-		$g_hLblBotClose = GUICtrlCreateLabel("×", $aBtnSize[0] * 2, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+		$g_hLblBotClose = GUICtrlCreateLabel("×", $aBtnSize[0] * ($_GUI_MAIN_BUTTON_COUNT - 1), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
 		GUICtrlSetFont(-1, 10)
 		GUICtrlSetBkColor(-1, 0xFF4040)
 		GUICtrlSetColor(-1, 0xF8F8F8)
@@ -270,8 +273,6 @@ Func CreateMainGUIControls()
 
 	GUISwitch($g_hFrmBot)
 	$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateInput("", 0, 0, -1, -1, $WS_TABSTOP)
-	;$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateLabel("", 0, 0, 0, 0, $WS_TABSTOP)
-	;$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateDummy()
 	GUICtrlSetState($g_hFrmBotEmbeddedShieldInput, $GUI_HIDE)
 
 	$g_hFrmBotBottom = _GUICreate("My Bot Buttons", $_GUI_MAIN_WIDTH, $_GUI_BOTTOM_HEIGHT, 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, _
@@ -281,15 +282,11 @@ Func CreateMainGUIControls()
 ;~ Header Menu
 ;~ ------------------------------------------------------
 	GUISwitch($g_hFrmBot)
-	;$idMENU_DONATE = GUICtrlCreateMenu("&" & GetTranslatedFileIni("MBR GUI Design Bottom", "g_hLblDonate_Info_01", "Paypal Donate?"))
-	;_GUICtrlMenu_SetItemType(_GUICtrlMenu_GetMenu($g_hFrmBot), 0, $MFT_RIGHTJUSTIFY) ; move to right
-	;$idMENU_DONATE_SUPPORT = GUICtrlCreateMenuItem(GetTranslatedFileIni("MBR GUI Design Bottom", "g_hLblDonate", "Support the development"), $idMENU_DONATE)
-	;GUICtrlSetOnEvent(-1, "")
 
 ;~ ------------------------------------------------------
 ;~ GUI Bottom Panel
 ;~ ------------------------------------------------------
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_02", "Loading GUI Bottom..."))
+	;mini SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_02", "Loading GUI Bottom..."))
 	GUISwitch($g_hFrmBotBottom)
 	CreateBottomPanel()
 
@@ -302,83 +299,7 @@ Func CreateMainGUIControls()
 	$g_hStatusBar = _GUICtrlStatusBar_Create($g_hFrmBotBottom)
 	_GUICtrlStatusBar_SetSimple($g_hStatusBar)
 	GUISetDefaultFont($g_hStatusBar)
-	_GUICtrlStatusBar_SetText($g_hStatusBar, "Status : Idle")
-
-	If $g_iGuiMode = 2 Then
-		Return
-	EndIf
-
-	; This dummy is used in btnStart and btnStop to disable/enable all labels, text, buttons etc. on all tabs.
-	$g_hFirstControlToHide = GUICtrlCreateDummy()
-
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_03", "Loading Log tab..."))
-	CreateLogTab()
-
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_04", "Loading Village tab..."))
-	CreateVillageTab()
-
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_05", "Loading Attack tab..."))
-	CreateAttackTab()
-
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_06", "Loading Bot tab..."))
-	CreateBotTab() ; also creates  $g_hLastControlToHide
-
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_07", "Loading About Us tab..."))
-	CreateAboutTab()
-
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_08", "Initializing GUI..."))
-
-;~ ------------------------------------------------------
-;~ GUI Main Tab Control
-;~ ------------------------------------------------------
-	GUISwitch($g_hFrmBotEx)
-	$g_hTabMain = GUICtrlCreateTab(5, 85 + $_GUI_MAIN_TOP, $_GUI_MAIN_WIDTH - 9, $_GUI_MAIN_HEIGHT - 225) ; , $TCS_MULTILINE)
-	$g_hTabLog = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_01", "Log"))
-	$g_hTabVillage = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_02", "Village"))
-	$g_hTabAttack = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_03", "Attack Plan"))
-	$g_hTabBot = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_04", "Bot"))
-	$g_hTabAbout = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_05", "About Us"))
-	GUICtrlCreateTabItem("")
-	GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
-
-;~ -------------------------------------------------------------
-;~ GUI init
-;~ -------------------------------------------------------------
-	; Bind Icon images to all Tabs in all GUI windows (main and children)
-	Bind_ImageList($g_hTabMain)
-
-	Bind_ImageList($g_hGUI_VILLAGE_TAB)
-	Bind_ImageList($g_hGUI_MISC_TAB)
-	Bind_ImageList($g_hGUI_DONATE_TAB)
-	Bind_ImageList($g_hGUI_UPGRADE_TAB)
-	Bind_ImageList($g_hGUI_NOTIFY_TAB)
-
-	Bind_ImageList($g_hGUI_ATTACK_TAB)
-	Bind_ImageList($g_hGUI_TRAINARMY_TAB)
-	Bind_ImageList($g_hGUI_SEARCH_TAB)
-	Bind_ImageList($g_hGUI_DEADBASE_TAB)
-	Bind_ImageList($g_hGUI_ACTIVEBASE_TAB)
-	Bind_ImageList($g_hGUI_THSNIPE_TAB)
-	Bind_ImageList($g_hGUI_ATTACKOPTION_TAB)
-	Bind_ImageList($g_hGUI_STRATEGIES_TAB)
-
-	Bind_ImageList($g_hGUI_BOT_TAB)
-
-	Bind_ImageList($g_hGUI_STATS_TAB)
-
-	; Show Tab LOG
-	GUICtrlSetState($g_hGUI_LOG, $GUI_SHOW)
-
-	; Create log window
-	cmbLog()
-
-;~ -------------------------------------------------------------
-	SetDebugLog("$g_hFrmBot=" & $g_hFrmBot, Default, True)
-	SetDebugLog("$g_hFrmBotEx=" & $g_hFrmBotEx, Default, True)
-	SetDebugLog("$g_hFrmBotBottom=" & $g_hFrmBotBottom, Default, True)
-	SetDebugLog("$g_hFrmBotEmbeddedShield=" & $g_hFrmBotEmbeddedShield, Default, True)
-	SetDebugLog("$g_hFrmBotEmbeddedShieldInput=" & $g_hFrmBotEmbeddedShieldInput, Default, True)
-	SetDebugLog("$g_hFrmBotEmbeddedGraphics=" & $g_hFrmBotEmbeddedGraphics, Default, True)
+	_GUICtrlStatusBar_SetTextEx($g_hStatusBar, "Status : Idle")
 
 EndFunc   ;==>CreateMainGUIControls
 
@@ -402,7 +323,7 @@ Func ShowMainGUI()
 	GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotButtons)
 	If $g_hFrmBotEx Then GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotEx)
 	GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotBottom)
-	CheckBotShrinkExpandButton()
+	;mini CheckBotShrinkExpandButton()
 
 	GUISwitch($g_hFrmBotEx)
 	$g_bFrmBotMinimized = False
@@ -424,54 +345,13 @@ Func UpdateMainGUI()
 		GUICtrlSetState($g_hBtnStart, $GUI_ENABLE)
 		; enable search only button when TH level variable has valid level, to avoid posts from users not pressing start first
 		If $g_iTownHallLevel > 2 Then
-			GUICtrlSetState($g_hBtnSearchMode, $GUI_ENABLE)
+			;mini GUICtrlSetState($g_hBtnSearchMode, $GUI_ENABLE)
 		EndIf
 	EndIf
 EndFunc   ;==>UpdateMainGUI
 
 Func CheckDpiAwareness($bCheckOnlyIfAlreadyAware = False, $bForceDpiAware = False, $bForceDpiAware2 = False)
-
-	Static $sbDpiAware = False
-	Static $sbDpiAlreadyChecked = False
-
-	If $bCheckOnlyIfAlreadyAware = True Then Return $sbDpiAware
-
-	Local $bDpiAware = False
-	Local $bChanged = False
-
-	If $sbDpiAlreadyChecked = True Or ($g_iBotLaunchTime = 0 And $bForceDpiAware2 = False) Then Return $bChanged
-
-	If $g_iDpiAwarenessMode <> 0 And RegRead("HKCU\Control Panel\Desktop\WindowMetrics", "AppliedDPI") <> 96 Then
-		; DPI is different, check if awareness needs to be set
-		$bDpiAware = $bForceDpiAware = True _ ; override to set DPI Awareness regardless of current state
-				Or $g_bChkBackgroundMode = False _ ; in non background mode Desktop screen capture is totally wrong due to the scaling
-				Or ($g_bAndroidAdbScreencap = False And GetProcessDpiAwareness(GetAndroidPid())) ; in normal background mode using WinAPI and Android is DPI Aware, bot must be too or window will be scaled and blury
-		$bChanged = $bDpiAware And Not $sbDpiAware
-		If $bChanged Then ; only required when not running with screencap
-			$sbDpiAware = True ; do it only once, assume bot will become DPI aware
-			Local $bWasEmbedded = AndroidEmbedded()
-			If $bWasEmbedded Then AndroidEmbed(False)
-			; Make this process DPI aware, so it doesn't scale (for now only way to get bot working right)
-			If $g_bCustomTitleBarActive = False Then
-				; Default Windows Title Bar changes height
-				Local $g_iDpiAwarenessYcomp = _WinAPI_GetSystemMetrics($SM_CYCAPTION)
-				Local $aResult = DllCall("user32.dll", "boolean", "SetProcessDPIAware")
-				$g_aFrmBotPosInit[7] = _WinAPI_GetSystemMetrics($SM_CYCAPTION) - $g_iDpiAwarenessYcomp
-				SetDebugLog("Enabled DPI Awareness, height compensation: " & $g_aFrmBotPosInit[7])
-				;DllCall("user32.dll", "dword", "SetProcessDpiAwareness", "dword", 0)
-			Else
-				; custom Custom Title Bar
-				Local $aResult = DllCall("user32.dll", "boolean", "SetProcessDPIAware")
-			EndIf
-			SetDebugLog("SetProcessDPIAware called: " & @error & ((UBound($aResult) = 0) ? ("") : (", " & $aResult[0])))
-			If $bWasEmbedded Then AndroidEmbed(True)
-		EndIf
-
-	EndIf
-
-	;$sbDpiAlreadyChecked = True ; executed often so cache result (even if DPI changes!)
-
-	Return $bChanged
+	Return False
 EndFunc   ;==>CheckDpiAwareness
 
 Func GetProcessDpiAwareness($iPid)

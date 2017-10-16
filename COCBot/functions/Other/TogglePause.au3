@@ -19,7 +19,7 @@ Func TogglePause()
 	TogglePauseImpl("Button")
 EndFunc   ;==>TogglePause
 
-Func TogglePauseImpl($Source)
+Func TogglePauseImpl($Source, $bDelayed = False)
 	If Not $g_bRunState Then Return
 	ResumeAndroid()
 	$g_bBotPaused = Not $g_bBotPaused
@@ -28,7 +28,7 @@ Func TogglePauseImpl($Source)
 		Return
 	EndIf
 	TogglePauseUpdateState($Source)
-	TogglePauseSleep()
+	If $bDelayed = False Then TogglePauseSleep()
 EndFunc   ;==>TogglePauseImpl
 
 Func TogglePauseUpdateState($Source)

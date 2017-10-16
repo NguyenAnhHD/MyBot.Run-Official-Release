@@ -277,7 +277,17 @@ Func btnEmbed()
 EndFunc   ;==>btnEmbed
 
 Func btnMakeScreenshot()
-	If $g_bRunState Then $g_bMakeScreenshotNow = True
+	If $g_bRunState Then
+		; call with flag when bot is running to execute on _sleep() idle
+		$g_bMakeScreenshotNow = True
+	Else
+		; call directly when bot is stopped
+		If $g_bScreenshotPNGFormat = False Then
+			MakeScreenshot($g_sProfileTempPath, "jpg")
+		Else
+			MakeScreenshot($g_sProfileTempPath, "png")
+		EndIf
+	EndIf
 EndFunc   ;==>btnMakeScreenshot
 
 Func GetFont()
@@ -605,6 +615,7 @@ Func DisableGuiControls($OptimizedRedraw = True)
 EndFunc   ;==>DisableGuiControls
 
 Func ToggleGuiControls($Enable, $OptimizedRedraw = True)
+	If $g_iGuiMode <> 1 Then Return
 	If $OptimizedRedraw = True Then Local $bWasRedraw = SetRedrawBotWindow(False, Default, Default, Default, "ToggleGuiControls")
 	If $Enable = False Then
 		SetDebugLog("Disable GUI Controls")

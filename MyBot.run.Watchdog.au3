@@ -41,6 +41,7 @@ Global Const $COLOR_SUCCESS = 0x006600 ; Dark Green, Action, method, or process 
 Global Const $COLOR_DEBUG = $COLOR_PURPLE ; Purple, basic debug color
 
 ; Global Variables
+Global $g_WatchOnlyClientPID = Default
 Global $g_bRunState = True
 Global $frmBot = 0 ; Dummy form for messages
 Global $g_iGlobalActiveBotsAllowed = 0 ; Dummy
@@ -55,6 +56,7 @@ Global $iTimeoutRestartBot = 120000 ; Milliseconds un-responsive bot is launched
 Global $iTimeoutAutoClose = 60000 ; Milliseconds watchdog automatically closed when no bot available, -1 = disabled
 Global $hTimeoutAutoClose = 0 ; Timer Handle for $iTimeoutAutoClose
 Global $g_bBotLaunchOption_NoBotSlot = True
+Global $g_iDebugWindowMessages = 0
 
 Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
@@ -63,11 +65,13 @@ Global $g_iDebugSetlog = 0
 
 ; Dummy functions
 Func _GUICtrlStatusBar_SetText($a, $b)
-EndFunc
+EndFunc   ;==>_GUICtrlStatusBar_SetText
+Func _GUICtrlStatusBar_SetTextEx($a, $b)
+EndFunc   ;==>_GUICtrlStatusBar_SetTextEx
 Func GetTranslated($a, $b, $c)
-EndFunc
+EndFunc   ;==>GetTranslated
 Func GetTranslatedFileIni($a, $b, $c)
-EndFunc
+EndFunc   ;==>GetTranslatedFileIni
 
 Func SetLog($String, $Color = $COLOR_BLACK, $LogPrefix = "L ")
 	Local $log = $LogPrefix & TimeDebug() & $String
@@ -94,8 +98,7 @@ Func _SleepMilli($iMilliSec)
 	_SleepMicro(Int($iMilliSec * 1000))
 EndFunc   ;==>_SleepMilli
 
-Global $sBotVersion = "v7.2.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
-Global $sBotTitle = "My Bot Watchdog " & $sBotVersion & " " ;~ Don't use any non file name supported characters like \ / : * ? " < > |
+Global $g_sBotTitle = "My Bot Watchdog " & $g_sBotVersion & " " ;~ Don't use any non file name supported characters like \ / : * ? " < > |
 
 Opt("WinTitleMatchMode", 3) ; Window Title exact match mode
 
@@ -111,7 +114,7 @@ If $hMutex_BotTitle = 0 Then
 EndIf
 
 ; create dummy form for Window Messsaging
-$frmBot = GUICreate($sBotTitle, 32, 32)
+$frmBot = GUICreate($g_sBotTitle, 32, 32)
 $hStarted = __TimerInit() ; Timer handle watchdog started
 $hTimeoutAutoClose = $hStarted
 
@@ -140,7 +143,7 @@ While 1
 	; automatically close watchdog when no bot available
 	If $iTimeoutAutoClose > -1 And __TimerDiff($hTimeoutAutoClose) > $iTimeoutAutoClose Then
 		If UBound(GetManagedMyBotDetails()) = 0 Then
-			SetLog("Closing " & $sBotTitle & "as no running bot found")
+			SetLog("Closing " & $g_sBotTitle & "as no running bot found")
 			$iExitCode = 1
 		EndIf
 		$hTimeoutAutoClose = __TimerInit() ; timeout starts again

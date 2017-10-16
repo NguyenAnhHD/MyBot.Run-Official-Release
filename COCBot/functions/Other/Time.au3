@@ -129,7 +129,6 @@ EndFunc   ;==>_HPTimerInit
 ; Example .......: No
 ; ===============================================================================================================================
 Func _HPTimerDiff($iOldTimerCount)
-	Static $iCompensation = [10, 0, 0, 0]
 	If $iOldTimerCount = 0 Then
 		SetLog("Bad parameter data passed to _HPTimerDiff", $COLOR_ERROR)
 		SetError(1, 0, 0)
@@ -146,13 +145,16 @@ Func _HPTimerDiff($iOldTimerCount)
 		Setlog("QueryPerformanceFrequency error code: " & $err & " ,Abort timer check", $COLOR_ERROR)
 		Return 0
 	EndIf
+	#cs ; disabled, as effect was not as hoped
+	Static $iCompensation = [10, 0, 0, 0]
 	If $iCompensation[1] < $iCompensation[0] Then
 		$iCompensation[1] += 1
 		$iCompensation[2] += _WinAPI_QueryPerformanceCounter() - $iNewTimerCount
 		$iCompensation[3] = $iCompensation[2] / $iCompensation[1]
 		If $iCompensation[1] = $iCompensation[0] Then SetDebugLog("QueryPerformanceCounter compensation is: " & $iCompensation[3])
 	EndIf
-
-	Return (($iNewTimerCount - $iOldTimerCount - $iCompensation[3] * 4) / $g_iHPTimerFreq) * 1000 ; return milliseconds between init and now
+	Return (($iNewTimerCount - $iOldTimerCount - $iCompensation[3] * 2) / $g_iHPTimerFreq) * 1000 ; return milliseconds between init and now
+	#ce
+	Return (($iNewTimerCount - $iOldTimerCount) / $g_iHPTimerFreq) * 1000 ; return milliseconds between init and now
 EndFunc   ;==>_HPTimerDiff
 

@@ -16,7 +16,9 @@
 #include-once
 #include "Synchronization.au3"
 #include "WmiAPI.au3"
+#include <WinAPI.au3>
 #include <WindowsConstants.au3>
+#include <APISysConstants.au3>
 #include <NamedPipes.au3>
 
 Global $g_RunPipe_StdIn = [0, 0] ; pipe read/write handles

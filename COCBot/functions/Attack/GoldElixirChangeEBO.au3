@@ -125,16 +125,24 @@ Func GoldElixirChangeEBO()
 		CheckHeroesHealth()
 
 		;WRITE LOG
-		$txtDiff = Round(($z - (__TimerDiff($iBegin) - SuspendAndroidTime() + $iSuspendAndroidTimeOffset)) / 1000, 1)
-		If Number($txtDiff) < 0 Then $txtDiff = 0
+		$txtDiff = Round(($z - (__TimerDiff($iBegin) - SuspendAndroidTime() + $iSuspendAndroidTimeOffset)) / 1000, 0)
+		If Number($txtDiff) < 0 Then
+			$txtDiff = "0s"
+		Else
+			Local $m = Int($txtDiff / 60)
+			Local $s = $txtDiff - $m * 60
+			$txtDiff = ""
+			If $m > 0 Then $txtDiff = $m & "m "
+			$txtDiff &= $s & "s"
+		EndIf
 		$NoResourceOCR = StringLen($Gold2) = 0 And StringLen($Elixir2) = 0 And StringLen($DarkElixir2) = 0
 		If $NoResourceOCR Then
 			SetLog("Exit now, [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
 		Else
 			If $g_iDebugSetlog = 1 Then
-				SetLog("Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & ", Suspend: " & SuspendAndroidTime() &  ", Offset: " & $iSuspendAndroidTimeOffset, $COLOR_INFO)
+				SetLog("Exit in " & $txtDiff & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & ", Suspend-Time: " & $g_iSuspendAndroidTime & ", Suspend-Count: " & $g_iSuspendAndroidTimeCount &  ", Offset: " & $iSuspendAndroidTimeOffset, $COLOR_INFO)
 			Else
-				SetLog("Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
+				SetLog("Exit in " & $txtDiff & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
 			EndIf
 		EndIf
 

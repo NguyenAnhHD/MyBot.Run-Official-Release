@@ -30,6 +30,7 @@ EndFunc   ;==>GetAndroidDisplayHWnD
 
 ; Syncronized _AndroidEmbed
 Func AndroidEmbed($Embed = True, $CallWinGetAndroidHandle = True, $bForceEmbed = False, $bNoAndroidScreenSizeCheck = False)
+	If $g_iGuiMode = 0 Then Return False
 	If $g_bAndroidEmbed = False Then Return False
 	Return _AndroidEmbed($Embed, $CallWinGetAndroidHandle, $bForceEmbed, $bNoAndroidScreenSizeCheck)
 	#cs
