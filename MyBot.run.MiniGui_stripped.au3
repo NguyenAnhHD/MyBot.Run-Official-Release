@@ -1515,6 +1515,7 @@ Global Const $GUI_EVENT_RESTORE = -5
 Global Const $GUI_RUNDEFMSG = 'GUI_RUNDEFMSG'
 Global Const $GUI_CHECKED = 1
 Global Const $GUI_UNCHECKED = 4
+Global Const $GUI_SHOW = 16
 Global Const $GUI_HIDE = 32
 Global Const $GUI_ENABLE = 64
 Global Const $GUI_DISABLE = 128
@@ -2301,6 +2302,7 @@ Return $aInfo
 EndFunc
 Global Const $TRAY_CHECKED = 1
 Global Const $TRAY_UNCHECKED = 4
+Global Const $TRAY_ENABLE = 64
 Global Const $TRAY_DISABLE = 128
 Global Const $CFE_SUBSCRIPT = 0x00010000
 Global Const $CFE_SUPERSCRIPT = 0x00020000
@@ -2506,24 +2508,23 @@ Global Const $g_iDEFAULT_HEIGHT = 780
 Global Const $g_iDEFAULT_WIDTH = 860
 Global Const $g_iMidOffsetY = Int(($g_iDEFAULT_HEIGHT - 720) / 2)
 Global $g_hBotLaunchTime = __TimerInit()
-Local Const $UserDebugEnable = 0
-Global $g_iDebugClick = $UserDebugEnable
-Global $g_iDebugSetlog = $UserDebugEnable
-Global $g_iDebugOcr = $UserDebugEnable
-Global $g_iDebugImageSave = $UserDebugEnable
-Global $g_iDebugBuildingPos = $UserDebugEnable
-Global $g_iDebugSetlogTrain = $UserDebugEnable
-Global $g_iDebugWindowMessages = $UserDebugEnable
-Global $g_bDebugSmartZap =($UserDebugEnable ? True : False)
-Global $g_iDebugAttackCSV = $UserDebugEnable
-Global $g_iDebugMakeIMGCSV = $UserDebugEnable
-Global $g_iDebugDeadBaseImage = 0
-Global $g_iDebugResourcesOffset = 0
-Global $g_iDebugMilkingIMGmake = 0
-Global $g_iDebugContinueSearchElixir = 0
-Global $g_iDebugOCRdonate = 0
-Global $g_iDebugDisableZoomout = 0
-Global $g_iDebugDisableVillageCentering = 0
+Global $g_bDebugClick = False
+Global $g_bDebugSetlog = False
+Global $g_bDebugOcr = False
+Global $g_bDebugImageSave = False
+Global $g_bDebugBuildingPos = False
+Global $g_bDebugSetlogTrain = False
+Global $g_iDebugWindowMessages = 0
+Global $g_bDebugSmartZap = False
+Global $g_bDebugAttackCSV = False
+Global $g_bDebugMakeIMGCSV = False
+Global $g_bDebugDeadBaseImage = False
+Global $g_bDebugResourcesOffset = False
+Global $g_bDebugMilkingIMGmake = False
+Global $g_bDebugContinueSearchElixir = False
+Global $g_bDebugOCRdonate = False
+Global $g_bDebugDisableZoomout = False
+Global $g_bDebugDisableVillageCentering = False
 Global $g_oDebugGDIHandles = ObjCreate("Scripting.Dictionary")
 Global Const $COLOR_ERROR = $COLOR_RED
 Global Const $COLOR_WARNING = $COLOR_MAROON
@@ -2657,11 +2658,26 @@ Global Enum $eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eD
 Global Enum $DB, $LB, $TS, $MA, $TB, $DT
 Global Const $g_iModeCount = 3
 Global Enum $eTroopBarbarian, $eTroopArcher, $eTroopGiant, $eTroopGoblin, $eTroopWallBreaker, $eTroopBalloon, $eTroopWizard, $eTroopHealer, $eTroopDragon, $eTroopPekka, $eTroopBabyDragon, $eTroopMiner, $eTroopMinion, $eTroopHogRider, $eTroopValkyrie, $eTroopGolem, $eTroopWitch, $eTroopLavaHound, $eTroopBowler, $eTroopCount
+Global Const $g_asTroopNames[$eTroopCount] = [ "Barbarian", "Archer", "Giant", "Goblin", "Wall Breaker", "Balloon", "Wizard", "Healer", "Dragon", "Pekka", "Baby Dragon", "Miner", "Minion", "Hog Rider", "Valkyrie", "Golem", "Witch", "Lava Hound", "Bowler"]
 Global Const $g_asTroopNamesPlural[$eTroopCount] = [ "Barbarians", "Archers", "Giants", "Goblins", "Wall Breakers", "Balloons", "Wizards", "Healers", "Dragons", "Pekkas", "Baby Dragons", "Miners", "Minions", "Hog Riders", "Valkyries", "Golems", "Witches", "Lava Hounds", "Bowlers"]
 Global Const $g_asTroopShortNames[$eTroopCount] = [ "Barb", "Arch", "Giant", "Gobl", "Wall", "Ball", "Wiza", "Heal", "Drag", "Pekk", "BabyD", "Mine", "Mini", "Hogs", "Valk", "Gole", "Witc", "Lava", "Bowl"]
 Global Enum $eSpellLightning, $eSpellHeal, $eSpellRage, $eSpellJump, $eSpellFreeze, $eSpellClone, $eSpellPoison, $eSpellEarthquake, $eSpellHaste, $eSpellSkeleton, $eSpellCount
+Global Const $g_asSpellNames[$eSpellCount] = ["Lightning", "Heal", "Rage", "Jump", "Freeze", "Clone", "Poison", "Earthquake", "Haste", "Skeleton"]
 Global Const $g_asSpellShortNames[$eSpellCount] = ["LSpell", "HSpell", "RSpell", "JSpell", "FSpell", "CSpell", "PSpell", "ESpell", "HaSpell", "SkSpell"]
 Global Enum $eHeroNone = 0, $eHeroKing = 1, $eHeroQueen = 2, $eHeroWarden = 4
+Global Enum $eHeroBarbarianKing, $eHeroArcherQueen, $eHeroGrandWarden, $eHeroCount
+Global Const $g_asHeroNames[$eHeroCount] = ["Barbarian King", "Archer Queen", "Grand Warden"]
+Func GetTroopName(Const $iIndex)
+If $iIndex >= $eBarb And $iIndex <= $eBowl Then
+Return $g_asTroopNames[$iIndex]
+ElseIf $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then
+Return $g_asSpellNames[$iIndex - $eLSpell]
+ElseIf $iIndex >= $eKing And $iIndex <= $eWarden Then
+Return $g_asHeroNames[$iIndex - $eKing]
+ElseIf $iIndex = $eCastle Then
+Return "Clan Castle"
+EndIf
+EndFunc
 Global $g_iLogDividerY = 385
 Global $g_iCmbLogDividerOption = 0
 Global $g_bChkBackgroundMode
@@ -3487,16 +3503,16 @@ EndFunc
 Global $g_RunPipe_hProcess = 0
 Global $g_RunPipe_hThread = 0
 Func LaunchConsole($cmd, $param, ByRef $process_killed, $timeout = 10000, $bUseSemaphore = False)
-If $bUseSemaphore = True Then
+If $bUseSemaphore Then
 Local $hSemaphore = LockSemaphore(StringReplace($cmd, "\", "/"), "Waiting to launch: " & $cmd)
 EndIf
 Local $data, $pid, $hStdIn[2], $hStdOut[2], $hTimer, $hProcess, $hThread
 If StringLen($param) > 0 Then $cmd &= " " & $param
 $hTimer = __TimerInit()
 $process_killed = False
-If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole: " & $cmd, $COLOR_DEBUG)
+If $g_bDebugSetlog Then Setlog("Func LaunchConsole: " & $cmd, $COLOR_DEBUG)
 $pid = RunPipe($cmd, "", @SW_HIDE, $STDERR_MERGED, $hStdIn, $hStdOut, $hProcess, $hThread)
-If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole: command launched", $COLOR_DEBUG)
+If $g_bDebugSetlog Then Setlog("Func LaunchConsole: command launched", $COLOR_DEBUG)
 If $pid = 0 Then
 SetLog("Launch faild: " & $cmd, $COLOR_ERROR)
 If $bUseSemaphore = True Then UnlockSemaphore($hSemaphore)
@@ -3510,7 +3526,7 @@ $data &= ReadPipe($hStdOut[0])
 Until($timeout > 0 And __TimerDiff($hTimer) > $timeout) Or $iWaitResult <> $WAIT_TIMEOUT
 If ProcessExists($pid) Then
 If ClosePipe($pid, $hStdIn, $hStdOut, $hProcess, $hThread) = 1 Then
-If $g_iDebugSetlog = 1 Then SetLog("Process killed: " & $cmd, $COLOR_ERROR)
+If $g_bDebugSetlog Then SetLog("Process killed: " & $cmd, $COLOR_ERROR)
 $process_killed = True
 EndIf
 Else
@@ -3519,8 +3535,8 @@ EndIf
 $g_RunPipe_hProcess = 0
 $g_RunPipe_hThread = 0
 CleanLaunchOutput($data)
-If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole Output: " & $data, $COLOR_DEBUG)
-If $bUseSemaphore = True Then UnlockSemaphore($hSemaphore)
+If $g_bDebugSetlog Then Setlog("Func LaunchConsole Output: " & $data, $COLOR_DEBUG)
+If $bUseSemaphore Then UnlockSemaphore($hSemaphore)
 Return $data
 EndFunc
 Func ProcessGetCommandLine($pid, $strComputer = ".")
@@ -3911,7 +3927,7 @@ Global $g_hLblResultElixirNow = 0, $g_hLblResultElixirHourNow = 0, $g_hPicResult
 Global $g_hLblResultDENow = 0, $g_hLblResultDEHourNow = 0, $g_hPicResultDENow = 0, $g_hPicResultDETemp = 0
 Global $g_hLblResultTrophyNow = 0, $g_hPicResultTrophyNow = 0, $g_hLblResultRuntimeNow = 0, $g_hPicResultRuntimeNow = 0, $g_hLblResultBuilderNow = 0, $g_hPicResultBuilderNow = 0
 Global $g_hLblResultAttackedHourNow = 0, $g_hPicResultAttackedHourNow = 0, $g_hLblResultGemNow = 0, $g_hPicResultGemNow = 0, $g_hLblResultSkippedHourNow = 0, $g_hPicResultSkippedHourNow = 0
-Global $g_hLblVillageReportTemp = 0, $g_hBtnTestVillage = 0
+Global $g_hLblVillageReportTemp = 0
 Func CreateBottomPanel()
 Local $sTxtTip = ""
 Local $y_bottom = 0
@@ -3968,7 +3984,7 @@ GUICtrlSetCursor(-1, 0)
 GUICtrlSetFont(-1, 8.5, $FW_BOLD)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate_Info_01", "Paypal Donate?"))
 GUICtrlCreateGroup("", -99, -99, 1, 1)
-If $g_bAndroidAdbScreencap = True Then chkBackground()
+If $g_bAndroidAdbScreencap Then chkBackground()
 $g_hPicTwoArrowShield = _GUICtrlCreateIcon($g_sLibIconPath, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
 $g_hLblVersion = GUICtrlCreateLabel($g_sBotVersion, 200, $y + 60, 60, 17, $SS_CENTER)
 GUICtrlSetColor(-1, $COLOR_MEDGRAY)
@@ -4018,9 +4034,6 @@ $g_hPicResultSkippedHourNow = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnBldgX, $x
 GUICtrlSetState(-1, $GUI_HIDE)
 $x = 285
 $g_hLblVillageReportTemp = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Bottom", "LblVillageReportTemp_01", "Village Report") & @CRLF & GetTranslatedFileIni("MBR GUI Design Bottom", "LblVillageReportTemp_02", "will appear here") & @CRLF & GetTranslatedFileIni("MBR GUI Design Bottom", "LblVillageReportTemp_03", "on first run."), $x + 27, $y + 5, 100, 45, BITOR($SS_CENTER, $BS_MULTILINE))
-$g_hBtnTestVillage = GUICtrlCreateButton("TEST BUTTON", $x + 25 , $y + 54, 100, 18)
-GUICtrlSetOnEvent(-1, "ButtonBoost")
-GUICtrlSetState(-1, $GUI_HIDE)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
 Func CreateMainGUI()
@@ -4332,22 +4345,22 @@ ReadConfig_600_56()
 ReadConfig_641_1()
 EndFunc
 Func ReadConfig_Debug()
-$g_iDebugClick = BitOR($g_iDebugClick, Int(IniRead($g_sProfileConfigPath, "debug", "debugsetclick", 0)))
-If $g_bDevMode = True Then
-$g_iDebugSetlog = BitOR($g_iDebugSetlog, Int(IniRead($g_sProfileConfigPath, "debug", "debugsetlog", 0)))
-$g_iDebugDisableZoomout = BitOR($g_iDebugDisableZoomout, Int(IniRead($g_sProfileConfigPath, "debug", "disablezoomout", 0)))
-$g_iDebugDisableVillageCentering = BitOR($g_iDebugDisableVillageCentering, Int(IniRead($g_sProfileConfigPath, "debug", "disablevillagecentering", 0)))
-$g_iDebugDeadBaseImage = BitOR($g_iDebugDeadBaseImage, Int(IniRead($g_sProfileConfigPath, "debug", "debugdeadbaseimage", 0)))
-$g_iDebugOcr = BitOR($g_iDebugOcr, Int(IniRead($g_sProfileConfigPath, "debug", "debugocr", 0)))
-$g_iDebugImageSave = BitOR($g_iDebugImageSave, Int(IniRead($g_sProfileConfigPath, "debug", "debugimagesave", 0)))
-$g_iDebugBuildingPos = BitOR($g_iDebugBuildingPos, Int(IniRead($g_sProfileConfigPath, "debug", "debugbuildingpos", 0)))
-$g_iDebugSetlogTrain = BitOR($g_iDebugSetlogTrain, Int(IniRead($g_sProfileConfigPath, "debug", "debugtrain", 0)))
-$g_iDebugResourcesOffset = BitOR($g_iDebugResourcesOffset, Int(IniRead($g_sProfileConfigPath, "debug", "debugresourcesoffset", 0)))
-$g_iDebugContinueSearchElixir = BitOR($g_iDebugContinueSearchElixir, Int(IniRead($g_sProfileConfigPath, "debug", "continuesearchelixirdebug", 0)))
-$g_iDebugMilkingIMGmake = BitOR($g_iDebugMilkingIMGmake, Int(IniRead($g_sProfileConfigPath, "debug", "debugMilkingIMGmake", 0)))
-$g_iDebugOCRdonate = BitOR($g_iDebugOCRdonate, Int(IniRead($g_sProfileConfigPath, "debug", "debugOCRDonate", 0)))
-$g_iDebugAttackCSV = BitOR($g_iDebugAttackCSV, Int(IniRead($g_sProfileConfigPath, "debug", "debugAttackCSV", 0)))
-$g_iDebugMakeIMGCSV = BitOR($g_iDebugMakeIMGCSV, Int(IniRead($g_sProfileConfigPath, "debug", "debugmakeimgcsv", 0)))
+$g_bDebugClick = IniRead($g_sProfileConfigPath, "debug", "debugsetclick", 0) = 1 ? True : False
+If $g_bDevMode Then
+$g_bDebugSetlog = IniRead($g_sProfileConfigPath, "debug", "debugsetlog", 0) = 1 ? True : False
+$g_bDebugDisableZoomout = IniRead($g_sProfileConfigPath, "debug", "disablezoomout", 0) = 1 ? True : False
+$g_bDebugDisableVillageCentering = IniRead($g_sProfileConfigPath, "debug", "disablevillagecentering", 0) = 1 ? True : False
+$g_bDebugDeadBaseImage = IniRead($g_sProfileConfigPath, "debug", "debugdeadbaseimage", 0) = 1 ? True : False
+$g_bDebugOcr = IniRead($g_sProfileConfigPath, "debug", "debugocr", 0) = 1 ? True : False
+$g_bDebugImageSave = IniRead($g_sProfileConfigPath, "debug", "debugimagesave", 0) = 1 ? True : False
+$g_bDebugBuildingPos = IniRead($g_sProfileConfigPath, "debug", "debugbuildingpos", 0) = 1 ? True : False
+$g_bDebugSetlogTrain = IniRead($g_sProfileConfigPath, "debug", "debugtrain", 0) = 1 ? True : False
+$g_bDebugResourcesOffset = IniRead($g_sProfileConfigPath, "debug", "debugresourcesoffset", 0) = 1 ? True : False
+$g_bDebugContinueSearchElixir = IniRead($g_sProfileConfigPath, "debug", "continuesearchelixirdebug", 0) = 1 ? True : False
+$g_bDebugMilkingIMGmake = IniRead($g_sProfileConfigPath, "debug", "debugMilkingIMGmake", 0) = 1 ? True : False
+$g_bDebugOCRdonate = IniRead($g_sProfileConfigPath, "debug", "debugOCRDonate", 0) = 1 ? True : False
+$g_bDebugAttackCSV = IniRead($g_sProfileConfigPath, "debug", "debugAttackCSV", 0) = 1 ? True : False
+$g_bDebugMakeIMGCSV = IniRead($g_sProfileConfigPath, "debug", "debugmakeimgcsv", 0) = 1 ? True : False
 $g_bDebugSmartZap = BitOR($g_bDebugSmartZap, Int(IniRead($g_sProfileConfigPath, "debug", "DebugSmartZap", 0)))
 EndIf
 EndFunc
@@ -4378,7 +4391,7 @@ $g_iAndroidInactiveColor = Dec(IniRead($g_sProfileConfigPath, "android", "inacti
 $g_iAndroidInactiveTransparency = Int(IniRead($g_sProfileConfigPath, "android", "inactive.transparency", $g_iAndroidInactiveTransparency))
 $g_iAndroidSuspendModeFlags = Int(IniRead($g_sProfileConfigPath, "android", "suspend.mode", $g_iAndroidSuspendModeFlags))
 $g_iAndroidRebootHours = Int(IniRead($g_sProfileConfigPath, "android", "reboot.hours", $g_iAndroidRebootHours))
-If $g_bBotLaunchOption_Restart = True Then
+If $g_bBotLaunchOption_Restart = True Or $g_asCmdLine[0] < 2 Then
 Local $sAndroidEmulator = IniRead($g_sProfileConfigPath, "android", "emulator", "")
 Local $sAndroidInstance = IniRead($g_sProfileConfigPath, "android", "instance", "")
 If $sAndroidEmulator <> "" Then
@@ -5688,8 +5701,6 @@ Func btnEmbed()
 EndFunc
 Func chkBackground()
 EndFunc
-Func ButtonBoost()
-EndFunc
 Func tiShow()
 BotRestore("tiShow")
 EndFunc
@@ -5713,6 +5724,91 @@ ShellExecute("https://mybot.run/forums/index.php?/donate/make-donation/")
 EndFunc
 Func tiExit()
 BotCloseRequest()
+EndFunc
+Func BotStarted()
+GUICtrlSetState($g_hBtnStart, $GUI_HIDE)
+GUICtrlSetState($g_hBtnStop, $GUI_SHOW)
+GUICtrlSetState($g_hBtnPause, $GUI_SHOW)
+GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
+GUICtrlSetState($g_hBtnSearchMode, $GUI_HIDE)
+GUICtrlSetState($g_hChkBackgroundMode, $GUI_DISABLE)
+TrayItemSetState($g_hTiStart, $TRAY_DISABLE)
+TrayItemSetState($g_hTiStop, $TRAY_ENABLE)
+TrayItemSetState($g_hTiPause, $TRAY_ENABLE)
+GUICtrlSetState($g_hBtnStart, $GUI_ENABLE)
+GUICtrlSetState($g_hBtnStop, $GUI_ENABLE)
+EndFunc
+Func BotStopped()
+GUICtrlSetState($g_hChkBackgroundMode, $GUI_ENABLE)
+GUICtrlSetState($g_hBtnStart, $GUI_SHOW)
+GUICtrlSetState($g_hBtnStop, $GUI_HIDE)
+GUICtrlSetState($g_hBtnPause, $GUI_HIDE)
+GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
+GUICtrlSetState($g_hBtnSearchMode, $GUI_SHOW)
+GUICtrlSetState($g_hBtnStart, $GUI_ENABLE)
+GUICtrlSetState($g_hBtnStop, $GUI_ENABLE)
+TrayItemSetState($g_hTiStart, $TRAY_ENABLE)
+TrayItemSetState($g_hTiStop, $TRAY_DISABLE)
+TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
+EndFunc
+Func UpdateManagedMyBot($aBotDetails)
+Local $sTitle = $aBotDetails[3]
+Local $bRunState = $aBotDetails[4]
+Local $bPaused = $aBotDetails[5]
+Local $bLaunched = $aBotDetails[6]
+Local $tBotState = $aBotDetails[8]
+Local $tOptionalStruct = $aBotDetails[9]
+Local $sProfile = ""
+Local $sEmulator = ""
+Local $sInstance = ""
+Local $eStructType = $g_eSTRUCT_NONE
+Local $pStructPtr = 0
+If $tBotState <> 0 Then
+$sProfile = DllStructGetData($tBotState, "Profile")
+$sEmulator = DllStructGetData($tBotState, "AndroidEmulator")
+$sInstance = DllStructGetData($tBotState, "AndroidInstance")
+$eStructType = DllStructGetData($tBotState, "StructType")
+$pStructPtr = DllStructGetData($tBotState, "StructPtr")
+EndIf
+Local $sStatusBar = Default
+Local $AdditionalData
+If $pStructPtr Then
+Switch $eStructType
+Case $g_eSTRUCT_STATUS_BAR
+$sStatusBar = DllStructGetData($tOptionalStruct, "Text")
+_GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sStatusBar)
+$AdditionalData = $sStatusBar
+EndSwitch
+EndIf
+SetLog("UpdateManagedMyBot: " & $aBotDetails[0] & ", Profile: " & $sProfile & ", Android: " & $sEmulator & ", Instance: " & $sInstance & ", StructType: " & $eStructType & ", Ptr: " & $pStructPtr & ", Data:" & $AdditionalData)
+If $g_hFrmBotBackend = 0 And $g_sAndroidEmulator = $sEmulator And $g_sAndroidInstance = $sInstance Then
+$g_hFrmBotBackend = $aBotDetails[0]
+$g_WatchOnlyClientPID = WinGetProcess($g_hFrmBotBackend)
+EndIf
+If $g_hFrmBotBackend = 0 Or $g_hFrmBotBackend <> $aBotDetails[0] Then
+Return
+EndIf
+If $sProfile <> "" Then $g_sProfileCurrentName = $sProfile
+If $sEmulator <> "" Then $g_sAndroidEmulator = $sEmulator
+If $sInstance <> "" Then $g_sAndroidInstance = $sInstance
+UpdateBotTitle($sTitle)
+Local $bStartStopInconsistent =(BitAND(GUICtrlGetState($g_hBtnStart), $GUI_SHOW) > 0 And $g_bRunState = True) Or(BitAND(GUICtrlGetState($g_hBtnStop), $GUI_SHOW) > 0 And $g_bRunState = False)
+If $bRunState And(Not $g_bRunState Or $bStartStopInconsistent) Then
+BotStarted()
+ElseIf Not $bRunState And($g_bRunState = True Or $bStartStopInconsistent) Then
+BotStopped()
+Else
+If $bPaused And Not $g_bBotPaused Then
+GUICtrlSetState($g_hBtnPause, $GUI_HIDE)
+GUICtrlSetState($g_hBtnResume, $GUI_SHOW)
+ElseIf Not $bPaused And $g_bBotPaused Then
+GUICtrlSetState($g_hBtnPause, $GUI_SHOW)
+GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
+EndIf
+EndIf
+$g_bRunState = $bRunState
+$g_bBotPaused = $bPaused
+$g_bBotLaunched = $bLaunched
 EndFunc
 Func LaunchBotBackend($bNoGUI = True)
 Local $sParam = ""
@@ -5808,6 +5904,14 @@ $g_aiAndroidAdbScreencapBuffer = 0
 $g_hStruct_SleepMicro = 0
 If $bExit = True Then Exit
 EndFunc
+Func ReferenceFunctions()
+If True Then Return
+UpdateManagedMyBot(0)
+GetTroopName(0)
+EndFunc
+Func ReferenceGlobals()
+If True Then Return
+EndFunc
 ProcessCommandLine()
 _Crypt_Startup()
 _GDIPlus_Startup()
@@ -5848,3 +5952,5 @@ EndIf
 EndSwitch
 $iMainLoop += 1
 WEnd
+ReferenceFunctions()
+ReferenceGlobals()

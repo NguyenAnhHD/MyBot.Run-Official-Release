@@ -64,9 +64,9 @@ Func _checkObstacles($bBuilderBase = False) ;Checks if something is in the way f
 	; Detect All Reload Button errors => 1- Another device, 2- Take a break, 3- Connection lost or error, 4- Out of sync, 5- Inactive, 6- Maintenance
 	Local $aMessage = _PixelSearch($aIsReloadError[0], $aIsReloadError[1], $aIsReloadError[0] + 3, $aIsReloadError[1] + 11, Hex($aIsReloadError[2], 6), $aIsReloadError[3], $g_bNoCapturePixel)
 	If IsArray($aMessage) Then
-		If $g_iDebugSetlog = 1 Then SetLog("(Inactive=" & _GetPixelColor($aIsInactive[0], $aIsInactive[1]) & ")(DC=" & _GetPixelColor($aIsConnectLost[0], $aIsConnectLost[1]) & ")(OoS=" & _GetPixelColor($aIsCheckOOS[0], $aIsCheckOOS[1]) & ")", $COLOR_DEBUG)
-		If $g_iDebugSetlog = 1 Then SetLog("(Maintenance=" & _GetPixelColor($aIsMaintenance[0], $aIsMaintenance[1]) & ")(RateCoC=" & ")", $COLOR_DEBUG)
-		If $g_iDebugSetlog = 1 Then SetLog("33B5E5=>true, 282828=>false", $COLOR_DEBUG)
+		If $g_bDebugSetlog Then SetLog("(Inactive=" & _GetPixelColor($aIsInactive[0], $aIsInactive[1]) & ")(DC=" & _GetPixelColor($aIsConnectLost[0], $aIsConnectLost[1]) & ")(OoS=" & _GetPixelColor($aIsCheckOOS[0], $aIsCheckOOS[1]) & ")", $COLOR_DEBUG)
+		If $g_bDebugSetlog Then SetLog("(Maintenance=" & _GetPixelColor($aIsMaintenance[0], $aIsMaintenance[1]) & ")(RateCoC=" & ")", $COLOR_DEBUG)
+		If $g_bDebugSetlog Then SetLog("33B5E5=>true, 282828=>false", $COLOR_DEBUG)
 		;;;;;;;##### 1- Another device #####;;;;;;;
 		$Result = getOcrMaintenanceTime(184, 325 + $g_iMidOffsetY, "Another Device OCR:") ; OCR text to find Another device message
 		If StringInStr($Result, "device", $STR_NOCASESENSEBASIC) Or _
@@ -152,7 +152,7 @@ Func _checkObstacles($bBuilderBase = False) ;Checks if something is in the way f
 				checkObstacles_ResetSearch()
 			Case Else
 				;  Add check for game update and Rate CoC error messages
-				If $g_iDebugImageSave = 1 Then DebugImageSave("ChkObstaclesReloadMsg_") ; debug only
+				If $g_bDebugImageSave Then DebugImageSave("ChkObstaclesReloadMsg_") ; debug only
 				$Result = getOcrRateCoc(228, 390 + $g_iMidOffsetY, "Check Obstacles getOCRRateCoC= ")
 				If StringInStr($Result, "never", $STR_NOCASESENSEBASIC) Or UBound(decodeSingleCoord(FindImageInPlace("RateNever", $g_sAppRateNever, "228,420,273,448", False))) > 1 Then
 					SetLog("Clash feedback window found, permanently closed!", $COLOR_ERROR)

@@ -70,7 +70,7 @@ Func CreateSplashScreen()
 		; Show Splash
 		GUISetState(@SW_SHOWNOACTIVATE, $g_hSplash)
 
-		If $g_iDebugSetlog Then SetDebugLog("Splash created: $g_hSplash=" & $g_hSplash & ", $g_lSplashPic=" & $g_lSplashPic & ", $g_lSplashTitle=" & $g_lSplashTitle & ", $g_hSplashProgress=" & $g_hSplashProgress & ", $g_lSplashStatus=" & $g_lSplashStatus)
+		If $g_bDebugSetlog Then SetDebugLog("Splash created: $g_hSplash=" & $g_hSplash & ", $g_lSplashPic=" & $g_lSplashPic & ", $g_lSplashTitle=" & $g_lSplashTitle & ", $g_hSplashProgress=" & $g_hSplashProgress & ", $g_lSplashStatus=" & $g_lSplashStatus)
 
 		$g_hSplashTimer = __TimerInit()
 	EndIf

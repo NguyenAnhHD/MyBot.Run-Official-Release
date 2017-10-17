@@ -160,7 +160,6 @@
 #include "functions\Android\UniversalCloseWaitOpenCoC.au3"
 #include "functions\Android\AndroidEmbed.au3"
 
-#include "functions\Other\WmiAPI.au3"
 #include "functions\Other\WerFaultClose.au3"
 #include "functions\Other\_NumberFormat.au3"
 #include "functions\Other\_PadStringCenter.au3"
@@ -174,7 +173,6 @@
 #include "functions\Other\ClickRemove.au3"
 #include "functions\Other\CreateLogFile.au3"
 #include "functions\Other\DebugImageSave.au3"
-#include "functions\Other\DebugSaveDesktopImage.au3"
 #include "functions\Other\ExtendedErrorInfo.au3"
 #include "functions\Other\FindPos.au3"
 #include "functions\Other\StringSize.au3"
@@ -279,20 +277,3 @@
 
 #include "functions\Other\Api.au3"
 #include "functions\Other\ApiClient.au3"
-
-; OLD CODE
-
-;#include "functions\Image Search\checkWall.au3"
-;#include "functions\CreateArmy\getArmyTroopCount.au3" we don't use this anymore
-;#include "functions\Other\MBRFunc.au3"
-;#include "functions\CreateArmy\Spell.au3"
-;#include "functions\CreateArmy\_TrainMoveBtn.au3"
-;#include "functions\CreateArmy\isBarrack.au3"ateArmy\TrainIt.au3"
-;#include "functions\CreateArmy\Train.au3"
-;#include "functions\Image Search\THSearch.au3"
-;#include "functions\CreateArmy\BarracksStatus.au3"
-;#include "functions\Image Search\checkTownhall.au3"
-;#include "functions\Village\LocateBarrack.au3"
-;#include "functions\Village\ClanLevel.au3"
-;#include "functions\Village\LocateSpell.au3"
-;#include "functions\Other\UpdateStatsWall.au3"

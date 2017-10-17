@@ -38,7 +38,7 @@ Opt("MustDeclareVars", 1)
 
 Global $g_sWmiTestApi = ""
 Global $g_bRunState = True
-Global $g_iDebugSetlog = 0
+Global $g_bDebugSetlog = False
 Global $g_iGlobalActiveBotsAllowed = 0 ; Dummy
 Global $g_hMutextOrSemaphoreGlobalActiveBots = 0 ; Dummy
 Global $g_bBotLaunchOption_NoBotSlot = True

@@ -61,7 +61,7 @@ Global $g_iDebugWindowMessages = 0
 Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
 Global $DELAYSLEEP = 500
-Global $g_iDebugSetlog = 0
+Global $g_bDebugSetlog = False
 
 ; Dummy functions
 Func _GUICtrlStatusBar_SetText($a, $b)

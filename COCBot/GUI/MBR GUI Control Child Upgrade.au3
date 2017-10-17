@@ -143,7 +143,7 @@ Func ResetLabUpgradeTime()
 			GetTranslatedFileIni("MBR Func_Village_Upgrade", "Lab_GUIUpdate_Info_08", "Click OK to reset") & @CRLF & GetTranslatedFileIni("MBR Func_Village_Upgrade", "Lab_GUIUpdate_Info_09", "Or Click Cancel to exit") & @CRLF
 	Local $MsgBox = _ExtMsgBox(0, GetTranslatedFileIni("MBR Func_Village_Upgrade", "Lab_GUIUpdate_Info_10", "Reset timer") & "|" & GetTranslatedFileIni("MBR Func_Village_Upgrade", "Lab_GUIUpdate_Info_11", "Cancel and Return"), _
 							   GetTranslatedFileIni("MBR Func_Village_Upgrade", "Lab_GUIUpdate_Info_12", "Reset laboratory upgrade timer?"), $stext, 120, $g_hFrmBot)
-	If $g_iDebugSetlog = 1 Then Setlog("$MsgBox= " & $MsgBox, $COLOR_DEBUG)
+	If $g_bDebugSetlog Then Setlog("$MsgBox= " & $MsgBox, $COLOR_DEBUG)
 	If $MsgBox = 1 Then
 		$g_sLabUpgradeTime = ""
 		_GUICtrlSetTip($g_hBtnResetLabUpgradeTime, GetTranslatedFileIni("MBR Func_Village_Upgrade", "BtnResetLabUpgradeTime_Info_01", "Visible Red button means that laboratory upgrade in process") & @CRLF & _
@@ -307,9 +307,7 @@ Func btnWalls()
 	$g_bRunState = True
 	Zoomout()
 	$g_iCmbUpgradeWallsLevel = _GUICtrlComboBox_GetCurSel($g_hCmbWalls)
-	;$g_iDebugWalls = 1
 	If imglocCheckWall() Then Setlog("Hei Chef! We found the Wall!")
-	;$g_iDebugWalls = 0
 	$g_bRunState = $wasRunState
 	AndroidShield("btnWalls") ; Update shield status due to manual $g_bRunState
 EndFunc   ;==>btnWalls

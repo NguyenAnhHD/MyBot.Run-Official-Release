@@ -1,4 +1,3 @@
-
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: checkMainScreen
 ; Description ...: Checks whether the pixel, located in the eyes of the builder in mainscreen, is available
@@ -46,7 +45,7 @@ Func checkMainScreen($bSetLog = True, $bBuilderBase = False) ;Checks if in main 
 		If _Sleep($DELAYCHECKMAINSCREEN1) Then Return
 
 		$bObstacleResult = checkObstacles($bBuilderBase)
-		If $g_iDebugSetlog = 1 Then Setlog("CheckObstacles Result = " & $bObstacleResult, $COLOR_DEBUG)
+		If $g_bDebugSetlog Then Setlog("CheckObstacles Result = " & $bObstacleResult, $COLOR_DEBUG)
 
 		If (Not $bObstacleResult And $g_bMinorObstacle) Then
 			$g_bMinorObstacle = False

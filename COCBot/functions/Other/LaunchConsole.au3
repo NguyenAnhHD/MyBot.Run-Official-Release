@@ -28,7 +28,7 @@ Global $g_RunPipe_hThread = 0
 
 Func LaunchConsole($cmd, $param, ByRef $process_killed, $timeout = 10000, $bUseSemaphore = False)
 
-	If $bUseSemaphore = True Then
+	If $bUseSemaphore Then
 		Local $hSemaphore = LockSemaphore(StringReplace($cmd, "\", "/"), "Waiting to launch: " & $cmd)
 	EndIf
 
@@ -40,9 +40,9 @@ Func LaunchConsole($cmd, $param, ByRef $process_killed, $timeout = 10000, $bUseS
 	$hTimer = __TimerInit()
 	$process_killed = False
 
-	If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole: " & $cmd, $COLOR_DEBUG) ; Debug Run
+	If $g_bDebugSetlog Then Setlog("Func LaunchConsole: " & $cmd, $COLOR_DEBUG) ; Debug Run
 	$pid = RunPipe($cmd, "", @SW_HIDE, $STDERR_MERGED, $hStdIn, $hStdOut, $hProcess, $hThread)
-	If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole: command launched", $COLOR_DEBUG)
+	If $g_bDebugSetlog Then Setlog("Func LaunchConsole: command launched", $COLOR_DEBUG)
 	If $pid = 0 Then
 		SetLog("Launch faild: " & $cmd, $COLOR_ERROR)
 		If $bUseSemaphore = True Then UnlockSemaphore($hSemaphore)
@@ -59,7 +59,7 @@ Func LaunchConsole($cmd, $param, ByRef $process_killed, $timeout = 10000, $bUseS
 
 	If ProcessExists($pid) Then
 		If ClosePipe($pid, $hStdIn, $hStdOut, $hProcess, $hThread) = 1 Then
-			If $g_iDebugSetlog = 1 Then SetLog("Process killed: " & $cmd, $COLOR_ERROR)
+			If $g_bDebugSetlog Then SetLog("Process killed: " & $cmd, $COLOR_ERROR)
 			$process_killed = True
 		EndIf
 	Else
@@ -69,8 +69,8 @@ Func LaunchConsole($cmd, $param, ByRef $process_killed, $timeout = 10000, $bUseS
 	$g_RunPipe_hThread = 0
 	CleanLaunchOutput($data)
 
-	If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole Output: " & $data, $COLOR_DEBUG) ; Debug Run Output
-	If $bUseSemaphore = True Then UnlockSemaphore($hSemaphore)
+	If $g_bDebugSetlog Then Setlog("Func LaunchConsole Output: " & $data, $COLOR_DEBUG) ; Debug Run Output
+	If $bUseSemaphore Then UnlockSemaphore($hSemaphore)
 	Return $data
 EndFunc   ;==>LaunchConsole
 

@@ -190,7 +190,7 @@ Func LaunchWatchdog()
 		SetLog("Cannot launch watchdog", $COLOR_RED)
 		Return 0
 	EndIf
-	If $g_iDebugSetlog Then
+	If $g_bDebugSetlog Then
 		SetDebugLog("Watchdog launched, PID = " & $pid)
 	Else
 		SetLog("Watchdog launched")
@@ -218,12 +218,11 @@ Func PrepareStatusBarManagedMyBotHost($hFrmHost, ByRef $iMsg, ByRef $wParam, ByR
 	DllStructSetData($tStatusBar, "Text", $sStatusBar)
 	PrepareStructBotState($tBotState, $g_eSTRUCT_STATUS_BAR, DllStructGetPtr($tStatusBar))
 	;If $g_iDebugWindowMessages Then
-	SetDebugLog("PrepareStatusBarManagedMyBotHost: $hFrmHost=" & $hFrmHost & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam & ",$sStatusBar=" & $sStatusBar)
+	If $g_iDebugWindowMessages Then SetDebugLog("PrepareStatusBarManagedMyBotHost: $hFrmHost=" & $hFrmHost & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam & ",$sStatusBar=" & $sStatusBar)
 	Return True
 EndFunc   ;==>PrepareStatusBarManagedMyBotHost
 
 Func StatusBarManagedMyBotHost($sStatusBar)
-	SetDebugLog("StatusBarManagedMyBotHost: " & $sStatusBar)
 	Return ManagedMyBotHostsPostMessage("PrepareStatusBarManagedMyBotHost", $sStatusBar)
 EndFunc   ;==>StatusBarManagedMyBotHost
 
@@ -271,9 +270,9 @@ Func ManagedMyBotHostsPostMessage($sExecutePrepare, $Value1 = Default, $Value2 =
 			If @error <> 0 And $bPostMessage = "" Then
 				SetDebugLog("ManagedMyBotHostsPostMessage: Error executing " & $sExecute)
 			ElseIf $bPostMessage = False Then
-				SetDebugLog("ManagedMyBotHostsPostMessage: Not posting message to " & $hFrmHost)
+				If $g_iDebugWindowMessages Then SetDebugLog("ManagedMyBotHostsPostMessage: Not posting message to " & $hFrmHost)
 			Else
-				SetDebugLog("ManagedMyBotHostsPostMessage: Posting message to " & $hFrmHost)
+				If $g_iDebugWindowMessages Then SetDebugLog("ManagedMyBotHostsPostMessage: Posting message to " & $hFrmHost)
 				_WinAPI_PostMessage($hFrmHost, $iMsg, $wParam, $lParam)
 			EndIf
 		EndIf
@@ -281,7 +280,17 @@ Func ManagedMyBotHostsPostMessage($sExecutePrepare, $Value1 = Default, $Value2 =
 EndFunc   ;==>ManagedMyBotHostsPostMessage
 
 Func _GUICtrlStatusBar_SetTextEx($hWnd, $sText = "", $iPart = 0, $iUFlag = 0)
-	SetDebugLog("_GUICtrlStatusBar_SetTextEx: Entered")
 	If $hWnd Then _GUICtrlStatusBar_SetText($hWnd, $sText, $iPart, $iUFlag)
 	StatusBarManagedMyBotHost($sText)
-EndFunc
+EndFunc   ;==>_GUICtrlStatusBar_SetTextEx
+
+Func ReferenceApiClientFunctions()
+	If True Then Return
+	Local $hFrmHost = 0
+	Local $iMsg = 0
+	Local $wParam = 0
+	Local $lParam = 0
+	PrepareStatusBarManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam, "")
+EndFunc   ;==>ReferenceApiClientFunctions
+
+ReferenceApiClientFunctions()

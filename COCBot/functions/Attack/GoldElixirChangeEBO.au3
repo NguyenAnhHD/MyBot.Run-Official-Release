@@ -139,7 +139,7 @@ Func GoldElixirChangeEBO()
 		If $NoResourceOCR Then
 			SetLog("Exit now, [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
 		Else
-			If $g_iDebugSetlog = 1 Then
+			If $g_bDebugSetlog Then
 				SetLog("Exit in " & $txtDiff & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage & ", Suspend-Time: " & $g_iSuspendAndroidTime & ", Suspend-Count: " & $g_iSuspendAndroidTimeCount &  ", Offset: " & $iSuspendAndroidTimeOffset, $COLOR_INFO)
 			Else
 				SetLog("Exit in " & $txtDiff & ", [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " [%]: " & $CurDamage, $COLOR_INFO)
@@ -270,7 +270,7 @@ Func GoldElixirChangeEBO()
 			SetLog("Gold & Elixir & DE no change detected, waiting...", $COLOR_SUCCESS)
 		EndIf
 	Else
-		If $g_iDebugSetlog = 1 Then
+		If $g_bDebugSetlog Then
 			Setlog("Gold1: " & Number($Gold1) & "  Gold2: " & Number($Gold2), $COLOR_DEBUG)
 			Setlog("Elixir1: " & Number($Elixir1) & "  Elixir2: " & Number($Elixir2), $COLOR_DEBUG)
 			Setlog("Dark Elixir1: " & Number($DarkElixir1) & "  Dark Elixir2: " & Number($DarkElixir2), $COLOR_DEBUG)
@@ -280,20 +280,3 @@ Func GoldElixirChangeEBO()
 	Return True
 
 EndFunc   ;==>GoldElixirChangeEBO
-
-
-Func OverallDamage($OverallDamage = 30, $SetLog = True)
-
-	Local $Damage = Number(getOcrOverAllDamage(780, 527 + $g_iBottomOffsetY))
-
-	If $SetLog = True Then
-		SetLog("Overall Damage: " & $Damage & "%")
-	EndIf
-
-	If $Damage >= $OverallDamage Then
-		Return True
-	Else
-		Return False
-	EndIf
-
-EndFunc   ;==>OverallDamage

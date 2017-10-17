@@ -101,8 +101,6 @@ Global $g_hFrmBotEmbeddedMouse = 0
 #include "COCBot\functions\Other\WindowsArrange.au3"
 
 #include "COCBot\MBR GUI Design Mini.au3"
-;#include "COCBot\MBR GUI Control Mini.au3"
-
 #include "COCBot\functions\Config\readConfig.au3"
 
 Func SetLog($String, $Color = $COLOR_BLACK, $LogPrefix = "L ")
@@ -696,7 +694,7 @@ EndFunc   ;==>OpenURL_Label
 
 Func _GUICtrlStatusBar_SetTextEx($hWnd, $sText = "", $iPart = 0, $iUFlag = 0)
 	If $hWnd Then _GUICtrlStatusBar_SetText($hWnd, $sText, $iPart, $iUFlag)
-EndFunc
+EndFunc   ;==>_GUICtrlStatusBar_SetTextEx
 
 Func GUIEvents()
 	;@GUI_WinHandle
@@ -1146,6 +1144,16 @@ Func BotClose($SaveConfig = Default, $bExit = True)
 	If $bExit = True Then Exit
 EndFunc   ;==>BotClose
 
+Func ReferenceFunctions()
+	If True Then Return
+	UpdateManagedMyBot(0)
+	GetTroopName(0)
+EndFunc   ;==>ReferenceFunctions
+
+Func ReferenceGlobals()
+	If True Then Return
+EndFunc
+
 ProcessCommandLine()
 
 _Crypt_Startup()
@@ -1237,3 +1245,6 @@ While 1
 
 	$iMainLoop += 1
 WEnd
+
+ReferenceFunctions()
+ReferenceGlobals()

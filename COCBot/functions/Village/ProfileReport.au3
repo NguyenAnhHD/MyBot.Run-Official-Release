@@ -42,16 +42,16 @@ Func ProfileReport()
 		$iDefensesWon = 0
 	Else
 		$iAttacksWon = getProfile(578, 347)
-		If $g_iDebugSetlog = 1 Then Setlog("$iAttacksWon: " & $iAttacksWon, $COLOR_DEBUG)
+		If $g_bDebugSetlog Then Setlog("$iAttacksWon: " & $iAttacksWon, $COLOR_DEBUG)
 		$iCount = 0
 		While $iAttacksWon = "" ; Wait for $attacksWon to be readable in case of slow PC
 			If _Sleep($DELAYPROFILEREPORT1) Then Return
 			$iAttacksWon = getProfile(578, 347)
-			If $g_iDebugSetlog = 1 Then Setlog("Read Loop $iAttacksWon: " & $iAttacksWon & ", Count: " & $iCount, $COLOR_DEBUG)
+			If $g_bDebugSetlog Then Setlog("Read Loop $iAttacksWon: " & $iAttacksWon & ", Count: " & $iCount, $COLOR_DEBUG)
 			$iCount += 1
 			If $iCount >= 20 Then ExitLoop
 		WEnd
-		If $g_iDebugSetlog = 1 And $iCount >= 20 Then Setlog("Excess wait time for reading $AttacksWon: " & getProfile(578, 347), $COLOR_DEBUG)
+		If $g_bDebugSetlog And $iCount >= 20 Then Setlog("Excess wait time for reading $AttacksWon: " & getProfile(578, 347), $COLOR_DEBUG)
 		$iDefensesWon = getProfile(790, 347)
 	EndIf
 	$g_iTroopsDonated = getProfile(158, 347)

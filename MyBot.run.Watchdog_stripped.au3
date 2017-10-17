@@ -483,7 +483,7 @@ Global $g_iDebugWindowMessages = 0
 Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
 Global $DELAYSLEEP = 500
-Global $g_iDebugSetlog = 0
+Global $g_bDebugSetlog = False
 Func _GUICtrlStatusBar_SetTextEx($a, $b)
 EndFunc
 Func SetLog($String, $Color = $COLOR_BLACK, $LogPrefix = "L ")
@@ -871,16 +871,16 @@ EndFunc
 Global $g_RunPipe_hProcess = 0
 Global $g_RunPipe_hThread = 0
 Func LaunchConsole($cmd, $param, ByRef $process_killed, $timeout = 10000, $bUseSemaphore = False)
-If $bUseSemaphore = True Then
+If $bUseSemaphore Then
 Local $hSemaphore = LockSemaphore(StringReplace($cmd, "\", "/"), "Waiting to launch: " & $cmd)
 EndIf
 Local $data, $pid, $hStdIn[2], $hStdOut[2], $hTimer, $hProcess, $hThread
 If StringLen($param) > 0 Then $cmd &= " " & $param
 $hTimer = __TimerInit()
 $process_killed = False
-If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole: " & $cmd, $COLOR_DEBUG)
+If $g_bDebugSetlog Then Setlog("Func LaunchConsole: " & $cmd, $COLOR_DEBUG)
 $pid = RunPipe($cmd, "", @SW_HIDE, $STDERR_MERGED, $hStdIn, $hStdOut, $hProcess, $hThread)
-If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole: command launched", $COLOR_DEBUG)
+If $g_bDebugSetlog Then Setlog("Func LaunchConsole: command launched", $COLOR_DEBUG)
 If $pid = 0 Then
 SetLog("Launch faild: " & $cmd, $COLOR_ERROR)
 If $bUseSemaphore = True Then UnlockSemaphore($hSemaphore)
@@ -894,7 +894,7 @@ $data &= ReadPipe($hStdOut[0])
 Until($timeout > 0 And __TimerDiff($hTimer) > $timeout) Or $iWaitResult <> $WAIT_TIMEOUT
 If ProcessExists($pid) Then
 If ClosePipe($pid, $hStdIn, $hStdOut, $hProcess, $hThread) = 1 Then
-If $g_iDebugSetlog = 1 Then SetLog("Process killed: " & $cmd, $COLOR_ERROR)
+If $g_bDebugSetlog Then SetLog("Process killed: " & $cmd, $COLOR_ERROR)
 $process_killed = True
 EndIf
 Else
@@ -903,8 +903,8 @@ EndIf
 $g_RunPipe_hProcess = 0
 $g_RunPipe_hThread = 0
 CleanLaunchOutput($data)
-If $g_iDebugSetlog = 1 Then Setlog("Func LaunchConsole Output: " & $data, $COLOR_DEBUG)
-If $bUseSemaphore = True Then UnlockSemaphore($hSemaphore)
+If $g_bDebugSetlog Then Setlog("Func LaunchConsole Output: " & $data, $COLOR_DEBUG)
+If $bUseSemaphore Then UnlockSemaphore($hSemaphore)
 Return $data
 EndFunc
 Func ProcessGetCommandLine($pid, $strComputer = ".")

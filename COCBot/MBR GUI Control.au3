@@ -65,6 +65,7 @@ Func InitializeMainGUI()
 	   ;applyConfig()
 	   setupProfileComboBox()
    EndIf
+
    selectProfile() ; Choose the profile
 
    ; Read saved settings
@@ -303,12 +304,12 @@ Func GUIControl_WM_MOUSE($hWin, $iMsg, $wParam, $lParam)
 	Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
 	Switch $iMSG
 		Case $WM_MOUSEMOVE
-			If $g_iDebugClick And AndroidShieldHasFocus() Then
+			If $g_bDebugClick And AndroidShieldHasFocus() Then
 				Local $c = GetPixelFromWindow($x, $y, $g_hAndroidControl)
 				_GUICtrlStatusBar_SetText($g_hStatusBar, StringFormat("Mouse %03i,%03i Color %s", $x, $y, $c))
 			EndIf
 		Case $WM_LBUTTONDOWN
-			If $g_iDebugClick And AndroidShieldHasFocus() Then
+			If $g_bDebugClick And AndroidShieldHasFocus() Then
 				Local $c = GetPixelFromWindow($x, $y, $g_hAndroidControl)
 				SetLog(StringFormat("Mouse LBUTTONDOWN %03i,%03i Color %s", $x, $y, $c), $COLOR_DEBUG)
 			EndIf
@@ -372,13 +373,13 @@ Func GUIControl_AndroidEmbedded($hWin, $iMsg, $wParam, $lParam)
 				AndroidBackButton(False)
 				$g_bSilentSetLog = $wasSilentSetLog
 				;_WinAPI_SetFocus(GUICtrlGetHandle($g_hFrmBotEmbeddedShieldInput))
-				;If $g_iDebugAndroidEmbedded Then AndroidShield("GUIControl_AndroidEmbedded WM_SETFOCUS", Default, False, 0, True)
+				;If $g_bDebugAndroidEmbedded Then AndroidShield("GUIControl_AndroidEmbedded WM_SETFOCUS", Default, False, 0, True)
 				;AndroidShield(Default, False, 10, AndroidShieldHasFocus())
 			Else
 				Local $hCtrlTarget = $g_aiAndroidEmbeddedCtrlTarget[0]
 				If $GUIControl_AndroidEmbedded_Call[0] <> $hCtrlTarget Or $GUIControl_AndroidEmbedded_Call[1] <> $iMsg Or $GUIControl_AndroidEmbedded_Call[2] <> $wParam Or $GUIControl_AndroidEmbedded_Call[3] <> $lParam Then
 					; protect against strange infinite loops with BS1/2 when using Ctrl-MouseWheel
-					If $g_iDebugAndroidEmbedded Then SetDebugLog("GUIControl_AndroidEmbedded: FORWARD $hWin=" & $hWin & ", $iMsg=" & Hex($iMsg) & ", $wParam=" & $wParam & ", $lParam=" & $lParam & ", $hCtrlTarget=" & $hCtrlTarget, Default, True)
+					If $g_bDebugAndroidEmbedded Then SetDebugLog("GUIControl_AndroidEmbedded: FORWARD $hWin=" & $hWin & ", $iMsg=" & Hex($iMsg) & ", $wParam=" & $wParam & ", $lParam=" & $lParam & ", $hCtrlTarget=" & $hCtrlTarget, Default, True)
 					_WinAPI_PostMessage($hCtrlTarget, $iMsg, $wParam, $lParam)
 					$GUIControl_AndroidEmbedded_Call[0] = $hCtrlTarget
 					$GUIControl_AndroidEmbedded_Call[1] = $iMsg
@@ -1076,7 +1077,6 @@ Func BotClose($SaveConfig = Default, $bExit = True)
    ; Clean up resources
    __GDIPlus_Shutdown()
    _Crypt_Shutdown()
-   ;MBRFunc(False) ; close MBRFunctions dll
    _GUICtrlRichEdit_Destroy($g_hTxtLog)
    _GUICtrlRichEdit_Destroy($g_hTxtAtkLog)
    DllCall("comctl32.dll", "int", "ImageList_Destroy", "hwnd", $hImageList)

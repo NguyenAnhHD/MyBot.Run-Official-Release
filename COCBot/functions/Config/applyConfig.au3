@@ -178,19 +178,19 @@ Func ApplyConfig_Debug($TypeReadSave)
 	; <><><><> Bot / Debug <><><><>
 	Switch $TypeReadSave
 		Case "Read"
-			GUICtrlSetState($g_hChkDebugClick, $g_iDebugClick = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugSetlog, $g_iDebugSetlog = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugDisableZoomout, $g_iDebugDisableZoomout = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugDisableVillageCentering, $g_iDebugDisableVillageCentering = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugDeadbaseImage, $g_iDebugDeadBaseImage = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugOCR, $g_iDebugOcr = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugImageSave, $g_iDebugImageSave = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkdebugBuildingPos, $g_iDebugBuildingPos = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkdebugTrain, $g_iDebugSetlogTrain = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugOCRDonate, $g_iDebugOCRdonate = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkdebugAttackCSV, $g_iDebugAttackCSV = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkMakeIMGCSV, $g_iDebugMakeIMGCSV = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugSmartZap, $g_bDebugSmartZap = True ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugClick, $g_bDebugClick ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugSetlog, $g_bDebugSetlog ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugDisableZoomout, $g_bDebugDisableZoomout ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugDisableVillageCentering, $g_bDebugDisableVillageCentering ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugDeadbaseImage, $g_bDebugDeadBaseImage ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugOCR, $g_bDebugOcr ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugImageSave, $g_bDebugImageSave ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkdebugBuildingPos, $g_bDebugBuildingPos ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkdebugTrain, $g_bDebugSetlogTrain ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugOCRDonate, $g_bDebugOCRdonate ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkdebugAttackCSV, $g_bDebugAttackCSV ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkMakeIMGCSV, $g_bDebugMakeIMGCSV ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugSmartZap, $g_bDebugSmartZap ? $GUI_CHECKED : $GUI_UNCHECKED)
 			If $g_bDevMode = True Then
 				GUICtrlSetState($g_hChkDebugSetlog, $GUI_ENABLE)
 				GUICtrlSetState($g_hChkDebugOCR, $GUI_ENABLE)
@@ -202,20 +202,20 @@ Func ApplyConfig_Debug($TypeReadSave)
 				GUICtrlSetState($g_hChkDebugSmartZap, $GUI_ENABLE)
 			EndIf
 		Case "Save"
-			$g_iDebugClick = GUICtrlRead($g_hChkDebugClick) = $GUI_CHECKED ? 1 : 0
-			If $g_bDevMode = True Then
-				$g_iDebugSetlog = GUICtrlRead($g_hChkDebugSetlog) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugDisableZoomout = GUICtrlRead($g_hChkDebugDisableZoomout) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugDisableVillageCentering = GUICtrlRead($g_hChkDebugDisableVillageCentering) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugDeadBaseImage = GUICtrlRead($g_hChkDebugDeadbaseImage) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugOcr = GUICtrlRead($g_hChkDebugOCR) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugImageSave = GUICtrlRead($g_hChkDebugImageSave) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugBuildingPos = GUICtrlRead($g_hChkdebugBuildingPos) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugSetlogTrain = GUICtrlRead($g_hChkdebugTrain) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugOCRdonate = GUICtrlRead($g_hChkDebugOCRDonate) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugAttackCSV = GUICtrlRead($g_hChkdebugAttackCSV) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugMakeIMGCSV = GUICtrlRead($g_hChkMakeIMGCSV) = $GUI_CHECKED ? 1 : 0
-				$g_bDebugSmartZap = (GUICtrlRead($g_hChkDebugSmartZap) = $GUI_CHECKED ? True : False)
+			$g_bDebugClick = (GUICtrlRead($g_hChkDebugClick) = $GUI_CHECKED)
+			If $g_bDevMode Then
+				$g_bDebugSetlog = (GUICtrlRead($g_hChkDebugSetlog) = $GUI_CHECKED)
+				$g_bDebugDisableZoomout = (GUICtrlRead($g_hChkDebugDisableZoomout) = $GUI_CHECKED)
+				$g_bDebugDisableVillageCentering = (GUICtrlRead($g_hChkDebugDisableVillageCentering) = $GUI_CHECKED)
+				$g_bDebugDeadBaseImage = (GUICtrlRead($g_hChkDebugDeadbaseImage) = $GUI_CHECKED)
+				$g_bDebugOcr = (GUICtrlRead($g_hChkDebugOCR) = $GUI_CHECKED)
+				$g_bDebugImageSave = (GUICtrlRead($g_hChkDebugImageSave) = $GUI_CHECKED)
+				$g_bDebugBuildingPos = (GUICtrlRead($g_hChkdebugBuildingPos) = $GUI_CHECKED)
+				$g_bDebugSetlogTrain = (GUICtrlRead($g_hChkdebugTrain) = $GUI_CHECKED)
+				$g_bDebugOCRdonate = (GUICtrlRead($g_hChkDebugOCRDonate) = $GUI_CHECKED)
+				$g_bDebugAttackCSV = (GUICtrlRead($g_hChkdebugAttackCSV) = $GUI_CHECKED)
+				$g_bDebugMakeIMGCSV = (GUICtrlRead($g_hChkMakeIMGCSV) = $GUI_CHECKED)
+				$g_bDebugSmartZap = (GUICtrlRead($g_hChkDebugSmartZap) = $GUI_CHECKED)
 			EndIf
 	EndSwitch
 EndFunc   ;==>ApplyConfig_Debug
@@ -1306,9 +1306,9 @@ Func ApplyConfig_600_29_DB_Milking($TypeReadSave)
 				GUICtrlSetState($g_hChkMilkingDebugIMG, $GUI_SHOW)
 				GUICtrlSetState($g_hChkMilkingDebugVillage, $GUI_SHOW)
 				GUICtrlSetState($g_hChkMilkingDebugFullSearch, $GUI_SHOW)
-				GUICtrlSetState($g_hChkMilkingDebugIMG, $g_iDebugResourcesOffset = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-				GUICtrlSetState($g_hChkMilkingDebugVillage, $g_iDebugMilkingIMGmake = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-				GUICtrlSetState($g_hChkMilkingDebugFullSearch, $g_iDebugContinueSearchElixir = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+				GUICtrlSetState($g_hChkMilkingDebugIMG, $g_bDebugResourcesOffset ? $GUI_CHECKED : $GUI_UNCHECKED)
+				GUICtrlSetState($g_hChkMilkingDebugVillage, $g_bDebugMilkingIMGmake ? $GUI_CHECKED : $GUI_UNCHECKED)
+				GUICtrlSetState($g_hChkMilkingDebugFullSearch, $g_bDebugContinueSearchElixir ? $GUI_CHECKED : $GUI_UNCHECKED)
 			EndIf
 		Case "Save"
 			$g_iMilkAttackType = _GUICtrlComboBox_GetCurSel($g_hCmbMilkAttackType)
@@ -1355,10 +1355,10 @@ Func ApplyConfig_600_29_DB_Milking($TypeReadSave)
 			$g_iMilkFarmForceToleranceNormal = GUICtrlRead($g_hTxtMilkFarmForceToleranceNormal)
 			$g_iMilkFarmForceToleranceBoosted = GUICtrlRead($g_hTxtMilkFarmForceToleranceBoosted)
 			$g_iMilkFarmForceToleranceDestroyed = GUICtrlRead($g_hTxtMilkFarmForceToleranceDestroyed)
-			If $g_bDevMode = True Then
-				$g_iDebugResourcesOffset = GUICtrlRead($g_hChkMilkingDebugIMG) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugMilkingIMGmake = GUICtrlRead($g_hChkMilkingDebugVillage) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugContinueSearchElixir = GUICtrlRead($g_hChkMilkingDebugFullSearch) = $GUI_CHECKED ? 1 : 0
+			If $g_bDevMode Then
+				$g_bDebugResourcesOffset = (GUICtrlRead($g_hChkMilkingDebugIMG) = $GUI_CHECKED)
+				$g_bDebugMilkingIMGmake = (GUICtrlRead($g_hChkMilkingDebugVillage) = $GUI_CHECKED)
+				$g_bDebugContinueSearchElixir = (GUICtrlRead($g_hChkMilkingDebugFullSearch) = $GUI_CHECKED)
 			EndIf
 	EndSwitch
 EndFunc   ;==>ApplyConfig_600_29_DB_Milking

@@ -18,6 +18,8 @@
 #AutoIt3Wrapper_Run_Au3Stripper=y
 #Au3Stripper_Parameters=/rsln /MI=3
 ;/SV=0
+
+;#AutoIt3Wrapper_Change2CUI=y
 ;#pragma compile(Console, true)
 #include "MyBot.run.version.au3"
 #pragma compile(ProductName, My Bot)
@@ -125,8 +127,10 @@ Func InitializeBot()
 	EndIf
 
 	; early load of config
+	Local $bConfigRead = False
 	If FileExists($g_sProfileConfigPath) Or FileExists($g_sProfileBuildingPath) Then
 		readConfig()
+		$bConfigRead = True
 	EndIf
 
 	CreateMainGUI() ; Just create the main window
@@ -135,7 +139,7 @@ Func InitializeBot()
 	; Ensure watchdog is launched (requires Bot Window for messaging)
 	If $g_bBotLaunchOption_NoWatchdog = False Then LaunchWatchdog()
 
-	InitializeMBR($sAndroidInfo)
+	InitializeMBR($sAndroidInfo, $bConfigRead)
 
 	; Create GUI
 	CreateMainGUIControls() ; Create all GUI Controls
@@ -240,7 +244,7 @@ EndFunc   ;==>ProcessCommandLine
 ; Name ..........: InitializeAndroid
 ; Description ...: Initialize Android
 ; Syntax ........:
-; Parameters ....: None
+; Parameters ....: $bConfigRead - if config was already read and Android Emulator info loaded
 ; Return values .: None
 ; Author ........:
 ; Modified ......: cosote (Feb-2017)
@@ -250,17 +254,17 @@ EndFunc   ;==>ProcessCommandLine
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-Func InitializeAndroid()
+Func InitializeAndroid($bConfigRead)
 
 	Local $s = GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_06", "Initializing Android...")
 	SplashStep($s)
 
 	If $g_bBotLaunchOption_Restart = False Then
-		; initialize Android config
-		InitAndroidConfig(True)
-
 		; Change Android type and update variable
 		If $g_asCmdLine[0] > 1 Then
+			; initialize Android config
+			InitAndroidConfig(True)
+
 			Local $i
 			For $i = 0 To UBound($g_avAndroidAppConfig) - 1
 				If StringCompare($g_avAndroidAppConfig[$i][0], $g_asCmdLine[2]) = 0 Then
@@ -279,7 +283,7 @@ Func InitializeAndroid()
 		EndIf
 
 		SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_07", "Detecting Android..."))
-		If $g_asCmdLine[0] < 2 Then
+		If $g_asCmdLine[0] < 2 And Not $bConfigRead Then
 			DetectRunningAndroid()
 			If Not $g_bFoundRunningAndroid Then DetectInstalledAndroid()
 		EndIf
@@ -329,6 +333,7 @@ EndFunc   ;==>SetupProfileFolder
 ; Description ...: MBR setup routine
 ; Syntax ........:
 ; Parameters ....: $sAI - populated with AndroidInfo string in this function
+;                  $bConfigRead - if config was already read and Android Emulator info loaded
 ; Return values .: None
 ; Author ........:
 ; Modified ......: CodeSlinger69 (2017)
@@ -338,7 +343,7 @@ EndFunc   ;==>SetupProfileFolder
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-Func InitializeMBR(ByRef $sAI)
+Func InitializeMBR(ByRef $sAI, $bConfigRead)
 
 	; license
 	If Not FileExists(@ScriptDir & "\License.txt") Then
@@ -373,7 +378,7 @@ Func InitializeMBR(ByRef $sAI)
 	EndIf
 
 	; Initialize Android emulator
-	InitializeAndroid()
+	InitializeAndroid($bConfigRead)
 
 	; Update Bot title
 	UpdateBotTitle()
@@ -750,7 +755,7 @@ Func runBot() ;Bot that runs everything in order
 			If _Sleep($DELAYRUNBOT3) Then Return
 			;  OCR read current Village Trophies when OOS restart maybe due PB or else DropTrophy skips one attack cycle after OOS
 			$g_aiCurrentLoot[$eLootTrophy] = Number(getTrophyMainScreen($aTrophies[0], $aTrophies[1]))
-			If $g_iDebugSetlog = 1 Then SetLog("Runbot Trophy Count: " & $g_aiCurrentLoot[$eLootTrophy], $COLOR_DEBUG)
+			If $g_bDebugSetlog Then SetLog("Runbot Trophy Count: " & $g_aiCurrentLoot[$eLootTrophy], $COLOR_DEBUG)
 			AttackMain()
 			$g_bSkipFirstZoomout = False
 			If $g_bOutOfGold = True Then
@@ -778,7 +783,7 @@ Func _Idle() ;Sequence that runs until Full Army
 	Static $iCollectCounter = 0 ; Collect counter, when reaches $g_iCollectAtCount, it will collect
 
 	Local $TimeIdle = 0 ;In Seconds
-	If $g_iDebugSetlog = 1 Then SetLog("Func Idle ", $COLOR_DEBUG)
+	If $g_bDebugSetlog Then SetLog("Func Idle ", $COLOR_DEBUG)
 
 	While $g_bIsFullArmywithHeroesAndSpells = False
 
@@ -925,7 +930,7 @@ Func AttackMain() ;Main control for attack functions
 				If _Sleep($DELAYATTACKMAIN1) Then Return
 				Return ; return to runbot, refill armycamps
 			EndIf
-			If $g_iDebugSetlog = 1 Then
+			If $g_bDebugSetlog Then
 				SetLog(_PadStringCenter(" Hero status check" & BitAND($g_aiAttackUseHeroes[$DB], $g_aiSearchHeroWaitEnable[$DB], $g_iHeroAvailable) & "|" & $g_aiSearchHeroWaitEnable[$DB] & "|" & $g_iHeroAvailable, 54, "="), $COLOR_DEBUG)
 				SetLog(_PadStringCenter(" Hero status check" & BitAND($g_aiAttackUseHeroes[$LB], $g_aiSearchHeroWaitEnable[$LB], $g_iHeroAvailable) & "|" & $g_aiSearchHeroWaitEnable[$LB] & "|" & $g_iHeroAvailable, 54, "="), $COLOR_DEBUG)
 				;Setlog("BullyMode: " & $g_abAttackTypeEnable[$TB] & ", Bully Hero: " & BitAND($g_aiAttackUseHeroes[$g_iAtkTBMode], $g_aiSearchHeroWaitEnable[$g_iAtkTBMode], $g_iHeroAvailable) & "|" & $g_aiSearchHeroWaitEnable[$g_iAtkTBMode] & "|" & $g_iHeroAvailable, $COLOR_DEBUG)
@@ -959,13 +964,13 @@ Func Attack() ;Selects which algorithm
 	$g_bAttackActive = True
 	SetLog(" ====== Start Attack ====== ", $COLOR_SUCCESS)
 	If ($g_iMatchMode = $DB And $g_aiAttackAlgorithm[$DB] = 1) Or ($g_iMatchMode = $LB And $g_aiAttackAlgorithm[$LB] = 1) Then
-		If $g_iDebugSetlog = 1 Then Setlog("start scripted attack", $COLOR_ERROR)
+		If $g_bDebugSetlog Then Setlog("start scripted attack", $COLOR_ERROR)
 		Algorithm_AttackCSV()
 	ElseIf $g_iMatchMode = $DB And $g_aiAttackAlgorithm[$DB] = 2 Then
-		If $g_iDebugSetlog = 1 Then Setlog("start milking attack", $COLOR_ERROR)
+		If $g_bDebugSetlog Then Setlog("start milking attack", $COLOR_ERROR)
 		Alogrithm_MilkingAttack()
 	Else
-		If $g_iDebugSetlog = 1 Then Setlog("start standard attack", $COLOR_ERROR)
+		If $g_bDebugSetlog Then Setlog("start standard attack", $COLOR_ERROR)
 		algorithm_AllTroops()
 	EndIf
 	$g_bAttackActive = False
@@ -985,26 +990,26 @@ Func QuickAttack()
 
 	$g_aiCurrentLoot[$eLootTrophy] = getTrophyMainScreen($aTrophies[0], $aTrophies[1])
 	If ($g_bDropTrophyEnable And Number($g_aiCurrentLoot[$eLootTrophy]) > Number($g_iDropTrophyMax)) Then
-		If $g_iDebugSetlog = 1 Then Setlog("No quickly re-attack, need to drop tropies", $COLOR_DEBUG)
+		If $g_bDebugSetlog Then Setlog("No quickly re-attack, need to drop tropies", $COLOR_DEBUG)
 		Return False ;need to drop tropies
 	EndIf
 
 	If $g_aiAttackAlgorithm[$DB] = 2 And IsSearchModeActive($DB) Then
 		If Int($g_CurrentCampUtilization) >= $g_iTotalCampSpace * $g_aiSearchCampsPct[$DB] / 100 And $g_abSearchCampsEnable[$DB] Then
-			If $g_iDebugSetlog = 1 Then Setlog("Milking: Quickly re-attack " & Int($g_CurrentCampUtilization) & " >= " & $g_iTotalCampSpace & " * " & $g_aiSearchCampsPct[$DB] & "/100 " & "= " & $g_iTotalCampSpace * $g_aiSearchCampsPct[$DB] / 100, $COLOR_DEBUG)
+			If $g_bDebugSetlog Then Setlog("Milking: Quickly re-attack " & Int($g_CurrentCampUtilization) & " >= " & $g_iTotalCampSpace & " * " & $g_aiSearchCampsPct[$DB] & "/100 " & "= " & $g_iTotalCampSpace * $g_aiSearchCampsPct[$DB] / 100, $COLOR_DEBUG)
 			Return True ;milking attack OK!
 		Else
-			If $g_iDebugSetlog = 1 Then Setlog("Milking: No Quickly re-attack:  cur. " & Int($g_CurrentCampUtilization) & "  need " & $g_iTotalCampSpace * $g_aiSearchCampsPct[$DB] / 100 & " firststart = " & ($g_bQuicklyFirstStart), $COLOR_DEBUG)
+			If $g_bDebugSetlog Then Setlog("Milking: No Quickly re-attack:  cur. " & Int($g_CurrentCampUtilization) & "  need " & $g_iTotalCampSpace * $g_aiSearchCampsPct[$DB] / 100 & " firststart = " & ($g_bQuicklyFirstStart), $COLOR_DEBUG)
 			Return False ;milking attack no restart.. no enough army
 		EndIf
 	EndIf
 
 	If IsSearchModeActive($TS) Then
 		If Int($g_CurrentCampUtilization) >= $g_iTotalCampSpace * $g_aiSearchCampsPct[$TS] / 100 And $g_abSearchCampsEnable[$TS] Then
-			If $g_iDebugSetlog = 1 Then Setlog("THSnipe: Quickly re-attack " & Int($g_CurrentCampUtilization) & " >= " & $g_iTotalCampSpace & " * " & $g_aiSearchCampsPct[$TS] & "/100 " & "= " & $g_iTotalCampSpace * $g_aiSearchCampsPct[$TS] / 100, $COLOR_DEBUG)
+			If $g_bDebugSetlog Then Setlog("THSnipe: Quickly re-attack " & Int($g_CurrentCampUtilization) & " >= " & $g_iTotalCampSpace & " * " & $g_aiSearchCampsPct[$TS] & "/100 " & "= " & $g_iTotalCampSpace * $g_aiSearchCampsPct[$TS] / 100, $COLOR_DEBUG)
 			Return True ;ts snipe attack OK!
 		Else
-			If $g_iDebugSetlog = 1 Then Setlog("THSnipe: No Quickly re-attack:  cur. " & Int($g_CurrentCampUtilization) & "  need " & $g_iTotalCampSpace * $g_aiSearchCampsPct[$TS] / 100 & " firststart = " & ($g_bQuicklyFirstStart), $COLOR_DEBUG)
+			If $g_bDebugSetlog Then Setlog("THSnipe: No Quickly re-attack:  cur. " & Int($g_CurrentCampUtilization) & "  need " & $g_iTotalCampSpace * $g_aiSearchCampsPct[$TS] / 100 & " firststart = " & ($g_bQuicklyFirstStart), $COLOR_DEBUG)
 			Return False ;ts snipe no restart... no enough army
 		EndIf
 	EndIf
@@ -1062,7 +1067,7 @@ Func _RunFunction($action)
 					getArmyHeroCount(False, True)
 				EndIf
 			Else
-				If $g_iDebugSetlogTrain = 1 Then Setlog("Halt mode - training disabled", $COLOR_DEBUG)
+				If $g_bDebugSetlogTrain Then Setlog("Halt mode - training disabled", $COLOR_DEBUG)
 			EndIf
 		Case "BoostBarracks"
 			BoostBarracks()

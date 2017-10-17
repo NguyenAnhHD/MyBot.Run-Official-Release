@@ -135,23 +135,19 @@ Func SetLogText(ByRef $hTxtLog, ByRef $sLogMessage, ByRef $Color, ByRef $Font, B
 	_GUICtrlRichEdit_AppendTextColor($hTxtLog, $sLogMessage & @CRLF, _ColorConvert($Color), False)
 EndFunc   ;==>SetLogText
 
-Func SetDebugLog($sLogMessage, $Color = Default, $bSilentSetLog = Default, $Font = Default, $FontSize = Default, $statusbar = Default)
-	If $Color = Default Then $Color = $COLOR_DEBUG
-	If $bSilentSetLog = Default Then $bSilentSetLog = False
-	If $statusbar = Default Then $statusbar = 0
+Func SetDebugLog($sLogMessage, $sColor = $COLOR_DEBUG, $bSilentSetLog = False, $Font = Default, $FontSize = Default, $statusbar = 0)
+	Local $sLogPrefix = "D "
+	Local $sLog = $sLogPrefix & TimeDebug() & $sLogMessage
 
-	Local $LogPrefix = "D "
-	Local $log = $LogPrefix & TimeDebug() & $sLogMessage
-	If $g_iDebugSetlog = 1 And $bSilentSetLog = False Then
-		_SetLog($sLogMessage, $Color, $Font, $FontSize, $statusbar, Default, True, $LogPrefix)
+	If $g_bDebugSetlog And $bSilentSetLog = False Then
+		_SetLog($sLogMessage, $sColor, $Font, $FontSize, $statusbar, Default, True, $sLogPrefix)
 	Else
-		If $sLogMessage <> "" Then ConsoleWrite(GetLogLevel($Color) & $log & @CRLF) ; Always write any log to console
+		If $sLogMessage <> "" Then ConsoleWrite(GetLogLevel($sColor) & $sLog & @CRLF) ; Always write any log to console
 		If $g_hLogFile = 0 And $g_sProfileLogsPath Then CreateLogFile()
 		If $g_hLogFile Then
-			__FileWriteLog($g_hLogFile, $log)
+			__FileWriteLog($g_hLogFile, $sLog)
 		Else
-			; log later
-			_SetLog($sLogMessage, $Color, $Font, $FontSize, $statusbar, Default, False, $LogPrefix, Default, True)
+			_SetLog($sLogMessage, $sColor, $Font, $FontSize, $statusbar, Default, False, $sLogPrefix, Default, True)
 		EndIf
 	EndIf
 EndFunc   ;==>SetDebugLog

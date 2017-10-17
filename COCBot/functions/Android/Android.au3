@@ -1602,7 +1602,7 @@ Func _AndroidAdbSendShellCommand($cmd = Default, $timeout = Default, $wasRunStat
 		If $cmd = Default Then
 			; nothing to launch
 		Else
-			If $g_iDebugSetlog = 1 Then
+			If $g_bDebugAndroid Then
 				;$g_bSilentSetLog = True
 				SetDebugLog("Send ADB shell command: " & $cmd)
 				;$g_bSilentSetLog = $_SilentSetLog
@@ -1613,7 +1613,7 @@ Func _AndroidAdbSendShellCommand($cmd = Default, $timeout = Default, $wasRunStat
 			Sleep(10)
 			$s &= ReadPipe($aReadPipe[0])
 			$loopCount += 1
-			If $wasRunState = True And $g_bRunState = False Then ExitLoop ; stop pressed here, exit without error
+			If $wasRunState And Not $g_bRunState Then ExitLoop ; stop pressed here, exit without error
 		WEnd
 	Else
 		; invoke new single ADB shell command
@@ -1622,7 +1622,7 @@ Func _AndroidAdbSendShellCommand($cmd = Default, $timeout = Default, $wasRunStat
 			; nothing to launch
 		Else
 			Local $process_killed
-			If $g_iDebugSetlog = 1 Then
+			If $g_bDebugAndroid Then
 				;$g_bSilentSetLog = True
 				SetDebugLog("Execute ADB shell command: " & $cmd)
 				;$g_bSilentSetLog = $_SilentSetLog
@@ -1631,7 +1631,7 @@ Func _AndroidAdbSendShellCommand($cmd = Default, $timeout = Default, $wasRunStat
 		EndIf
 	EndIf
 
-	If $cleanOutput = True Then
+	If $cleanOutput Then
 		Local $i = StringInStr($s, @LF)
 		If $i > 0 Then $s = StringMid($s, $i) ; remove echo'd command
 		If StringRight($s, StringLen($g_sAndroidAdbPrompt) + 1) = @LF & $g_sAndroidAdbPrompt Then $s = StringLeft($s, StringLen($s) - StringLen($g_sAndroidAdbPrompt) - 1) ; remove tailing prompt
@@ -1646,7 +1646,7 @@ Func _AndroidAdbSendShellCommand($cmd = Default, $timeout = Default, $wasRunStat
 		If StringLeft($s, 1) = @LF Then $s = StringMid($s, 2) ; remove starting @LF
 	EndIf
 
-	If $g_bAndroidAdbInstance = True And $g_iDebugSetlog = 1 And StringLen($s) > 0 Then SetDebugLog("ADB shell command output: " & $s)
+	If $g_bAndroidAdbInstance = True And $g_bDebugAndroid And StringLen($s) > 0 Then SetDebugLog("ADB shell command output: " & $s)
 	SuspendAndroid($SuspendMode)
 	Local $error = (($g_bRunState = False Or __TimerDiff($hTimer) < $timeout Or $timeout < 1) ? 0 : 1)
 	If $error <> 0 Then
@@ -2209,7 +2209,7 @@ Func _AndroidScreencap($iLeft, $iTop, $iWidth, $iHeight, $iRetryCount = 0)
 	If $g_aiAndroidAdbStatsLast[$AdbStatsType][1] = 0 Then
 		Local $totalAvg = Round($g_aiAndroidAdbStatsTotal[$AdbStatsType][1] / $g_aiAndroidAdbStatsTotal[$AdbStatsType][0])
 		Local $lastAvg = Round($g_aiAndroidAdbStatsLast[$AdbStatsType][0] / $iLastCount)
-		If $g_iDebugSetlog = 1 Or Mod($g_aiAndroidAdbStatsTotal[$AdbStatsType][0], 100) = 0 Then
+		If $g_bDebugAndroid Or Mod($g_aiAndroidAdbStatsTotal[$AdbStatsType][0], 100) = 0 Then
 			SetDebugLog("AdbScreencap: " & $totalAvg & "/" & $lastAvg & "/" & $duration & " ms (all/" & $iLastCount & "/1)," & $shellLogInfo & "," & $iLoopCountFile & ",l=" & $iLeft & ",t=" & $iTop & ",w=" & $iWidth & ",h=" & $iHeight & ", " & $Filename & ": w=" & $g_iAndroidAdbScreencapWidth & ",h=" & $g_iAndroidAdbScreencapHeight & ",f=" & $iF)
 		EndIf
 	EndIf
@@ -2388,7 +2388,7 @@ Func _AndroidFastClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = Tru
 		For $i = 1 To $times
 			$g_aiAndroidAdbClicks[$pos + $i] = $Click
 		Next
-		If $g_iDebugSetlog = 1 Or $g_iDebugClick = 1 Then
+		If $g_bDebugAndroid Or $g_bDebugClick Then
 			$g_bSilentSetLog = True
 			SetDebugLog("Hold back click (" & $x & "/" & $y & " * " & $times & "): queue size = " & $g_aiAndroidAdbClicks[0], $COLOR_ERROR)
 			$g_bSilentSetLog = $_SilentSetLog
@@ -2450,7 +2450,7 @@ Func _AndroidFastClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = Tru
 	Next
 
 	If $ReleaseClicks = True Then
-		If $g_iDebugSetlog = 1 Or $g_iDebugClick = 1 Then SetDebugLog("Release clicks: queue size = " & $g_aiAndroidAdbClicks[0])
+		If $g_bDebugAndroid Or $g_bDebugClick Then SetDebugLog("Release clicks: queue size = " & $g_aiAndroidAdbClicks[0])
 	Else
 		Execute($g_sAndroidEmulator & "AdjustClickCoordinates($x,$y)")
 	EndIf
@@ -2595,7 +2595,7 @@ Func _AndroidFastClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = Tru
 			; wait remaining time
 			Local $wait = Round($adjustSpeed - __TimerDiff($timer))
 			If $wait > 0 Then
-				If $g_iDebugSetlog = 1 Or $g_iDebugClick = 1 Then
+				If $g_bDebugAndroid Or $g_bDebugClick Then
 					$g_bSilentSetLog = True
 					SetDebugLog("AndroidFastClick: Sleep " & $wait & " ms.")
 					$g_bSilentSetLog = $_SilentSetLog
@@ -2655,7 +2655,7 @@ Func _AndroidFastClick($x, $y, $times = 1, $speed = 0, $checkProblemAffect = Tru
 	If $g_aiAndroidAdbStatsLast[$AdbStatsType][1] = 0 Then
 		Local $totalAvg = Round($g_aiAndroidAdbStatsTotal[$AdbStatsType][1] / $g_aiAndroidAdbStatsTotal[$AdbStatsType][0])
 		Local $lastAvg = Round($g_aiAndroidAdbStatsLast[$AdbStatsType][0] / $iLastCount)
-		If $g_iDebugSetlog = 1 Or $g_iDebugClick = 1 Or Mod($g_aiAndroidAdbStatsTotal[$AdbStatsType][0], 100) = 0 Then
+		If $g_bDebugAndroid Or $g_bDebugClick Or Mod($g_aiAndroidAdbStatsTotal[$AdbStatsType][0], 100) = 0 Then
 			SetDebugLog("AndroidFastClick: " & $totalAvg & "/" & $lastAvg & "/" & $duration & " ms (all/" & $iLastCount & "/1), $x=" & $x & ", $y=" & $y & ", $times=" & $times & ", $speed = " & $speed & ", $checkProblemAffect=" & $checkProblemAffect)
 		EndIf
 	EndIf
@@ -2784,7 +2784,7 @@ Func SuspendAndroidTime($Action = False)
 EndFunc   ;==>SuspendAndroidTime
 
 Func SuspendAndroid($SuspendMode = True, $bDebugLog = Default, $bForceSuspendAndroid = False)
-	If $bDebugLog = Default Then $bDebugLog = $g_iDebugSetlog > 0
+	If $bDebugLog = Default Then $bDebugLog = $g_bDebugAndroid
 	If ($g_bAndroidSuspendedEnabled = False Or $g_iAndroidSuspendModeFlags = 0 Or $g_bMainWindowOk = False) And $bForceSuspendAndroid = False Then Return False
 	If $SuspendMode = False Then Return ResumeAndroid($bDebugLog, $bForceSuspendAndroid)
 	If $g_bAndroidSuspended = True Then Return True
@@ -2825,7 +2825,7 @@ Func SuspendAndroid($SuspendMode = True, $bDebugLog = Default, $bForceSuspendAnd
 EndFunc   ;==>SuspendAndroid
 
 Func ResumeAndroid($bDebugLog = Default, $bForceSuspendAndroid = False)
-	If $bDebugLog = Default Then $bDebugLog = $g_iDebugSetlog > 0
+	If $bDebugLog = Default Then $bDebugLog = $g_bDebugAndroid
 	If ($g_bAndroidSuspendedEnabled = False Or $g_iAndroidSuspendModeFlags = 0) And $bForceSuspendAndroid = False Then Return False
 	If $g_bAndroidSuspended = False Then Return False
 	Local $bSuspendProcess = BitAND($g_iAndroidSuspendModeFlags, 4) = 0

@@ -23,7 +23,7 @@ Global $g_hLblResultElixirNow = 0, $g_hLblResultElixirHourNow = 0, $g_hPicResult
 Global $g_hLblResultDENow = 0, $g_hLblResultDEHourNow = 0, $g_hPicResultDENow = 0, $g_hPicResultDETemp = 0
 Global $g_hLblResultTrophyNow = 0, $g_hPicResultTrophyNow = 0, $g_hLblResultRuntimeNow = 0, $g_hPicResultRuntimeNow = 0, $g_hLblResultBuilderNow = 0, $g_hPicResultBuilderNow = 0
 Global $g_hLblResultAttackedHourNow = 0, $g_hPicResultAttackedHourNow = 0, $g_hLblResultGemNow = 0, $g_hPicResultGemNow = 0, $g_hLblResultSkippedHourNow = 0, $g_hPicResultSkippedHourNow = 0
-Global $g_hLblVillageReportTemp = 0, $g_hBtnTestVillage = 0
+Global $g_hLblVillageReportTemp = 0
 
 Func CreateBottomPanel()
    Local $sTxtTip = ""
@@ -89,7 +89,7 @@ Func CreateBottomPanel()
 		   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate_Info_01", "Paypal Donate?"))
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-   If $g_bAndroidAdbScreencap = True Then chkBackground() ; update background mode GUI
+   If $g_bAndroidAdbScreencap Then chkBackground() ; update background mode GUI
 
    $g_hPicTwoArrowShield = _GUICtrlCreateIcon($g_sLibIconPath, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
 
@@ -149,10 +149,6 @@ Func CreateBottomPanel()
 
 	   $x = 285
 	   $g_hLblVillageReportTemp = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Bottom", "LblVillageReportTemp_01", "Village Report") & @CRLF & GetTranslatedFileIni("MBR GUI Design Bottom", "LblVillageReportTemp_02", "will appear here") & @CRLF & GetTranslatedFileIni("MBR GUI Design Bottom", "LblVillageReportTemp_03", "on first run."), $x + 27, $y + 5, 100, 45, BITOR($SS_CENTER, $BS_MULTILINE))
-
-	   $g_hBtnTestVillage = GUICtrlCreateButton("TEST BUTTON", $x + 25 , $y + 54, 100, 18)
-		   GUICtrlSetOnEvent(-1, "ButtonBoost")
-		   GUICtrlSetState(-1, $GUI_HIDE)
 
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc

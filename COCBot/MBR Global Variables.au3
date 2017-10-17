@@ -77,63 +77,44 @@ Global $g_iVILLAGE_OFFSET[3] = [0, 0, 1]
 ; <><><><><><><><><><><><><><><><><><>
 ; <><><><> debug flags <><><><>
 ; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-
-Local Const $UserDebugEnable = 0 ; <<< change this value equal to 1, to enable USER debug mode when posting bugs in MBR forums!
-
-; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-; <><><><> Individual error flags for debugging individual sections of code!   			<><><><>
-; <><><><> Can be manually set when required, Enabled when = 1, disabled when = 0 	   <><><><>
-; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-Global $g_iDebugClick = $UserDebugEnable ; Debug Bot Clicks and when docked, display current mouse position and RGB color
-Global $g_iDebugSetlog = $UserDebugEnable ; Verbose log messages, or extra log messages most everywhere
-Global $g_iDebugOcr = $UserDebugEnable ; Creates \Lib\Debug folder and collects OCR images of text capture plus creates OCR log file
-Global $g_iDebugImageSave = $UserDebugEnable ; Save images at key points to allow review/verify emulator window status
-Global $g_iDebugBuildingPos = $UserDebugEnable ; extra information about buildings detected while searching for base to attack
-Global $g_iDebugSetlogTrain = $UserDebugEnable ; verbose log information during troop training
-Global $g_iDebugWindowMessages = $UserDebugEnable ; 0=off, 1=most Window Messages, 2=all Window Messages
-Global $g_iDebugAndroidEmbedded = $UserDebugEnable ; Extra Android messages when using dock mode
-Global $g_iDebugWalls = $UserDebugEnable ;  extra information about wall finding
-Global $g_iDebugGetLocation = $UserDebugEnable ;make a image of each structure detected with getlocation
-Global $g_iDebugSearchArea = $UserDebugEnable ; search area logging
-Global $g_iDebugRedArea = $UserDebugEnable ; display red line data captured
+Global $g_bDebugAndroid = False ; Debug Android
+Global $g_bDebugClick = False ; Debug Bot Clicks and when docked, display current mouse position and RGB color
+Global $g_bDebugSetlog = False ; Verbose log messages, or extra log messages most everywhere
+Global $g_bDebugOcr = False ; Creates \Lib\Debug folder and collects OCR images of text capture plus creates OCR log file
+Global $g_bDebugImageSave = False ; Save images at key points to allow review/verify emulator window status
+Global $g_bDebugBuildingPos = False ; extra information about buildings detected while searching for base to attack
+Global $g_bDebugSetlogTrain = False ; verbose log information during troop training
+Global $g_iDebugWindowMessages = 0 ; 0=off, 1=most Window Messages, 2=all Window Messages
+Global $g_bDebugAndroidEmbedded = False ; Extra Android messages when using dock mode
+Global $g_bDebugGetLocation = False ;make a image of each structure detected with getlocation
+Global $g_bDebugRedArea = False ; display red line data captured
 Global $g_hDebugAlwaysSaveFullScreenTimer = 0 ; __TimerInit() to save every screen capture at full size for 5 Minutes
-
-; <><><><> Enabled when = "True", disabled when = "False"  <><><><>
-Global $g_bDebugSmartZap = ($UserDebugEnable ? True : False) ; verbose logs for SmartZap users
-
-; <><><><> Enable these flags when debugging Attack CSV Scripts! <><><><>
-Global $g_iDebugAttackCSV = $UserDebugEnable ; Verbose log output of actual attack script plus bot actions
-Global $g_iDebugMakeIMGCSV = $UserDebugEnable ; Saves "clean" iamge and image with all drop points and detected buildings marked
+Global $g_bDebugSmartZap = False ; verbose logs for SmartZap users
+Global $g_bDebugAttackCSV = False ; Verbose log output of actual attack script plus bot actions
+Global $g_bDebugMakeIMGCSV = False ; Saves "clean" iamge and image with all drop points and detected buildings marked
 
 ; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 ; <><><><> ONLY Enable items below this line when debugging special errors listed!! <><><><>
 ; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 ; <><><><> Capture image of every base during village search! <><><><>
-Global $g_iDebugVillageSearchImages = 0 ; will fill drive with huge number of images, enable "Delete Temp Files" to reduce lag created with too many images in folder
-
+Global $g_bDebugVillageSearchImages = False ; will fill drive with huge number of images, enable "Delete Temp Files" to reduce lag created with too many images in folder
 ; <><><><> Debug Dead Base search problems <><><><>
-Global $g_iDebugDeadBaseImage = 0 ; Enable collection of zombie base images where loot is above search filter, no dead base detected
+Global $g_bDebugDeadBaseImage = False ; Enable collection of zombie base images where loot is above search filter, no dead base detected
 Global $g_aiSearchEnableDebugDeadBaseImage = 200 ; If $g_iDebugDeadBaseImage is 0 and more than these searches reached, set $g_iDebugDeadBaseImage = 1, 0 = disabled
-
 ; <><><><> Enable when debugging Milk attack errors! <><><><>
-Global $g_iDebugResourcesOffset = 0 ;make images with offset to check correct adjust values
-Global $g_iDebugMilkingIMGmake = 0
-Global $g_iDebugContinueSearchElixir = 0 ; SLOW... if =1 search elixir check all images even if capacity < mincapacity and make debug image in temp folder if no match all images
-
+Global $g_bDebugResourcesOffset = False ;make images with offset to check correct adjust values
+Global $g_bDebugMilkingIMGmake = False
+Global $g_bDebugContinueSearchElixir = False ; SLOW... if =1 search elixir check all images even if capacity < mincapacity and make debug image in temp folder if no match all images
 ; <><><><> Enable this flag to test Donation code, but DOES NOT DONATE! <><><><>
-Global $g_iDebugOCRdonate = 0 ; Creates OCR/image data and simulate, but do not donate
-
+Global $g_bDebugOCRdonate = False ; Creates OCR/image data and simulate, but do not donate
 ; <><><><> Only enable this when debugging Android zoom out issues! <><><><>
-Global $g_iDebugDisableZoomout = 0
-Global $g_iDebugDisableVillageCentering = 0
-
+Global $g_bDebugDisableZoomout = False
+Global $g_bDebugDisableVillageCentering = False
 ; <><><><> Only used to debug GDI memory leaks! <><><><>
 Global $g_iDebugGDICount = 0 ; monitor bot GDI Handle count, 0 = Disabled, <> 0 = Enabled
-
 ; <><><><> Only used to debug language translations! <><><><>
-Global $g_iDebugMultilanguage = 0 ; Debug translated GUI messages, displays section/# of translate for GUI elements instead of actual text
-
+Global $g_bDebugMultilanguage = False ; Debug translated GUI messages, displays section/# of translate for GUI elements instead of actual text
 ; <><><><> debugging use only variables <><><><>
 
 ; Enabled saving of enemy villages when deadbase is active

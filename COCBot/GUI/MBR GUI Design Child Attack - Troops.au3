@@ -807,7 +807,7 @@ Func CreateTrainOrderSubTab()
 	   GUICtrlSetOnEvent(-1, "chkTroopOrder2")
 
 	  If UBound($g_asTroopOrderList) - 1 <> $eTroopCount Then ; safety check in case troops are added
-		If $g_iDebugSetlogTrain = 1 Then Setlog("UBound($g_asTroopOrderList) - 1: " & UBound($g_asTroopOrderList) - 1 & " = " & "$eTroopCount: " & $eTroopCount, $COLOR_DEBUG) ;Debug
+		If $g_bDebugSetlogTrain Then Setlog("UBound($g_asTroopOrderList) - 1: " & UBound($g_asTroopOrderList) - 1 & " = " & "$eTroopCount: " & $eTroopCount, $COLOR_DEBUG) ;Debug
 		Setlog("Monkey ate bad banana, fix $g_asTroopOrderList & $eTroopCount arrays!", $COLOR_RED)
 	  EndIf
 
