@@ -63,6 +63,13 @@ Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
 Global $DELAYSLEEP = 500
 Global $g_bDebugSetlog = False
 
+; used by API
+Global Enum $eLootGold, $eLootElixir, $eLootDarkElixir, $eLootTrophy, $eLootCount
+Global $g_aiCurrentLoot[$eLootCount] = [0, 0, 0, 0] ; current stats
+Global $g_iStatsTotalGain[$eLootCount] = [0, 0, 0, 0]
+Global $g_iStatsLastAttack[$eLootCount] = [0, 0, 0, 0]
+Global $g_iStatsBonusLast[$eLootCount] = [0, 0, 0, 0]
+
 ; Dummy functions
 Func _GUICtrlStatusBar_SetText($a, $b)
 EndFunc   ;==>_GUICtrlStatusBar_SetText

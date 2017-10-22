@@ -105,10 +105,16 @@ Func GetManagedMyBotDetails($hFrmBot = Default, $iFilterPID = Default, $_RunStat
 					Local $pStructPtr = DllStructGetData($tBotState, "StructPtr")
 					Switch $eStructType
 						Case $g_eSTRUCT_STATUS_BAR
-							SetDebugLog("GetManagedMyBotDetails: Reading StatusBar Text")
+							If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Reading StatusBar Text")
 							If _MemoryReadStruct($pStructPtr, $hMem, $tStatusBar) = 1 Then
 								$tStruct = $tStatusBar
-								SetDebugLog("GetManagedMyBotDetails: StatusBar Text: " & DllStructGetData($tStatusBar, "Text"))
+								SetDebugLog("StatusBar Text: " & DllStructGetData($tStatusBar, "Text"))
+							EndIf
+						Case $g_eSTRUCT_UPDATE_STATS
+							If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Reading Update Stats")
+							If _MemoryReadStruct($pStructPtr, $hMem, $tUpdateStats) = 1 Then
+								$tStruct = $tUpdateStats
+								If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Update Stats read")
 							EndIf
 					EndSwitch
 				EndIf

@@ -529,19 +529,29 @@ Func FinalInitialization(Const $sAI)
 	EndIf
 	SetLog(GetTranslatedFileIni("MBR GUI Design - Loading", "Msg_Android_instance_04", "Android Emulator Configuration: %s", $sAI), $COLOR_SUCCESS)
 
-	; destroy splash screen here (so we witness the 100% ;)
-	DestroySplashScreen()
-
 	;AdlibRegister("PushBulletRemoteControl", $g_iPBRemoteControlInterval)
 	;AdlibRegister("PushBulletDeleteOldPushes", $g_iPBDeleteOldPushesInterval)
 
 	LoadAmountOfResourcesImages()
 
-	; InitializeVariables();initialize variables used in extrawindows
-	CheckVersion() ; check latest version on mybot.run site
-
 	; Remember time in Milliseconds bot launched
 	$g_iBotLaunchTime = __TimerDiff($g_hBotLaunchTime)
+
+	; wait for remote GUI to show when no GUI in this process
+	If $g_iGuiMode = 0 Then
+		$g_iGuiPID = @AutoItPID
+		Local $timer = __TimerInit()
+		While $g_iGuiPID = @AutoItPID And __TimerDiff($timer) < 15000
+			; wait for GUI Process updating $g_iGuiPID
+			_Sleep(50)
+		WEnd
+	EndIf
+
+	; destroy splash screen here (so we witness the 100% ;)
+	DestroySplashScreen()
+
+	; InitializeVariables();initialize variables used in extrawindows
+	CheckVersion() ; check latest version on mybot.run site
 	SetDebugLog("Maximum of " & $g_iGlobalActiveBotsAllowed & " bots running at same time configured")
 	SetDebugLog("MyBot.run launch time " & Round($g_iBotLaunchTime) & " ms.")
 

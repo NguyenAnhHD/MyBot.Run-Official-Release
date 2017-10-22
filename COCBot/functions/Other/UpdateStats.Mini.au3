@@ -43,7 +43,7 @@ Func UpdateStats()
 		GUICtrlSetState($g_hPicResultElixirTemp, $GUI_HIDE)
 		GUICtrlSetState($g_hPicResultDETemp, $GUI_HIDE)
 
-		GUICtrlSetState($g_hLblResultGoldNow, $GUI_SHOW + $GUI_DISABLE) ; $GUI_DISABLE to trigger default view in btnVillageStat
+		GUICtrlSetState($g_hLblResultGoldNow, $GUI_SHOW) ; $GUI_DISABLE to trigger default view in btnVillageStat
 		GUICtrlSetState($g_hPicResultGoldNow, $GUI_SHOW)
 		GUICtrlSetState($g_hLblResultElixirNow, $GUI_SHOW)
 		GUICtrlSetState($g_hPicResultElixirNow, $GUI_SHOW)
@@ -51,31 +51,33 @@ Func UpdateStats()
 			GUICtrlSetState($g_hLblResultDeNow, $GUI_SHOW)
 			GUICtrlSetState($g_hPicResultDeNow, $GUI_SHOW)
 		Else
+			#cs mini
 			GUICtrlSetState($g_hPicResultDEStart, $GUI_HIDE)
 			GUICtrlSetState($g_hPicDarkLoot, $GUI_HIDE)
 			GUICtrlSetState($g_hPicDarkLastAttack, $GUI_HIDE)
 			GUICtrlSetState($g_hPicHourlyStatsDark, $GUI_HIDE)
+			#ce
 		EndIf
 		GUICtrlSetState($g_hLblResultTrophyNow, $GUI_SHOW)
 		GUICtrlSetState($g_hLblResultBuilderNow, $GUI_SHOW)
 		GUICtrlSetState($g_hLblResultGemNow, $GUI_SHOW)
-		btnVillageStat("UpdateStats")
+		;mini btnVillageStat("UpdateStats")
 		$g_iStatsStartedWith[$eLootGold] = $g_aiCurrentLoot[$eLootGold]
 		$g_iStatsStartedWith[$eLootElixir] = $g_aiCurrentLoot[$eLootElixir]
 		$g_iStatsStartedWith[$eLootDarkElixir] = $g_aiCurrentLoot[$eLootDarkElixir]
 		$g_iStatsStartedWith[$eLootTrophy] = $g_aiCurrentLoot[$eLootTrophy]
-		GUICtrlSetData($g_ahLblStatsStartedWith[$eLootGold], _NumberFormat($g_aiCurrentLoot[$eLootGold], True))
+		;mini GUICtrlSetData($g_ahLblStatsStartedWith[$eLootGold], _NumberFormat($g_aiCurrentLoot[$eLootGold], True))
 		GUICtrlSetData($g_hLblResultGoldNow, _NumberFormat($g_aiCurrentLoot[$eLootGold], True))
 		$iOldCurrentLoot[$eLootGold] = $g_aiCurrentLoot[$eLootGold]
-		GUICtrlSetData($g_ahLblStatsStartedWith[$eLootElixir], _NumberFormat($g_aiCurrentLoot[$eLootElixir], True))
+		;mini GUICtrlSetData($g_ahLblStatsStartedWith[$eLootElixir], _NumberFormat($g_aiCurrentLoot[$eLootElixir], True))
 		GUICtrlSetData($g_hLblResultElixirNow, _NumberFormat($g_aiCurrentLoot[$eLootElixir], True))
 		$iOldCurrentLoot[$eLootElixir] = $g_aiCurrentLoot[$eLootElixir]
 		If $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
-			GUICtrlSetData($g_ahLblStatsStartedWith[$eLootDarkElixir], _NumberFormat($g_aiCurrentLoot[$eLootDarkElixir], True))
+			;mini GUICtrlSetData($g_ahLblStatsStartedWith[$eLootDarkElixir], _NumberFormat($g_aiCurrentLoot[$eLootDarkElixir], True))
 			GUICtrlSetData($g_hLblResultDeNow, _NumberFormat($g_aiCurrentLoot[$eLootDarkElixir], True))
 			$iOldCurrentLoot[$eLootDarkElixir] = $g_aiCurrentLoot[$eLootDarkElixir]
 		EndIf
-		GUICtrlSetData($g_ahLblStatsStartedWith[$eLootTrophy], _NumberFormat($g_aiCurrentLoot[$eLootTrophy], True))
+		; mini GUICtrlSetData($g_ahLblStatsStartedWith[$eLootTrophy], _NumberFormat($g_aiCurrentLoot[$eLootTrophy], True))
 		GUICtrlSetData($g_hLblResultTrophyNow, _NumberFormat($g_aiCurrentLoot[$eLootTrophy], True))
 		$iOldCurrentLoot[$eLootTrophy] = $g_aiCurrentLoot[$eLootTrophy]
 		GUICtrlSetData($g_hLblResultGemNow, _NumberFormat($g_iGemAmount, True))
@@ -84,11 +86,7 @@ Func UpdateStats()
 		$iOldFreeBuilderCount = $g_iFreeBuilderCount
 		$iOldTotalBuilderCount = $g_iTotalBuilderCount
 		$g_iFirstRun = 0
-		GUICtrlSetState($btnResetStats, $GUI_ENABLE)
-		If $g_iGuiMode = 0 Then
-			; send update to GUI process
-			UpdateStatsManagedMyBotHost()
-		EndIf
+		;mini GUICtrlSetState($btnResetStats, $GUI_ENABLE)
 		Return
 	EndIf
 
@@ -105,39 +103,39 @@ Func UpdateStats()
 	If Number($g_iStatsLastAttack[$eLootGold]) > Number($topgoldloot) Then
 		$bStatsUpdated = True
 		$topgoldloot = $g_iStatsLastAttack[$eLootGold]
-		GUICtrlSetData($g_ahLblStatsTop[$eLootGold],_NumberFormat($topgoldloot))
+		;mini GUICtrlSetData($g_ahLblStatsTop[$eLootGold],_NumberFormat($topgoldloot))
 	EndIf
 
 	If Number($g_iStatsLastAttack[$eLootElixir]) > Number($topelixirloot) Then
 		$bStatsUpdated = True
 		$topelixirloot = $g_iStatsLastAttack[$eLootElixir]
-		GUICtrlSetData($g_ahLblStatsTop[$eLootElixir],_NumberFormat($topelixirloot))
+		; mini GUICtrlSetData($g_ahLblStatsTop[$eLootElixir],_NumberFormat($topelixirloot))
 	EndIf
 
 	If Number($g_iStatsLastAttack[$eLootDarkElixir]) > Number($topdarkloot) Then
 		$bStatsUpdated = True
 		$topdarkloot = $g_iStatsLastAttack[$eLootDarkElixir]
-		GUICtrlSetData($g_ahLblStatsTop[$eLootDarkElixir],_NumberFormat($topdarkloot))
+		; mini GUICtrlSetData($g_ahLblStatsTop[$eLootDarkElixir],_NumberFormat($topdarkloot))
 	EndIf
 
 	If Number($g_iStatsLastAttack[$eLootTrophy]) > Number($topTrophyloot) Then
 		$bStatsUpdated = True
 		$topTrophyloot = $g_iStatsLastAttack[$eLootTrophy]
-		GUICtrlSetData($g_ahLblStatsTop[$eLootTrophy],_NumberFormat($topTrophyloot))
+		; mini GUICtrlSetData($g_ahLblStatsTop[$eLootTrophy],_NumberFormat($topTrophyloot))
 	EndIf
 
 	If $ResetStats = 1 Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsStartedWith[$eLootGold], _NumberFormat($g_aiCurrentLoot[$eLootGold], True))
-		GUICtrlSetData($g_ahLblStatsStartedWith[$eLootElixir], _NumberFormat($g_aiCurrentLoot[$eLootElixir], True))
+		; mini GUICtrlSetData($g_ahLblStatsStartedWith[$eLootGold], _NumberFormat($g_aiCurrentLoot[$eLootGold], True))
+		; mini GUICtrlSetData($g_ahLblStatsStartedWith[$eLootElixir], _NumberFormat($g_aiCurrentLoot[$eLootElixir], True))
 		If $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
-			GUICtrlSetData($g_ahLblStatsStartedWith[$eLootDarkElixir], _NumberFormat($g_aiCurrentLoot[$eLootDarkElixir], True))
+			; mini GUICtrlSetData($g_ahLblStatsStartedWith[$eLootDarkElixir], _NumberFormat($g_aiCurrentLoot[$eLootDarkElixir], True))
 		EndIf
-		GUICtrlSetData($g_ahLblStatsStartedWith[$eLootTrophy], _NumberFormat($g_aiCurrentLoot[$eLootTrophy], True))
-		GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootGold], "")
-		GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootElixir], "")
-		GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootDarkElixir], "")
-		GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootTrophy], "")
+		; mini GUICtrlSetData($g_ahLblStatsStartedWith[$eLootTrophy], _NumberFormat($g_aiCurrentLoot[$eLootTrophy], True))
+		;mini GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootGold], "")
+		; mini GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootElixir], "")
+		; mini GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootDarkElixir], "")
+		; mini GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootTrophy], "")
 		GUICtrlSetData($g_hLblResultGoldHourNow, "") ;GUI BOTTOM
 		GUICtrlSetData($g_hLblResultElixirHourNow, "");GUI BOTTOM
 		GUICtrlSetData($g_hLblResultDEHourNow, "") ;GUI BOTTOM
@@ -183,64 +181,65 @@ Func UpdateStats()
 
 	If $iOldTotalLoot[$eLootGold] <> $g_iStatsTotalGain[$eLootGold] And ($g_iFirstAttack = 2 Or $ResetStats = 1) Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsTotalGain[$eLootGold], _NumberFormat($g_iStatsTotalGain[$eLootGold]))
+		;mini GUICtrlSetData($g_ahLblStatsTotalGain[$eLootGold], _NumberFormat($g_iStatsTotalGain[$eLootGold]))
 		$iOldTotalLoot[$eLootGold] = $g_iStatsTotalGain[$eLootGold]
 	EndIf
 
 	If $iOldTotalLoot[$eLootElixir] <> $g_iStatsTotalGain[$eLootElixir] And ($g_iFirstAttack = 2 Or $ResetStats = 1) Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsTotalGain[$eLootElixir], _NumberFormat($g_iStatsTotalGain[$eLootElixir]))
+		; mini GUICtrlSetData($g_ahLblStatsTotalGain[$eLootElixir], _NumberFormat($g_iStatsTotalGain[$eLootElixir]))
 		$iOldTotalLoot[$eLootElixir] = $g_iStatsTotalGain[$eLootElixir]
 	EndIf
 
 	If $iOldTotalLoot[$eLootDarkElixir] <> $g_iStatsTotalGain[$eLootDarkElixir] And (($g_iFirstAttack = 2 And $g_iStatsStartedWith[$eLootDarkElixir] <> "") Or $ResetStats = 1) Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsTotalGain[$eLootDarkElixir], _NumberFormat($g_iStatsTotalGain[$eLootDarkElixir]))
+		; mini GUICtrlSetData($g_ahLblStatsTotalGain[$eLootDarkElixir], _NumberFormat($g_iStatsTotalGain[$eLootDarkElixir]))
 		$iOldTotalLoot[$eLootDarkElixir] = $g_iStatsTotalGain[$eLootDarkElixir]
 	EndIf
 
 	If $iOldTotalLoot[$eLootTrophy] <> $g_iStatsTotalGain[$eLootTrophy] And ($g_iFirstAttack = 2 Or $ResetStats = 1) Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsTotalGain[$eLootTrophy], _NumberFormat($g_iStatsTotalGain[$eLootTrophy]))
+		; mini GUICtrlSetData($g_ahLblStatsTotalGain[$eLootTrophy], _NumberFormat($g_iStatsTotalGain[$eLootTrophy]))
 		$iOldTotalLoot[$eLootTrophy] = $g_iStatsTotalGain[$eLootTrophy]
 	EndIf
 
 	If $iOldLastLoot[$eLootGold] <> $g_iStatsLastAttack[$eLootGold] Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsLastAttack[$eLootGold], _NumberFormat($g_iStatsLastAttack[$eLootGold]))
+		;mini GUICtrlSetData($g_ahLblStatsLastAttack[$eLootGold], _NumberFormat($g_iStatsLastAttack[$eLootGold]))
 		$iOldLastLoot[$eLootGold] = $g_iStatsLastAttack[$eLootGold]
 	EndIf
 
 	If $iOldLastLoot[$eLootElixir] <> $g_iStatsLastAttack[$eLootElixir] Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsLastAttack[$eLootElixir], _NumberFormat($g_iStatsLastAttack[$eLootElixir]))
+		; mini GUICtrlSetData($g_ahLblStatsLastAttack[$eLootElixir], _NumberFormat($g_iStatsLastAttack[$eLootElixir]))
 		$iOldLastLoot[$eLootElixir] = $g_iStatsLastAttack[$eLootElixir]
 	EndIf
 
 	If $iOldLastLoot[$eLootDarkElixir] <> $g_iStatsLastAttack[$eLootDarkElixir] Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsLastAttack[$eLootDarkElixir], _NumberFormat($g_iStatsLastAttack[$eLootDarkElixir]))
+		; mini GUICtrlSetData($g_ahLblStatsLastAttack[$eLootDarkElixir], _NumberFormat($g_iStatsLastAttack[$eLootDarkElixir]))
 		$iOldLastLoot[$eLootDarkElixir] = $g_iStatsLastAttack[$eLootDarkElixir]
 	EndIf
 
 	If $iOldLastLoot[$eLootTrophy] <> $g_iStatsLastAttack[$eLootTrophy] Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsLastAttack[$eLootTrophy], _NumberFormat($g_iStatsLastAttack[$eLootTrophy]))
+		; mini GUICtrlSetData($g_ahLblStatsLastAttack[$eLootTrophy], _NumberFormat($g_iStatsLastAttack[$eLootTrophy]))
 		$iOldLastLoot[$eLootTrophy] = $g_iStatsLastAttack[$eLootTrophy]
 	EndIf
 
 	If $iOldLastBonus[$eLootGold] <> $g_iStatsBonusLast[$eLootGold] Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsBonusLast[$eLootGold], _NumberFormat($g_iStatsBonusLast[$eLootGold]))
+		;mini GUICtrlSetData($g_ahLblStatsBonusLast[$eLootGold], _NumberFormat($g_iStatsBonusLast[$eLootGold]))
 		$iOldLastBonus[$eLootGold] = $g_iStatsBonusLast[$eLootGold]
 	EndIf
 
 	If $iOldLastBonus[$eLootElixir] <> $g_iStatsBonusLast[$eLootElixir] Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsBonusLast[$eLootElixir], _NumberFormat($g_iStatsBonusLast[$eLootElixir]))
+		; mini GUICtrlSetData($g_ahLblStatsBonusLast[$eLootElixir], _NumberFormat($g_iStatsBonusLast[$eLootElixir]))
 		$iOldLastBonus[$eLootElixir] = $g_iStatsBonusLast[$eLootElixir]
 	EndIf
 
+	#cs mini
 	If $iOldLastBonus[$eLootDarkElixir] <> $g_iStatsBonusLast[$eLootDarkElixir] Then
 		$bStatsUpdated = True
 		GUICtrlSetData($g_ahLblStatsBonusLast[$eLootDarkElixir], _NumberFormat($g_iStatsBonusLast[$eLootDarkElixir]))
@@ -497,15 +496,16 @@ Func UpdateStats()
 		EndIf
 
 	Next
+	#ce
 
 	If $g_iFirstAttack = 2 Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootGold], _NumberFormat(Round($g_iStatsTotalGain[$eLootGold] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600)) & "k / h")
-		GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootElixir], _NumberFormat(Round($g_iStatsTotalGain[$eLootElixir] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600)) & "k / h")
+		; mini GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootGold], _NumberFormat(Round($g_iStatsTotalGain[$eLootGold] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600)) & "k / h")
+		; mini GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootElixir], _NumberFormat(Round($g_iStatsTotalGain[$eLootElixir] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600)) & "k / h")
 		If $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
-			GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootDarkElixir], _NumberFormat(Round($g_iStatsTotalGain[$eLootDarkElixir] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600 * 1000)) & " / h")
+			; mini GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootDarkElixir], _NumberFormat(Round($g_iStatsTotalGain[$eLootDarkElixir] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600 * 1000)) & " / h")
 		EndIf
-		GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootTrophy], _NumberFormat(Round($g_iStatsTotalGain[$eLootTrophy] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600 * 1000)) & " / h")
+		; mini GUICtrlSetData($g_ahLblStatsGainPerHour[$eLootTrophy], _NumberFormat(Round($g_iStatsTotalGain[$eLootTrophy] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600 * 1000)) & " / h")
 
 		GUICtrlSetData($g_hLblResultGoldHourNow, _NumberFormat(Round($g_iStatsTotalGain[$eLootGold] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600)) & "k / h") ;GUI BOTTOM
 		GUICtrlSetData($g_hLblResultElixirHourNow, _NumberFormat(Round($g_iStatsTotalGain[$eLootElixir] / (Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600)) & "k / h") ;GUI BOTTOM
@@ -518,34 +518,29 @@ Func UpdateStats()
 	If Number($g_iStatsLastAttack[$eLootGold]) > Number($topgoldloot) Then
 		$bStatsUpdated = True
 		$topgoldloot = $g_iStatsLastAttack[$eLootGold]
-		GUICtrlSetData($g_ahLblStatsTop[$eLootGold],_NumberFormat($topgoldloot))
+		; mini GUICtrlSetData($g_ahLblStatsTop[$eLootGold],_NumberFormat($topgoldloot))
 	EndIf
 
 	If Number($g_iStatsLastAttack[$eLootElixir]) > Number($topelixirloot) Then
 		$bStatsUpdated = True
 		$topelixirloot = $g_iStatsLastAttack[$eLootElixir]
-		GUICtrlSetData($g_ahLblStatsTop[$eLootElixir],_NumberFormat($topelixirloot))
+		; mini GUICtrlSetData($g_ahLblStatsTop[$eLootElixir],_NumberFormat($topelixirloot))
 	EndIf
 
 	If Number($g_iStatsLastAttack[$eLootDarkElixir]) > Number($topdarkloot) Then
 		$bStatsUpdated = True
 		$topdarkloot = $g_iStatsLastAttack[$eLootDarkElixir]
-		GUICtrlSetData($g_ahLblStatsTop[$eLootDarkElixir],_NumberFormat($topdarkloot))
+		; mini GUICtrlSetData($g_ahLblStatsTop[$eLootDarkElixir],_NumberFormat($topdarkloot))
 	EndIf
 
 	If Number($g_iStatsLastAttack[$eLootTrophy]) > Number($topTrophyloot) Then
 		$bStatsUpdated = True
 		$topTrophyloot = $g_iStatsLastAttack[$eLootTrophy]
-		GUICtrlSetData($g_ahLblStatsTop[$eLootTrophy],_NumberFormat($topTrophyloot))
+		; mini GUICtrlSetData($g_ahLblStatsTop[$eLootTrophy],_NumberFormat($topTrophyloot))
 	EndIf
 
 	If $ResetStats = 1 Then
 		$ResetStats = 0
-	EndIf
-
-	If $bStatsUpdated And $g_iGuiMode = 0 Then
-		; send update to GUI process
-		UpdateStatsManagedMyBotHost()
 	EndIf
 
 EndFunc   ;==>UpdateStats
@@ -555,7 +550,7 @@ Func ResetStats()
 	$g_iFirstAttack = 0
 	$g_iTimePassed = 0
 	$g_hTimerSinceStarted = __TimerInit()
-	GUICtrlSetData($g_hLblResultRuntime, "00:00:00")
+	;mini GUICtrlSetData($g_hLblResultRuntime, "00:00:00")
 	GUICtrlSetData($g_hLblResultRuntimeNow, "00:00:00")
 	$g_iStatsStartedWith[$eLootGold] = $g_aiCurrentLoot[$eLootGold]
 	$g_iStatsStartedWith[$eLootElixir] = $g_aiCurrentLoot[$eLootElixir]
@@ -624,13 +619,3 @@ Func ResetStats()
 
 	UpdateStats()
  EndFunc   ;==>ResetStats
-
- Func WallsStatsMAJ()
-	$g_aiWallsCurrentCount[$g_iCmbUpgradeWallsLevel + 4] -= Number($g_iNbrOfWallsUpped)
-	$g_aiWallsCurrentCount[$g_iCmbUpgradeWallsLevel + 5] += Number($g_iNbrOfWallsUpped)
-	$g_iNbrOfWallsUpped = 0
-	For $i = 4 To 12
-		GUICtrlSetData($g_ahWallsCurrentCount[$i], $g_aiWallsCurrentCount[$i])
-    Next
-    SaveConfig()
-EndFunc   ;==>WallsStatsMAJ

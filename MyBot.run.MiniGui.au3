@@ -80,6 +80,7 @@ Global $g_sBotTitle = "My Bot Mini " & $g_sBotVersion & " " ;~ Don't use any non
 Global $g_hFrmBot = 0
 Global $g_hFrmBotBackend = 0
 Global $g_bBotLaunched = False
+Global $g_iBotBackendFindTimeout = 3000;
 
 Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
@@ -102,6 +103,10 @@ Global $g_hFrmBotEmbeddedMouse = 0
 
 #include "COCBot\MBR GUI Design Mini.au3"
 #include "COCBot\functions\Config\readConfig.au3"
+#include "COCBot\functions\Other\UpdateStats.Mini.au3"
+#include "COCBot\functions\Other\_NumberFormat.au3"
+
+Global Enum $eBotUpdateStats = $eBotClose + 1
 
 Func SetLog($String, $Color = $COLOR_BLACK, $LogPrefix = "L ")
 	Local $log = $LogPrefix & TimeDebug() & $String
@@ -944,6 +949,7 @@ Func BotStopped()
 EndFunc   ;==>BotStopped
 
 Func UpdateManagedMyBot($aBotDetails)
+	If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[0])
 	Local $sTitle = $aBotDetails[3]
 	Local $bRunState = $aBotDetails[4]
 	Local $bPaused = $aBotDetails[5]
@@ -956,6 +962,7 @@ Func UpdateManagedMyBot($aBotDetails)
 	Local $eStructType = $g_eSTRUCT_NONE
 	Local $pStructPtr = 0
 	If $tBotState <> 0 Then
+		If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Update Sate: " & $aBotDetails[0])
 		$sProfile = DllStructGetData($tBotState, "Profile")
 		$sEmulator = DllStructGetData($tBotState, "AndroidEmulator")
 		$sInstance = DllStructGetData($tBotState, "AndroidInstance")
@@ -969,13 +976,24 @@ Func UpdateManagedMyBot($aBotDetails)
 	If $pStructPtr Then
 		Switch $eStructType
 			Case $g_eSTRUCT_STATUS_BAR
+				If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Update Status Bar: " & $aBotDetails[0] & ", $pStructPtr=" & $pStructPtr)
 				$sStatusBar = DllStructGetData($tOptionalStruct, "Text")
 				_GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sStatusBar)
 				$AdditionalData = $sStatusBar
+			Case $g_eSTRUCT_UPDATE_STATS
+				If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Receive Update Stats: " & $aBotDetails[0] & ", $pStructPtr=" & $pStructPtr)
+				_DllStructLoadData($tOptionalStruct, "g_aiCurrentLoot", $g_aiCurrentLoot)
+				_DllStructLoadData($tOptionalStruct, "g_iFreeBuilderCount", $g_iFreeBuilderCount)
+				_DllStructLoadData($tOptionalStruct, "g_iTotalBuilderCount", $g_iTotalBuilderCount)
+				_DllStructLoadData($tOptionalStruct, "g_iGemAmount", $g_iGemAmount)
+				_DllStructLoadData($tOptionalStruct, "g_iStatsTotalGain", $g_iStatsTotalGain)
+				_DllStructLoadData($tOptionalStruct, "g_iStatsLastAttack", $g_iStatsLastAttack)
+				_DllStructLoadData($tOptionalStruct, "g_iStatsBonusLast", $g_iStatsBonusLast)
+				$g_iBotAction = $eBotUpdateStats
 		EndSwitch
 	EndIf
 
-	SetLog("UpdateManagedMyBot: " & $aBotDetails[0] & ", Profile: " & $sProfile & ", Android: " & $sEmulator & ", Instance: " & $sInstance & ", StructType: " & $eStructType & ", Ptr: " & $pStructPtr & ", Data:" & $AdditionalData)
+	If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[0] & ", Profile: " & $sProfile & ", Android: " & $sEmulator & ", Instance: " & $sInstance & ", StructType: " & $eStructType & ", Ptr: " & $pStructPtr & ", Data:" & $AdditionalData)
 
 	If $g_hFrmBotBackend = 0 And $g_sAndroidEmulator = $sEmulator And $g_sAndroidInstance = $sInstance Then
 		; found already running backend bot
@@ -988,7 +1006,11 @@ Func UpdateManagedMyBot($aBotDetails)
 		Return
 	EndIf
 
-	If $sProfile <> "" Then $g_sProfileCurrentName = $sProfile
+	If $g_sProfileCurrentName <> $sProfile Then
+		$g_sProfileCurrentName = $sProfile
+		; Set the profile name on the village info group.
+		GUICtrlSetData($g_hGrpVillage, GetTranslatedFileIni("MBR Main GUI", "Tab_02", "Village") & ": " & $g_sProfileCurrentName)
+	EndIf
 	If $sEmulator <> "" Then $g_sAndroidEmulator = $sEmulator
 	If $sInstance <> "" Then $g_sAndroidInstance = $sInstance
 
@@ -1053,7 +1075,7 @@ Func LaunchBotBackend($bNoGUI = True)
 	SetLog("Check if backend My Bot process is already running...")
 	While __TimerDiff($hTimer) < 5 * 60 * 1000
 
-		If $g_WatchOnlyClientPID = Default And __TimerDiff($hTimer) > 2 * 1000 Then
+		If $g_WatchOnlyClientPID = Default And __TimerDiff($hTimer) > $g_iBotBackendFindTimeout Then
 			$bCheck = False
 			SetLog("My Bot backend process not found, launching now...")
 			SetDebugLog("My Bot backend process launching: " & $cmd)
@@ -1071,12 +1093,24 @@ Func LaunchBotBackend($bNoGUI = True)
 			ClearManagedMyBotDetails()
 		EndIf
 
-		If $g_bBotLaunched And ProcessExists($g_WatchOnlyClientPID) Then
-			$pid = $g_WatchOnlyClientPID
-			ExitLoop
+		If $g_bBotLaunched Then
+			If ProcessExists($g_WatchOnlyClientPID) Then
+				$pid = $g_WatchOnlyClientPID
+				; update GUI PID
+				_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1060, $g_hFrmBot)
+				ExitLoop
+			Else
+				; launch bot again
+				$g_WatchOnlyClientPID = Default
+			EndIf
+		Else
+			If $g_WatchOnlyClientPID <> Default And ProcessExists($g_WatchOnlyClientPID) = 0 Then
+				SetDebugLog("My Bot backend process not launched, PID = " & $g_WatchOnlyClientPID)
+				$g_WatchOnlyClientPID = Default
+			EndIf
 		EndIf
 
-		_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API_1_0, 0x0100, $g_hFrmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
+		_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API_1_0, 0x01FF, $g_hFrmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
 
 		;Local $iActiveBots = GetActiveMyBotCount($iTimeoutBroadcast + 3000)
 		;SetDebugLog("Active bots: " & $iActiveBots)
@@ -1190,6 +1224,11 @@ CreateMainGUIControls() ; Create all GUI Controls
 ; Launch bot backend process
 LaunchBotBackend()
 
+If $g_bBotLaunched Then
+	; update stats
+	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x0200, $g_hFrmBot)
+EndIf
+
 ; Show main GUI
 ShowMainGUI()
 
@@ -1234,6 +1273,9 @@ While 1
 		#ce
 		Case $eBotClose
 			BotClose()
+		Case $eBotUpdateStats
+			UpdateStats()
+			$g_iBotAction = $eBotNoAction
 		Case Else
 			; update status
 			If $iMainLoop > 20 And ($hStusUpdateTimer = 0 Or __TimerDiff($hStusUpdateTimer) > 60000) Then

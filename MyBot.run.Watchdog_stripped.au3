@@ -484,6 +484,11 @@ Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
 Global $DELAYSLEEP = 500
 Global $g_bDebugSetlog = False
+Global Enum $eLootGold, $eLootElixir, $eLootDarkElixir, $eLootTrophy, $eLootCount
+Global $g_aiCurrentLoot[$eLootCount] = [0, 0, 0, 0]
+Global $g_iStatsTotalGain[$eLootCount] = [0, 0, 0, 0]
+Global $g_iStatsLastAttack[$eLootCount] = [0, 0, 0, 0]
+Global $g_iStatsBonusLast[$eLootCount] = [0, 0, 0, 0]
 Func _GUICtrlStatusBar_SetTextEx($a, $b)
 EndFunc
 Func SetLog($String, $Color = $COLOR_BLACK, $LogPrefix = "L ")
@@ -507,10 +512,12 @@ Global $g_sBotTitle = "My Bot Watchdog " & $g_sBotVersion & " "
 Opt("WinTitleMatchMode", 3)
 Global $sWatchdogMutex = "MyBot.run/ManageFarm"
 Global $tagSTRUCT_BOT_STATE = "struct;hwnd BotHWnd;hwnd AndroidHWnd;boolean RunState;boolean Paused;boolean Launched;char Profile[64];char AndroidEmulator[32];char AndroidInstance[32];int StructType;ptr StructPtr;endstruct"
-Global Enum $g_eSTRUCT_NONE = 0, $g_eSTRUCT_STATUS_BAR
+Global Enum $g_eSTRUCT_NONE = 0, $g_eSTRUCT_STATUS_BAR, $g_eSTRUCT_UPDATE_STATS
 Global $tagSTRUCT_STATUS_BAR = "struct;char Text[255];endstruct"
+Global $tagSTRUCT_UPDATE_STATS = "struct;" & "LONG g_aiCurrentLoot[" & UBound($g_aiCurrentLoot) & "]" & ";LONG g_iFreeBuilderCount" & ";LONG g_iTotalBuilderCount" & ";LONG g_iGemAmount" & ";LONG g_iStatsTotalGain[" & UBound($g_iStatsTotalGain) & "]" & ";LONG g_iStatsLastAttack[" & UBound($g_iStatsLastAttack) & "]" & ";LONG g_iStatsBonusLast[" & UBound($g_iStatsBonusLast) & "]" & ";endstruct"
 Global $tBotState = DllStructCreate($tagSTRUCT_BOT_STATE)
 Global $tStatusBar = DllStructCreate($tagSTRUCT_STATUS_BAR)
+Global $tUpdateStats = DllStructCreate($tagSTRUCT_UPDATE_STATS)
 Global $WM_MYBOTRUN_API_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/API/1.1")
 Global $WM_MYBOTRUN_STATE_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/1.1")
 Func _MemoryOpen($iv_Pid, $iv_DesiredAccess = 0x1F0FFF, $if_InheritHandle = 1)
@@ -628,10 +635,16 @@ Local $eStructType = DllStructGetData($tBotState, "StructType")
 Local $pStructPtr = DllStructGetData($tBotState, "StructPtr")
 Switch $eStructType
 Case $g_eSTRUCT_STATUS_BAR
-SetDebugLog("GetManagedMyBotDetails: Reading StatusBar Text")
+If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Reading StatusBar Text")
 If _MemoryReadStruct($pStructPtr, $hMem, $tStatusBar) = 1 Then
 $tStruct = $tStatusBar
-SetDebugLog("GetManagedMyBotDetails: StatusBar Text: " & DllStructGetData($tStatusBar, "Text"))
+SetDebugLog("StatusBar Text: " & DllStructGetData($tStatusBar, "Text"))
+EndIf
+Case $g_eSTRUCT_UPDATE_STATS
+If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Reading Update Stats")
+If _MemoryReadStruct($pStructPtr, $hMem, $tUpdateStats) = 1 Then
+$tStruct = $tUpdateStats
+If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Update Stats read")
 EndIf
 EndSwitch
 EndIf

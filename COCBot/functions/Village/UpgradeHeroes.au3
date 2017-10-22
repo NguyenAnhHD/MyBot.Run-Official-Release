@@ -305,8 +305,6 @@ Func WardenUpgrade()
 		Return
 	EndIf
 
-	Local $aHeroLevel = 0
-
 	SetLog("Upgrade Grand Warden")
 	ClickP($g_aiWardenAltarPos, 1, 0, "#8888") ;Click Warden Altar
 	If _Sleep($DELAYUPGRADEHERO2) Then Return
@@ -331,9 +329,9 @@ Func WardenUpgrade()
 			Return
 		Else
 			If $sInfo[2] <> "" Then
-				$aHeroLevel = Number($sInfo[2]) ; grab hero level from building info array
-				SetLog("Your Grand Warden Warden Level read as: " & $aHeroLevel, $COLOR_SUCCESS)
-				If $aHeroLevel = $g_iMaxWardenLevel Then ; max hero
+				$g_iWardenLevel = Number($sInfo[2]) ; grab hero level from building info array
+				SetLog("Your Grand Warden Warden Level read as: " & $g_iWardenLevel, $COLOR_SUCCESS)
+				If $g_iWardenLevel = $g_iMaxWardenLevel Then ; max hero
 					SetLog("Your Grand Warden is at max level, cannot upgrade anymore!", $COLOR_INFO)
 					$g_bUpgradeWardenEnable = False ; turn OFF the Wardn's Upgrade
 					Return
@@ -356,8 +354,8 @@ Func WardenUpgrade()
 	EndIf
 	If _Sleep(100) Then Return
 
-	If $g_aiCurrentLoot[$eLootElixir] < ($g_afWardenUpgCost[$aHeroLevel] * 1000000) + $g_iUpgradeMinElixir Then
-		SetLog("Insufficient Elixir for Warden Upgrade, requires: " & ($g_afWardenUpgCost[$aHeroLevel] * 1000000) & " + " & $g_iUpgradeMinElixir, $COLOR_INFO)
+	If $g_aiCurrentLoot[$eLootElixir] < ($g_afWardenUpgCost[$g_iWardenLevel] * 1000000) + $g_iUpgradeMinElixir Then
+		SetLog("Insufficient Elixir for Warden Upgrade, requires: " & ($g_afWardenUpgCost[$g_iWardenLevel] * 1000000) & " + " & $g_iUpgradeMinElixir, $COLOR_INFO)
 		Return
 	EndIf
 	If _Sleep($DELAYUPGRADEHERO2) Then Return
@@ -392,7 +390,8 @@ Func WardenUpgrade()
 				SetLog("Warden Upgrade Started", $COLOR_SUCCESS)
 				If _Sleep($DELAYUPGRADEHERO2) Then Return ; Wait for window to close
 				$g_iNbrOfHeroesUpped += 1
-				$g_iCostElixirBuilding += $g_afWardenUpgCost[$aHeroLevel - 1] * 1000
+				$g_iCostElixirBuilding += $g_afWardenUpgCost[$g_iWardenLevel - 1] * 1000
+				$g_iWardenLevel += 1
 				UpdateStats()
 			EndIf
 		Else

@@ -2049,6 +2049,7 @@ Global $g_sBotTitle = "My Bot Mini " & $g_sBotVersion & " "
 Global $g_hFrmBot = 0
 Global $g_hFrmBotBackend = 0
 Global $g_bBotLaunched = False
+Global $g_iBotBackendFindTimeout = 3000
 Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
 Global $DELAYSLEEP = 10
@@ -2650,6 +2651,10 @@ Global $g_bBotMoveRequested = False
 Global $g_bBotShrinkExpandToggleRequested = False
 Global $g_bRunState = False
 Global $g_bRestarted =($g_bBotLaunchOption_Autostart ? True : False)
+Global $g_iFirstRun = 1
+Global $g_iFirstAttack = 0
+Global $g_hTimerSinceStarted = 0
+Global $g_iTimePassed = 0
 Global $g_bBotPaused = False
 Global $g_bTogglePauseAllowed = True
 Global Const $REDLINE_IMGLOC_RAW = 0
@@ -2667,6 +2672,7 @@ Global Const $g_asSpellShortNames[$eSpellCount] = ["LSpell", "HSpell", "RSpell",
 Global Enum $eHeroNone = 0, $eHeroKing = 1, $eHeroQueen = 2, $eHeroWarden = 4
 Global Enum $eHeroBarbarianKing, $eHeroArcherQueen, $eHeroGrandWarden, $eHeroCount
 Global Const $g_asHeroNames[$eHeroCount] = ["Barbarian King", "Archer Queen", "Grand Warden"]
+Global Enum $eLootGold, $eLootElixir, $eLootDarkElixir, $eLootTrophy, $eLootCount
 Func GetTroopName(Const $iIndex)
 If $iIndex >= $eBarb And $iIndex <= $eBowl Then
 Return $g_asTroopNames[$iIndex]
@@ -2850,6 +2856,12 @@ Global $g_iFrmBotDockedPosY = -1
 Global $g_bGUIControlDisabled = False
 Global Const $g_sDirLanguages = @ScriptDir & "\Languages\"
 Global Const $g_sDefaultLanguage = "English"
+Global $g_iFreeBuilderCount = 0, $g_iTotalBuilderCount = 0, $g_iGemAmount = 0
+Global $g_iStatsStartedWith[$eLootCount] = [0, 0, 0, 0]
+Global $g_iStatsTotalGain[$eLootCount] = [0, 0, 0, 0]
+Global $g_iStatsLastAttack[$eLootCount] = [0, 0, 0, 0]
+Global $g_iStatsBonusLast[$eLootCount] = [0, 0, 0, 0]
+Global $g_aiCurrentLoot[$eLootCount] = [0, 0, 0, 0]
 Global $g_iTownHallLevel = 0
 Global $g_aiTownHallPos[2] = [-1, -1]
 Global $g_aiKingAltarPos[2] = [-1, -1]
@@ -3067,12 +3079,25 @@ Return $g_sLanguageText
 EndIf
 EndFunc
 Global $tagSTRUCT_BOT_STATE = "struct;hwnd BotHWnd;hwnd AndroidHWnd;boolean RunState;boolean Paused;boolean Launched;char Profile[64];char AndroidEmulator[32];char AndroidInstance[32];int StructType;ptr StructPtr;endstruct"
-Global Enum $g_eSTRUCT_NONE = 0, $g_eSTRUCT_STATUS_BAR
+Global Enum $g_eSTRUCT_NONE = 0, $g_eSTRUCT_STATUS_BAR, $g_eSTRUCT_UPDATE_STATS
 Global $tagSTRUCT_STATUS_BAR = "struct;char Text[255];endstruct"
+Global $tagSTRUCT_UPDATE_STATS = "struct;" & "LONG g_aiCurrentLoot[" & UBound($g_aiCurrentLoot) & "]" & ";LONG g_iFreeBuilderCount" & ";LONG g_iTotalBuilderCount" & ";LONG g_iGemAmount" & ";LONG g_iStatsTotalGain[" & UBound($g_iStatsTotalGain) & "]" & ";LONG g_iStatsLastAttack[" & UBound($g_iStatsLastAttack) & "]" & ";LONG g_iStatsBonusLast[" & UBound($g_iStatsBonusLast) & "]" & ";endstruct"
 Global $tBotState = DllStructCreate($tagSTRUCT_BOT_STATE)
 Global $tStatusBar = DllStructCreate($tagSTRUCT_STATUS_BAR)
+Global $tUpdateStats = DllStructCreate($tagSTRUCT_UPDATE_STATS)
 Global $WM_MYBOTRUN_API_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/API/1.1")
 Global $WM_MYBOTRUN_STATE_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/1.1")
+Func _DllStructLoadData(ByRef $Struct, $Element, ByRef $value)
+If IsArray($value) Then
+For $i = 0 To UBound($value) - 1
+$value[$i] = DllStructGetData($Struct, $Element, $i + 1)
+Next
+Return 1
+Else
+$value = DllStructGetData($Struct, $Element)
+Return 0
+EndIf
+EndFunc
 Func _MemoryOpen($iv_Pid, $iv_DesiredAccess = 0x1F0FFF, $if_InheritHandle = 1)
 If Not ProcessExists($iv_Pid) Then
 SetError(1)
@@ -3188,10 +3213,16 @@ Local $eStructType = DllStructGetData($tBotState, "StructType")
 Local $pStructPtr = DllStructGetData($tBotState, "StructPtr")
 Switch $eStructType
 Case $g_eSTRUCT_STATUS_BAR
-SetDebugLog("GetManagedMyBotDetails: Reading StatusBar Text")
+If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Reading StatusBar Text")
 If _MemoryReadStruct($pStructPtr, $hMem, $tStatusBar) = 1 Then
 $tStruct = $tStatusBar
-SetDebugLog("GetManagedMyBotDetails: StatusBar Text: " & DllStructGetData($tStatusBar, "Text"))
+SetDebugLog("StatusBar Text: " & DllStructGetData($tStatusBar, "Text"))
+EndIf
+Case $g_eSTRUCT_UPDATE_STATS
+If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Reading Update Stats")
+If _MemoryReadStruct($pStructPtr, $hMem, $tUpdateStats) = 1 Then
+$tStruct = $tUpdateStats
+If $g_iDebugWindowMessages Then SetDebugLog("GetManagedMyBotDetails: Update Stats read")
 EndIf
 EndSwitch
 EndIf
@@ -5137,6 +5168,209 @@ Case Else
 $variable = $readValue
 EndSwitch
 EndFunc
+Global $ResetStats = 0
+Func UpdateStats()
+Static $s_iOldSmartZapGain = 0, $s_iOldNumLSpellsUsed = 0, $s_iOldNumEQSpellsUsed = 0
+Static $topgoldloot = 0, $topelixirloot = 0, $topdarkloot = 0, $topTrophyloot = 0
+Static $bDonateTroopsStatsChanged = False, $bDonateSpellsStatsChanged = False
+Static $iOldFreeBuilderCount, $iOldTotalBuilderCount, $iOldGemAmount
+Static $iOldCurrentLoot[$eLootCount]
+Static $iOldTotalLoot[$eLootCount]
+Static $iOldLastLoot[$eLootCount]
+Static $iOldLastBonus[$eLootCount]
+Static $iOldSkippedVillageCount, $iOldDroppedTrophyCount
+Static $iOldCostGoldWall, $iOldCostElixirWall, $iOldCostGoldBuilding, $iOldCostElixirBuilding, $iOldCostDElixirHero
+Static $iOldNbrOfWallsUppedGold, $iOldNbrOfWallsUppedElixir, $iOldNbrOfBuildingsUppedGold, $iOldNbrOfBuildingsUppedElixir, $iOldNbrOfHeroesUpped
+Static $iOldSearchCost, $iOldTrainCostElixir, $iOldTrainCostDElixir
+Static $iOldNbrOfOoS
+Static $iOldNbrOfTHSnipeFails, $iOldNbrOfTHSnipeSuccess
+Static $iOldGoldFromMines, $iOldElixirFromCollectors, $iOldDElixirFromDrills
+Static $iOldAttackedCount, $iOldAttackedVillageCount[$g_iModeCount + 1]
+Static $iOldTotalGoldGain[$g_iModeCount + 1], $iOldTotalElixirGain[$g_iModeCount + 1], $iOldTotalDarkGain[$g_iModeCount + 1], $iOldTotalTrophyGain[$g_iModeCount + 1]
+Static $iOldNbrOfDetectedMines[$g_iModeCount + 1], $iOldNbrOfDetectedCollectors[$g_iModeCount + 1], $iOldNbrOfDetectedDrills[$g_iModeCount + 1]
+If $g_iFirstRun = 1 Then
+GUICtrlSetState($g_hLblVillageReportTemp, $GUI_HIDE)
+GUICtrlSetState($g_hPicResultGoldTemp, $GUI_HIDE)
+GUICtrlSetState($g_hPicResultElixirTemp, $GUI_HIDE)
+GUICtrlSetState($g_hPicResultDETemp, $GUI_HIDE)
+GUICtrlSetState($g_hLblResultGoldNow, $GUI_SHOW)
+GUICtrlSetState($g_hPicResultGoldNow, $GUI_SHOW)
+GUICtrlSetState($g_hLblResultElixirNow, $GUI_SHOW)
+GUICtrlSetState($g_hPicResultElixirNow, $GUI_SHOW)
+If $g_aiCurrentLoot[$eLootDarkElixir] <> "" Then
+GUICtrlSetState($g_hLblResultDeNow, $GUI_SHOW)
+GUICtrlSetState($g_hPicResultDeNow, $GUI_SHOW)
+Else
+EndIf
+GUICtrlSetState($g_hLblResultTrophyNow, $GUI_SHOW)
+GUICtrlSetState($g_hLblResultBuilderNow, $GUI_SHOW)
+GUICtrlSetState($g_hLblResultGemNow, $GUI_SHOW)
+$g_iStatsStartedWith[$eLootGold] = $g_aiCurrentLoot[$eLootGold]
+$g_iStatsStartedWith[$eLootElixir] = $g_aiCurrentLoot[$eLootElixir]
+$g_iStatsStartedWith[$eLootDarkElixir] = $g_aiCurrentLoot[$eLootDarkElixir]
+$g_iStatsStartedWith[$eLootTrophy] = $g_aiCurrentLoot[$eLootTrophy]
+GUICtrlSetData($g_hLblResultGoldNow, _NumberFormat($g_aiCurrentLoot[$eLootGold], True))
+$iOldCurrentLoot[$eLootGold] = $g_aiCurrentLoot[$eLootGold]
+GUICtrlSetData($g_hLblResultElixirNow, _NumberFormat($g_aiCurrentLoot[$eLootElixir], True))
+$iOldCurrentLoot[$eLootElixir] = $g_aiCurrentLoot[$eLootElixir]
+If $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
+GUICtrlSetData($g_hLblResultDeNow, _NumberFormat($g_aiCurrentLoot[$eLootDarkElixir], True))
+$iOldCurrentLoot[$eLootDarkElixir] = $g_aiCurrentLoot[$eLootDarkElixir]
+EndIf
+GUICtrlSetData($g_hLblResultTrophyNow, _NumberFormat($g_aiCurrentLoot[$eLootTrophy], True))
+$iOldCurrentLoot[$eLootTrophy] = $g_aiCurrentLoot[$eLootTrophy]
+GUICtrlSetData($g_hLblResultGemNow, _NumberFormat($g_iGemAmount, True))
+$iOldGemAmount = $g_iGemAmount
+GUICtrlSetData($g_hLblResultBuilderNow, $g_iFreeBuilderCount & "/" & $g_iTotalBuilderCount)
+$iOldFreeBuilderCount = $g_iFreeBuilderCount
+$iOldTotalBuilderCount = $g_iTotalBuilderCount
+$g_iFirstRun = 0
+Return
+EndIf
+Local $bStatsUpdated = False
+If $g_iFirstAttack = 1 Then
+$g_iFirstAttack = 2
+EndIf
+If Number($g_iStatsLastAttack[$eLootGold]) > Number($topgoldloot) Then
+$bStatsUpdated = True
+$topgoldloot = $g_iStatsLastAttack[$eLootGold]
+EndIf
+If Number($g_iStatsLastAttack[$eLootElixir]) > Number($topelixirloot) Then
+$bStatsUpdated = True
+$topelixirloot = $g_iStatsLastAttack[$eLootElixir]
+EndIf
+If Number($g_iStatsLastAttack[$eLootDarkElixir]) > Number($topdarkloot) Then
+$bStatsUpdated = True
+$topdarkloot = $g_iStatsLastAttack[$eLootDarkElixir]
+EndIf
+If Number($g_iStatsLastAttack[$eLootTrophy]) > Number($topTrophyloot) Then
+$bStatsUpdated = True
+$topTrophyloot = $g_iStatsLastAttack[$eLootTrophy]
+EndIf
+If $ResetStats = 1 Then
+$bStatsUpdated = True
+If $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
+EndIf
+GUICtrlSetData($g_hLblResultGoldHourNow, "")
+GUICtrlSetData($g_hLblResultElixirHourNow, "")
+GUICtrlSetData($g_hLblResultDEHourNow, "")
+EndIf
+If $iOldFreeBuilderCount <> $g_iFreeBuilderCount Or $iOldTotalBuilderCount <> $g_iTotalBuilderCount Then
+$bStatsUpdated = True
+GUICtrlSetData($g_hLblResultBuilderNow, $g_iFreeBuilderCount & "/" & $g_iTotalBuilderCount)
+$iOldFreeBuilderCount = $g_iFreeBuilderCount
+$iOldTotalBuilderCount = $g_iTotalBuilderCount
+EndIf
+If $iOldGemAmount <> $g_iGemAmount Then
+$bStatsUpdated = True
+GUICtrlSetData($g_hLblResultGemNow, _NumberFormat($g_iGemAmount, True))
+$iOldGemAmount = $g_iGemAmount
+EndIf
+If $iOldCurrentLoot[$eLootGold] <> $g_aiCurrentLoot[$eLootGold] Then
+$bStatsUpdated = True
+GUICtrlSetData($g_hLblResultGoldNow, _NumberFormat($g_aiCurrentLoot[$eLootGold], True))
+$iOldCurrentLoot[$eLootGold] = $g_aiCurrentLoot[$eLootGold]
+EndIf
+If $iOldCurrentLoot[$eLootElixir] <> $g_aiCurrentLoot[$eLootElixir] Then
+$bStatsUpdated = True
+GUICtrlSetData($g_hLblResultElixirNow, _NumberFormat($g_aiCurrentLoot[$eLootElixir], True))
+$iOldCurrentLoot[$eLootElixir] = $g_aiCurrentLoot[$eLootElixir]
+EndIf
+If $iOldCurrentLoot[$eLootDarkElixir] <> $g_aiCurrentLoot[$eLootDarkElixir] And $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
+$bStatsUpdated = True
+GUICtrlSetData($g_hLblResultDeNow, _NumberFormat($g_aiCurrentLoot[$eLootDarkElixir], True))
+$iOldCurrentLoot[$eLootDarkElixir] = $g_aiCurrentLoot[$eLootDarkElixir]
+EndIf
+If $iOldCurrentLoot[$eLootTrophy] <> $g_aiCurrentLoot[$eLootTrophy] Then
+$bStatsUpdated = True
+GUICtrlSetData($g_hLblResultTrophyNow, _NumberFormat($g_aiCurrentLoot[$eLootTrophy], True))
+$iOldCurrentLoot[$eLootTrophy] = $g_aiCurrentLoot[$eLootTrophy]
+EndIf
+If $iOldTotalLoot[$eLootGold] <> $g_iStatsTotalGain[$eLootGold] And($g_iFirstAttack = 2 Or $ResetStats = 1) Then
+$bStatsUpdated = True
+$iOldTotalLoot[$eLootGold] = $g_iStatsTotalGain[$eLootGold]
+EndIf
+If $iOldTotalLoot[$eLootElixir] <> $g_iStatsTotalGain[$eLootElixir] And($g_iFirstAttack = 2 Or $ResetStats = 1) Then
+$bStatsUpdated = True
+$iOldTotalLoot[$eLootElixir] = $g_iStatsTotalGain[$eLootElixir]
+EndIf
+If $iOldTotalLoot[$eLootDarkElixir] <> $g_iStatsTotalGain[$eLootDarkElixir] And(($g_iFirstAttack = 2 And $g_iStatsStartedWith[$eLootDarkElixir] <> "") Or $ResetStats = 1) Then
+$bStatsUpdated = True
+$iOldTotalLoot[$eLootDarkElixir] = $g_iStatsTotalGain[$eLootDarkElixir]
+EndIf
+If $iOldTotalLoot[$eLootTrophy] <> $g_iStatsTotalGain[$eLootTrophy] And($g_iFirstAttack = 2 Or $ResetStats = 1) Then
+$bStatsUpdated = True
+$iOldTotalLoot[$eLootTrophy] = $g_iStatsTotalGain[$eLootTrophy]
+EndIf
+If $iOldLastLoot[$eLootGold] <> $g_iStatsLastAttack[$eLootGold] Then
+$bStatsUpdated = True
+$iOldLastLoot[$eLootGold] = $g_iStatsLastAttack[$eLootGold]
+EndIf
+If $iOldLastLoot[$eLootElixir] <> $g_iStatsLastAttack[$eLootElixir] Then
+$bStatsUpdated = True
+$iOldLastLoot[$eLootElixir] = $g_iStatsLastAttack[$eLootElixir]
+EndIf
+If $iOldLastLoot[$eLootDarkElixir] <> $g_iStatsLastAttack[$eLootDarkElixir] Then
+$bStatsUpdated = True
+$iOldLastLoot[$eLootDarkElixir] = $g_iStatsLastAttack[$eLootDarkElixir]
+EndIf
+If $iOldLastLoot[$eLootTrophy] <> $g_iStatsLastAttack[$eLootTrophy] Then
+$bStatsUpdated = True
+$iOldLastLoot[$eLootTrophy] = $g_iStatsLastAttack[$eLootTrophy]
+EndIf
+If $iOldLastBonus[$eLootGold] <> $g_iStatsBonusLast[$eLootGold] Then
+$bStatsUpdated = True
+$iOldLastBonus[$eLootGold] = $g_iStatsBonusLast[$eLootGold]
+EndIf
+If $iOldLastBonus[$eLootElixir] <> $g_iStatsBonusLast[$eLootElixir] Then
+$bStatsUpdated = True
+$iOldLastBonus[$eLootElixir] = $g_iStatsBonusLast[$eLootElixir]
+EndIf
+If $g_iFirstAttack = 2 Then
+$bStatsUpdated = True
+If $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
+EndIf
+GUICtrlSetData($g_hLblResultGoldHourNow, _NumberFormat(Round($g_iStatsTotalGain[$eLootGold] /(Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600)) & "k / h")
+GUICtrlSetData($g_hLblResultElixirHourNow, _NumberFormat(Round($g_iStatsTotalGain[$eLootElixir] /(Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600)) & "k / h")
+If $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
+GUICtrlSetData($g_hLblResultDEHourNow, _NumberFormat(Round($g_iStatsTotalGain[$eLootDarkElixir] /(Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed)) * 3600 * 1000)) & " / h")
+EndIf
+EndIf
+If Number($g_iStatsLastAttack[$eLootGold]) > Number($topgoldloot) Then
+$bStatsUpdated = True
+$topgoldloot = $g_iStatsLastAttack[$eLootGold]
+EndIf
+If Number($g_iStatsLastAttack[$eLootElixir]) > Number($topelixirloot) Then
+$bStatsUpdated = True
+$topelixirloot = $g_iStatsLastAttack[$eLootElixir]
+EndIf
+If Number($g_iStatsLastAttack[$eLootDarkElixir]) > Number($topdarkloot) Then
+$bStatsUpdated = True
+$topdarkloot = $g_iStatsLastAttack[$eLootDarkElixir]
+EndIf
+If Number($g_iStatsLastAttack[$eLootTrophy]) > Number($topTrophyloot) Then
+$bStatsUpdated = True
+$topTrophyloot = $g_iStatsLastAttack[$eLootTrophy]
+EndIf
+If $ResetStats = 1 Then
+$ResetStats = 0
+EndIf
+EndFunc
+Func _NumberFormat($Number, $NullToZero = False)
+If $Number = "" Then
+If $NullToZero = False Then
+Return ""
+Else
+Return "0"
+EndIf
+EndIf
+If StringLeft($Number, 1) = "-" Then
+Return "- " & StringRegExpReplace(StringTrimLeft($Number, 1), "(\A\d{1,3}(?=(\d{3})+\z)|\d{3}(?=\d))", "\1 ")
+Else
+Return StringRegExpReplace($Number, "(\A\d{1,3}(?=(\d{3})+\z)|\d{3}(?=\d))", "\1 ")
+EndIf
+EndFunc
+Global Enum $eBotUpdateStats = $eBotClose + 1
 Func SetLog($String, $Color = $COLOR_BLACK, $LogPrefix = "L ")
 Local $log = $LogPrefix & TimeDebug() & $String
 ConsoleWrite($log & @CRLF)
@@ -5752,6 +5986,7 @@ TrayItemSetState($g_hTiStop, $TRAY_DISABLE)
 TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
 EndFunc
 Func UpdateManagedMyBot($aBotDetails)
+If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[0])
 Local $sTitle = $aBotDetails[3]
 Local $bRunState = $aBotDetails[4]
 Local $bPaused = $aBotDetails[5]
@@ -5764,6 +5999,7 @@ Local $sInstance = ""
 Local $eStructType = $g_eSTRUCT_NONE
 Local $pStructPtr = 0
 If $tBotState <> 0 Then
+If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Update Sate: " & $aBotDetails[0])
 $sProfile = DllStructGetData($tBotState, "Profile")
 $sEmulator = DllStructGetData($tBotState, "AndroidEmulator")
 $sInstance = DllStructGetData($tBotState, "AndroidInstance")
@@ -5775,12 +6011,23 @@ Local $AdditionalData
 If $pStructPtr Then
 Switch $eStructType
 Case $g_eSTRUCT_STATUS_BAR
+If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Update Status Bar: " & $aBotDetails[0] & ", $pStructPtr=" & $pStructPtr)
 $sStatusBar = DllStructGetData($tOptionalStruct, "Text")
 _GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sStatusBar)
 $AdditionalData = $sStatusBar
+Case $g_eSTRUCT_UPDATE_STATS
+If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Receive Update Stats: " & $aBotDetails[0] & ", $pStructPtr=" & $pStructPtr)
+_DllStructLoadData($tOptionalStruct, "g_aiCurrentLoot", $g_aiCurrentLoot)
+_DllStructLoadData($tOptionalStruct, "g_iFreeBuilderCount", $g_iFreeBuilderCount)
+_DllStructLoadData($tOptionalStruct, "g_iTotalBuilderCount", $g_iTotalBuilderCount)
+_DllStructLoadData($tOptionalStruct, "g_iGemAmount", $g_iGemAmount)
+_DllStructLoadData($tOptionalStruct, "g_iStatsTotalGain", $g_iStatsTotalGain)
+_DllStructLoadData($tOptionalStruct, "g_iStatsLastAttack", $g_iStatsLastAttack)
+_DllStructLoadData($tOptionalStruct, "g_iStatsBonusLast", $g_iStatsBonusLast)
+$g_iBotAction = $eBotUpdateStats
 EndSwitch
 EndIf
-SetLog("UpdateManagedMyBot: " & $aBotDetails[0] & ", Profile: " & $sProfile & ", Android: " & $sEmulator & ", Instance: " & $sInstance & ", StructType: " & $eStructType & ", Ptr: " & $pStructPtr & ", Data:" & $AdditionalData)
+If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[0] & ", Profile: " & $sProfile & ", Android: " & $sEmulator & ", Instance: " & $sInstance & ", StructType: " & $eStructType & ", Ptr: " & $pStructPtr & ", Data:" & $AdditionalData)
 If $g_hFrmBotBackend = 0 And $g_sAndroidEmulator = $sEmulator And $g_sAndroidInstance = $sInstance Then
 $g_hFrmBotBackend = $aBotDetails[0]
 $g_WatchOnlyClientPID = WinGetProcess($g_hFrmBotBackend)
@@ -5788,7 +6035,10 @@ EndIf
 If $g_hFrmBotBackend = 0 Or $g_hFrmBotBackend <> $aBotDetails[0] Then
 Return
 EndIf
-If $sProfile <> "" Then $g_sProfileCurrentName = $sProfile
+If $g_sProfileCurrentName <> $sProfile Then
+$g_sProfileCurrentName = $sProfile
+GUICtrlSetData($g_hGrpVillage, GetTranslatedFileIni("MBR Main GUI", "Tab_02", "Village") & ": " & $g_sProfileCurrentName)
+EndIf
 If $sEmulator <> "" Then $g_sAndroidEmulator = $sEmulator
 If $sInstance <> "" Then $g_sAndroidInstance = $sInstance
 UpdateBotTitle($sTitle)
@@ -5836,7 +6086,7 @@ $g_hFrmBotBackend = 0
 $g_WatchOnlyClientPID = Default
 SetLog("Check if backend My Bot process is already running...")
 While __TimerDiff($hTimer) < 5 * 60 * 1000
-If $g_WatchOnlyClientPID = Default And __TimerDiff($hTimer) > 2 * 1000 Then
+If $g_WatchOnlyClientPID = Default And __TimerDiff($hTimer) > $g_iBotBackendFindTimeout Then
 $bCheck = False
 SetLog("My Bot backend process not found, launching now...")
 SetDebugLog("My Bot backend process launching: " & $cmd)
@@ -5853,11 +6103,21 @@ EndIf
 $g_WatchOnlyClientPID = $pid
 ClearManagedMyBotDetails()
 EndIf
-If $g_bBotLaunched And ProcessExists($g_WatchOnlyClientPID) Then
+If $g_bBotLaunched Then
+If ProcessExists($g_WatchOnlyClientPID) Then
 $pid = $g_WatchOnlyClientPID
+_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1060, $g_hFrmBot)
 ExitLoop
+Else
+$g_WatchOnlyClientPID = Default
 EndIf
-_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API_1_0, 0x0100, $g_hFrmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
+Else
+If $g_WatchOnlyClientPID <> Default And ProcessExists($g_WatchOnlyClientPID) = 0 Then
+SetDebugLog("My Bot backend process not launched, PID = " & $g_WatchOnlyClientPID)
+$g_WatchOnlyClientPID = Default
+EndIf
+EndIf
+_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API_1_0, 0x01FF, $g_hFrmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
 Sleep(2000)
 WEnd
 If Not $g_bBotLaunched Then SetLog("Bot didn't launch in 5 Minutes")
@@ -5927,6 +6187,9 @@ InitializeAndroid()
 CreateMainGUI()
 CreateMainGUIControls()
 LaunchBotBackend()
+If $g_bBotLaunched Then
+_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x0200, $g_hFrmBot)
+EndIf
 ShowMainGUI()
 GUISetOnEvent($GUI_EVENT_CLOSE, "GUIEvents", $g_hFrmBot)
 GUISetOnEvent($GUI_EVENT_MINIMIZE, "GUIEvents", $g_hFrmBot)
@@ -5943,6 +6206,9 @@ _Sleep(50, True, False)
 Switch $g_iBotAction
 Case $eBotClose
 BotClose()
+Case $eBotUpdateStats
+UpdateStats()
+$g_iBotAction = $eBotNoAction
 Case Else
 If $iMainLoop > 20 And($hStusUpdateTimer = 0 Or __TimerDiff($hStusUpdateTimer) > 60000) Then
 $iMainLoop = 0

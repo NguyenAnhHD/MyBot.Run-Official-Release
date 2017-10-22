@@ -8,6 +8,7 @@
  * Fix wall upgrade not saving resources for enabled non-repeated building upgrades when a builder is available
  * Fix Log Messages when Heroes are not enabled to auto Upgrade
  * Fix Balloon Donation Issues
+ * Fix Wall Upgrade Ignoring Auto Warden Upgrade when checking if enough Elixir is available
  * Improve Weak Base Eagle Lvl 2 Detection
  * Improve Dead Base Collector Lvl 11 Detection
  * Improve village measuring with secondary images to fix zoom out loop when village cannot be measured

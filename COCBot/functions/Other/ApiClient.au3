@@ -27,23 +27,30 @@ Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 	If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4 ; bot launched
 
 	Local $wParamLo = BitAND($wParam, 0xFFFF)
+	Local $bRegisterHost = True
 
 	Switch $wParamLo
 
 		; Post Message to Manage Farm App and consume message
-		Case 0x0100 ; query bot detailed state
+		Case 0x0100 To 0x01FF ; query bot detailed state
 			$iMsg = $WM_MYBOTRUN_STATE_1_0
 			$hWind = HWnd($lParam)
 			$lParam = $g_hFrmBot
 			$wParam = DllStructGetPtr($tBotState)
+			$bRegisterHost = $wParamLo < 0x01FF
 			PrepareStructBotState($tBotState)
+		Case 0x0200 ; query bot stats
+			If $g_iFirstRun = 0 Then
+				$hWind = HWnd($lParam)
+				PrepareUpdateStatsManagedMyBotHost($hWind, $iMsg, $wParam, $lParam)
+			EndIf
 		Case 0x1000 ; start bot
 			$hWind = HWnd($lParam)
 			$lParam = $g_hFrmBot
 			$wParam = $wParamLo + 1
 			If $g_bRunState = False Then
 				$wParamHi = 1
-				If $g_bBotPaused = True Then $wParamHi += 2
+				;If $g_bBotPaused = True Then $wParamHi += 2
 				If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4 ; bot launched
 				btnStart()
 			EndIf
@@ -55,7 +62,7 @@ Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 			$wParam = $wParamLo + 1
 			If $g_bRunState = True Then
 				$wParamHi = 0
-				If $g_bBotPaused = True Then $wParamHi += 2
+				;If $g_bBotPaused = True Then $wParamHi += 2
 				If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4 ; bot launched
 				btnStop()
 			EndIf
@@ -113,6 +120,21 @@ Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 			btnMakeScreenshot()
 			$wParam += BitShift($wParamHi, -16)
 
+		Case 0x1060 ; update GUI PID
+			$hWind = HWnd($lParam)
+			$lParam = $g_hFrmBot
+			$wParam = $wParamLo + 1
+			$wParamHi = 0
+			If $g_bRunState = True Then $wParamHi += 1
+			If $g_bBotPaused = True Then $wParamHi += 2
+			If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4 ; bot launched
+			Local $pid = WinGetProcess($hWind)
+			If $pid <> 0 And $pid <> -1 Then
+				$g_iGuiPID = $pid
+				SetBotGuiPID($pid)
+			EndIf
+			$wParam += BitShift($wParamHi, -16)
+
 		Case Else ;Case 0x0000 ; query bot run and pause state
 			If $wParam < 0x100 Then
 				$hWind = HWnd($lParam)
@@ -132,7 +154,7 @@ Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 	EndSwitch
 
 	If $hWind <> 0 Then
-		Local $a = GetManagedMyBotHost($hWind, True)
+		Local $a = GetManagedMyBotHost($hWind, True, $bRegisterHost)
 		_WinAPI_PostMessage($hWind, $iMsg, $wParam, $lParam)
 	EndIf
 
@@ -146,7 +168,7 @@ Func WM_MYBOTRUN_API_1_0_CLIENT_TogglePause($hWnd, $iMsg, $iIDTimer, $iTime)
 	TogglePauseImpl("ManageFarm")
 EndFunc   ;==>WM_MYBOTRUN_API_1_0_CLIENT_TogglePause
 
-Func GetManagedMyBotHost($hFrmHost = Default, $bUpdateTime = False)
+Func GetManagedMyBotHost($hFrmHost = Default, $bUpdateTime = False, $bRegisterHost = True)
 
 	If $hFrmHost = Default Then
 		Return $g_ahManagedMyBotHosts
@@ -165,13 +187,15 @@ Func GetManagedMyBotHost($hFrmHost = Default, $bUpdateTime = False)
 		EndIf
 	Next
 
-	Local $i = UBound($g_ahManagedMyBotHosts)
-	ReDim $g_ahManagedMyBotHosts[$i + 1]
 	Local $a[2]
 	$a[0] = $hFrmHost
 	If $bUpdateTime Then $a[1] = __TimerInit()
-	$g_ahManagedMyBotHosts[$i] = $a
-	SetDebugLog("New Bot Host Window Handle registered: " & $hFrmHost)
+	If $bRegisterHost Then
+		Local $i = UBound($g_ahManagedMyBotHosts)
+		ReDim $g_ahManagedMyBotHosts[$i + 1]
+		$g_ahManagedMyBotHosts[$i] = $a
+		SetDebugLog("New Bot Host Window Handle registered: " & $hFrmHost)
+	EndIf
 	Return $a
 EndFunc   ;==>GetManagedMyBotHost
 
@@ -217,7 +241,6 @@ Func PrepareStatusBarManagedMyBotHost($hFrmHost, ByRef $iMsg, ByRef $wParam, ByR
 	$wParam = DllStructGetPtr($tBotState)
 	DllStructSetData($tStatusBar, "Text", $sStatusBar)
 	PrepareStructBotState($tBotState, $g_eSTRUCT_STATUS_BAR, DllStructGetPtr($tStatusBar))
-	;If $g_iDebugWindowMessages Then
 	If $g_iDebugWindowMessages Then SetDebugLog("PrepareStatusBarManagedMyBotHost: $hFrmHost=" & $hFrmHost & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam & ",$sStatusBar=" & $sStatusBar)
 	Return True
 EndFunc   ;==>PrepareStatusBarManagedMyBotHost
@@ -225,6 +248,26 @@ EndFunc   ;==>PrepareStatusBarManagedMyBotHost
 Func StatusBarManagedMyBotHost($sStatusBar)
 	Return ManagedMyBotHostsPostMessage("PrepareStatusBarManagedMyBotHost", $sStatusBar)
 EndFunc   ;==>StatusBarManagedMyBotHost
+
+Func PrepareUpdateStatsManagedMyBotHost($hFrmHost, ByRef $iMsg, ByRef $wParam, ByRef $lParam)
+	$iMsg = $WM_MYBOTRUN_STATE_1_0
+	$lParam = $g_hFrmBot
+	$wParam = DllStructGetPtr($tBotState)
+	_DllStructSetData($tUpdateStats, "g_aiCurrentLoot", $g_aiCurrentLoot)
+	_DllStructSetData($tUpdateStats, "g_iFreeBuilderCount", $g_iFreeBuilderCount)
+	_DllStructSetData($tUpdateStats, "g_iTotalBuilderCount", $g_iTotalBuilderCount)
+	_DllStructSetData($tUpdateStats, "g_iGemAmount", $g_iGemAmount)
+	_DllStructSetData($tUpdateStats, "g_iStatsTotalGain", $g_iStatsTotalGain)
+	_DllStructSetData($tUpdateStats, "g_iStatsLastAttack", $g_iStatsLastAttack)
+	_DllStructSetData($tUpdateStats, "g_iStatsBonusLast", $g_iStatsBonusLast)
+	PrepareStructBotState($tBotState, $g_eSTRUCT_UPDATE_STATS, DllStructGetPtr($tUpdateStats))
+	If $g_iDebugWindowMessages Then SetDebugLog("PrepareUpdateStatsManagedMyBotHost: $hFrmHost=" & $hFrmHost & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam)
+	Return True
+EndFunc   ;==>PrepareStatusBarManagedMyBotHost
+
+Func UpdateStatsManagedMyBotHost()
+	Return ManagedMyBotHostsPostMessage("PrepareUpdateStatsManagedMyBotHost")
+EndFunc
 
 Func PrepareUnregisterManagedMyBotHost($hFrmHost, ByRef $iMsg, ByRef $wParam, ByRef $lParam)
 	$iMsg = $WM_MYBOTRUN_API_1_0
@@ -291,6 +334,7 @@ Func ReferenceApiClientFunctions()
 	Local $wParam = 0
 	Local $lParam = 0
 	PrepareStatusBarManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam, "")
+	PrepareUpdateStatsManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam)
 EndFunc   ;==>ReferenceApiClientFunctions
 
 ReferenceApiClientFunctions()
