@@ -455,6 +455,7 @@ Global $g_hMutex_MyBot = 0
 ; Detected Bot Instance thru watchdog registration
 Global $g_BotInstanceCount = 0
 Global $g_WatchOnlyClientPID = Default
+Global $g_WatchDogLogStatusBar = False
 
 ; Arrays to hold stat information
 Global $g_aiWeakBaseStats

@@ -6528,7 +6528,7 @@ Global $DELAYSWITCHBASES1 = 1000
 Global $DELAYCLOCKTOWER1 = 1000
 Global $DELAYCLOCKTOWER2 = 100
 Global $g_hSplash = 0, $g_hSplashProgress, $g_lSplashStatus, $g_lSplashPic, $g_lSplashTitle
-Global Const $g_iSplashTotalSteps = 10
+Global $g_iSplashTotalSteps = Default
 Global $g_iSplashCurrentStep = 0
 Global $g_hSplashTimer = 0
 Global $g_hSplashMutex = 0
@@ -6566,13 +6566,30 @@ EndFunc
 Func MoveSplashScreen()
 _WinAPI_PostMessage($g_hSplash, $WM_SYSCOMMAND, 0xF012, 0)
 EndFunc
-Func CreateSplashScreen()
+Func CreateSplashScreen($iSteps = Default)
+Local $iGuiState = @SW_SHOWNOACTIVATE
+Local $bDisableSplash = $g_bDisableSplash
+If $iSteps = Default Then
+$g_iSplashTotalSteps = 10
+Else
+$iGuiState = @SW_SHOW
+$bDisableSplash = False
+$g_iSplashTotalSteps = $iSteps
+$g_iSplashCurrentStep = 0
+$g_hSplashTimer = 0
+EndIf
 Local $sSplashImg = $g_sLogoPath
 Local $hImage, $iX, $iY
 Local $iT = 20
 Local $iB = 10
+Switch $g_iGuiMode
+Case 0
+$g_iSplashTotalSteps = 3
+Case 2
+$g_iSplashTotalSteps = 4
+EndSwitch
 $g_hSplashMutex = AcquireMutexTicket("Launching", 1, Default, False)
-If $g_bDisableSplash = False Then
+If $bDisableSplash = False Then
 Local $hSplashImg = _GDIPlus_BitmapCreateFromFile($sSplashImg)
 $iX = _GDIPlus_ImageGetWidth($hSplashImg)
 $iY = _GDIPlus_ImageGetHeight($hSplashImg)
@@ -6585,7 +6602,7 @@ Else
 Local $iTop = $iCenterY - $iHeight / 2
 EndIf
 Local $iLeft = $iCenterX - $iX / 2
-$g_hSplash = _GUICreate("", $iX, $iHeight, $iLeft, $iTop, BitOR($WS_POPUP, $WS_BORDER), BitOR($WS_EX_TOPMOST, $WS_EX_WINDOWEDGE, $WS_EX_TOOLWINDOW))
+$g_hSplash = GUICreate("", $iX, $iHeight, $iLeft, $iTop, BitOR($WS_POPUP, $WS_BORDER), BitOR($WS_EX_TOPMOST, $WS_EX_WINDOWEDGE, $WS_EX_TOOLWINDOW))
 GUISetBkColor($COLOR_WHITE, $g_hSplash)
 $g_lSplashPic = _GUICtrlCreatePic($hSplashImg, 0, $iT)
 GUICtrlSetOnEvent(-1, "MoveSplashScreen")
@@ -6595,7 +6612,7 @@ $g_hSplashProgress = GUICtrlCreateProgress(15, $iY + $iT + $iB + 20, $iX - 30, 1
 $g_lSplashStatus = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_Loading", "Loading..."), 15, $iY + $iT + $iB + 38, $iX - 30, 15, $SS_CENTER)
 GUICtrlSetOnEvent(-1, "MoveSplashScreen")
 _GDIPlus_BitmapDispose($hSplashImg)
-GUISetState(@SW_SHOWNOACTIVATE, $g_hSplash)
+GUISetState($iGuiState, $g_hSplash)
 If $g_bDebugSetlog Then SetDebugLog("Splash created: $g_hSplash=" & $g_hSplash & ", $g_lSplashPic=" & $g_lSplashPic & ", $g_lSplashTitle=" & $g_lSplashTitle & ", $g_hSplashProgress=" & $g_hSplashProgress & ", $g_lSplashStatus=" & $g_lSplashStatus)
 $g_hSplashTimer = __TimerInit()
 EndIf
@@ -9567,7 +9584,7 @@ EndFunc
 Func AndroidInputSwipe($x1, $y1, $x2, $y2, $wasRunState = $g_bRunState)
 AndroidAdbLaunchShellInstance($wasRunState)
 If @error = 0 Then
-AndroidAdbSendShellCommand("input swipe " & $x1 & " " & $y1 & " " & $x2 & " " & $y2, Default, $wasRunState)
+AndroidAdbSendShellCommand("input swipe " & $x1 & " " & $y1 & " " & $x2 & " " & $y2 & ";input tap " & $x2 & " " & $y2, Default, $wasRunState)
 SetError(0, 0)
 Else
 Local $error = @error
@@ -10220,10 +10237,13 @@ EndFunc
 Global Const $TCM_SETITEM = 0x1306
 Global $_GUI_MAIN_WIDTH = 472
 Global $_GUI_MAIN_HEIGHT = 692
-Global Const $_MINIGUI_MAIN_WIDTH = 472
+Global Const $_NORMALGUI_MAIN_WIDTH = $_GUI_MAIN_WIDTH
+Global Const $_NORMALGUI_MAIN_HEIGHT = $_GUI_MAIN_HEIGHT
+Global Const $_MINIGUI_MAIN_WIDTH = $_GUI_MAIN_WIDTH
 Global Const $_MINIGUI_MAIN_HEIGHT = 220
 Global $_GUI_MAIN_TOP = 23
 Global $_GUI_MAIN_BUTTON_SIZE = [25, 17]
+Global $_GUI_MAIN_BUTTON_COUNT = 4
 Global $_GUI_CHILD_TOP = 110 + $_GUI_MAIN_TOP
 Global Const $_GUI_BOTTOM_HEIGHT = 135
 Global Const $_GUI_CHILD_LEFT = 10
@@ -10239,9 +10259,7 @@ Global Const $g_iSizeHGrpTab4 = $_GUI_MAIN_HEIGHT - 345
 Global $g_iBotDesignFlags = 3
 Global $g_bCustomTitleBarActive = Default
 Global $g_bBotDockedShrinked = False
-Global $hImageList = 0
-Global $g_hFrmBotButtons, $g_hFrmBotLogoUrlSmall, $g_hFrmBotEx = 0, $g_hLblBotTitle, $g_hLblBotShrink = 0, $g_hLblBotExpand = 0, $g_hLblBotMinimize = 0, $g_hLblBotClose = 0, $g_hFrmBotBottom = 0
-Global $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmBotEmbeddedGraphics = 0
+Global $g_hFrmBotButtons, $g_hFrmBotLogoUrlSmall, $g_hFrmBotEx = 0, $g_hLblBotTitle, $g_hLblBotShrink = 0, $g_hLblBotExpand = 0, $g_hLblBotMiniGUI = 0, $g_hLblBotNormalGUI = 0 , $g_hLblBotMinimize = 0, $g_hLblBotClose = 0, $g_hFrmBotBottom = 0, $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmBotEmbeddedGraphics = 0
 Global $g_hFrmBot_MAIN_PIC = 0, $g_hFrmBot_URL_PIC = 0, $g_hFrmBot_URL_PIC2 = 0
 Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabAbout = 0
 Global $g_hStatusBar = 0
@@ -10250,6 +10268,7 @@ Global $g_aFrmBotPosInit[8] = [0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hFirstControlToHide = 0, $g_hLastControlToHide = 0, $g_aiControlPrevState[1]
 Global $g_bFrmBotMinimized = False
 Global $g_oCtrlIconData = ObjCreate("Scripting.Dictionary")
+Global $g_oGuiNotInMini = ObjCreate("Scripting.Dictionary")
 Global $g_hBtnStart = 0, $g_hBtnStop = 0, $g_hBtnPause = 0, $g_hBtnResume = 0, $g_hBtnSearchMode = 0, $g_hBtnMakeScreenshot = 0, $g_hBtnHide = 0, $g_hBtnEmbed = 0, $g_hChkBackgroundMode = 0, $g_hLblDonate = 0, $g_hBtnAttackNowDB = 0, $g_hBtnAttackNowLB = 0, $g_hBtnAttackNowTS = 0
 Global $g_hPicTwoArrowShield = 0, $g_hLblVersion = 0, $g_hPicArrowLeft = 0, $g_hPicArrowRight = 0
 Global $g_hGrpVillage = 0
@@ -10325,7 +10344,7 @@ _GUICtrlSetTip(-1, $sTxtTip)
 $g_hPicArrowRight = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnArrowRight, $x + 247 + 198, $y + 30, 16, 16)
 _GUICtrlSetTip(-1, $sTxtTip)
 Local $x = 295, $y = $y_bottom + 20
-$g_hGrpVillage = GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Bottom", "GrpVillage", "Village"), $x - 20, $y - 20, 180, 85)
+$g_hGrpVillage = GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Bottom", "GrpVillage", "Village") & ": " & $g_sProfileCurrentName, $x - 20, $y - 20, 180, 85)
 $g_hLblResultGoldNow = GUICtrlCreateLabel("", $x - 5, $y + 2, 60, 15, $SS_RIGHT)
 $g_hLblResultGoldHourNow = GUICtrlCreateLabel("", $x, $y + 2, 60, 15, $SS_RIGHT)
 GUICtrlSetState(-1, $GUI_HIDE)
@@ -12907,33 +12926,33 @@ Global $g_hGUI_ATTACK = 0
 Global $g_hGUI_TRAINARMY = 0
 Global $g_hGUI_TRAINARMY_TAB = 0, $g_hGUI_TRAINARMY_TAB_ITEM1 = 0, $g_hGUI_TRAINARMY_TAB_ITEM2 = 0, $g_hGUI_TRAINARMY_TAB_ITEM3 = 0, $g_hGUI_TRAINARMY_TAB_ITEM4 = 0
 Global $g_hChkUseQuickTrain = 0, $g_hRdoArmy1 = 0, $g_hRdoArmy2 = 0, $g_hRdoArmy3 = 0
-Global $g_ahTxtTrainArmyTroopCount[$eTroopCount] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-Global $g_ahLblTrainArmyTroopLevel[$eTroopCount] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-Global $g_ahTxtTrainArmySpellCount[$eSpellCount] = [0,0,0,0,0,0,0,0,0,0]
-Global $g_ahLblTrainArmySpellLevel[$eSpellCount] = [0,0,0,0,0,0,0,0,0,0]
+Global $g_ahTxtTrainArmyTroopCount[$eTroopCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ahLblTrainArmyTroopLevel[$eTroopCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ahTxtTrainArmySpellCount[$eSpellCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ahLblTrainArmySpellLevel[$eSpellCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hTxtFullTroop = 0, $g_hChkTotalCampForced = 0, $g_hTxtTotalCampForced = 0, $g_hChkForceBrewBeforeAttack = 0
 Global $g_hGrpTrainTroops = 0, $g_hGrpCookSpell = 0
-Global $g_ahPicTrainArmyTroop[$eTroopCount] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-Global $g_ahPicTrainArmySpell[$eSpellCount] = [0,0,0,0,0,0,0,0,0,0]
+Global $g_ahPicTrainArmyTroop[$eTroopCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ahPicTrainArmySpell[$eSpellCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hLblTotalTimeCamp = 0, $g_hLblElixirCostCamp = 0, $g_hLblDarkCostCamp = 0, $g_hCalTotalTroops = 0, $g_hLblTotalProgress = 0, $g_hLblCountTotal = 0, $g_hTxtTotalCountSpell = 0, $g_hLblTotalTimeSpell = 0, $g_hLblElixirCostSpell = 0, $g_hLblDarkCostSpell = 0
 Global $g_hCmbBoostBarracks = 0, $g_hCmbBoostSpellFactory = 0, $g_hCmbBoostBarbarianKing = 0, $g_hCmbBoostArcherQueen = 0, $g_hCmbBoostWarden = 0
-GLobal $g_hLblBoosthour = 0, $g_ahLblBoosthoursE = 0
-GLobal $g_hLblBoosthours[12] = [0,0,0,0,0,0,0,0,0,0,0,0]
-Global $g_hChkBoostBarracksHours[24] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], $g_hChkBoostBarracksHoursE1 = 0, $g_hChkBoostBarracksHoursE2 = 0
+Global $g_hLblBoosthour = 0, $g_ahLblBoosthoursE = 0
+Global $g_hLblBoosthours[12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_hChkBoostBarracksHours[24] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], $g_hChkBoostBarracksHoursE1 = 0, $g_hChkBoostBarracksHoursE2 = 0
 Func LoadTranslatedTrainTroopsOrderList()
-Global Const $g_asTroopOrderList[] = [ "", GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBarbarians", "Barbarians"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtArchers", "Archers"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGiants", "Giants"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGoblins", "Goblins"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWallBreakers", "Wall Breakers"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBalloons", "Balloons"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWizards", "Wizards"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtHealers", "Healers"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtDragons", "Dragons"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtPekkas", "Pekkas"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBabyDragons", "Baby Dragons"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtMiners", "Miners"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtMinions", "Minions"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtHogRiders", "Hog Riders"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtValkyries", "Valkyries"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGolems", "Golems"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWitches", "Witches"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtLavaHounds", "Lava Hounds"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBowlers", "Bowlers") ]
+Global $g_asTroopOrderList = ["", GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBarbarians", "Barbarians"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtArchers", "Archers"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGiants", "Giants"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGoblins", "Goblins"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWallBreakers", "Wall Breakers"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBalloons", "Balloons"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWizards", "Wizards"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtHealers", "Healers"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtDragons", "Dragons"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtPekkas", "Pekkas"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBabyDragons", "Baby Dragons"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtMiners", "Miners"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtMinions", "Minions"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtHogRiders", "Hog Riders"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtValkyries", "Valkyries"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtGolems", "Golems"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtWitches", "Witches"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtLavaHounds", "Lava Hounds"), GetTranslatedFileIni("MBR Global GUI Design Names Troops", "TxtBowlers", "Bowlers")]
 EndFunc
 Global $g_hChkCustomTrainOrderEnable = 0
-Global $g_ahCmbTroopOrder[$eTroopCount] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-Global $g_ahImgTroopOrder[$eTroopCount] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+Global $g_ahCmbTroopOrder[$eTroopCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ahImgTroopOrder[$eTroopCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hBtnTroopOrderSet = 0, $g_ahImgTroopOrderSet = 0
 Global $g_hBtnRemoveTroops
 Func LoadTranslatedBrewSpellsOrderList()
-Global Const $g_asSpellsOrderList[] = [ "", GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortLightningSpells", "Lightning"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortHealSpells", "Heal"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortRageSpells", "Rage"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortJumpSpells", "Jump"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortFreezeSpells", "Freeze"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortCloneSpells", "Clone"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortPoisonSpells", "Poison"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortEarthquakeSpells", "EarthQuake"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortHasteSpells", "Haste"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortSkeletonSpells", "Skeleton")]
+Global $g_asSpellsOrderList = ["", GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortLightningSpells", "Lightning"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortHealSpells", "Heal"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortRageSpells", "Rage"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortJumpSpells", "Jump"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortFreezeSpells", "Freeze"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortCloneSpells", "Clone"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortPoisonSpells", "Poison"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortEarthquakeSpells", "EarthQuake"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortHasteSpells", "Haste"), GetTranslatedFileIni("MBR Global GUI Design Names Spells", "TxtShortSkeletonSpells", "Skeleton")]
 EndFunc
 Global $g_hChkCustomBrewOrderEnable = 0
-Global $g_ahCmbSpellsOrder[$eSpellCount] = [0,0,0,0,0,0,0,0,0,0]
-Global $g_ahImgSpellsOrder[$eSpellCount] = [0,0,0,0,0,0,0,0,0,0]
+Global $g_ahCmbSpellsOrder[$eSpellCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ahImgSpellsOrder[$eSpellCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hBtnSpellsOrderSet = 0, $g_ahImgSpellsOrderSet = 0
 Global $g_hBtnRemoveSpells
 Global $g_hChkCloseWhileTraining = 0, $g_hChkCloseWithoutShield = 0, $g_hChkCloseEmulator = 0, $g_hChkSuspendComputer = 0, $g_hChkRandomClose = 0, $g_hRdoCloseWaitExact = 0, $g_hRdoCloseWaitRandom = 0, $g_hCmbCloseWaitRdmPercent = 0, $g_hCmbMinimumTimeClose = 0, $g_hSldTrainITDelay = 0, $g_hChkTrainAddRandomDelayEnable = 0, $g_hTxtAddRandomDelayMin = 0, $g_hTxtAddRandomDelayMax = 0
@@ -13000,10 +13019,10 @@ Local $sTroopName = GetTranslatedFileIni("MBR Global GUI Design Names Troops", "
 $g_ahPicTrainArmyTroop[$eTroopWallBreaker] = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnWallBreaker, $x, $y - 5, 32, 32)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR Global GUI Design", "Level", -1) & " " & $sTroopName & ":" & @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "Mouse_Left_Click", -1))
 GUICtrlSetOnEvent(-1, "TrainTroopLevelClick")
-$g_ahLblTrainArmyTroopLevel[$eTroopWallbreaker] = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
+$g_ahLblTrainArmyTroopLevel[$eTroopWallBreaker] = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
 GUICtrlSetBkColor(-1, $COLOR_WHITE)
 GUICtrlSetFont(-1, 7, 400)
-$g_ahTxtTrainArmyTroopCount[$eTroopWallbreaker] = GUICtrlCreateInput("4", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+$g_ahTxtTrainArmyTroopCount[$eTroopWallBreaker] = GUICtrlCreateInput("4", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 _GUICtrlSetTip(-1, $sTxtSetPerc & " " & $sTroopName & " " & $sTxtSetPerc2)
 GUICtrlSetState(-1, $GUI_HIDE)
 GUICtrlSetLimit(-1, 3)
@@ -13228,7 +13247,7 @@ _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", 
 GUICtrlSetLimit(-1, 3)
 GUICtrlCreateLabel("%", $x + 115, $y - 7, -1, 17)
 $x += 180
-$Y -= 23
+$y -= 23
 _GUICtrlCreateIcon($g_sLibIconPath, $eIcnTroopsCost, $x - 33, $y + 10, 24, 24)
 $g_hLblTotalTimeCamp = GUICtrlCreateLabel(" 0s", $x - 11, $y + 15, 70, 15, $SS_RIGHT)
 GUICtrlSetBkColor(-1, $COLOR_GRAY)
@@ -13245,7 +13264,7 @@ GUICtrlSetFont(-1, 9, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 GUICtrlSetColor(-1, $COLOR_WHITE)
 _GUICtrlCreateIcon($g_sLibIconPath, $eIcnDark, $x + 146, $y + 14, 16, 16)
 $x -= 195
-$Y += 35
+$y += 35
 $g_hChkTotalCampForced = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "ChkTotalCampForced", "Force Total Army Camp") & ":", $x + 3, $y, -1, -1)
 GUICtrlSetState(-1, $GUI_CHECKED)
 GUICtrlSetOnEvent(-1, "chkTotalCampForced")
@@ -13483,7 +13502,7 @@ GUICtrlSetOnEvent(-1, "chkUpgradeWarden")
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $y += 50
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Boost", "Group_04", "Boost Schedule"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 70)
-$g_hLblBoosthour = GUICtrlCreateLabel(GetTranslatedFileIni("MBR Global GUI Design", "Hour", -1) & ":", $x , $y, -1, 15)
+$g_hLblBoosthour = GUICtrlCreateLabel(GetTranslatedFileIni("MBR Global GUI Design", "Hour", -1) & ":", $x, $y, -1, 15)
 $sTxtTip = GetTranslatedFileIni("MBR Global GUI Design", "Only_during_hours", -1)
 _GUICtrlSetTip(-1, $sTxtTip)
 $g_hLblBoosthours[0] = GUICtrlCreateLabel(" 0", $x + 30, $y)
@@ -13649,7 +13668,7 @@ GUICtrlSetState(-1, BitOR($GUI_UNCHECKED, $GUI_DISABLE))
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_TrainingOrder", "BtnRemoveSpells_Info_01", "Push button to remove all spells from list and start over"))
 GUICtrlSetOnEvent(-1, "BtnRemoveSpells")
 $y += 25
-$g_hBtnSpellsOrderSet =GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_TrainingOrder", "BtnSpellsOrderSet", "Apply New Order"), $x, $y, 94, 22)
+$g_hBtnSpellsOrderSet = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_TrainingOrder", "BtnSpellsOrderSet", "Apply New Order"), $x, $y, 94, 22)
 GUICtrlSetState(-1, BitOR($GUI_UNCHECKED, $GUI_DISABLE))
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_TrainingOrder", "BtnSpellsOrderSet_Info_01", "Push button when finished selecting custom spells brew order") & @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_TrainingOrder", "BtnSpellsOrderSet_Info_02", "Icon changes color based on status: Red= Not Set, Green = Order Set") & @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_TrainingOrder", "BtnSpellsOrderSet_Info_03", "When not all spells slots are filled, will use random spell order in empty slots!"))
 GUICtrlSetOnEvent(-1, "BtnSpellsOrderSet")
@@ -13746,8 +13765,8 @@ $x = 25 + 151 + 5
 $y = 45
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "Group_03", "Training Add Random Delay"), $x - 20, $y - 20, 173, 81)
 $y += 15
-$g_hChkTrainAddRandomDelayEnable = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable", "Add Random Delay"),$x + 18, $y - 11, 130, -1)
-$sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable_Info_01", "Add random delay between two calls of train army.")& @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable_Info_02", "This option reduces the calls to the training window  humanizing the bot spacing calls each time with a causal interval chosen between the minimum and maximum values indicated below.")
+$g_hChkTrainAddRandomDelayEnable = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable", "Add Random Delay"), $x + 18, $y - 11, 130, -1)
+$sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable_Info_01", "Add random delay between two calls of train army.") & @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable_Info_02", "This option reduces the calls to the training window  humanizing the bot spacing calls each time with a causal interval chosen between the minimum and maximum values indicated below.")
 GUICtrlSetState(-1, $GUI_CHECKED)
 _GUICtrlSetTip(-1, $sTxtTip)
 GUICtrlSetOnEvent(-1, "chkAddDelayIdlePhaseEnable")
@@ -13755,13 +13774,13 @@ _GUICtrlCreateIcon($g_sLibIconPath, $eIcnDelay, $x - 13, $y - 13, 24, 24)
 _GUICtrlSetTip(-1, $sTxtTip)
 $x += 18
 $y += 18
-$g_hLblAddDelayIdlePhaseBetween = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "LblAddDelayIdlePhaseBetween", "Between"), $x-12, $y, 50, 30)
-$g_hTxtAddRandomDelayMin = GUICtrlCreateInput($g_iTrainAddRandomDelayMin, $x + 32, $y-2, 25, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+$g_hLblAddDelayIdlePhaseBetween = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "LblAddDelayIdlePhaseBetween", "Between"), $x - 12, $y, 50, 30)
+$g_hTxtAddRandomDelayMin = GUICtrlCreateInput($g_iTrainAddRandomDelayMin, $x + 32, $y - 2, 25, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 GUICtrlSetLimit(-1, 999)
-GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "TxtWaitForCastleSpell", "And"), $x+61, $y, 20, 30)
-$g_hTxtAddRandomDelayMax = GUICtrlCreateInput($g_iTrainAddRandomDelayMax, $x + 82, $y-2, 25, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "TxtWaitForCastleSpell", "And"), $x + 61, $y, 20, 30)
+$g_hTxtAddRandomDelayMax = GUICtrlCreateInput($g_iTrainAddRandomDelayMax, $x + 82, $y - 2, 25, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 GUICtrlSetLimit(-1, 999)
-$g_hLblAddDelayIdlePhaseSec = GUICtrlCreateLabel(GetTranslatedFileIni("MBR Global GUI Design", "sec.", "sec."), $x+110, $y, 20, 30)
+$g_hLblAddDelayIdlePhaseSec = GUICtrlCreateLabel(GetTranslatedFileIni("MBR Global GUI Design", "sec.", "sec."), $x + 110, $y, 20, 30)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
 Global $g_hGUI_SEARCH = 0
@@ -13952,31 +13971,31 @@ $y = 255
 GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Deadbase Attack Milking", "CapacityStructure_01", "0-4%"),$x, $y)
 $x = 21
 $y = 273
-GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_0_70_A.bmp", $x , $y, 25, 25 )
+_GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_0_70_A.bmp", $x , $y, 25, 25 )
 $x = 65
 $y = 255
 GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Deadbase Attack Milking", "CapacityStructure_02", "5-19%"),$x, $y)
 $x = 66
 $y = 273
-GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_1_70_A.bmp", $x , $y, 25, 25 )
+_GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_1_70_A.bmp", $x , $y, 25, 25 )
 $x = 117
 $y = 255
 GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Deadbase Attack Milking", "CapacityStructure_03", "20-74%"),$x, $y)
 $x = 121
 $y = 273
-GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_2_70_A.bmp", $x , $y, 25, 25 )
+_GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_2_70_A.bmp", $x , $y, 25, 25 )
 $x = 173
 $y = 255
 GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Deadbase Attack Milking", "CapacityStructure_04", "75-89%"),$x, $y)
 $x = 176
 $y = 273
-GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_3_70_A.bmp", $x , $y, 25, 25 )
+_GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_3_70_A.bmp", $x , $y, 25, 25 )
 $x = 224
 $y = 255
 GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Deadbase Attack Milking", "CapacityStructure_05", "90-100%"),$x, $y)
 $x = 232
 $y = 273
-GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_4_70_A.bmp", $x , $y, 25, 25 )
+_GUICtrlCreatePic(@ScriptDir & "\Images\CapacityStructure\elixir_8_4_70_A.bmp", $x , $y, 25, 25 )
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 GUICtrlCreateTabItem( GetTranslatedFileIni("MBR GUI Design Child Attack - Attack", "Cmb-Algorithm_Item_03_SubItem_02","B - Conditions"))
 Local $x = 14, $y = 45
@@ -17150,36 +17169,31 @@ GUICtrlSetLimit(-1, 100, 0)
 GUICtrlSetFont(-1, 9, 400, 1)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Bot - Profiles", "TxtVillageName_Info_01", "Your village/profile's name"))
 GUICtrlSetState(-1, $GUI_HIDE)
-Local $bIconAdd = _GUIImageList_Create(24, 24, 4)
+Static $bIconAdd = 0
+If $bIconAdd = 0 Then
+$bIconAdd = _GUIImageList_Create(24, 24, 4)
 _GUIImageList_AddBitmap($bIconAdd, @ScriptDir & "\images\Button\iconAdd.bmp")
-_GUIImageList_AddBitmap($bIconAdd, @ScriptDir & "\images\Button\iconAdd_2.bmp")
-_GUIImageList_AddBitmap($bIconAdd, @ScriptDir & "\images\Button\iconAdd_2.bmp")
-_GUIImageList_AddBitmap($bIconAdd, @ScriptDir & "\images\Button\iconAdd_4.bmp")
-_GUIImageList_AddBitmap($bIconAdd, @ScriptDir & "\images\Button\iconAdd.bmp")
-Local $bIconConfirm = _GUIImageList_Create(24, 24, 4)
+EndIf
+Static $bIconConfirm = 0
+If $bIconConfirm = 0 Then
+$bIconConfirm = _GUIImageList_Create(24, 24, 4)
 _GUIImageList_AddBitmap($bIconConfirm, @ScriptDir & "\images\Button\iconConfirm.bmp")
-_GUIImageList_AddBitmap($bIconConfirm, @ScriptDir & "\images\Button\iconConfirm_2.bmp")
-_GUIImageList_AddBitmap($bIconConfirm, @ScriptDir & "\images\Button\iconConfirm_2.bmp")
-_GUIImageList_AddBitmap($bIconConfirm, @ScriptDir & "\images\Button\iconConfirm_4.bmp")
-_GUIImageList_AddBitmap($bIconConfirm, @ScriptDir & "\images\Button\iconConfirm.bmp")
-Local $bIconDelete = _GUIImageList_Create(24, 24, 4)
+EndIf
+Static $bIconDelete = 0
+If $bIconDelete = 0 Then
+$bIconDelete = _GUIImageList_Create(24, 24, 4)
 _GUIImageList_AddBitmap($bIconDelete, @ScriptDir & "\images\Button\iconDelete.bmp")
-_GUIImageList_AddBitmap($bIconDelete, @ScriptDir & "\images\Button\iconDelete_2.bmp")
-_GUIImageList_AddBitmap($bIconDelete, @ScriptDir & "\images\Button\iconDelete_2.bmp")
-_GUIImageList_AddBitmap($bIconDelete, @ScriptDir & "\images\Button\iconDelete_4.bmp")
-_GUIImageList_AddBitmap($bIconDelete, @ScriptDir & "\images\Button\iconDelete.bmp")
-Local $bIconCancel = _GUIImageList_Create(24, 24, 4)
+EndIf
+Static $bIconCancel = 0
+If $bIconCancel = 0 Then
+$bIconCancel = _GUIImageList_Create(24, 24, 4)
 _GUIImageList_AddBitmap($bIconCancel, @ScriptDir & "\images\Button\iconCancel.bmp")
-_GUIImageList_AddBitmap($bIconCancel, @ScriptDir & "\images\Button\iconCancel_2.bmp")
-_GUIImageList_AddBitmap($bIconCancel, @ScriptDir & "\images\Button\iconCancel_2.bmp")
-_GUIImageList_AddBitmap($bIconCancel, @ScriptDir & "\images\Button\iconCancel_4.bmp")
-_GUIImageList_AddBitmap($bIconCancel, @ScriptDir & "\images\Button\iconCancel.bmp")
-Local $bIconEdit = _GUIImageList_Create(24, 24, 4)
+EndIf
+Static $bIconEdit = 0
+If $bIconEdit = 0 Then
+$bIconEdit = _GUIImageList_Create(24, 24, 4)
 _GUIImageList_AddBitmap($bIconEdit, @ScriptDir & "\images\Button\iconEdit.bmp")
-_GUIImageList_AddBitmap($bIconEdit, @ScriptDir & "\images\Button\iconEdit_2.bmp")
-_GUIImageList_AddBitmap($bIconEdit, @ScriptDir & "\images\Button\iconEdit_2.bmp")
-_GUIImageList_AddBitmap($bIconEdit, @ScriptDir & "\images\Button\iconEdit_4.bmp")
-_GUIImageList_AddBitmap($bIconEdit, @ScriptDir & "\images\Button\iconEdit.bmp")
+EndIf
 $g_hBtnAddProfile = GUICtrlCreateButton("", $x + 135, $y, 24, 24)
 _GUICtrlButton_SetImageList($g_hBtnAddProfile, $bIconAdd, 4)
 GUICtrlSetOnEvent(-1, "btnAddConfirm")
@@ -18525,7 +18539,7 @@ Case 2
 $_GUI_MAIN_WIDTH = $_MINIGUI_MAIN_WIDTH
 $_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
 EndSwitch
-$g_hFrmBot = _GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, BitOR($WS_MINIMIZEBOX, $WS_POPUP, $WS_SYSMENU, $WS_CLIPCHILDREN, $WS_CLIPSIBLINGS, $iStyle))
+$g_hFrmBot = GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, BitOR($WS_MINIMIZEBOX, $WS_POPUP, $WS_SYSMENU, $WS_CLIPCHILDREN, $WS_CLIPSIBLINGS, $iStyle))
 GUISetIcon($g_sLibIconPath, $eIcnGUI)
 If $g_iGuiMode = 0 Then
 UpdateBotTitle()
@@ -18557,16 +18571,27 @@ TrayCreateItem("")
 $g_hTiExit = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_05", "Exit"))
 TrayItemSetOnEvent(-1, "tiExit")
 EndFunc
-Func CreateMainGUIControls()
+Func CreateMainGUIControls($bGuiModeUpdate = False)
+If Not $bGuiModeUpdate Then
 Local $aBtnSize = $_GUI_MAIN_BUTTON_SIZE
 GUISwitch($g_hFrmBot)
-If $g_iGuiMode = 0 Then Return
-SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01", "Loading Main GUI..."))
+Local $sStepText
+Switch $g_iGuiMode
+Case 0
+Return
+Case 1
+$sStepText = GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01", "Loading Main GUI...")
+Case 2
+$sStepText = GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01_Mini", "Loading Mini GUI...")
+EndSwitch
+SplashStep($sStepText)
 If $g_bCustomTitleBarActive Then
-$g_hFrmBotButtons = GUICreate("My Bot Title Buttons", 3 * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_WIDTH - $aBtnSize[0] * 3, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE,($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
+$g_hFrmBotButtons = GUICreate("My Bot Title Buttons", $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE,($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
 WinSetTrans($g_hFrmBotButtons, "", 254)
 EndIf
-$g_hFrmBotEx = _GUICreate("My Bot Controls", $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
+$g_hFrmBotEx = GUICreate("My Bot Controls", $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
+$g_hToolTip = _GUIToolTip_Create($g_hFrmBot)
+_GUIToolTip_SetMaxTipWidth($g_hToolTip, $_GUI_MAIN_WIDTH)
 If $g_bCustomTitleBarActive = False Then
 GUICtrlCreateLabel("", 0, 0, $_GUI_MAIN_WIDTH, $_GUI_MAIN_TOP)
 GUICtrlSetOnEvent(-1, "BotMoveRequest")
@@ -18576,34 +18601,50 @@ Local $iTitleX = 25
 GUICtrlCreateLabel("", 0, 0, $iTitleX, $_GUI_MAIN_TOP)
 GUICtrlSetOnEvent(-1, "BotMoveRequest")
 GUICtrlSetBkColor(-1, $COLOR_WHITE)
-$g_hLblBotTitle = GUICtrlCreateLabel($g_sBotTitle, $iTitleX, 0, $_GUI_MAIN_WIDTH - 3 * $aBtnSize[0] - 25, $_GUI_MAIN_TOP)
+$g_hLblBotTitle = GUICtrlCreateLabel($g_sBotTitle, $iTitleX, 0, $_GUI_MAIN_WIDTH - $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0] - 25, $_GUI_MAIN_TOP)
 GUICtrlSetOnEvent(-1, "BotMoveRequest")
 GUICtrlSetFont(-1, 11, 0, 0, "Segoe UI")
 GUICtrlSetBkColor(-1, $COLOR_WHITE)
 GUICtrlSetColor(-1, 0x171717)
 GUISwitch($g_hFrmBotButtons)
 $g_hLblBotShrink = GUICtrlCreateLabel(ChrW(0x25C4), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotShrink", "Shrink Bot when docked"))
 GUICtrlSetFont(-1, 10)
 GUICtrlSetBkColor(-1, 0xF0F0F0)
 GUICtrlSetColor(-1, 0xB8B8B8)
 $g_hLblBotExpand = GUICtrlCreateLabel(ChrW(0x25BA), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotExpand", "Expand Bot when docked"))
 GUICtrlSetState(-1, $GUI_HIDE)
 GUICtrlSetFont(-1, 10)
 GUICtrlSetBkColor(-1, 0xF0F0F0)
 GUICtrlSetColor(-1, 0xB8B8B8)
-$g_hLblBotMinimize = GUICtrlCreateLabel("̶", $aBtnSize[0], 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+$g_hLblBotMiniGUI = GUICtrlCreateLabel(ChrW(0x2584), $aBtnSize[0] *($_GUI_MAIN_BUTTON_COUNT - 3), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotMiniGUI", "Switch to Mini Mode"))
+GUICtrlSetState(-1, $g_iGuiMode = 1 ? $GUI_SHOW : $GUI_HIDE)
 GUICtrlSetFont(-1, 10)
 GUICtrlSetBkColor(-1, 0xF0F0F0)
 GUICtrlSetColor(-1, 0xB8B8B8)
-$g_hLblBotClose = GUICtrlCreateLabel("×", $aBtnSize[0] * 2, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+$g_hLblBotNormalGUI = GUICtrlCreateLabel(ChrW(0x2588), $aBtnSize[0] *($_GUI_MAIN_BUTTON_COUNT - 3), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotNormal", "Switch to Normal Mode"))
+GUICtrlSetState(-1, $g_iGuiMode = 2 ? $GUI_SHOW : $GUI_HIDE)
+GUICtrlSetFont(-1, 10)
+GUICtrlSetBkColor(-1, 0xF0F0F0)
+GUICtrlSetColor(-1, 0xB8B8B8)
+$g_hLblBotMinimize = GUICtrlCreateLabel("̶", $aBtnSize[0] *($_GUI_MAIN_BUTTON_COUNT - 2), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotMinimize", "Minimize"))
+GUICtrlSetFont(-1, 10)
+GUICtrlSetBkColor(-1, 0xF0F0F0)
+GUICtrlSetColor(-1, 0xB8B8B8)
+$g_hLblBotClose = GUICtrlCreateLabel("×", $aBtnSize[0] *($_GUI_MAIN_BUTTON_COUNT - 1), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotClose", "Close"))
 GUICtrlSetFont(-1, 10)
 GUICtrlSetBkColor(-1, 0xFF4040)
 GUICtrlSetColor(-1, 0xF8F8F8)
-$g_hFrmBotLogoUrlSmall = _GUICreate("My Bot URL", 290, 13, 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE,($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
+$g_hFrmBotLogoUrlSmall = GUICreate("My Bot URL", 290, 13, 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE,($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
 $g_hFrmBot_URL_PIC2 = _GUICtrlCreatePic($g_sLogoUrlSmallPath, 0, 0, 290, 13)
 GUICtrlSetCursor(-1, 0)
 GUISwitch($g_hFrmBotEx)
-GUICtrlCreateLabel("", $_GUI_MAIN_WIDTH - 3 * $aBtnSize[0], $aBtnSize[1], 3 * $aBtnSize[0], $_GUI_MAIN_TOP - $aBtnSize[1])
+GUICtrlCreateLabel("", $_GUI_MAIN_WIDTH - $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $_GUI_MAIN_TOP - $aBtnSize[1])
 GUICtrlSetOnEvent(-1, "BotMoveRequest")
 GUICtrlSetBkColor(-1, $COLOR_WHITE)
 EndIf
@@ -18611,12 +18652,10 @@ $g_hFrmBot_MAIN_PIC = _GUICtrlCreatePic($g_sLogoPath, 0, $_GUI_MAIN_TOP, $_GUI_M
 GUICtrlSetOnEvent(-1, "BotMoveRequest")
 $g_hFrmBot_URL_PIC = _GUICtrlCreatePic($g_sLogoUrlPath, 0, $_GUI_MAIN_TOP + 67, $_GUI_MAIN_WIDTH, 13)
 GUICtrlSetCursor(-1, 0)
-$g_hToolTip = _GUIToolTip_Create($g_hFrmBot)
-_GUIToolTip_SetMaxTipWidth($g_hToolTip, $_GUI_MAIN_WIDTH)
 GUISwitch($g_hFrmBot)
 $g_hFrmBotEmbeddedShieldInput = GUICtrlCreateInput("", 0, 0, -1, -1, $WS_TABSTOP)
 GUICtrlSetState($g_hFrmBotEmbeddedShieldInput, $GUI_HIDE)
-$g_hFrmBotBottom = _GUICreate("My Bot Buttons", $_GUI_MAIN_WIDTH, $_GUI_BOTTOM_HEIGHT, 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
+$g_hFrmBotBottom = GUICreate("My Bot Buttons", $_GUI_MAIN_WIDTH, $_GUI_BOTTOM_HEIGHT, 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
 GUISwitch($g_hFrmBot)
 SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_02", "Loading GUI Bottom..."))
 GUISwitch($g_hFrmBotBottom)
@@ -18624,8 +18663,10 @@ CreateBottomPanel()
 GUISwitch($g_hFrmBotEx)
 $g_hStatusBar = _GUICtrlStatusBar_Create($g_hFrmBotBottom)
 _GUICtrlStatusBar_SetSimple($g_hStatusBar)
-GUISetDefaultFont($g_hStatusBar)
 _GUICtrlStatusBar_SetText($g_hStatusBar, "Status : Idle")
+Else
+GUISwitch($g_hFrmBotEx)
+EndIf
 If $g_iGuiMode = 2 Then
 Return
 EndIf
@@ -18640,7 +18681,14 @@ SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_06", "Lo
 CreateBotTab()
 SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_07", "Loading About Us tab..."))
 CreateAboutTab()
-SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_08", "Initializing GUI..."))
+Local $sStepText = ""
+Switch $g_iGuiMode
+Case 1
+$sStepText = GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_08", "Initializing GUI...")
+Case 2
+$sStepText = GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_08_Mini", "Initializing Mini GUI...")
+EndSwitch
+SplashStep($sStepText)
 GUISwitch($g_hFrmBotEx)
 $g_hTabMain = GUICtrlCreateTab(5, 85 + $_GUI_MAIN_TOP, $_GUI_MAIN_WIDTH - 9, $_GUI_MAIN_HEIGHT - 225)
 $g_hTabLog = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_01", "Log"))
@@ -18650,23 +18698,40 @@ $g_hTabBot = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_04",
 $g_hTabAbout = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_05", "About Us"))
 GUICtrlCreateTabItem("")
 GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
-Bind_ImageList($g_hTabMain)
-Bind_ImageList($g_hGUI_VILLAGE_TAB)
-Bind_ImageList($g_hGUI_MISC_TAB)
-Bind_ImageList($g_hGUI_DONATE_TAB)
-Bind_ImageList($g_hGUI_UPGRADE_TAB)
-Bind_ImageList($g_hGUI_NOTIFY_TAB)
-Bind_ImageList($g_hGUI_ATTACK_TAB)
-Bind_ImageList($g_hGUI_TRAINARMY_TAB)
-Bind_ImageList($g_hGUI_SEARCH_TAB)
-Bind_ImageList($g_hGUI_DEADBASE_TAB)
-Bind_ImageList($g_hGUI_ACTIVEBASE_TAB)
-Bind_ImageList($g_hGUI_THSNIPE_TAB)
-Bind_ImageList($g_hGUI_ATTACKOPTION_TAB)
-Bind_ImageList($g_hGUI_STRATEGIES_TAB)
-Bind_ImageList($g_hGUI_BOT_TAB)
-Bind_ImageList($g_hGUI_STATS_TAB)
-GUICtrlSetState($g_hGUI_LOG, $GUI_SHOW)
+Static $g_hTabMain_ImageList = 0
+Static $g_hGUI_VILLAGE_TAB_ImageList = 0
+Static $g_hGUI_MISC_TAB_ImageList = 0
+Static $g_hGUI_DONATE_TAB_ImageList = 0
+Static $g_hGUI_UPGRADE_TAB_ImageList = 0
+Static $g_hGUI_NOTIFY_TAB_ImageList = 0
+Static $g_hGUI_ATTACK_TAB_ImageList = 0
+Static $g_hGUI_TRAINARMY_TAB_ImageList = 0
+Static $g_hGUI_SEARCH_TAB_ImageList = 0
+Static $g_hGUI_DEADBASE_TAB_ImageList = 0
+Static $g_hGUI_ACTIVEBASE_TAB_ImageList = 0
+Static $g_hGUI_THSNIPE_TAB_ImageList = 0
+Static $g_hGUI_ATTACKOPTION_TAB_ImageList = 0
+Static $g_hGUI_STRATEGIES_TAB_ImageList = 0
+Static $g_hGUI_BOT_TAB_ImageList = 0
+Static $g_hGUI_STATS_TAB_ImageList = 0
+Bind_ImageList($g_hTabMain, $g_hTabMain_ImageList)
+Bind_ImageList($g_hGUI_VILLAGE_TAB, $g_hGUI_VILLAGE_TAB_ImageList)
+Bind_ImageList($g_hGUI_MISC_TAB, $g_hGUI_MISC_TAB_ImageList)
+Bind_ImageList($g_hGUI_DONATE_TAB, $g_hGUI_DONATE_TAB_ImageList)
+Bind_ImageList($g_hGUI_UPGRADE_TAB, $g_hGUI_UPGRADE_TAB_ImageList)
+Bind_ImageList($g_hGUI_NOTIFY_TAB, $g_hGUI_NOTIFY_TAB_ImageList)
+Bind_ImageList($g_hGUI_ATTACK_TAB, $g_hGUI_ATTACK_TAB_ImageList)
+Bind_ImageList($g_hGUI_TRAINARMY_TAB, $g_hGUI_TRAINARMY_TAB_ImageList)
+Bind_ImageList($g_hGUI_SEARCH_TAB, $g_hGUI_SEARCH_TAB_ImageList)
+Bind_ImageList($g_hGUI_DEADBASE_TAB, $g_hGUI_DEADBASE_TAB_ImageList)
+Bind_ImageList($g_hGUI_ACTIVEBASE_TAB, $g_hGUI_ACTIVEBASE_TAB_ImageList)
+Bind_ImageList($g_hGUI_THSNIPE_TAB, $g_hGUI_THSNIPE_TAB_ImageList)
+Bind_ImageList($g_hGUI_ATTACKOPTION_TAB, $g_hGUI_ATTACKOPTION_TAB_ImageList)
+Bind_ImageList($g_hGUI_STRATEGIES_TAB, $g_hGUI_STRATEGIES_TAB_ImageList)
+Bind_ImageList($g_hGUI_BOT_TAB, $g_hGUI_BOT_TAB_ImageList)
+Bind_ImageList($g_hGUI_STATS_TAB, $g_hGUI_STATS_TAB_ImageList)
+GUICtrlSetState($g_hTabLog, $GUI_SHOW)
+tabMain()
 cmbLog()
 SetDebugLog("$g_hFrmBot=" & $g_hFrmBot, Default, True)
 SetDebugLog("$g_hFrmBotEx=" & $g_hFrmBotEx, Default, True)
@@ -18756,10 +18821,10 @@ Return $iDpiAwareness
 EndFunc
 Func _GUICreate($title, $width, $height, $left = -1, $top = -1, $style = -1, $exStyle = -1, $parent = 0)
 Local $h = GUICreate($title, $width, $height, $left, $top, $style, $exStyle, $parent)
-GUISetDefaultFont($h)
+Local $key = String($h)
+Local $obj = $h
+$g_oGuiNotInMini.Add($key, $obj)
 Return $h
-EndFunc
-Func GUISetDefaultFont($h)
 EndFunc
 Func _GUICtrlCreateIcon($filename, $iconName, $left, $top, $width = 32, $height = 32, $style = -1, $exStyle = -1)
 Static $s_hLibIcon = 0
@@ -19189,8 +19254,9 @@ Func updateBtnEmbed()
 If $g_hBtnEmbed = 0 Then Return False
 UpdateFrmBotStyle()
 Local $state = GUICtrlGetState($g_hBtnEmbed)
-If $g_hAndroidWindow = 0 Or $g_bAndroidBackgroundLaunched = True Or $g_bAndroidEmbed = False Then
+If $g_hAndroidWindow = 0 Or $g_bAndroidBackgroundLaunched = True Or $g_bAndroidEmbed = False Or $g_iGuiMode <> 1 Then
 If $state <> $GUI_DISABLE Then GUICtrlSetState($g_hBtnEmbed, $GUI_DISABLE)
+updateBtnHideState()
 Return False
 EndIf
 Local $text = GUICtrlRead($g_hBtnEmbed)
@@ -23195,6 +23261,7 @@ GUICtrlSetData($g_hCmbPresetList, $output)
 EndFunc
 Func PresetLoadConfigInfo()
 Local $inputfilename = $g_sProfilePresetPath & "\" & GUICtrlRead($g_hCmbPresetList) & ".ini"
+SetDebugLog("PresetLoadConfigInfo: " & $inputfilename)
 Local $message = IniRead($inputfilename, "Preset", "info", "")
 If StringInStr($message, "\n") > 0 Then
 GUICtrlSetData($g_hTxtPresetMessage, StringReplace($message, "\n", @CRLF))
@@ -23211,6 +23278,7 @@ EndFunc
 Func PresetLoadConf()
 Local $filename = GUICtrlRead($g_hCmbPresetList)
 $g_sProfileSecondaryInputFileName = $g_sProfilePresetPath & "\" & $filename & ".ini"
+SetDebugLog("PresetLoadConf: " & $g_sProfileSecondaryInputFileName)
 SaveConfig()
 readConfig()
 applyConfig(False)
@@ -23240,6 +23308,7 @@ WEnd
 EndIf
 Local $msg = StringReplace(GUICtrlRead($g_hTxtSavePresetMessage), @CRLF, "\n")
 $g_sProfileSecondaryOutputFileName = $g_sProfilePresetPath & "\" & $filename & ".ini"
+SetDebugLog("PresetSaveConf: " & $g_sProfileSecondaryInputFileName)
 IniWrite($g_sProfileSecondaryOutputFileName, "preset", "info", $msg)
 saveConfig()
 readconfig()
@@ -23251,6 +23320,7 @@ EndFunc
 Func PresetDeleteConf()
 Local $button = MsgBox($MB_ICONWARNING + $MB_OKCANCEL, GetTranslatedFileIni("MBR Popups", "Func_PresetDeleteConf_Info_01", "Delete Configuration"), GetTranslatedFileIni("MBR Popups", "Func_PresetDeleteConf_Info_02", 'Are you sure you want to delete the configuration ?') & GUICtrlRead($g_hCmbPresetList) & '"?' & @CRLF & "This cannot be undone.")
 If $button = $IDOK Then
+SetDebugLog("PresetDeleteConf: " & $g_sProfilePresetPath & "\" & GUICtrlRead($g_hCmbPresetList) & ".ini")
 FileDelete($g_sProfilePresetPath & "\" & GUICtrlRead($g_hCmbPresetList) & ".ini")
 saveconfig()
 readconfig()
@@ -24200,19 +24270,19 @@ If $g_hFrmBotEmbeddedMouse = 0 Then $hWinMouse =(($g_iAndroidEmbedMode = 0) ? $g
 If $g_iDebugWindowMessages > 1 Then SetDebugLog("GUIControl_WM_MOUSE: $hWin=" & $hWin & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam & ",$hWinMouse=" & $hWinMouse, Default, True)
 CheckBotZOrder()
 If $hWin <> $hWinMouse Or $g_bAndroidEmbedded = False Or $g_avAndroidShieldStatus[0] = True Then
-If $g_avAndroidShieldStatus[0] = True And $iMSG = $WM_LBUTTONDOWN And $hWin <> $g_hFrmBotButtons Then BotMoveRequest()
+If $g_avAndroidShieldStatus[0] = True And $iMsg = $WM_LBUTTONDOWN And $hWin <> $g_hFrmBotButtons Then BotMoveRequest()
 $g_bTogglePauseAllowed = $wasAllowed
 SetCriticalMessageProcessing($wasCritical)
 Return $GUI_RUNDEFMSG
 EndIf
-Switch $iMSG
+Switch $iMsg
 Case $WM_LBUTTONDOWN, $WM_LBUTTONUP, $WM_RBUTTONDOWN, $WM_RBUTTONUP
 Local $hInput = GUICtrlGetHandle($g_hFrmBotEmbeddedShieldInput)
 _WinAPI_SetFocus($hInput)
 EndSwitch
 Local $x = BitAND($lParam, 0xFFFF)
 Local $y = BitAND($lParam, 0xFFFF0000) / 0x10000
-Switch $iMSG
+Switch $iMsg
 Case $WM_MOUSEMOVE
 If $g_bDebugClick And AndroidShieldHasFocus() Then
 Local $c = GetPixelFromWindow($x, $y, $g_hAndroidControl)
@@ -24225,7 +24295,7 @@ SetLog(StringFormat("Mouse LBUTTONDOWN %03i,%03i Color %s", $x, $y, $c), $COLOR_
 EndIf
 Case $WM_LBUTTONUP, $WM_RBUTTONUP
 If $g_iDebugWindowMessages Then
-SetDebugLog("GUIControl_WM_MOUSE: " &($iMSG = $WM_LBUTTONUP ? "$WM_LBUTTONUP" : "$WM_RBUTTONUP") & " $hWin=" & $hWin & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam & ", X=" & $x & ", Y=" & $y, Default, True)
+SetDebugLog("GUIControl_WM_MOUSE: " &($iMsg = $WM_LBUTTONUP ? "$WM_LBUTTONUP" : "$WM_RBUTTONUP") & " $hWin=" & $hWin & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam & ", X=" & $x & ", Y=" & $y, Default, True)
 EndIf
 If AndroidShieldHasFocus() = False Then
 Local $hInput = GUICtrlGetHandle($g_hFrmBotEmbeddedShieldInput)
@@ -24242,7 +24312,7 @@ SetCriticalMessageProcessing($wasCritical)
 Return $GUI_RUNDEFMSG
 EndIf
 Local $hCtrlTarget = $g_aiAndroidEmbeddedCtrlTarget[0]
-If $iMSG <> $WM_MOUSEMOVE Or $g_iAndroidEmbedMode <> 0 Then
+If $iMsg <> $WM_MOUSEMOVE Or $g_iAndroidEmbedMode <> 0 Then
 $lParam = $y * 0x10000 + $x
 Local $Result = _WinAPI_PostMessage($hCtrlTarget, $iMsg, $wParam, $lParam)
 EndIf
@@ -24288,7 +24358,7 @@ $g_bTogglePauseAllowed = False
 If $g_iDebugWindowMessages > 1 Then SetDebugLog("GUIControl_WM_COMMAND: $hWind=" & $hWind & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam, Default, True)
 Local $nNotifyCode = BitShift($wParam, 16)
 Local $nID = BitAND($wParam, 0x0000FFFF)
-If $hWind <> $g_hFrmBotEmbeddedShield And $hWind <> $g_hFrmBotEmbeddedGraphics And $hWinD <> $g_hFrmBotEmbeddedMouse And $nID <> $g_hFrmBotEmbeddedShieldInput And $hWind <> $g_hFrmBotButtons Then
+If $hWind <> $g_hFrmBotEmbeddedShield And $hWind <> $g_hFrmBotEmbeddedGraphics And $hWind <> $g_hFrmBotEmbeddedMouse And $nID <> $g_hFrmBotEmbeddedShieldInput And $hWind <> $g_hFrmBotButtons Then
 If AndroidShieldHasFocus() = True Then
 If $g_iDebugWindowMessages Then SetDebugLog("GUIControl_WM_COMMAND: $hWind=" & $hWind & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam, Default, True)
 AndroidShield("GUIControl_WM_COMMAND", Default, False, 150, False)
@@ -24305,6 +24375,8 @@ Case $g_hLblBotMinimize
 BotMinimizeRequest()
 Case $GUI_EVENT_CLOSE, $g_hLblBotClose
 BotCloseRequest()
+Case $g_hLblBotMiniGUI, $g_hLblBotNormalGUI
+BotGuiModeToggle()
 Case $g_hLblCreditsBckGrnd
 Local $CursorInfo = GUIGetCursorInfo($g_hFrmBot)
 If IsArray($CursorInfo) = 1 Then
@@ -24525,7 +24597,7 @@ Case Else
 $bCheckEmbeddedShield = False
 EndSwitch
 If $bCheckEmbeddedShield Then
-If $hWind <> $g_hFrmBotEmbeddedShield And $hWind <> $g_hFrmBotEmbeddedGraphics And $hWinD <> $g_hFrmBotEmbeddedMouse Then
+If $hWind <> $g_hFrmBotEmbeddedShield And $hWind <> $g_hFrmBotEmbeddedGraphics And $hWind <> $g_hFrmBotEmbeddedMouse Then
 If AndroidShieldHasFocus() = True Then
 If $g_iDebugWindowMessages Then SetDebugLog("GUIControl_WM_NOTIFY: $hWind=" & $hWind & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam, Default, True)
 AndroidShield("GUIControl_WM_NOTIFY", Default, False, 150, False)
@@ -24634,13 +24706,13 @@ Local $aPos = ControlGetPos($g_hFrmBot, "", $g_hFrmBotButtons)
 Local $bDetached = False
 Local $bBottonsHidden = False
 If UBound($aPos) > 3 Then
-Local $x = $_GUI_MAIN_WIDTH - $aBtnSize[0] * 3
+Local $x = $_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT
 Local $y = 0
 Local $iStyle = _WinAPI_GetWindowLong($g_hFrmBotButtons, $GWL_STYLE)
 If $g_bAndroidEmbedded = True Then
 Local $a = $g_aiAndroidEmbeddedCtrlTarget[6]
 Local $iAndroidWidth = $a[2]
-$x = $iAndroidWidth + 2 +(($g_bBotDockedShrinked) ?(-$aBtnSize[0] * 3) :($_GUI_MAIN_WIDTH - $aBtnSize[0] * 3))
+$x = $iAndroidWidth + 2 +(($g_bBotDockedShrinked) ?(-$aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT) :($_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT))
 If $g_iAndroidEmbedMode = 1 Then
 If $g_bBotDockedShrinked Then
 $bDetached = True
@@ -24751,10 +24823,10 @@ $g_bBotDockedShrinked =(($g_bBotDockedShrinked) ?(False) :(True))
 If Not $g_bBotDockedShrinked Then GUISetState(@SW_HIDE, $g_hFrmBotLogoUrlSmall)
 Local $aBtnSize = $_GUI_MAIN_BUTTON_SIZE
 Local $a = $g_aiAndroidEmbeddedCtrlTarget[6]
-Local $iAndroidWIdth = $a[2]
+Local $iAndroidWidth = $a[2]
 If Not $g_bBotDockedShrinked And CheckBotShrinkExpandButton(True) Then
 Local $bStillShrinked = True
-WinMove2($g_hFrmBotButtons, "", $iAndroidWIdth + 2 +(($bStillShrinked) ?(-$aBtnSize[0] * 3) :($_GUI_MAIN_WIDTH - $aBtnSize[0] * 3)), 0, -1, -1, 0, 0, False)
+WinMove2($g_hFrmBotButtons, "", $iAndroidWidth + 2 +(($bStillShrinked) ?(-$aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT) :($_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT)), 0, -1, -1, 0, 0, False)
 GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotButtons)
 EndIf
 Local $iMode =(($g_bBotDockedShrinked) ?(1) :(-1))
@@ -24768,13 +24840,13 @@ GUISetState(@SW_HIDE, $g_hFrmBotBottom)
 Local $iSteps = 10
 Local $fStep = $_GUI_MAIN_WIDTH / $iSteps
 Local $bGetAnimationSpeed = True
-local $iAnimationDelay = 0
+Local $iAnimationDelay = 0
 For $i = 1 To $iSteps
 Local $iWidth = Round($aPos[2] - $i * $fStep * $iMode, 0)
 Local $iChange = $iWidth - $aPos[2]
 If $bGetAnimationSpeed Then Local $hTimer = __TimerInit()
 WinMove2($g_hFrmBot, "", -1, -1, $iWidth, $aPos[3], 0, 0, False)
-WinMove2($g_hFrmBotButtons, "", $iAndroidWIdth + 2 - $aBtnSize[0] * 3 + $iChange +(($g_bBotDockedShrinked) ?($_GUI_MAIN_WIDTH) :(0)), $aPosBtn[1], -1, -1, 0, 0, False)
+WinMove2($g_hFrmBotButtons, "", $iAndroidWidth + 2 - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT + $iChange +(($g_bBotDockedShrinked) ?($_GUI_MAIN_WIDTH) :(0)), $aPosBtn[1], -1, -1, 0, 0, False)
 If $bGetAnimationSpeed Then
 $iAnimationDelay = 100 / $iSteps - __TimerDiff($hTimer)
 EndIf
@@ -24783,9 +24855,9 @@ Next
 GUICtrlSetState($g_hLblBotShrink,(($g_bBotDockedShrinked) ?($GUI_HIDE) :($GUI_SHOW)))
 GUICtrlSetState($g_hLblBotExpand,(($g_bBotDockedShrinked) ?($GUI_SHOW) :($GUI_HIDE)))
 WinSetTrans($g_hFrmBotButtons, "",(($g_bBotDockedShrinked) ?(210) :(254)))
-WinMove2($g_hFrmBotButtons, "", $iAndroidWIdth + 2 +(($g_bBotDockedShrinked) ?(-$aBtnSize[0] * 3) :($_GUI_MAIN_WIDTH - $aBtnSize[0] * 3)), $aPosBtn[1], -1, -1, 0, 0, False)
+WinMove2($g_hFrmBotButtons, "", $iAndroidWidth + 2 +(($g_bBotDockedShrinked) ?(-$aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT) :($_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT)), $aPosBtn[1], -1, -1, 0, 0, False)
 If $g_bBotDockedShrinked Then
-WinMove2($g_hFrmBotLogoUrlSmall, "", $iAndroidWIdth + 2 +(($g_bBotDockedShrinked) ?(-$aBtnSize[0] * 3) :($_GUI_MAIN_WIDTH - $aBtnSize[0] * 3)) - 290, $aPosBtn[1], -1, -1, 0, 0, False)
+WinMove2($g_hFrmBotLogoUrlSmall, "", $iAndroidWidth + 2 +(($g_bBotDockedShrinked) ?(-$aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT) :($_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT)) - 290, $aPosBtn[1], -1, -1, 0, 0, False)
 GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotLogoUrlSmall)
 EndIf
 GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotEx)
@@ -24798,6 +24870,76 @@ If $g_bBotDockedShrinked Then CheckBotShrinkExpandButton()
 SetDebugLog("BotShrinkExpandToggle: Bot " &(($g_bBotDockedShrinked) ?("collapsed") :("expanded")))
 $g_bAndroidShieldEnabled = $bAndroidShieldEnabled
 $g_bBotShrinkExpandToggleRequested = False
+Return True
+EndFunc
+Func BotGuiModeToggle()
+If $g_iGuiMode = 0 Then Return False
+If $g_iBotAction = $eBotClose Then Return False
+If $g_bAndroidEmbedded Then AndroidEmbed(False)
+Switch $g_iGuiMode
+Case 1
+SetLog("Switch to Mini GUI Mode")
+$g_iGuiMode = 2
+SetRedrawBotWindow(False, Default, Default, Default, "BotGuiModeToggle")
+$_GUI_MAIN_WIDTH = $_MINIGUI_MAIN_WIDTH
+$_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
+GUICtrlDelete($g_hTabMain)
+GUICtrlDelete($g_hTabLog)
+GUICtrlDelete($g_hTabVillage)
+GUICtrlDelete($g_hTabAttack)
+GUICtrlDelete($g_hTabBot)
+GUICtrlDelete($g_hTabAbout)
+GUICtrlDelete($g_hGUI_VILLAGE_TAB)
+GUICtrlDelete($g_hGUI_MISC_TAB)
+GUICtrlDelete($g_hGUI_DONATE_TAB)
+GUICtrlDelete($g_hGUI_UPGRADE_TAB)
+GUICtrlDelete($g_hGUI_NOTIFY_TAB)
+GUICtrlDelete($g_hGUI_ATTACK_TAB)
+GUICtrlDelete($g_hGUI_TRAINARMY_TAB)
+GUICtrlDelete($g_hGUI_SEARCH_TAB)
+GUICtrlDelete($g_hGUI_DEADBASE_TAB)
+GUICtrlDelete($g_hGUI_ACTIVEBASE_TAB)
+GUICtrlDelete($g_hGUI_THSNIPE_TAB)
+GUICtrlDelete($g_hGUI_ATTACKOPTION_TAB)
+GUICtrlDelete($g_hGUI_STRATEGIES_TAB)
+GUICtrlDelete($g_hGUI_BOT_TAB)
+GUICtrlDelete($g_hGUI_STATS_TAB)
+For $i = $g_hFirstControlToHide To $g_hLastControlToHide
+GUICtrlDelete($i)
+Next
+$g_hFirstControlToHide = 0
+$g_hLastControlToHide = 0
+For $hGUI In $g_oGuiNotInMini
+SetDebugLog("GUIDelete: " & $hGUI)
+GUIDelete($hGUI)
+Next
+$g_oGuiNotInMini.RemoveAll
+$oAlwaysEnabledControls.RemoveAll
+__GDIPlus_Shutdown()
+__GDIPlus_Startup()
+Case 2
+SetLog("Switch to Normal GUI Mode")
+$g_iGuiMode = 1
+$_GUI_MAIN_WIDTH = $_NORMALGUI_MAIN_WIDTH
+$_GUI_MAIN_HEIGHT = $_NORMALGUI_MAIN_HEIGHT
+CreateSplashScreen(6)
+CreateMainGUIControls(True)
+tabBot()
+tabDONATE()
+tabSEARCH()
+tabAttack()
+tabVillage()
+DestroySplashScreen()
+SetRedrawBotWindow(False, Default, Default, Default, "BotGuiModeToggle")
+EndSwitch
+WinMove2($g_hFrmBotBottom, "", 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, -1, -1, 0, 0, False)
+WinMove2($g_hFrmBotEx, "", -1, -1, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, False)
+WinMove2($g_hFrmBot, "", -1, -1, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT, 0, 0, False)
+GUICtrlSetState($g_hLblBotNormalGUI,(($g_iGuiMode = 1) ?($GUI_HIDE) :($GUI_SHOW)))
+GUICtrlSetState($g_hLblBotMiniGUI,(($g_iGuiMode = 2) ?($GUI_HIDE) :($GUI_SHOW)))
+updateBtnEmbed()
+SetRedrawBotWindow(True, Default, Default, Default, "BotGuiModeToggle")
+ShowMainGUI()
 Return True
 EndFunc
 Func BotMoveRequest()
@@ -24847,7 +24989,6 @@ __GDIPlus_Shutdown()
 _Crypt_Shutdown()
 _GUICtrlRichEdit_Destroy($g_hTxtLog)
 _GUICtrlRichEdit_Destroy($g_hTxtAtkLog)
-DllCall("comctl32.dll", "int", "ImageList_Destroy", "hwnd", $hImageList)
 If $g_hAndroidWindow <> 0 Then ControlFocus($g_hAndroidWindow, "", $g_hAndroidWindow)
 GUIDelete($g_hFrmBot)
 $g_aiAndroidAdbScreencapBuffer = 0
@@ -24994,7 +25135,7 @@ Else
 If IsArray($RedrawControlIDs) Then
 SetDebugLog("Redraw MyBot ControlIds" &($bForceRedraw ? " (forced)" : "") & ": " & _ArrayToString($RedrawControlIDs, ", "))
 Local $c
-For $c in $RedrawControlIDs
+For $c In $RedrawControlIDs
 If ControlRedraw($g_hFrmBot, $c) = 0 Then
 _WinAPI_RedrawWindow($g_hFrmBotEx, 0, 0, BitOR($RDW_INVALIDATE, $RDW_ALLCHILDREN, $RDW_ERASE))
 ExitLoop
@@ -25214,7 +25355,7 @@ GUICtrlSetPos($g_hChkDeadbase, $tabdbx[2] - 15, $tabdbx[3] - 15)
 GUICtrlSetPos($g_hChkActivebase, $tababx[2] - 15, $tababx[3] - 15)
 GUICtrlSetPos($g_hChkBully, $tabblx[2] - 15, $tabblx[3] - 15)
 GUICtrlSetPos($g_hChkTHSnipe, $tabtsx[2] - 15, $tabtsx[3] - 17)
-tabTHSNIPE()
+tabTHSnipe()
 Case $tabidx = 3
 GUISetState(@SW_HIDE, $g_hGUI_DEADBASE)
 GUISetState(@SW_HIDE, $g_hGUI_ACTIVEBASE)
@@ -25281,19 +25422,19 @@ Local $tabidx = GUICtrlRead($g_hGUI_BOT_TAB)
 Select
 Case $tabidx = 0
 GUISetState(@SW_HIDE, $g_hGUI_STATS)
-ControlShow("","",$g_hCmbGUILanguage)
+ControlShow("", "", $g_hCmbGUILanguage)
 Case $tabidx = 1
 GUISetState(@SW_HIDE, $g_hGUI_STATS)
-ControlHide("","",$g_hCmbGUILanguage)
+ControlHide("", "", $g_hCmbGUILanguage)
 Case $tabidx = 2
 GUISetState(@SW_HIDE, $g_hGUI_STATS)
-ControlHide("","",$g_hCmbGUILanguage)
+ControlHide("", "", $g_hCmbGUILanguage)
 Case $tabidx = 3
 GUISetState(@SW_HIDE, $g_hGUI_STATS)
-ControlHide("","",$g_hCmbGUILanguage)
+ControlHide("", "", $g_hCmbGUILanguage)
 Case $tabidx = 4
 GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_STATS)
-ControlHide("","",$g_hCmbGUILanguage)
+ControlHide("", "", $g_hCmbGUILanguage)
 EndSelect
 EndFunc
 Func tabDeadbase()
@@ -25301,7 +25442,7 @@ Local $tabidx = GUICtrlRead($g_hGUI_DEADBASE_TAB)
 Select
 Case $tabidx = 1
 cmbDBAlgorithm()
-Case ELSE
+Case Else
 GUISetState(@SW_HIDE, $g_hGUI_DEADBASE_ATTACK_STANDARD)
 GUISetState(@SW_HIDE, $g_hGUI_DEADBASE_ATTACK_SCRIPTED)
 GUISetState(@SW_HIDE, $g_hGUI_DEADBASE_ATTACK_MILKING)
@@ -25312,7 +25453,7 @@ Local $tabidx = GUICtrlRead($g_hGUI_ACTIVEBASE_TAB)
 Select
 Case $tabidx = 1
 cmbABAlgorithm()
-Case ELSE
+Case Else
 GUISetState(@SW_HIDE, $g_hGUI_ACTIVEBASE_ATTACK_STANDARD)
 GUISetState(@SW_HIDE, $g_hGUI_ACTIVEBASE_ATTACK_SCRIPTED)
 EndSelect
@@ -25321,7 +25462,7 @@ Func tabTHSnipe()
 Local $tabidx = GUICtrlRead($g_hGUI_THSNIPE_TAB)
 Select
 Case $tabidx = 1
-Case ELSE
+Case Else
 EndSelect
 EndFunc
 Func Doncheck()
@@ -25386,14 +25527,11 @@ $g_abAttackTypeEnable[$TB] =(GUICtrlRead($g_hChkBully) = $GUI_CHECKED)
 If $g_iBotLaunchTime > 0 Then _GUICtrlTab_SetCurFocus($g_hGUI_SEARCH_TAB, 3)
 tabSEARCH()
 EndFunc
-Func ImageList_Create()
-$hImageList = DllCall("comctl32.dll", "hwnd", "ImageList_Create", "int", 16, "int", 16, "int", 0x0021, "int", 0, "int", 1)
-$hImageList = $hImageList[0]
-Return $hImageList
-EndFunc
-Func Bind_ImageList($nCtrl)
+Func Bind_ImageList($nCtrl, ByRef $hImageList)
 Local $aIconIndex = 0
-$hImageList = ImageList_Create()
+If $hImageList = 0 Then
+$hImageList = _GUIImageList_Create(16, 16, 5, 1)
+EndIf
 GUICtrlSendMsg($nCtrl, $TCM_SETIMAGELIST, 0, $hImageList)
 Local $tTcItem = DllStructCreate("uint;dword;dword;ptr;int;int;int")
 DllStructSetData($tTcItem, 1, 0x0002)
@@ -25435,46 +25573,46 @@ EndSwitch
 If IsArray($aIconIndex) Then
 For $i = 0 To UBound($aIconIndex) - 1
 DllStructSetData($tTcItem, 6, $i)
-AddImageToTab($nCtrl, $i, $tTcItem, $g_sLibIconPath, $aIconIndex[$i] - 1)
+AddImageToTab($nCtrl, $hImageList, $i, $tTcItem, $g_sLibIconPath, $aIconIndex[$i] - 1)
 Next
 $aIconIndex = 0
 EndIf
-$tTcItem = 0
 EndFunc
-Func AddImageToTab($nCtrl, $nTabIndex, $nItem, $g_sLibIconPath, $nIconID)
+Func AddImageToTab($nCtrl, ByRef $hImageList, $nTabIndex, $nItem, $g_sLibIconPath, $nIconID)
 Local $hIcon = DllStructCreate("int")
-Local $result = DllCall("shell32.dll", "int", "ExtractIconEx", "str", $g_sLibIconPath, "int", $nIconID, "hwnd", 0, "ptr", DllStructGetPtr($hIcon), "int", 1)
-$result = $result[0]
-If $result > 0 Then
+Local $Result = DllCall("shell32.dll", "int", "ExtractIconEx", "str", $g_sLibIconPath, "int", $nIconID, "hwnd", 0, "ptr", DllStructGetPtr($hIcon), "int", 1)
+If UBound($Result) > 0 Then
+$Result = $Result[0]
+If $Result > 0 Then
 DllCall("comctl32.dll", "int", "ImageList_AddIcon", "hwnd", $hImageList, "hwnd", DllStructGetData($hIcon, 1))
 DllCall("user32.dll", "int", "SendMessage", "hwnd", ControlGetHandle($g_hFrmBot, "", $nCtrl), "int", $TCM_SETITEM, "int", $nTabIndex, "ptr", DllStructGetPtr($nItem))
-DllCall("user32.dll", "int", "DestroyIcon", "hwnd", $hIcon)
+DllCall("user32.dll", "int", "DestroyIcon", "hwnd", DllStructGetData($hIcon, 1))
 EndIf
-$hIcon = 0
+EndIf
 EndFunc
-Func _GUICtrlListView_SetItemHeightByFont( $hListView, $iHeight )
-Local $hDC = _WinAPI_GetDC( $hListView ), $hFont = _SendMessage( $hListView, $WM_GETFONT )
-Local $hObject = _WinAPI_SelectObject( $hDC, $hFont ), $lvLOGFONT = DllStructCreate( $tagLOGFONT )
-_WinAPI_GetObject( $hFont, DllStructGetSize( $lvLOGFONT ), DllStructGetPtr( $lvLOGFONT ) )
-Local $hLVfont = _WinAPI_CreateFontIndirect( $lvLOGFONT )
-_WinAPI_SelectObject( $hDC, $hObject )
-_WinAPI_ReleaseDC( $hListView, $hDC )
-_WinAPI_DeleteObject( $hFont )
-$hFont = _WinAPI_CreateFont( $iHeight, 0 )
-_WinAPI_SetFont( $hListView, $hFont )
-_WinAPI_DeleteObject( $hFont )
-Local $hHeader = _GUICtrlListView_GetHeader( $hListView )
-If $hHeader Then _WinAPI_SetFont( $hHeader, $hLVfont )
+Func _GUICtrlListView_SetItemHeightByFont($hListView, $iHeight)
+Local $hDC = _WinAPI_GetDC($hListView), $hFont = _SendMessage($hListView, $WM_GETFONT)
+Local $hObject = _WinAPI_SelectObject($hDC, $hFont), $lvLOGFONT = DllStructCreate($tagLOGFONT)
+_WinAPI_GetObject($hFont, DllStructGetSize($lvLOGFONT), DllStructGetPtr($lvLOGFONT))
+Local $hLVfont = _WinAPI_CreateFontIndirect($lvLOGFONT)
+_WinAPI_SelectObject($hDC, $hObject)
+_WinAPI_ReleaseDC($hListView, $hDC)
+_WinAPI_DeleteObject($hFont)
+$hFont = _WinAPI_CreateFont($iHeight, 0)
+_WinAPI_SetFont($hListView, $hFont)
+_WinAPI_DeleteObject($hFont)
+Local $hHeader = _GUICtrlListView_GetHeader($hListView)
+If $hHeader Then _WinAPI_SetFont($hHeader, $hLVfont)
 $lvLOGFONT = 0
 Return $hLVfont
 EndFunc
-Func _GUICtrlListView_GetHeightToFitRows( $hListView, $iRows )
-Local $tRect = _WinAPI_GetClientRect( $hListView )
-Local $hHeader = _GUICtrlListView_GetHeader( $hListView )
-Local $tWindowPos = _GUICtrlHeader_Layout( $hHeader, $tRect )
-Local $iHdrHeight = DllStructGetData( $tWindowPos , "CY" )
-Local $aItemRect = _GUICtrlListView_GetItemRect( $hListView, 0, 0 )
-Return($aItemRect[3] - $aItemRect[1] ) * $iRows + $iHdrHeight + 8
+Func _GUICtrlListView_GetHeightToFitRows($hListView, $iRows)
+Local $tRECT = _WinAPI_GetClientRect($hListView)
+Local $hHeader = _GUICtrlListView_GetHeader($hListView)
+Local $tWindowPos = _GUICtrlHeader_Layout($hHeader, $tRECT)
+Local $iHdrHeight = DllStructGetData($tWindowPos, "CY")
+Local $aItemRect = _GUICtrlListView_GetItemRect($hListView, 0, 0)
+Return($aItemRect[3] - $aItemRect[1]) * $iRows + $iHdrHeight + 8
 EndFunc
 Func EnableControls($hWin, $Enable, ByRef $avArr, $bGUIControl_Disabled = True, $i = 0)
 If $hWin = 0 Or $hWin = -1 Then Return 0
@@ -25491,10 +25629,10 @@ EndIf
 Local $hChild = _WinAPI_GetWindow($hWin, $GW_CHILD)
 While $hChild
 $i += 1
-If $avArr[0][0]+1 > UBound($avArr, 1)-1 Then
-ReDim $avArr[$avArr[0][0]+2][2]
-$avArr[$avArr[0][0]+1][0] = $hChild
-$avArr[$avArr[0][0]+1][1] = BitAND(WinGetState($hChild), 4) > 0
+If $avArr[0][0] + 1 > UBound($avArr, 1) - 1 Then
+ReDim $avArr[$avArr[0][0] + 2][2]
+$avArr[$avArr[0][0] + 1][0] = $hChild
+$avArr[$avArr[0][0] + 1][1] = BitAND(WinGetState($hChild), 4) > 0
 EndIf
 If $Enable = Default Then
 WinSetState($hChild, "",($avArr[$i][1] = True ? @SW_ENABLE : @SW_DISABLE))
@@ -25538,7 +25676,7 @@ $g_hFrmBot_WNDPROC = 0
 EndIf
 EndFunc
 Func IsGUICtrlHidden($hGUICtrl)
-If BitAnd(WinGetState(GUICtrlGetHandle($hGUICtrl), ""), 2) = 0 Then Return True
+If BitAND(WinGetState(GUICtrlGetHandle($hGUICtrl), ""), 2) = 0 Then Return True
 Return False
 EndFunc
 Global $g_oTxtLogInitText = ObjCreate("Scripting.Dictionary")
@@ -25586,7 +25724,7 @@ EndIf
 $g_oTxtLogInitText($g_oTxtLogInitText.Count + 1) = $a
 If $bActive Then Return
 $bActive = True
-If(($g_hTxtLog <> 0 Or $g_iGuiMode = 0) And $g_bRunState = False) Or($bPostponed = False And __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout) Then
+If(($g_hTxtLog <> 0 Or $g_iGuiMode <> 1) And $g_bRunState = False) Or($bPostponed = False And __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout) Then
 CheckPostponedLog()
 EndIf
 $bActive = False
@@ -25683,7 +25821,7 @@ If $a[6] = 1 Then
 ContinueLoop
 EndIf
 EndIf
-If $bUpdateStatus = True And($g_hStatusBar Or $g_iGuiMode = 0) And $iSize > 4 And $a[4] = 1 Then
+If $bUpdateStatus = True And($g_hStatusBar Or $g_iGuiMode <> 1) And $iSize > 4 And $a[4] = 1 Then
 $sLastStatus = $a[0]
 Local $iPosCr = StringInStr($sLastStatus, Chr(13))
 Local $iPosLf = StringInStr($sLastStatus, Chr(10))
@@ -25710,10 +25848,10 @@ EndFunc
 Func CheckPostponedLog($bNow = False)
 Local $iLogs = 0
 If $g_bCriticalMessageProcessing Or($bNow = False And __TimerDiff($g_hTxtLogTimer) < $g_iTxtLogTimerTimeout) Then Return 0
-If $g_oTxtLogInitText.Count > 0 And($g_hTxtLog Or $g_iGuiMode = 0) Then
+If $g_oTxtLogInitText.Count > 0 And($g_hTxtLog Or $g_iGuiMode <> 1) Then
 $iLogs += FlushGuiLog($g_hTxtLog, $g_oTxtLogInitText, True, "txtLog")
 EndIf
-If $g_oTxtAtkLogInitText.Count > 0 And($g_hTxtAtkLog Or $g_iGuiMode = 0) Then
+If $g_oTxtAtkLogInitText.Count > 0 And($g_hTxtAtkLog Or $g_iGuiMode <> 1) Then
 $iLogs += FlushGuiLog($g_hTxtAtkLog, $g_oTxtAtkLogInitText, False, "txtAtkLog")
 EndIf
 $g_hTxtLogTimer = __TimerInit()
@@ -25881,10 +26019,12 @@ DirCreate($g_sProfileDonateCaptureBlacklistPath)
 If FileExists($g_sProfileConfigPath) = 0 Then SetLog("New Profile '" & $g_sProfileCurrentName & "' created")
 EndFunc
 Func setupProfile()
+If $g_iGuiMode = 1 Then
 If GUICtrlRead($g_hCmbProfile) = "<No Profiles>" Then
 $g_sProfileCurrentName = StringRegExpReplace(GUICtrlRead($g_hTxtVillageName), '[/:*?"<>|]', '_')
 Else
 $g_sProfileCurrentName = GUICtrlRead($g_hCmbProfile)
+EndIf
 EndIf
 createProfile()
 GUICtrlSetData($g_hGrpVillage, GetTranslatedFileIni("MBR Main GUI", "Tab_02", "Village") & ": " & $g_sProfileCurrentName)
@@ -25952,10 +26092,6 @@ $g_asIniTable[$g_iIniLineCount][1] = $value
 $g_iIniLineCount += 1
 EndFunc
 Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read")
-If $g_iGuiMode = 0 Then
-UpdateBotTitle()
-Return
-EndIf
 Static $iApplyConfigCount = 0
 $iApplyConfigCount += 1
 SetDebugLog("applyConfig(), call number " & $iApplyConfigCount)
@@ -25967,7 +26103,18 @@ If $g_iAndroidPosX > -30000 And $g_iAndroidPosY > -30000 And $g_bIsHidden = Fals
 Else
 If $g_iFrmBotDockedPosX > -30000 And $g_iFrmBotDockedPosY > -30000 And $g_bFrmBotMinimized = False Then WinMove($g_hFrmBot, "", $g_iFrmBotDockedPosX, $g_iFrmBotDockedPosY)
 EndIf
-If $g_iGuiMode <> 1 Then Return
+If $g_iGuiMode <> 1 Then
+If $g_iGuiMode = 2 Then
+Switch $TypeReadSave
+Case "Read"
+GUICtrlSetState($g_hChkBackgroundMode, $g_bChkBackgroundMode = True ? $GUI_CHECKED : $GUI_UNCHECKED)
+Case "Save"
+$g_bChkBackgroundMode =(GUICtrlRead($g_hChkBackgroundMode) = $GUI_CHECKED)
+EndSwitch
+EndIf
+UpdateBotTitle()
+Return
+EndIf
 Local $bWasRdraw = SetRedrawBotWindow(False, Default, Default, Default, "applyConfig")
 ApplyConfig_Profile($TypeReadSave)
 ApplyConfig_Android($TypeReadSave)
@@ -28680,11 +28827,11 @@ _Ini_Add("other", "xQueenAltarPos", $g_aiQueenAltarPos[0])
 _Ini_Add("other", "yQueenAltarPos", $g_aiQueenAltarPos[1])
 _Ini_Add("other", "xWardenAltarPos", $g_aiWardenAltarPos[0])
 _Ini_Add("other", "yWardenAltarPos", $g_aiWardenAltarPos[1])
-ApplyConfig_600_14("Save")
+ApplyConfig_600_14(GetApplyConfigSaveAction())
 _Ini_Add("upgrade", "upgradetroops", $g_bAutoLabUpgradeEnable ? 1 : 0)
 _Ini_Add("upgrade", "upgradetroopname", $g_iCmbLaboratory)
 _Ini_Add("upgrade", "upgradelabtime", $g_sLabUpgradeTime)
-ApplyConfig_600_16("Save")
+ApplyConfig_600_16(GetApplyConfigSaveAction())
 For $iz = 0 To UBound($g_avBuildingUpgrades, 1) - 1
 _Ini_Add("upgrade", "xupgrade" & $iz, $g_avBuildingUpgrades[$iz][0])
 _Ini_Add("upgrade", "yupgrade" & $iz, $g_avBuildingUpgrades[$iz][1])
@@ -28706,7 +28853,6 @@ _Ini_Clear()
 _Ini_Add("general", "version", GetVersionNormalized($g_sBotVersion))
 _Ini_Add("general", "threads", $g_iThreads)
 _Ini_add("general", "botDesignFlags", $g_iBotDesignFlags)
-_Ini_Add("general", "cmbProfile", _GUICtrlComboBox_GetCurSel($g_hCmbProfile))
 _Ini_Add("general", "frmBotPosX", $g_iFrmBotPosX)
 _Ini_Add("general", "frmBotPosY", $g_iFrmBotPosY)
 If $g_hAndroidWindow <> 0 Then WinGetAndroidHandle()
@@ -28753,7 +28899,7 @@ SaveConfig_Debug()
 _Ini_Save($g_sProfileConfigPath)
 EndFunc
 Func SaveConfig_Android()
-ApplyConfig_Android("Save")
+ApplyConfig_Android(GetApplyConfigSaveAction())
 _Ini_Add("android", "game.distributor", $g_sAndroidGameDistributor)
 _Ini_Add("android", "game.package", $g_sAndroidGamePackage)
 _Ini_Add("android", "game.class", $g_sAndroidGameClass)
@@ -28784,7 +28930,7 @@ _Ini_Add("android", "instance", $g_sAndroidInstance)
 _Ini_Add("android", "reboot.hours", $g_iAndroidRebootHours)
 EndFunc
 Func SaveConfig_Debug()
-ApplyConfig_Debug("Save")
+ApplyConfig_Debug(GetApplyConfigSaveAction())
 _Ini_Add("debug", "debugsetlog", $g_bDebugSetlog ? 1 : 0)
 _Ini_Add("debug", "debugsetclick", $g_bDebugClick ? 1 : 0)
 _Ini_Add("debug", "disablezoomout", $g_bDebugDisableZoomout ? 1 : 0)
@@ -28803,13 +28949,13 @@ _Ini_Add("debug", "debugmakeimgcsv", $g_bDebugMakeIMGCSV ? 1 : 0)
 _Ini_Add("debug", "DebugSmartZap", $g_bDebugSmartZap)
 EndFunc
 Func SaveConfig_600_1()
-ApplyConfig_600_1("Save")
+ApplyConfig_600_1(GetApplyConfigSaveAction())
 _Ini_Add("general", "logstyle", $g_iCmbLogDividerOption)
 _Ini_Add("general", "LogDividerY", $g_iLogDividerY)
 _Ini_Add("general", "Background", $g_bChkBackgroundMode ? 1 : 0)
 EndFunc
 Func SaveConfig_600_6()
-ApplyConfig_600_6("Save")
+ApplyConfig_600_6(GetApplyConfigSaveAction())
 _Ini_Add("general", "BotStop", $g_bChkBotStop ? 1 : 0)
 _Ini_Add("general", "Command", $g_iCmbBotCommand)
 _Ini_Add("general", "Cond", $g_iCmbBotCond)
@@ -28826,12 +28972,12 @@ _Ini_Add("other", "ChkTreasuryCollect", $g_bChkTreasuryCollect ? 1 : 0)
 _Ini_Add("other", "minTreasurygold", $g_iTxtTreasuryGold)
 _Ini_Add("other", "minTreasuryelixir", $g_iTxtTreasuryElixir)
 _Ini_Add("other", "minTreasurydark", $g_iTxtTreasuryDark)
-_Ini_Add("other", "ChkCollectBuildersBase", $g_bChkCollectBuilderBase ? 1: 0)
+_Ini_Add("other", "ChkCollectBuildersBase", $g_bChkCollectBuilderBase ? 1 : 0)
 _Ini_Add("other", "ChkStartClockTowerBoost", $g_bChkStartClockTowerBoost ? 1 : 0)
 _Ini_Add("other", "ChkCTBoostBlderBz", $g_bChkCTBoostBlderBz ? 1 : 0)
 EndFunc
 Func SaveConfig_600_9()
-ApplyConfig_600_9("Save")
+ApplyConfig_600_9(GetApplyConfigSaveAction())
 _Ini_Add("Unbreakable", "chkUnbreakable", $g_iUnbrkMode)
 _Ini_Add("Unbreakable", "UnbreakableWait", $g_iUnbrkWait)
 _Ini_Add("Unbreakable", "minUnBrkgold", $g_iUnbrkMinGold)
@@ -28842,7 +28988,7 @@ _Ini_Add("Unbreakable", "maxUnBrkelixir", $g_iUnbrkMaxElixir)
 _Ini_Add("Unbreakable", "maxUnBrkdark", $g_iUnbrkMaxDark)
 EndFunc
 Func SaveConfig_600_11()
-ApplyConfig_600_11("Save")
+ApplyConfig_600_11(GetApplyConfigSaveAction())
 _Ini_Add("planned", "RequestHoursEnable", $g_bRequestTroopsEnable ? 1 : 0)
 _Ini_Add("donate", "txtRequest", $g_sRequestTroopsText)
 Local $string = ""
@@ -28853,7 +28999,7 @@ _Ini_Add("planned", "RequestHours", $string)
 EndFunc
 Func SaveConfig_600_12()
 Local $t = __TimerInit()
-ApplyConfig_600_12("Save")
+ApplyConfig_600_12(GetApplyConfigSaveAction())
 _Ini_Add("donate", "Doncheck", $g_bChkDonate ? 1 : 0)
 For $i = 0 To $eTroopCount - 1 + $g_iCustomDonateConfigs
 Local $sIniName = ""
@@ -28891,7 +29037,7 @@ _Ini_Add("donate", "chkExtraPersian", $g_bChkExtraPersian ? 1 : 0)
 _Ini_Add("donate", "txtBlacklist", StringReplace($g_sTxtGeneralBlacklist, @CRLF, "|"))
 EndFunc
 Func SaveConfig_600_13()
-ApplyConfig_600_13("Save")
+ApplyConfig_600_13(GetApplyConfigSaveAction())
 _Ini_Add("planned", "DonateHoursEnable", $g_bDonateHoursEnable ? 1 : 0)
 Local $string = ""
 For $i = 0 To 23
@@ -28903,7 +29049,7 @@ _Ini_Add("donate", "SkipDonateNearFulLTroopsEnable", $g_bDonateSkipNearFullEnabl
 _Ini_Add("donate", "SkipDonateNearFulLTroopsPercentual", $g_iDonateSkipNearFullPercent)
 EndFunc
 Func SaveConfig_600_15()
-ApplyConfig_600_15("Save")
+ApplyConfig_600_15(GetApplyConfigSaveAction())
 _Ini_Add("upgrade", "UpgradeKing", $g_bUpgradeKingEnable ? 1 : 0)
 _Ini_Add("upgrade", "UpgradeQueen", $g_bUpgradeQueenEnable ? 1 : 0)
 _Ini_Add("upgrade", "UpgradeWarden", $g_bUpgradeWardenEnable ? 1 : 0)
@@ -28914,7 +29060,7 @@ _Ini_Add("upgrade", "minupgrelixir", $g_iUpgradeMinElixir)
 _Ini_Add("upgrade", "minupgrdark", $g_iUpgradeMinDark)
 EndFunc
 Func SaveConfig_600_17()
-ApplyConfig_600_17("Save")
+ApplyConfig_600_17(GetApplyConfigSaveAction())
 _Ini_Add("upgrade", "auto-wall", $g_bAutoUpgradeWallsEnable ? 1 : 0)
 _Ini_Add("upgrade", "minwallgold", $g_iUpgradeWallMinGold)
 _Ini_Add("upgrade", "minwallelixir", $g_iUpgradeWallMinElixir)
@@ -28927,7 +29073,7 @@ Next
 _Ini_Add("upgrade", "WallCost", $g_iWallCost)
 EndFunc
 Func SaveConfig_600_18()
-ApplyConfig_600_18("Save")
+ApplyConfig_600_18(GetApplyConfigSaveAction())
 _Ini_Add("notify", "PBEnabled", $g_bNotifyPBEnable ? 1 : 0)
 _Ini_Add("notify", "TGEnabled", $g_bNotifyTGEnable ? 1 : 0)
 _Ini_Add("notify", "PBToken", $g_sNotifyPBToken)
@@ -28954,7 +29100,7 @@ _Ini_Add("notify", "AlertPBUpdate", $g_bNotifyAlertBOTUpdate ? 1 : 0)
 _Ini_Add("notify", "AlertSmartWaitTime", $g_bNotifyAlertSmartWaitTime ? 1 : 0)
 EndFunc
 Func SaveConfig_600_19()
-ApplyConfig_600_19("Save")
+ApplyConfig_600_19(GetApplyConfigSaveAction())
 _Ini_Add("notify", "NotifyHoursEnable", $g_bNotifyScheduleHoursEnable ? 1 : 0)
 Local $string = ""
 For $i = 0 To 23
@@ -28969,7 +29115,7 @@ Next
 _Ini_Add("notify", "NotifyWeekDays", $string)
 EndFunc
 Func SaveConfig_600_22()
-ApplyConfig_600_22("Save")
+ApplyConfig_600_22(GetApplyConfigSaveAction())
 Local $string = ""
 For $i = 0 To 23
 $string &=($g_abBoostBarracksHours[$i] ? "1" : "0") & "|"
@@ -28977,14 +29123,14 @@ Next
 _Ini_Add("planned", "BoostBarracksHours", $string)
 EndFunc
 Func SaveConfig_600_26()
-ApplyConfig_600_26("Save")
+ApplyConfig_600_26(GetApplyConfigSaveAction())
 _Ini_Add("search", "BullyMode", $g_abAttackTypeEnable[$TB] ? 1 : 0)
 _Ini_Add("search", "ATBullyMode", $g_iAtkTBEnableCount)
 _Ini_Add("search", "YourTH", $g_iAtkTBMaxTHLevel)
 _Ini_Add("search", "THBullyAttackMode", $g_iAtkTBMode)
 EndFunc
 Func SaveConfig_600_28()
-ApplyConfig_600_28("Save")
+ApplyConfig_600_28(GetApplyConfigSaveAction())
 _Ini_Add("search", "reduction", $g_bSearchReductionEnable ? 1 : 0)
 _Ini_Add("search", "reduceCount", $g_iSearchReductionCount)
 _Ini_Add("search", "reduceGold", $g_iSearchReductionGold)
@@ -29001,7 +29147,7 @@ _Ini_Add("search", "RestartSearchLimit", $g_iSearchRestartLimit)
 _Ini_Add("general", "AlertSearch", $g_bSearchAlertMe ? 1 : 0)
 EndFunc
 Func SaveConfig_600_28_DB()
-ApplyConfig_600_28_DB("Save")
+ApplyConfig_600_28_DB(GetApplyConfigSaveAction())
 _Ini_Add("search", "DBcheck", $g_abAttackTypeEnable[$DB] ? 1 : 0)
 _Ini_Add("search", "ChkDBSearchSearches", $g_abSearchSearchesEnable[$DB] ? 1 : 0)
 _Ini_Add("search", "DBEnableAfterCount", $g_aiSearchSearchesMin[$DB])
@@ -29046,7 +29192,7 @@ _Ini_Add("search", "DBWeakEagle", $g_aiFilterMaxEagleLevel[$DB])
 _Ini_Add("search", "DBMeetOne", $g_abFilterMeetOneConditionEnable[$DB] ? 1 : 0)
 EndFunc
 Func SaveConfig_600_28_LB()
-ApplyConfig_600_28_LB("Save")
+ApplyConfig_600_28_LB(GetApplyConfigSaveAction())
 _Ini_Add("search", "ABcheck", $g_abAttackTypeEnable[$LB] ? 1 : 0)
 _Ini_Add("search", "ChkABSearchSearches", $g_abSearchSearchesEnable[$LB] ? 1 : 0)
 _Ini_Add("search", "ABEnableAfterCount", $g_aiSearchSearchesMin[$LB])
@@ -29091,7 +29237,7 @@ _Ini_Add("search", "ABWeakEagle", $g_aiFilterMaxEagleLevel[$LB])
 _Ini_Add("search", "ABMeetOne", $g_abFilterMeetOneConditionEnable[$LB] ? 1 : 0)
 EndFunc
 Func SaveConfig_600_28_TS()
-ApplyConfig_600_28_TS("Save")
+ApplyConfig_600_28_TS(GetApplyConfigSaveAction())
 _Ini_Add("search", "TScheck", $g_abAttackTypeEnable[$TS] ? 1 : 0)
 _Ini_Add("search", "ChkTSSearchSearches", $g_abSearchSearchesEnable[$TS] ? 1 : 0)
 _Ini_Add("search", "TSEnableAfterCount", $g_aiSearchSearchesMin[$TS])
@@ -29111,7 +29257,7 @@ _Ini_Add("search", "SWTtiles", $g_iAtkTSAddTilesWhileTrain)
 _Ini_Add("search", "THaddTiles", $g_iAtkTSAddTilesFullTroops)
 EndFunc
 Func SaveConfig_600_29()
-ApplyConfig_600_29("Save")
+ApplyConfig_600_29(GetApplyConfigSaveAction())
 _Ini_Add("attack", "ActivateKQ", $g_iActivateKQCondition)
 _Ini_Add("attack", "delayActivateKQ", $g_iDelayActivateKQ)
 _Ini_Add("attack", "ActivateWarden", $g_bActivateWardenCondition ? 1 : 0)
@@ -29146,7 +29292,7 @@ Next
 _Ini_Add("planned", "DropCCHours", $string)
 EndFunc
 Func SaveConfig_600_29_DB()
-ApplyConfig_600_29_DB("Save")
+ApplyConfig_600_29_DB(GetApplyConfigSaveAction())
 _Ini_Add("attack", "DBAtkAlgorithm", $g_aiAttackAlgorithm[$DB])
 _Ini_Add("attack", "DBSelectTroop", $g_aiAttackTroopSelection[$DB])
 _Ini_Add("attack", "DBKingAtk", BitAND($g_aiAttackUseHeroes[$DB], $eHeroKing))
@@ -29171,7 +29317,7 @@ SaveConfig_600_29_DB_Scripted()
 SaveConfig_600_29_DB_Milking()
 EndFunc
 Func SaveConfig_600_29_DB_Standard()
-ApplyConfig_600_29_DB_Standard("Save")
+ApplyConfig_600_29_DB_Standard(GetApplyConfigSaveAction())
 _Ini_Add("attack", "DBStandardAlgorithm", $g_aiAttackStdDropOrder[$DB])
 _Ini_Add("attack", "DBDeploy", $g_aiAttackStdDropSides[$DB])
 _Ini_Add("attack", "DBUnitD", $g_aiAttackStdUnitDelay[$DB])
@@ -29184,13 +29330,13 @@ _Ini_Add("attack", "DBSmartAttackElixirCollector", $g_abAttackStdSmartNearCollec
 _Ini_Add("attack", "DBSmartAttackDarkElixirDrill", $g_abAttackStdSmartNearCollectors[$DB][2] ? 1 : 0)
 EndFunc
 Func SaveConfig_600_29_DB_Scripted()
-ApplyConfig_600_29_DB_Scripted("Save")
+ApplyConfig_600_29_DB_Scripted(GetApplyConfigSaveAction())
 _Ini_Add("attack", "RedlineRoutineDB", $g_aiAttackScrRedlineRoutine[$DB])
 _Ini_Add("attack", "DroplineEdgeDB", $g_aiAttackScrDroplineEdge[$DB])
 _Ini_Add("attack", "ScriptDB", $g_sAttackScrScriptName[$DB])
 EndFunc
 Func SaveConfig_600_29_DB_Milking()
-ApplyConfig_600_29_DB_Milking("Save")
+ApplyConfig_600_29_DB_Milking(GetApplyConfigSaveAction())
 _Ini_Add("MilkingAttack", "MilkAttackType", $g_iMilkAttackType)
 Local $string = ""
 For $i = 0 To 8
@@ -29230,7 +29376,7 @@ _Ini_Add("MilkingAttack", "MilkFarmForcetoleranceboosted", $g_iMilkFarmForceTole
 _Ini_Add("MilkingAttack", "MilkFarmForcetolerancedestroyed", $g_iMilkFarmForceToleranceDestroyed)
 EndFunc
 Func SaveConfig_600_29_LB()
-ApplyConfig_600_29_LB("Save")
+ApplyConfig_600_29_LB(GetApplyConfigSaveAction())
 _Ini_Add("attack", "ABAtkAlgorithm", $g_aiAttackAlgorithm[$LB])
 _Ini_Add("attack", "ABSelectTroop", $g_aiAttackTroopSelection[$LB])
 _Ini_Add("attack", "ABKingAtk", BitAND($g_aiAttackUseHeroes[$LB], $eHeroKing))
@@ -29254,7 +29400,7 @@ SaveConfig_600_29_LB_Standard()
 SaveConfig_600_29_LB_Scripted()
 EndFunc
 Func SaveConfig_600_29_LB_Standard()
-ApplyConfig_600_29_LB_Standard("Save")
+ApplyConfig_600_29_LB_Standard(GetApplyConfigSaveAction())
 _Ini_Add("attack", "LBStandardAlgorithm", $g_aiAttackStdDropOrder[$LB])
 _Ini_Add("attack", "ABDeploy", $g_aiAttackStdDropSides[$LB])
 _Ini_Add("attack", "ABUnitD", $g_aiAttackStdUnitDelay[$LB])
@@ -29267,13 +29413,13 @@ _Ini_Add("attack", "ABSmartAttackElixirCollector", $g_abAttackStdSmartNearCollec
 _Ini_Add("attack", "ABSmartAttackDarkElixirDrill", $g_abAttackStdSmartNearCollectors[$LB][2] ? 1 : 0)
 EndFunc
 Func SaveConfig_600_29_LB_Scripted()
-ApplyConfig_600_29_LB_Scripted("Save")
+ApplyConfig_600_29_LB_Scripted(GetApplyConfigSaveAction())
 _Ini_Add("attack", "RedlineRoutineAB", $g_aiAttackScrRedlineRoutine[$LB])
 _Ini_Add("attack", "DroplineEdgeAB", $g_aiAttackScrDroplineEdge[$LB])
 _Ini_Add("attack", "ScriptAB", $g_sAttackScrScriptName[$LB])
 EndFunc
 Func SaveConfig_600_29_TS()
-ApplyConfig_600_29_TS("Save")
+ApplyConfig_600_29_TS(GetApplyConfigSaveAction())
 _Ini_Add("attack", "TSSelectTroop", $g_aiAttackTroopSelection[$TS])
 _Ini_Add("attack", "TSKingAtk", BitAND($g_aiAttackUseHeroes[$TS], $eHeroKing))
 _Ini_Add("attack", "TSQueenAtk", BitAND($g_aiAttackUseHeroes[$TS], $eHeroQueen))
@@ -29290,7 +29436,7 @@ _Ini_Add("attack", "TSHasteSpell", $g_abAttackUseHasteSpell[$TS] ? 1 : 0)
 _Ini_Add("attack", "AttackTHType", $g_sAtkTSType)
 EndFunc
 Func SaveConfig_600_30()
-ApplyConfig_600_30("Save")
+ApplyConfig_600_30(GetApplyConfigSaveAction())
 _Ini_Add("shareattack", "ShareAttack", $g_bShareAttackEnable ? 1 : 0)
 _Ini_Add("shareattack", "minGold", $g_iShareMinGold)
 _Ini_Add("shareattack", "minElixir", $g_iShareMinElixir)
@@ -29300,7 +29446,7 @@ _Ini_Add("attack", "TakeLootSnapShot", $g_bTakeLootSnapShot ? 1 : 0)
 _Ini_Add("attack", "ScreenshotLootInfo", $g_bScreenshotLootInfo ? 1 : 0)
 EndFunc
 Func SaveConfig_600_30_DB()
-ApplyConfig_600_30_DB("Save")
+ApplyConfig_600_30_DB(GetApplyConfigSaveAction())
 _Ini_Add("endbattle", "chkDBTimeStopAtk", $g_abStopAtkNoLoot1Enable[$DB] ? 1 : 0)
 _Ini_Add("endbattle", "txtDBTimeStopAtk", $g_aiStopAtkNoLoot1Time[$DB])
 _Ini_Add("endbattle", "chkDBTimeStopAtk2", $g_abStopAtkNoLoot2Enable[$DB] ? 1 : 0)
@@ -29317,7 +29463,7 @@ _Ini_Add("endbattle", "chkDBPercentageChange", $g_abStopAtkPctNoChangeEnable[$DB
 _Ini_Add("endbattle", "txtDBPercentageChange", $g_aiStopAtkPctNoChangeTime[$DB])
 EndFunc
 Func SaveConfig_600_30_LB()
-ApplyConfig_600_30_LB("Save")
+ApplyConfig_600_30_LB(GetApplyConfigSaveAction())
 _Ini_Add("endbattle", "chkABTimeStopAtk", $g_abStopAtkNoLoot1Enable[$LB] ? 1 : 0)
 _Ini_Add("endbattle", "txtABTimeStopAtk", $g_aiStopAtkNoLoot1Time[$LB])
 _Ini_Add("endbattle", "chkABTimeStopAtk2", $g_abStopAtkNoLoot2Enable[$LB] ? 1 : 0)
@@ -29340,12 +29486,12 @@ _Ini_Add("endbattle", "chkABPercentageChange", $g_abStopAtkPctNoChangeEnable[$LB
 _Ini_Add("endbattle", "txtABPercentageChange", $g_aiStopAtkPctNoChangeTime[$LB])
 EndFunc
 Func SaveConfig_600_30_TS()
-ApplyConfig_600_30_TS("Save")
+ApplyConfig_600_30_TS(GetApplyConfigSaveAction())
 _Ini_Add("search", "ChkTSSearchCamps2", $g_bEndTSCampsEnable ? 1 : 0)
 _Ini_Add("search", "TSEnableAfterArmyCamps2", $g_iEndTSCampsPct)
 EndFunc
 Func SaveConfig_600_31()
-ApplyConfig_600_31("Save")
+ApplyConfig_600_31(GetApplyConfigSaveAction())
 For $i = 6 To 12
 _Ini_Add("collectors", "lvl" & $i & "Enabled", $g_abCollectorLevelEnabled[$i] ? 1 : 0)
 _Ini_Add("collectors", "lvl" & $i & "fill", $g_aiCollectorLevelFill[$i])
@@ -29355,7 +29501,7 @@ _Ini_Add("collectors", "minmatches", $g_iCollectorMatchesMin)
 _Ini_Add("collectors", "tolerance", $g_iCollectorToleranceOffset)
 EndFunc
 Func SaveConfig_600_32()
-ApplyConfig_600_32("Save")
+ApplyConfig_600_32(GetApplyConfigSaveAction())
 _Ini_Add("search", "TrophyRange", $g_bDropTrophyEnable ? 1 : 0)
 _Ini_Add("search", "MaxTrophy", $g_iDropTrophyMax)
 _Ini_Add("search", "MinTrophy", $g_iDropTrophyMin)
@@ -29365,7 +29511,7 @@ _Ini_Add("search", "chkTrophyAtkDead", $g_bDropTrophyAtkDead ? 1 : 0)
 _Ini_Add("search", "DTArmyMin", $g_iDropTrophyArmyMinPct)
 EndFunc
 Func SaveConfig_600_35()
-ApplyConfig_600_35("Save")
+ApplyConfig_600_35(GetApplyConfigSaveAction())
 _Ini_Add("other", "language", $g_sLanguage)
 _Ini_Add("General", "ChkDisableSplash", $g_bDisableSplash ? 1 : 0)
 _Ini_Add("General", "ChkVersion", $g_bCheckVersion ? 1 : 0)
@@ -29397,12 +29543,12 @@ _Ini_Add("other", "ChkDisableNotifications", $g_bDisableNotifications)
 _Ini_Add("other", "ChkFixClanCastle", $g_bForceClanCastleDetection ? 1 : 0)
 EndFunc
 Func SaveConfig_600_52_1()
-ApplyConfig_600_52_1("Save")
+ApplyConfig_600_52_1(GetApplyConfigSaveAction())
 _Ini_Add("other", "ChkUseQTrain", $g_bQuickTrainEnable ? 1 : 0)
 _Ini_Add("troop", "QuickTrainArmyNum", $g_iQuickTrainArmyNum)
 EndFunc
 Func SaveConfig_600_52_2()
-ApplyConfig_600_52_2("Save")
+ApplyConfig_600_52_2(GetApplyConfigSaveAction())
 For $t = 0 To $eTroopCount - 1
 _Ini_Add("troop", $g_asTroopShortNames[$t], $g_aiArmyCompTroops[$t])
 _Ini_Add("LevelTroop", $g_asTroopShortNames[$t], $g_aiTrainArmyTroopLevel[$t])
@@ -29418,7 +29564,7 @@ _Ini_Add("Spells", "SpellFactory", $g_iTotalSpellValue)
 _Ini_Add("other", "ChkForceBrewBeforeAttack", $g_bForceBrewSpells ? 1 : 0)
 EndFunc
 Func SaveConfig_600_54()
-ApplyConfig_600_54("Save")
+ApplyConfig_600_54(GetApplyConfigSaveAction())
 _Ini_Add("troop", "chkTroopOrder", $g_bCustomTrainOrderEnable ? 1 : 0)
 For $z = 0 To UBound($g_aiCmbCustomTrainOrder) - 1
 _Ini_Add("troop", "cmbTroopOrder" & $z, $g_aiCmbCustomTrainOrder[$z])
@@ -29429,7 +29575,7 @@ _Ini_Add("Spells", "cmbSpellOrder" & $z, $g_aiCmbCustomBrewOrder[$z])
 Next
 EndFunc
 Func SaveConfig_600_56()
-ApplyConfig_600_56("Save")
+ApplyConfig_600_56(GetApplyConfigSaveAction())
 _Ini_Add("SmartZap", "UseSmartZap", $g_bSmartZapEnable ? 1 : 0)
 _Ini_Add("SmartZap", "UseEarthQuakeZap", $g_bEarthQuakeZap ? 1 : 0)
 _Ini_Add("SmartZap", "UseNoobZap", $g_bNoobZap ? 1 : 0)
@@ -29440,7 +29586,7 @@ _Ini_Add("SmartZap", "MinDE", $g_iSmartZapMinDE)
 _Ini_Add("SmartZap", "ExpectedDE", $g_iSmartZapExpectedDE)
 EndFunc
 Func SaveConfig_641_1()
-ApplyConfig_641_1("Save")
+ApplyConfig_641_1(GetApplyConfigSaveAction())
 _Ini_Add("other", "chkCloseWaitEnable", $g_bCloseWhileTrainingEnable ? 1 : 0)
 _Ini_Add("other", "chkCloseWaitTrain", $g_bCloseWithoutShield ? 1 : 0)
 _Ini_Add("other", "btnCloseWaitStop", $g_bCloseEmulator ? 1 : 0)
@@ -29457,6 +29603,12 @@ _Ini_Add("other", "txtAddDelayIdlePhaseTimeMax", $g_iTrainAddRandomDelayMax)
 EndFunc
 Func IniWriteS($filename, $section, $key, $value)
 IniWrite($filename, $section, $key, $value)
+EndFunc
+Func GetApplyConfigSaveAction()
+If $g_iGuiMode <> 1 Then
+Return "Save(disabled)"
+EndIf
+Return "Save"
 EndFunc
 Func AttackReport()
 Static $iBonusLast = 0
@@ -46352,7 +46504,7 @@ Local $h =(($g_bAndroidEmbedded = False) ? $g_hAndroidWindow : $g_hFrmBot)
 Return $h
 EndFunc
 Func AndroidEmbed($Embed = True, $CallWinGetAndroidHandle = True, $bForceEmbed = False, $bNoAndroidScreenSizeCheck = False)
-If $g_iGuiMode = 0 Then Return False
+If $g_iGuiMode <> 1 Then Return False
 If $g_bAndroidEmbed = False Then Return False
 Return _AndroidEmbed($Embed, $CallWinGetAndroidHandle, $bForceEmbed, $bNoAndroidScreenSizeCheck)
 EndFunc
@@ -47008,7 +47160,7 @@ Local $show_shield = @SW_SHOWNOACTIVATE
 If $bCreateShield And($Enable <> $g_avAndroidShieldStatus[0] Or $g_hFrmBotEmbeddedShield = 0) Then
 If $bDetachedShield = False Then
 If $g_hFrmBotEmbeddedShield = 0 Then
-$g_hFrmBotEmbeddedShield = _GUICreate("", $aPosCtl[2], $aPosCtl[3], 0, 0, BitOR($WS_CHILD, $WS_TABSTOP),($bNoVisibleShield ? $WS_EX_TRANSPARENT : 0), $g_hFrmBot)
+$g_hFrmBotEmbeddedShield = GUICreate("", $aPosCtl[2], $aPosCtl[3], 0, 0, BitOR($WS_CHILD, $WS_TABSTOP),($bNoVisibleShield ? $WS_EX_TRANSPARENT : 0), $g_hFrmBot)
 Else
 WinMove($g_hFrmBotEmbeddedShield, "", 0, 0, $aPosCtl[2], $aPosCtl[3])
 EndIf
@@ -47017,10 +47169,10 @@ Else
 Local $bHasFocus = WinActive($g_hFrmBot) <> 0
 Local $a = AndroidEmbed_HWnD_Position(True, $bDetachedShield)
 If $g_hFrmBotEmbeddedShield = 0 Then
-$g_hFrmBotEmbeddedShield = _GUICreate("", $aPosCtl[2], $aPosCtl[3], $a[0], $a[1], BitOR($WS_POPUP, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, $WS_EX_TRANSPARENT), $g_hFrmBot)
+$g_hFrmBotEmbeddedShield = GUICreate("", $aPosCtl[2], $aPosCtl[3], $a[0], $a[1], BitOR($WS_POPUP, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, $WS_EX_TRANSPARENT), $g_hFrmBot)
 _WinAPI_EnableWindow($g_hFrmBotEmbeddedShield, False)
 GUISetOnEvent($GUI_EVENT_PRIMARYDOWN, "BotMoveRequest")
-$g_hFrmBotEmbeddedMouse = _GUICreate("", $aPosCtl[2], $aPosCtl[3], 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), $WS_EX_TRANSPARENT, $g_hFrmBot)
+$g_hFrmBotEmbeddedMouse = GUICreate("", $aPosCtl[2], $aPosCtl[3], 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), $WS_EX_TRANSPARENT, $g_hFrmBot)
 EndIf
 If $g_bBotDockedShrinked And Not $bHasFocus Then WinMove2($g_hFrmBotButtons, "", -1, -1, -1, -1, $HWND_BOTTOM, 0, False)
 WinMove2($g_hFrmBotEmbeddedShield, "", $a[0], $a[1], $aPosCtl[2], $aPosCtl[3],($bHasFocus ? -1 : $HWND_BOTTOM), 0, False)
@@ -47072,7 +47224,7 @@ Local $a = AndroidEmbed_HWnD_Position(True, $bDetachedShield)
 $iL = $a[0]
 $iT = $a[1]
 EndIf
-$g_hFrmBotEmbeddedGraphics = _GUICreate("", $iW, $iH, $iL, $iT, $WS_CHILD, BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, $WS_EX_LAYERED, $WS_EX_TOPMOST), $g_hFrmBot)
+$g_hFrmBotEmbeddedGraphics = GUICreate("", $iW, $iH, $iL, $iT, $WS_CHILD, BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, $WS_EX_LAYERED, $WS_EX_TOPMOST), $g_hFrmBot)
 EndIf
 WinMove2($g_hFrmBotEmbeddedGraphics, "", $iW, $iH, $iL, $iT, $HWND_NOTOPMOST, 0, False)
 GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotEmbeddedGraphics)
@@ -49937,7 +50089,7 @@ If $bLogged = False Then
 $bLogged = True
 SetLog($sWaitMessage)
 EndIf
-If $g_hStatusBar Then _GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
+_GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
 EndIf
 If $bUse_Sleep Then
 _Sleep($iDelay)
@@ -49975,7 +50127,7 @@ If $bLogged = False Then
 $bLogged = True
 SetLog($sWaitMessage)
 EndIf
-If $g_hStatusBar Then _GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
+_GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
 EndIf
 _Sleep($iDelay, True, False)
 WEnd
@@ -50043,7 +50195,7 @@ If $bLogged = False Then
 $bLogged = True
 SetLog($sWaitMessage)
 EndIf
-If $g_hStatusBar Then _GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
+_GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sWaitMessage)
 EndIf
 _Sleep($iDelay, True, False)
 WEnd
@@ -59793,16 +59945,19 @@ EndIf
 ClickP($aAway, 1, 0, "#0329")
 If $bSwitchToNV Then SwitchBetweenBases()
 EndFunc
-Global $sWatchdogMutex = "MyBot.run/ManageFarm"
-Global $tagSTRUCT_BOT_STATE = "struct;hwnd BotHWnd;hwnd AndroidHWnd;boolean RunState;boolean Paused;boolean Launched;char Profile[64];char AndroidEmulator[32];char AndroidInstance[32];int StructType;ptr StructPtr;endstruct"
+Global $tagSTRUCT_BOT_STATE = "struct" & ";hwnd BotHWnd" & ";hwnd AndroidHWnd" & ";boolean RunState" & ";boolean Paused" & ";boolean Launched" & ";uint64 g_hTimerSinceStarted" & ";uint g_iTimePassed" & ";char Profile[64]" & ";char AndroidEmulator[32]" & ";char AndroidInstance[32]" & ";int StructType" & ";ptr StructPtr" & ";boolean RegisterInHost" & ";endstruct"
 Global Enum $g_eSTRUCT_NONE = 0, $g_eSTRUCT_STATUS_BAR, $g_eSTRUCT_UPDATE_STATS
 Global $tagSTRUCT_STATUS_BAR = "struct;char Text[255];endstruct"
-Global $tagSTRUCT_UPDATE_STATS = "struct;" & "LONG g_aiCurrentLoot[" & UBound($g_aiCurrentLoot) & "]" & ";LONG g_iFreeBuilderCount" & ";LONG g_iTotalBuilderCount" & ";LONG g_iGemAmount" & ";LONG g_iStatsTotalGain[" & UBound($g_iStatsTotalGain) & "]" & ";LONG g_iStatsLastAttack[" & UBound($g_iStatsLastAttack) & "]" & ";LONG g_iStatsBonusLast[" & UBound($g_iStatsBonusLast) & "]" & ";endstruct"
+Global $tagSTRUCT_UPDATE_STATS = "struct" & ";long g_aiCurrentLoot[" & UBound($g_aiCurrentLoot) & "]" & ";long g_iFreeBuilderCount" & ";long g_iTotalBuilderCount" & ";long g_iGemAmount" & ";long g_iStatsTotalGain[" & UBound($g_iStatsTotalGain) & "]" & ";long g_iStatsLastAttack[" & UBound($g_iStatsLastAttack) & "]" & ";long g_iStatsBonusLast[" & UBound($g_iStatsBonusLast) & "]" & ";int g_iFirstAttack" & ";int g_aiAttackedCount" & ";int g_iSkippedVillageCount" & ";endstruct"
 Global $tBotState = DllStructCreate($tagSTRUCT_BOT_STATE)
 Global $tStatusBar = DllStructCreate($tagSTRUCT_STATUS_BAR)
 Global $tUpdateStats = DllStructCreate($tagSTRUCT_UPDATE_STATS)
-Global $WM_MYBOTRUN_API_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/API/1.1")
-Global $WM_MYBOTRUN_STATE_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/1.1")
+Global $API_VERSION = "1.1"
+Global $sWatchdogMutex = "MyBot.run/ManageFarm/" & $API_VERSION
+Global $WM_MYBOTRUN_API = _WinAPI_RegisterWindowMessage("MyBot.run/API/" & $API_VERSION)
+SetDebugLog("MyBot.run/API/1.1 Message ID = " & $WM_MYBOTRUN_API)
+Global $WM_MYBOTRUN_STATE = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/" & $API_VERSION)
+SetDebugLog("MyBot.run/STATE/1.1 Message ID = " & $WM_MYBOTRUN_STATE)
 Func _DllStructSetData(ByRef $Struct, $Element, $value, $index = Default)
 If IsArray($value) Then
 Local $Result[UBound($value)]
@@ -59815,11 +59970,11 @@ Return DllStructSetData($Struct, $Element, $value, $index)
 EndIf
 EndFunc
 Global $g_ahManagedMyBotHosts[0]
-GUIRegisterMsg($WM_MYBOTRUN_API_1_0, "WM_MYBOTRUN_API_1_0_CLIENT")
-Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
+GUIRegisterMsg($WM_MYBOTRUN_API, "WM_MYBOTRUN_API_CLIENT")
+Func WM_MYBOTRUN_API_CLIENT($hWind, $iMsg, $wParam, $lParam)
 If $hWind <> $g_hFrmBot Then Return 0
 If $g_iDebugWindowMessages Then SetDebugLog("API-CLIENT: $hWind=" & $hWind & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam)
-$hWind = 0
+$hWind = HWnd($lParam)
 Local $wParamHi = 0
 If $g_bRunState = True Then $wParamHi += 1
 If $g_bBotPaused = True Then $wParamHi += 2
@@ -59827,20 +59982,42 @@ If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
 Local $wParamLo = BitAND($wParam, 0xFFFF)
 Local $bRegisterHost = True
 Switch $wParamLo
+Case 0x0000 To 0x00FF
+$lParam = $g_hFrmBot
+Local $iActiveBots = BitAND($wParam, 0xFF)
+If $iActiveBots < 255 Then
+If $g_BotInstanceCount <> $iActiveBots Then SetDebugLog($iActiveBots & " running bot instances detected")
+$g_BotInstanceCount = $iActiveBots
+Else
+$bRegisterHost = False
+EndIf
+$wParam = 1
+$wParamHi = 0
+If $g_bRunState = True Then $wParamHi += 1
+If $g_bBotPaused = True Then $wParamHi += 2
+If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
+$wParam += BitShift($wParamHi, -16)
 Case 0x0100 To 0x01FF
-$iMsg = $WM_MYBOTRUN_STATE_1_0
-$hWind = HWnd($lParam)
+Local $iActiveBots = BitAND($wParam, 0xFF)
+If $iActiveBots < 255 Then
+If $g_BotInstanceCount <> $iActiveBots Then SetDebugLog($iActiveBots & " running bot instances detected")
+$g_BotInstanceCount = $iActiveBots
+EndIf
+$iMsg = $WM_MYBOTRUN_STATE
 $lParam = $g_hFrmBot
 $wParam = DllStructGetPtr($tBotState)
 $bRegisterHost = $wParamLo < 0x01FF
-PrepareStructBotState($tBotState)
+PrepareStructBotState($tBotState, Default, Default, $bRegisterHost)
 Case 0x0200
 If $g_iFirstRun = 0 Then
-$hWind = HWnd($lParam)
 PrepareUpdateStatsManagedMyBotHost($hWind, $iMsg, $wParam, $lParam)
+Else
+$iMsg = $WM_MYBOTRUN_STATE
+$lParam = $g_hFrmBot
+$wParam = DllStructGetPtr($tBotState)
+PrepareStructBotState($tBotState)
 EndIf
 Case 0x1000
-$hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 $wParam = $wParamLo + 1
 If $g_bRunState = False Then
@@ -59850,7 +60027,6 @@ btnStart()
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case 0x1010
-$hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 $wParam = $wParamLo + 1
 If $g_bRunState = True Then
@@ -59860,7 +60036,6 @@ btnStop()
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case 0x1020
-$hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 $wParam = $wParamLo + 1
 If $g_bBotPaused = True And $g_bRunState = True Then
@@ -59871,7 +60046,6 @@ TogglePauseImpl("ManageFarm")
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case 0x1030
-$hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 $wParam = $wParamLo + 1
 If $g_bBotPaused = False And $g_bRunState = True Then
@@ -59882,14 +60056,12 @@ TogglePauseImpl("ManageFarm", True)
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case 0x1040
-$hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 $wParam = $wParamLo + 1
 $wParamHi = 0
 BotCloseRequest()
 $wParam += BitShift($wParamHi, -16)
 Case 0x1050
-$hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 $wParam = $wParamLo + 1
 $wParamHi = 0
@@ -59899,7 +60071,6 @@ If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
 btnMakeScreenshot()
 $wParam += BitShift($wParamHi, -16)
 Case 0x1060
-$hWind = HWnd($lParam)
 $lParam = $g_hFrmBot
 $wParam = $wParamLo + 1
 $wParamHi = 0
@@ -59913,21 +60084,7 @@ SetBotGuiPID($pid)
 EndIf
 $wParam += BitShift($wParamHi, -16)
 Case Else
-If $wParam < 0x100 Then
-$hWind = HWnd($lParam)
-$lParam = $g_hFrmBot
-Local $iActiveBots = BitAND($wParam, 0xFF)
-If $iActiveBots < 255 Then
-If $g_BotInstanceCount <> $iActiveBots Then SetDebugLog($iActiveBots & " running bot instances detected")
-$g_BotInstanceCount = $iActiveBots
-EndIf
-$wParam = 1
-$wParamHi = 0
-If $g_bRunState = True Then $wParamHi += 1
-If $g_bBotPaused = True Then $wParamHi += 2
-If Not $g_iBotLaunchTime = 0 Then $wParamHi += 4
-$wParam += BitShift($wParamHi, -16)
-EndIf
+$hWind = 0
 EndSwitch
 If $hWind <> 0 Then
 Local $a = GetManagedMyBotHost($hWind, True, $bRegisterHost)
@@ -59982,20 +60139,25 @@ SetLog("Watchdog launched")
 EndIf
 Return $pid
 EndFunc
-Func PrepareStructBotState(ByRef $tBotState, $eStructType = $g_eSTRUCT_NONE, $pStructPtr = 0)
+Func PrepareStructBotState(ByRef $tBotState, $eStructType = Default, $pStructPtr = Default, $bRegisterInHost = True)
+If $eStructType = Default Then $eStructType = $g_eSTRUCT_NONE
+If $pStructPtr = Default Then $pStructPtr = 0
 DllStructSetData($tBotState, "BotHWnd", $g_hFrmBot)
 DllStructSetData($tBotState, "AndroidHWnd", $g_hAndroidWindow)
 DllStructSetData($tBotState, "RunState", $g_bRunState)
 DllStructSetData($tBotState, "Paused", $g_bBotPaused)
 DllStructSetData($tBotState, "Launched", Not $g_iBotLaunchTime = 0)
+DllStructSetData($tBotState, "g_hTimerSinceStarted", $g_hTimerSinceStarted)
+DllStructSetData($tBotState, "g_iTimePassed", $g_iTimePassed)
 DllStructSetData($tBotState, "Profile", $g_sProfileCurrentName)
 DllStructSetData($tBotState, "AndroidEmulator", $g_sAndroidEmulator)
 DllStructSetData($tBotState, "AndroidInstance", $g_sAndroidInstance)
 DllStructSetData($tBotState, "StructType", $eStructType)
 DllStructSetData($tBotState, "StructPtr", $pStructPtr)
+DllStructSetData($tBotState, "RegisterInHost", $bRegisterInHost)
 EndFunc
 Func PrepareStatusBarManagedMyBotHost($hFrmHost, ByRef $iMsg, ByRef $wParam, ByRef $lParam, $sStatusBar)
-$iMsg = $WM_MYBOTRUN_STATE_1_0
+$iMsg = $WM_MYBOTRUN_STATE
 $lParam = $g_hFrmBot
 $wParam = DllStructGetPtr($tBotState)
 DllStructSetData($tStatusBar, "Text", $sStatusBar)
@@ -60007,7 +60169,7 @@ Func StatusBarManagedMyBotHost($sStatusBar)
 Return ManagedMyBotHostsPostMessage("PrepareStatusBarManagedMyBotHost", $sStatusBar)
 EndFunc
 Func PrepareUpdateStatsManagedMyBotHost($hFrmHost, ByRef $iMsg, ByRef $wParam, ByRef $lParam)
-$iMsg = $WM_MYBOTRUN_STATE_1_0
+$iMsg = $WM_MYBOTRUN_STATE
 $lParam = $g_hFrmBot
 $wParam = DllStructGetPtr($tBotState)
 _DllStructSetData($tUpdateStats, "g_aiCurrentLoot", $g_aiCurrentLoot)
@@ -60017,6 +60179,9 @@ _DllStructSetData($tUpdateStats, "g_iGemAmount", $g_iGemAmount)
 _DllStructSetData($tUpdateStats, "g_iStatsTotalGain", $g_iStatsTotalGain)
 _DllStructSetData($tUpdateStats, "g_iStatsLastAttack", $g_iStatsLastAttack)
 _DllStructSetData($tUpdateStats, "g_iStatsBonusLast", $g_iStatsBonusLast)
+_DllStructSetData($tUpdateStats, "g_iFirstAttack", $g_iFirstAttack)
+_DllStructSetData($tUpdateStats, "g_aiAttackedCount", $g_aiAttackedCount)
+_DllStructSetData($tUpdateStats, "g_iSkippedVillageCount", $g_iSkippedVillageCount)
 PrepareStructBotState($tBotState, $g_eSTRUCT_UPDATE_STATS, DllStructGetPtr($tUpdateStats))
 If $g_iDebugWindowMessages Then SetDebugLog("PrepareUpdateStatsManagedMyBotHost: $hFrmHost=" & $hFrmHost & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam)
 Return True
@@ -60051,7 +60216,7 @@ Local $a = $g_ahManagedMyBotHosts[$i]
 Local $hFrmHost = $a[0]
 $g_ahManagedMyBotHosts[$i] = $a
 If IsHWnd($hFrmHost) Then
-Local $iMsg = $WM_MYBOTRUN_API_1_0
+Local $iMsg = $WM_MYBOTRUN_API
 Local $wParam = 0x0000
 Local $lParam = $g_hFrmBot
 Local $sExecute = $sExecutePrepare & "($hFrmHost, $iMsg, $wParam, $lParam" & $sAdditional & ")"
@@ -61904,6 +62069,7 @@ CleanSecureFiles()
 GetCOCDistributors()
 EndFunc
 Func SetupProfileFolder()
+SetDebugLog("SetupProfileFolder: " & $g_sProfilePath & "\" & $g_sProfileCurrentName)
 $g_sProfileConfigPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\config.ini"
 $g_sProfileBuildingStatsPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\stats_buildings.ini"
 $g_sProfileBuildingPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\building.ini"
@@ -62025,13 +62191,21 @@ SetLog("Found installed " & $g_sAndroidEmulator & " " & $g_sAndroidVersion, $COL
 EndIf
 SetLog(GetTranslatedFileIni("MBR GUI Design - Loading", "Msg_Android_instance_04", "Android Emulator Configuration: %s", $sAI), $COLOR_SUCCESS)
 LoadAmountOfResourcesImages()
+$g_iGuiPID = @AutoItPID
 $g_iBotLaunchTime = __TimerDiff($g_hBotLaunchTime)
 If $g_iGuiMode = 0 Then
-$g_iGuiPID = @AutoItPID
+SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "Waiting_for_Remote_GUI", "Waiting for remote GUI..."))
+SetDebugLog("Wait for GUI Process...")
 Local $timer = __TimerInit()
-While $g_iGuiPID = @AutoItPID And __TimerDiff($timer) < 15000
+While $g_iGuiPID = @AutoItPID And __TimerDiff($timer) < 60000
 _Sleep(50)
 WEnd
+If $g_iGuiPID = @AutoItPID Then
+SetDebugLog("GUI Process not received, close bot")
+BotClose()
+Else
+SetDebugLog("Linked to GUI Process " & $g_iGuiPID)
+EndIf
 EndIf
 DestroySplashScreen()
 CheckVersion()

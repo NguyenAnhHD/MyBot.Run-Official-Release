@@ -275,13 +275,16 @@ Func UpdateStats()
 		GUICtrlSetData($g_hLblHeroUpgCost, _NumberFormat($g_iCostDElixirHero, True))
 		$iOldCostDElixirHero = $g_iCostDElixirHero
 	EndIf
+	#ce
 
 	If $iOldSkippedVillageCount <> $g_iSkippedVillageCount Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_hLblResultVillagesSkipped, _NumberFormat($g_iSkippedVillageCount, True))
+		;mini GUICtrlSetData($g_hLblResultVillagesSkipped, _NumberFormat($g_iSkippedVillageCount, True))
 		GUICtrlSetData($g_hLblResultSkippedHourNow, _NumberFormat($g_iSkippedVillageCount, True))
 		$iOldSkippedVillageCount = $g_iSkippedVillageCount
 	EndIf
+
+	#cs mini
 
 	If $iOldDroppedTrophyCount <> $g_iDroppedTrophyCount Then
 		$bStatsUpdated = True
@@ -465,14 +468,16 @@ Func UpdateStats()
 		EndIf
 
 	Next
+	#ce
 
 	If $iOldAttackedCount <> $g_aiAttackedCount Then
 		$bStatsUpdated = True
-		GUICtrlSetData($g_hLblResultVillagesAttacked, _NumberFormat($g_aiAttackedCount, True))
+		;mini GUICtrlSetData($g_hLblResultVillagesAttacked, _NumberFormat($g_aiAttackedCount, True))
 		GUICtrlSetData($g_hLblResultAttackedHourNow, _NumberFormat($g_aiAttackedCount, True))
 		$iOldAttackedCount = $g_aiAttackedCount
 	EndIf
 
+	#cs mini
 	For $i = 0 To $g_iModeCount
 
 		If $i = $TS Then ContinueLoop

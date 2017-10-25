@@ -12,27 +12,60 @@
 ; ===============================================================================================================================
 #include-once
 
-Global $sWatchdogMutex = "MyBot.run/ManageFarm"
-Global $tagSTRUCT_BOT_STATE = "struct;hwnd BotHWnd;hwnd AndroidHWnd;boolean RunState;boolean Paused;boolean Launched;char Profile[64];char AndroidEmulator[32];char AndroidInstance[32];int StructType;ptr StructPtr;endstruct"
+; MyBot Manage Farm (Host) uses these enums to place data of client bot in array
+Global Enum $g_eBotDetailsBotForm = 0, $g_eBotDetailsTimer, $g_eBotDetailsProfile, $g_eBotDetailsCommandLine, $g_eBotDetailsTitle, $g_eBotDetailsRunState, $g_eBotDetailsPaused, $g_eBotDetailsLaunched, $g_eBotDetailsVerifyCount, $g_eBotDetailsBotStateStruct, $g_eBotDetailsOptionalStruct, $g_eBotDetailsArraySize
+; $tagSTRUCT_BOT_STATE defines bot state details
+Global $tagSTRUCT_BOT_STATE = _
+		"struct" & _
+		";hwnd BotHWnd" & _
+		";hwnd AndroidHWnd" & _
+		";boolean RunState" & _
+		";boolean Paused" & _
+		";boolean Launched" & _
+		";uint64 g_hTimerSinceStarted" & _
+		";uint g_iTimePassed" & _
+		";char Profile[64]" & _
+		";char AndroidEmulator[32]" & _
+		";char AndroidInstance[32]" & _
+		";int StructType" & _
+		";ptr StructPtr" & _
+		";boolean RegisterInHost" & _
+		";endstruct"
+; $tagSTRUCT_BOT_STATE can contain optional struct for additional information like Status Bar text or Stats
 Global Enum $g_eSTRUCT_NONE = 0, $g_eSTRUCT_STATUS_BAR, $g_eSTRUCT_UPDATE_STATS
 Global $tagSTRUCT_STATUS_BAR = "struct;char Text[255];endstruct"
-Global $tagSTRUCT_UPDATE_STATS = "struct;" & _
-									"LONG g_aiCurrentLoot[" & UBound($g_aiCurrentLoot) & "]" & _
-									";LONG g_iFreeBuilderCount" & _
-									";LONG g_iTotalBuilderCount" & _
-									";LONG g_iGemAmount" & _
-									";LONG g_iStatsTotalGain[" & UBound($g_iStatsTotalGain) & "]" & _
-									";LONG g_iStatsLastAttack[" & UBound($g_iStatsLastAttack) & "]" & _
-									";LONG g_iStatsBonusLast[" & UBound($g_iStatsBonusLast) & "]" & _
-								";endstruct"
+Global $tagSTRUCT_UPDATE_STATS = _
+		"struct" & _
+		";long g_aiCurrentLoot[" & UBound($g_aiCurrentLoot) & "]" & _
+		";long g_iFreeBuilderCount" & _
+		";long g_iTotalBuilderCount" & _
+		";long g_iGemAmount" & _
+		";long g_iStatsTotalGain[" & UBound($g_iStatsTotalGain) & "]" & _
+		";long g_iStatsLastAttack[" & UBound($g_iStatsLastAttack) & "]" & _
+		";long g_iStatsBonusLast[" & UBound($g_iStatsBonusLast) & "]" & _
+		";int g_iFirstAttack" & _
+		";int g_aiAttackedCount" & _
+		";int g_iSkippedVillageCount" & _
+		";endstruct"
 Global $tBotState = DllStructCreate($tagSTRUCT_BOT_STATE)
 Global $tStatusBar = DllStructCreate($tagSTRUCT_STATUS_BAR)
 Global $tUpdateStats = DllStructCreate($tagSTRUCT_UPDATE_STATS)
-Global $WM_MYBOTRUN_API_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/API/1.1")
-;SetDebugLog("MyBot.run/API/1.0 Message = " & $WM_MYBOTRUN_API_1_0)
-Global $WM_MYBOTRUN_STATE_1_0 = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/1.1")
-;SetDebugLog("MyBot.run/STATE/1.0 Message = " & $WM_MYBOTRUN_STATE_1_0)
 
+; API Version
+Global $API_VERSION = "1.1"
+
+; Mutex to ensure only one watchdog runs
+Global $sWatchdogMutex = "MyBot.run/ManageFarm/" & $API_VERSION
+
+; Register MyBot API Window Message
+Global $WM_MYBOTRUN_API = _WinAPI_RegisterWindowMessage("MyBot.run/API/" & $API_VERSION)
+SetDebugLog("MyBot.run/API/1.1 Message ID = " & $WM_MYBOTRUN_API)
+
+; Register MyBot State Window Message
+Global $WM_MYBOTRUN_STATE = _WinAPI_RegisterWindowMessage("MyBot.run/STATE/" & $API_VERSION)
+SetDebugLog("MyBot.run/STATE/1.1 Message ID = " & $WM_MYBOTRUN_STATE)
+
+; Struct helper methods
 Func _DllStructSetData(ByRef $Struct, $Element, $value, $index = Default)
 	If IsArray($value) Then
 		Local $Result[UBound($value)]
@@ -43,7 +76,7 @@ Func _DllStructSetData(ByRef $Struct, $Element, $value, $index = Default)
 	Else
 		Return DllStructSetData($Struct, $Element, $value, $index)
 	EndIf
-EndFunc
+EndFunc   ;==>_DllStructSetData
 
 Func _DllStructLoadData(ByRef $Struct, $Element, ByRef $value)
 	If IsArray($value) Then
@@ -55,5 +88,5 @@ Func _DllStructLoadData(ByRef $Struct, $Element, ByRef $value)
 		$value = DllStructGetData($Struct, $Element)
 		Return 0
 	EndIf
-EndFunc
+EndFunc   ;==>_DllStructLoadData
 

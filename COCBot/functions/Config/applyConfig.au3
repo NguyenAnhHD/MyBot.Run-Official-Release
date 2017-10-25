@@ -15,11 +15,6 @@
 
 Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the data from config to the controls in GUI
 
-	If $g_iGuiMode = 0 Then
-		UpdateBotTitle()
-		Return
-	EndIf
-
 	Static $iApplyConfigCount = 0
 	$iApplyConfigCount += 1
 	SetDebugLog("applyConfig(), call number " & $iApplyConfigCount)
@@ -35,7 +30,18 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 		If $g_iFrmBotDockedPosX > -30000 And $g_iFrmBotDockedPosY > -30000 And $g_bFrmBotMinimized = False Then WinMove($g_hFrmBot, "", $g_iFrmBotDockedPosX, $g_iFrmBotDockedPosY)
 	EndIf
 
-	If $g_iGuiMode <> 1 Then Return
+	If $g_iGuiMode <> 1 Then
+		If $g_iGuiMode = 2 Then ; mini mode controls
+			Switch $TypeReadSave
+				Case "Read"
+					GUICtrlSetState($g_hChkBackgroundMode, $g_bChkBackgroundMode = True ? $GUI_CHECKED : $GUI_UNCHECKED)
+				Case "Save"
+					$g_bChkBackgroundMode = (GUICtrlRead($g_hChkBackgroundMode) = $GUI_CHECKED)
+			EndSwitch
+		EndIf
+		UpdateBotTitle()
+		Return
+	EndIf
 
 	; Move with redraw disabled causes ghost window in VMWare, so move first then disable redraw
 	Local $bWasRdraw = SetRedrawBotWindow(False, Default, Default, Default, "applyConfig")

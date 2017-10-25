@@ -78,10 +78,13 @@ MBR GUI Design.au3; CreateMainGUI()
 Global Const $TCM_SETITEM = 0x1306
 Global $_GUI_MAIN_WIDTH = 472 ; changed from 470 to 472 for DPI scaling cutting off right by 2 pixel
 Global $_GUI_MAIN_HEIGHT = 692 ; changed from 690 to 692 for DPI scaling cutting off bottom by 2 pixel
-Global Const $_MINIGUI_MAIN_WIDTH = 472 ; changed from 470 to 472 for DPI scaling cutting off right by 2 pixel
+Global Const $_NORMALGUI_MAIN_WIDTH = $_GUI_MAIN_WIDTH ; changed from 470 to 472 for DPI scaling cutting off right by 2 pixel
+Global Const $_NORMALGUI_MAIN_HEIGHT = $_GUI_MAIN_HEIGHT ; changed from 690 to 692 for DPI scaling cutting off bottom by 2 pixel
+Global Const $_MINIGUI_MAIN_WIDTH = $_GUI_MAIN_WIDTH ; changed from 470 to 472 for DPI scaling cutting off right by 2 pixel
 Global Const $_MINIGUI_MAIN_HEIGHT = 220 ; changed from 690 to 692 for DPI scaling cutting off bottom by 2 pixel
 Global $_GUI_MAIN_TOP = 23 ; Adjusted in CreateMainGUI()
 Global $_GUI_MAIN_BUTTON_SIZE = [25, 17] ; minimize/close button size
+Global $_GUI_MAIN_BUTTON_COUNT = 4
 Global $_GUI_CHILD_TOP = 110 + $_GUI_MAIN_TOP ; Adjusted in CreateMainGUI()
 Global Const $_GUI_BOTTOM_HEIGHT = 135
 Global Const $_GUI_CHILD_LEFT = 10
@@ -99,9 +102,8 @@ Global Const $g_iSizeHGrpTab4 = $_GUI_MAIN_HEIGHT - 345 ;345
 Global $g_iBotDesignFlags = 3 ; Bit 0 = Use Windows Default Title Bar, 1 = Use new custom Title Bar, 2 = Auto Slide bot when docked and window activation changes, 4, 8, ... future features
 Global $g_bCustomTitleBarActive = Default ; Current state if custom title bar has been designed, set to True or False in CreateMainGUI()
 Global $g_bBotDockedShrinked = False ; Bot is shrinked or not when docked
-Global $hImageList = 0
-Global $g_hFrmBotButtons, $g_hFrmBotLogoUrlSmall, $g_hFrmBotEx = 0, $g_hLblBotTitle, $g_hLblBotShrink = 0, $g_hLblBotExpand = 0, $g_hLblBotMinimize = 0, $g_hLblBotClose = 0, $g_hFrmBotBottom = 0
-Global $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmBotEmbeddedGraphics = 0
+Global $g_hFrmBotButtons, $g_hFrmBotLogoUrlSmall, $g_hFrmBotEx = 0, $g_hLblBotTitle, $g_hLblBotShrink = 0, $g_hLblBotExpand = 0, $g_hLblBotMiniGUI = 0, $g_hLblBotNormalGUI = 0 _
+		, $g_hLblBotMinimize = 0, $g_hLblBotClose = 0, $g_hFrmBotBottom = 0, $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmBotEmbeddedGraphics = 0
 Global $g_hFrmBot_MAIN_PIC = 0, $g_hFrmBot_URL_PIC = 0, $g_hFrmBot_URL_PIC2 = 0
 Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabAbout = 0
 Global $g_hStatusBar = 0
@@ -111,6 +113,7 @@ Global $g_hFirstControlToHide = 0, $g_hLastControlToHide = 0, $g_aiControlPrevSt
 Global $g_bFrmBotMinimized = False ; prevents bot flickering
 
 Global $g_oCtrlIconData = ObjCreate("Scripting.Dictionary")
+Global $g_oGuiNotInMini = ObjCreate("Scripting.Dictionary")
 
 #include "GUI\MBR GUI Design Bottom.au3"
 #include "GUI\MBR GUI Design Log.au3"
@@ -145,7 +148,7 @@ Func CreateMainGUI()
 			$_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
 	EndSwitch
 
-	$g_hFrmBot = _GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, _
+	$g_hFrmBot = GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, _
 			BitOR($WS_MINIMIZEBOX, $WS_POPUP, $WS_SYSMENU, $WS_CLIPCHILDREN, $WS_CLIPSIBLINGS, $iStyle))
 
 	; Set Main Window icon
@@ -190,119 +193,153 @@ Func CreateMainGUI()
 
 EndFunc   ;==>CreateMainGUI
 
-Func CreateMainGUIControls()
+Func CreateMainGUIControls($bGuiModeUpdate = False)
 
-	Local $aBtnSize = $_GUI_MAIN_BUTTON_SIZE
-	GUISwitch($g_hFrmBot)
+	If Not $bGuiModeUpdate Then
 
-	If $g_iGuiMode = 0 Then Return
+		Local $aBtnSize = $_GUI_MAIN_BUTTON_SIZE
+		GUISwitch($g_hFrmBot)
 
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01", "Loading Main GUI..."))
+		Local $sStepText
+		Switch $g_iGuiMode
+			Case 0
+				Return
+			Case 1
+				$sStepText = GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01", "Loading Main GUI...")
+			Case 2
+				$sStepText = GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01_Mini", "Loading Mini GUI...")
+				;$_GUI_MAIN_BUTTON_COUNT = 3
+		EndSwitch
 
-	If $g_bCustomTitleBarActive Then
-		$g_hFrmBotButtons = GUICreate("My Bot Title Buttons", 3 * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_WIDTH - $aBtnSize[0] * 3, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
-		WinSetTrans($g_hFrmBotButtons, "", 254) ; trick to hide buttons from Android Screen that is not always refreshing
-	EndIf
-	; Need $g_hFrmBotEx for embedding Android
-	$g_hFrmBotEx = _GUICreate("My Bot Controls", $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, _
-			BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
-	If $g_bCustomTitleBarActive = False Then
-		; Window default title bar
-		GUICtrlCreateLabel("", 0, 0, $_GUI_MAIN_WIDTH, $_GUI_MAIN_TOP)
+		SplashStep($sStepText)
+
+		If $g_bCustomTitleBarActive Then
+			$g_hFrmBotButtons = GUICreate("My Bot Title Buttons", $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
+			WinSetTrans($g_hFrmBotButtons, "", 254) ; trick to hide buttons from Android Screen that is not always refreshing
+		EndIf
+		; Need $g_hFrmBotEx for embedding Android
+		$g_hFrmBotEx = GUICreate("My Bot Controls", $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, _
+				BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
+
+		$g_hToolTip = _GUIToolTip_Create($g_hFrmBot) ; tool tips for URL links etc
+		_GUIToolTip_SetMaxTipWidth($g_hToolTip, $_GUI_MAIN_WIDTH) ; support multiple lines
+
+		If $g_bCustomTitleBarActive = False Then
+			; Window default title bar
+			GUICtrlCreateLabel("", 0, 0, $_GUI_MAIN_WIDTH, $_GUI_MAIN_TOP)
+			GUICtrlSetOnEvent(-1, "BotMoveRequest")
+			GUICtrlSetBkColor(-1, $COLOR_WHITE)
+		Else
+			; align title bar with logo
+			Local $iTitleX = 25
+			GUICtrlCreateLabel("", 0, 0, $iTitleX, $_GUI_MAIN_TOP)
+			GUICtrlSetOnEvent(-1, "BotMoveRequest")
+			GUICtrlSetBkColor(-1, $COLOR_WHITE)
+			; title
+			$g_hLblBotTitle = GUICtrlCreateLabel($g_sBotTitle, $iTitleX, 0, $_GUI_MAIN_WIDTH - $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0] - 25, $_GUI_MAIN_TOP) ;, $SS_CENTER)
+			GUICtrlSetOnEvent(-1, "BotMoveRequest")
+			GUICtrlSetFont(-1, 11, 0, 0, "Segoe UI") ; "Verdana" "Lucida Console"
+			GUICtrlSetBkColor(-1, $COLOR_WHITE)
+			GUICtrlSetColor(-1, 0x171717)
+
+			; buttons, positions are adjusted also in BotShrinkExpandToggle()
+			GUISwitch($g_hFrmBotButtons)
+			; ◄ ► docked shrink/expand
+			$g_hLblBotShrink = GUICtrlCreateLabel(ChrW(0x25C4), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotShrink", "Shrink Bot when docked"))
+			GUICtrlSetFont(-1, 10)
+			GUICtrlSetBkColor(-1, 0xF0F0F0)
+			GUICtrlSetColor(-1, 0xB8B8B8)
+			$g_hLblBotExpand = GUICtrlCreateLabel(ChrW(0x25BA), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotExpand", "Expand Bot when docked"))
+			GUICtrlSetState(-1, $GUI_HIDE)
+			GUICtrlSetFont(-1, 10)
+			GUICtrlSetBkColor(-1, 0xF0F0F0)
+			GUICtrlSetColor(-1, 0xB8B8B8)
+			; ▄ █ Mini/Normal GUI mode switch
+			$g_hLblBotMiniGUI = GUICtrlCreateLabel(ChrW(0x2584), $aBtnSize[0] * ($_GUI_MAIN_BUTTON_COUNT - 3), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotMiniGUI", "Switch to Mini Mode"))
+			GUICtrlSetState(-1, $g_iGuiMode = 1 ? $GUI_SHOW : $GUI_HIDE)
+			GUICtrlSetFont(-1, 10)
+			GUICtrlSetBkColor(-1, 0xF0F0F0)
+			GUICtrlSetColor(-1, 0xB8B8B8)
+			$g_hLblBotNormalGUI = GUICtrlCreateLabel(ChrW(0x2588), $aBtnSize[0] * ($_GUI_MAIN_BUTTON_COUNT - 3), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotNormal", "Switch to Normal Mode"))
+			GUICtrlSetState(-1, $g_iGuiMode = 2 ? $GUI_SHOW : $GUI_HIDE)
+			GUICtrlSetFont(-1, 10)
+			GUICtrlSetBkColor(-1, 0xF0F0F0)
+			GUICtrlSetColor(-1, 0xB8B8B8)
+			; minimize button
+			$g_hLblBotMinimize = GUICtrlCreateLabel("̶", $aBtnSize[0] * ($_GUI_MAIN_BUTTON_COUNT - 2), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotMinimize", "Minimize"))
+			GUICtrlSetFont(-1, 10)
+			GUICtrlSetBkColor(-1, 0xF0F0F0)
+			GUICtrlSetColor(-1, 0xB8B8B8)
+			; close button
+			$g_hLblBotClose = GUICtrlCreateLabel("×", $aBtnSize[0] * ($_GUI_MAIN_BUTTON_COUNT - 1), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotClose", "Close"))
+			GUICtrlSetFont(-1, 10)
+			GUICtrlSetBkColor(-1, 0xFF4040)
+			GUICtrlSetColor(-1, 0xF8F8F8)
+
+			$g_hFrmBotLogoUrlSmall = GUICreate("My Bot URL", 290, 13, 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
+			;WinSetTrans($g_hFrmBotLogoUrlSmall, "", 254) ; trick to hide buttons from Android Screen that is not always refreshing
+			$g_hFrmBot_URL_PIC2 = _GUICtrlCreatePic($g_sLogoUrlSmallPath, 0, 0, 290, 13)
+			GUICtrlSetCursor(-1, 0)
+
+			GUISwitch($g_hFrmBotEx)
+			; fill button space
+			GUICtrlCreateLabel("", $_GUI_MAIN_WIDTH - $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $_GUI_MAIN_TOP - $aBtnSize[1])
+			GUICtrlSetOnEvent(-1, "BotMoveRequest")
+			GUICtrlSetBkColor(-1, $COLOR_WHITE)
+		EndIf
+
+		$g_hFrmBot_MAIN_PIC = _GUICtrlCreatePic($g_sLogoPath, 0, $_GUI_MAIN_TOP, $_GUI_MAIN_WIDTH, 67)
 		GUICtrlSetOnEvent(-1, "BotMoveRequest")
-		GUICtrlSetBkColor(-1, $COLOR_WHITE)
-	Else
-		; align title bar with logo
-		Local $iTitleX = 25
-		GUICtrlCreateLabel("", 0, 0, $iTitleX, $_GUI_MAIN_TOP)
-		GUICtrlSetOnEvent(-1, "BotMoveRequest")
-		GUICtrlSetBkColor(-1, $COLOR_WHITE)
-		; title
-		$g_hLblBotTitle = GUICtrlCreateLabel($g_sBotTitle, $iTitleX, 0, $_GUI_MAIN_WIDTH - 3 * $aBtnSize[0] - 25, $_GUI_MAIN_TOP) ;, $SS_CENTER)
-		GUICtrlSetOnEvent(-1, "BotMoveRequest")
-		GUICtrlSetFont(-1, 11, 0, 0, "Segoe UI") ; "Verdana" "Lucida Console"
-		GUICtrlSetBkColor(-1, $COLOR_WHITE)
-		GUICtrlSetColor(-1, 0x171717)
 
-		; buttons, positions are adjusted also in BotShrinkExpandToggle()
-		GUISwitch($g_hFrmBotButtons)
-		; ◄ ► docked shrink/expand
-		$g_hLblBotShrink = GUICtrlCreateLabel(ChrW(0x25C4), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
-		GUICtrlSetFont(-1, 10)
-		GUICtrlSetBkColor(-1, 0xF0F0F0)
-		GUICtrlSetColor(-1, 0xB8B8B8)
-		$g_hLblBotExpand = GUICtrlCreateLabel(ChrW(0x25BA), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
-		GUICtrlSetState(-1, $GUI_HIDE)
-		GUICtrlSetFont(-1, 10)
-		GUICtrlSetBkColor(-1, 0xF0F0F0)
-		GUICtrlSetColor(-1, 0xB8B8B8)
-		; minimize button
-		$g_hLblBotMinimize = GUICtrlCreateLabel("̶", $aBtnSize[0], 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
-		GUICtrlSetFont(-1, 10)
-		GUICtrlSetBkColor(-1, 0xF0F0F0)
-		GUICtrlSetColor(-1, 0xB8B8B8)
-		; close button
-		$g_hLblBotClose = GUICtrlCreateLabel("×", $aBtnSize[0] * 2, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
-		GUICtrlSetFont(-1, 10)
-		GUICtrlSetBkColor(-1, 0xFF4040)
-		GUICtrlSetColor(-1, 0xF8F8F8)
-
-		$g_hFrmBotLogoUrlSmall = _GUICreate("My Bot URL", 290, 13, 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
-		;WinSetTrans($g_hFrmBotLogoUrlSmall, "", 254) ; trick to hide buttons from Android Screen that is not always refreshing
-		$g_hFrmBot_URL_PIC2 = _GUICtrlCreatePic($g_sLogoUrlSmallPath, 0, 0, 290, 13)
+		$g_hFrmBot_URL_PIC = _GUICtrlCreatePic($g_sLogoUrlPath, 0, $_GUI_MAIN_TOP + 67, $_GUI_MAIN_WIDTH, 13)
 		GUICtrlSetCursor(-1, 0)
 
+		GUISwitch($g_hFrmBot)
+		$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateInput("", 0, 0, -1, -1, $WS_TABSTOP)
+		;$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateLabel("", 0, 0, 0, 0, $WS_TABSTOP)
+		;$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateDummy()
+		GUICtrlSetState($g_hFrmBotEmbeddedShieldInput, $GUI_HIDE)
+
+		$g_hFrmBotBottom = GUICreate("My Bot Buttons", $_GUI_MAIN_WIDTH, $_GUI_BOTTOM_HEIGHT, 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, _
+				BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
+
+	;~ ------------------------------------------------------
+	;~ Header Menu
+	;~ ------------------------------------------------------
+		GUISwitch($g_hFrmBot)
+		;$idMENU_DONATE = GUICtrlCreateMenu("&" & GetTranslatedFileIni("MBR GUI Design Bottom", "g_hLblDonate_Info_01", "Paypal Donate?"))
+		;_GUICtrlMenu_SetItemType(_GUICtrlMenu_GetMenu($g_hFrmBot), 0, $MFT_RIGHTJUSTIFY) ; move to right
+		;$idMENU_DONATE_SUPPORT = GUICtrlCreateMenuItem(GetTranslatedFileIni("MBR GUI Design Bottom", "g_hLblDonate", "Support the development"), $idMENU_DONATE)
+		;GUICtrlSetOnEvent(-1, "")
+
+	;~ ------------------------------------------------------
+	;~ GUI Bottom Panel
+	;~ ------------------------------------------------------
+		SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_02", "Loading GUI Bottom..."))
+		GUISwitch($g_hFrmBotBottom)
+		CreateBottomPanel()
+
+	;~ ------------------------------------------------------
+	;~ GUI Child Tab Files
+	;~ ------------------------------------------------------
 		GUISwitch($g_hFrmBotEx)
-		; fill button space
-		GUICtrlCreateLabel("", $_GUI_MAIN_WIDTH - 3 * $aBtnSize[0], $aBtnSize[1], 3 * $aBtnSize[0], $_GUI_MAIN_TOP - $aBtnSize[1])
-		GUICtrlSetOnEvent(-1, "BotMoveRequest")
-		GUICtrlSetBkColor(-1, $COLOR_WHITE)
+
+		; Bottom status bar
+		$g_hStatusBar = _GUICtrlStatusBar_Create($g_hFrmBotBottom)
+		_GUICtrlStatusBar_SetSimple($g_hStatusBar)
+		_GUICtrlStatusBar_SetText($g_hStatusBar, "Status : Idle")
+
+	Else
+
+		GUISwitch($g_hFrmBotEx)
+
 	EndIf
-
-	$g_hFrmBot_MAIN_PIC = _GUICtrlCreatePic($g_sLogoPath, 0, $_GUI_MAIN_TOP, $_GUI_MAIN_WIDTH, 67)
-	GUICtrlSetOnEvent(-1, "BotMoveRequest")
-
-	$g_hFrmBot_URL_PIC = _GUICtrlCreatePic($g_sLogoUrlPath, 0, $_GUI_MAIN_TOP + 67, $_GUI_MAIN_WIDTH, 13)
-	GUICtrlSetCursor(-1, 0)
-
-	$g_hToolTip = _GUIToolTip_Create($g_hFrmBot) ; tool tips for URL links etc
-	_GUIToolTip_SetMaxTipWidth($g_hToolTip, $_GUI_MAIN_WIDTH) ; support multiple lines
-
-	GUISwitch($g_hFrmBot)
-	$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateInput("", 0, 0, -1, -1, $WS_TABSTOP)
-	;$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateLabel("", 0, 0, 0, 0, $WS_TABSTOP)
-	;$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateDummy()
-	GUICtrlSetState($g_hFrmBotEmbeddedShieldInput, $GUI_HIDE)
-
-	$g_hFrmBotBottom = _GUICreate("My Bot Buttons", $_GUI_MAIN_WIDTH, $_GUI_BOTTOM_HEIGHT, 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, _
-			BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
-
-;~ ------------------------------------------------------
-;~ Header Menu
-;~ ------------------------------------------------------
-	GUISwitch($g_hFrmBot)
-	;$idMENU_DONATE = GUICtrlCreateMenu("&" & GetTranslatedFileIni("MBR GUI Design Bottom", "g_hLblDonate_Info_01", "Paypal Donate?"))
-	;_GUICtrlMenu_SetItemType(_GUICtrlMenu_GetMenu($g_hFrmBot), 0, $MFT_RIGHTJUSTIFY) ; move to right
-	;$idMENU_DONATE_SUPPORT = GUICtrlCreateMenuItem(GetTranslatedFileIni("MBR GUI Design Bottom", "g_hLblDonate", "Support the development"), $idMENU_DONATE)
-	;GUICtrlSetOnEvent(-1, "")
-
-;~ ------------------------------------------------------
-;~ GUI Bottom Panel
-;~ ------------------------------------------------------
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_02", "Loading GUI Bottom..."))
-	GUISwitch($g_hFrmBotBottom)
-	CreateBottomPanel()
-
-;~ ------------------------------------------------------
-;~ GUI Child Tab Files
-;~ ------------------------------------------------------
-	GUISwitch($g_hFrmBotEx)
-
-	; Bottom status bar
-	$g_hStatusBar = _GUICtrlStatusBar_Create($g_hFrmBotBottom)
-	_GUICtrlStatusBar_SetSimple($g_hStatusBar)
-	GUISetDefaultFont($g_hStatusBar)
-	_GUICtrlStatusBar_SetText($g_hStatusBar, "Status : Idle")
 
 	If $g_iGuiMode = 2 Then
 		Return
@@ -326,7 +363,14 @@ Func CreateMainGUIControls()
 	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_07", "Loading About Us tab..."))
 	CreateAboutTab()
 
-	SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_08", "Initializing GUI..."))
+	Local $sStepText = ""
+	Switch $g_iGuiMode
+		Case 1
+			$sStepText = GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_08", "Initializing GUI...")
+		Case 2
+			$sStepText = GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_08_Mini", "Initializing Mini GUI...")
+	EndSwitch
+	SplashStep($sStepText)
 
 ;~ ------------------------------------------------------
 ;~ GUI Main Tab Control
@@ -345,32 +389,53 @@ Func CreateMainGUIControls()
 ;~ GUI init
 ;~ -------------------------------------------------------------
 	; Bind Icon images to all Tabs in all GUI windows (main and children)
-	Bind_ImageList($g_hTabMain)
 
-	Bind_ImageList($g_hGUI_VILLAGE_TAB)
-	Bind_ImageList($g_hGUI_MISC_TAB)
-	Bind_ImageList($g_hGUI_DONATE_TAB)
-	Bind_ImageList($g_hGUI_UPGRADE_TAB)
-	Bind_ImageList($g_hGUI_NOTIFY_TAB)
+	; Static to avoid GDI Handle leak
+	Static $g_hTabMain_ImageList = 0
+	Static $g_hGUI_VILLAGE_TAB_ImageList = 0
+	Static $g_hGUI_MISC_TAB_ImageList = 0
+	Static $g_hGUI_DONATE_TAB_ImageList = 0
+	Static $g_hGUI_UPGRADE_TAB_ImageList = 0
+	Static $g_hGUI_NOTIFY_TAB_ImageList = 0
+	Static $g_hGUI_ATTACK_TAB_ImageList = 0
+	Static $g_hGUI_TRAINARMY_TAB_ImageList = 0
+	Static $g_hGUI_SEARCH_TAB_ImageList = 0
+	Static $g_hGUI_DEADBASE_TAB_ImageList = 0
+	Static $g_hGUI_ACTIVEBASE_TAB_ImageList = 0
+	Static $g_hGUI_THSNIPE_TAB_ImageList = 0
+	Static $g_hGUI_ATTACKOPTION_TAB_ImageList = 0
+	Static $g_hGUI_STRATEGIES_TAB_ImageList = 0
+	Static $g_hGUI_BOT_TAB_ImageList = 0
+	Static $g_hGUI_STATS_TAB_ImageList = 0
 
-	Bind_ImageList($g_hGUI_ATTACK_TAB)
-	Bind_ImageList($g_hGUI_TRAINARMY_TAB)
-	Bind_ImageList($g_hGUI_SEARCH_TAB)
-	Bind_ImageList($g_hGUI_DEADBASE_TAB)
-	Bind_ImageList($g_hGUI_ACTIVEBASE_TAB)
-	Bind_ImageList($g_hGUI_THSNIPE_TAB)
-	Bind_ImageList($g_hGUI_ATTACKOPTION_TAB)
-	Bind_ImageList($g_hGUI_STRATEGIES_TAB)
+	Bind_ImageList($g_hTabMain, $g_hTabMain_ImageList)
 
-	Bind_ImageList($g_hGUI_BOT_TAB)
+	Bind_ImageList($g_hGUI_VILLAGE_TAB, $g_hGUI_VILLAGE_TAB_ImageList)
+	Bind_ImageList($g_hGUI_MISC_TAB, $g_hGUI_MISC_TAB_ImageList)
+	Bind_ImageList($g_hGUI_DONATE_TAB, $g_hGUI_DONATE_TAB_ImageList)
+	Bind_ImageList($g_hGUI_UPGRADE_TAB, $g_hGUI_UPGRADE_TAB_ImageList)
+	Bind_ImageList($g_hGUI_NOTIFY_TAB, $g_hGUI_NOTIFY_TAB_ImageList)
 
-	Bind_ImageList($g_hGUI_STATS_TAB)
+	Bind_ImageList($g_hGUI_ATTACK_TAB, $g_hGUI_ATTACK_TAB_ImageList)
+	Bind_ImageList($g_hGUI_TRAINARMY_TAB, $g_hGUI_TRAINARMY_TAB_ImageList)
+	Bind_ImageList($g_hGUI_SEARCH_TAB, $g_hGUI_SEARCH_TAB_ImageList)
+	Bind_ImageList($g_hGUI_DEADBASE_TAB, $g_hGUI_DEADBASE_TAB_ImageList)
+	Bind_ImageList($g_hGUI_ACTIVEBASE_TAB, $g_hGUI_ACTIVEBASE_TAB_ImageList)
+	Bind_ImageList($g_hGUI_THSNIPE_TAB, $g_hGUI_THSNIPE_TAB_ImageList)
+	Bind_ImageList($g_hGUI_ATTACKOPTION_TAB, $g_hGUI_ATTACKOPTION_TAB_ImageList)
+	Bind_ImageList($g_hGUI_STRATEGIES_TAB, $g_hGUI_STRATEGIES_TAB_ImageList)
+
+	Bind_ImageList($g_hGUI_BOT_TAB, $g_hGUI_BOT_TAB_ImageList)
+
+	Bind_ImageList($g_hGUI_STATS_TAB, $g_hGUI_STATS_TAB_ImageList)
 
 	; Show Tab LOG
-	GUICtrlSetState($g_hGUI_LOG, $GUI_SHOW)
+	GUICtrlSetState($g_hTabLog, $GUI_SHOW)
+	tabMain()
 
 	; Create log window
 	cmbLog()
+
 
 ;~ -------------------------------------------------------------
 	SetDebugLog("$g_hFrmBot=" & $g_hFrmBot, Default, True)
@@ -495,16 +560,14 @@ Func GetProcessDpiAwareness($iPid)
 	Return $iDpiAwareness
 EndFunc   ;==>GetProcessDpiAwareness
 
+; Create GUI but register it also in $g_oGuiNotInMini to get deleted when switching to Mini Mode
 Func _GUICreate($title, $width, $height, $left = -1, $top = -1, $style = -1, $exStyle = -1, $parent = 0)
 	Local $h = GUICreate($title, $width, $height, $left, $top, $style, $exStyle, $parent)
-	GUISetDefaultFont($h)
+	Local $key = String($h)
+	Local $obj = $h
+	$g_oGuiNotInMini.Add($key, $obj)
 	Return $h
 EndFunc   ;==>_GUICreate
-
-Func GUISetDefaultFont($h)
-	; Disabled for now as DPI Aware support is more difficult to add
-	;GUISetFont(8.5 * GetDPIRatio(), 0, 0, "", $h) ; update gui for scales DPI settings
-EndFunc   ;==>GUISetDefaultFont
 
 ;######################################################################################################################################
 ; #FUNCTION# ====================================================================================================================

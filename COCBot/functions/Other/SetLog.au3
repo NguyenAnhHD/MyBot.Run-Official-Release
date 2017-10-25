@@ -83,7 +83,7 @@ Func _SetLog($sLogMessage, $Color = Default, $Font = Default, $FontSize = Defaul
 	If $bActive Then Return
 	$bActive = True
 
-	If (($g_hTxtLog <> 0 Or $g_iGuiMode = 0) And $g_bRunState = False) Or ($bPostponed = False And __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout) Then
+	If (($g_hTxtLog <> 0 Or $g_iGuiMode <> 1) And $g_bRunState = False) Or ($bPostponed = False And __TimerDiff($g_hTxtLogTimer) >= $g_iTxtLogTimerTimeout) Then
 		; log now to GUI
 		CheckPostponedLog()
 	EndIf
@@ -199,7 +199,7 @@ Func FlushGuiLog(ByRef $hTxtLog, ByRef $oTxtLog, $bUpdateStatus = False, $sLogMu
 			EndIf
 		EndIf
 
-		If $bUpdateStatus = True And ($g_hStatusBar Or $g_iGuiMode = 0) And $iSize > 4 And $a[4] = 1 Then
+		If $bUpdateStatus = True And ($g_hStatusBar Or $g_iGuiMode <> 1) And $iSize > 4 And $a[4] = 1 Then
 			$sLastStatus = $a[0]
 			; only till CR/LF or text overwrites
 			Local $iPosCr = StringInStr($sLastStatus, Chr(13))
@@ -231,15 +231,15 @@ Func FlushGuiLog(ByRef $hTxtLog, ByRef $oTxtLog, $bUpdateStatus = False, $sLogMu
 EndFunc   ;==>FlushGuiLog
 
 Func CheckPostponedLog($bNow = False)
-	;SetDebugLog("CheckPostponedLog: Entered, $bNow=" & $bNow & ", count=" & $g_oTxtLogInitText.Count & ", $g_hTxtLog=" & $g_hTxtLog & ", remote=" & $g_iGuiMode = 0)
+	;SetDebugLog("CheckPostponedLog: Entered, $bNow=" & $bNow & ", count=" & $g_oTxtLogInitText.Count & ", $g_hTxtLog=" & $g_hTxtLog & ", $g_iGuiMode=" & $g_iGuiMode)
 	Local $iLogs = 0
 	If $g_bCriticalMessageProcessing Or ($bNow = False And __TimerDiff($g_hTxtLogTimer) < $g_iTxtLogTimerTimeout) Then Return 0
 
-	If $g_oTxtLogInitText.Count > 0 And ($g_hTxtLog Or $g_iGuiMode = 0) Then
+	If $g_oTxtLogInitText.Count > 0 And ($g_hTxtLog Or $g_iGuiMode <> 1) Then
 		$iLogs += FlushGuiLog($g_hTxtLog, $g_oTxtLogInitText, True, "txtLog")
 	EndIf
 
-	If $g_oTxtAtkLogInitText.Count > 0 And ($g_hTxtAtkLog Or $g_iGuiMode = 0) Then
+	If $g_oTxtAtkLogInitText.Count > 0 And ($g_hTxtAtkLog Or $g_iGuiMode <> 1) Then
 		$iLogs += FlushGuiLog($g_hTxtAtkLog, $g_oTxtAtkLogInitText, False, "txtAtkLog")
 	EndIf
 

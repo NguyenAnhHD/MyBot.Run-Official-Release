@@ -143,7 +143,7 @@ Func CreateMainGUI()
 		$_GUI_MAIN_WIDTH = $_MINIGUI_MAIN_WIDTH
 		$_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
 	EndIf
-	$g_hFrmBot = _GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, _
+	$g_hFrmBot = GUICreate($g_sBotTitle, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT + $_GUI_MAIN_TOP, $g_iFrmBotPosX, $g_iFrmBotPosY, _
 			BitOR($WS_MINIMIZEBOX, $WS_POPUP, $WS_SYSMENU, $WS_CLIPCHILDREN, $WS_CLIPSIBLINGS, $iStyle))
 
 	; Set Main Window icon
@@ -205,8 +205,12 @@ Func CreateMainGUIControls()
 		WinSetTrans($g_hFrmBotButtons, "", 254) ; trick to hide buttons from Android Screen that is not always refreshing
 	EndIf
 	; Need $g_hFrmBotEx for embedding Android
-	$g_hFrmBotEx = _GUICreate("My Bot Controls", $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, _
+	$g_hFrmBotEx = GUICreate("My Bot Controls", $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, _
 			BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
+
+	$g_hToolTip = _GUIToolTip_Create($g_hFrmBot) ; tool tips for URL links etc
+	_GUIToolTip_SetMaxTipWidth($g_hToolTip, $_GUI_MAIN_WIDTH) ; support multiple lines
+
 	If $g_bCustomTitleBarActive = False Then
 		; Window default title bar
 		GUICtrlCreateLabel("", 0, 0, $_GUI_MAIN_WIDTH, $_GUI_MAIN_TOP)
@@ -227,13 +231,15 @@ Func CreateMainGUIControls()
 
 		; buttons, positions are adjusted also in BotShrinkExpandToggle()
 		GUISwitch($g_hFrmBotButtons)
-		If Not $g_bGuiRemote Then
+		If $g_iGuiMode = 1 Then
 			; ◄ ► docked shrink/expand
 			$g_hLblBotShrink = GUICtrlCreateLabel(ChrW(0x25C4), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotShrink", "Shrink when docked"))
 			GUICtrlSetFont(-1, 10)
 			GUICtrlSetBkColor(-1, 0xF0F0F0)
 			GUICtrlSetColor(-1, 0xB8B8B8)
 			$g_hLblBotExpand = GUICtrlCreateLabel(ChrW(0x25BA), 0, 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotExpand", "Expand when docked"))
 			GUICtrlSetState(-1, $GUI_HIDE)
 			GUICtrlSetFont(-1, 10)
 			GUICtrlSetBkColor(-1, 0xF0F0F0)
@@ -241,23 +247,25 @@ Func CreateMainGUIControls()
 		EndIf
 		; minimize button
 		$g_hLblBotMinimize = GUICtrlCreateLabel("̶", $aBtnSize[0] * ($_GUI_MAIN_BUTTON_COUNT - 2), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+		_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotMinimize", "Minimize"))
 		GUICtrlSetFont(-1, 10)
 		GUICtrlSetBkColor(-1, 0xF0F0F0)
 		GUICtrlSetColor(-1, 0xB8B8B8)
 		; close button
 		$g_hLblBotClose = GUICtrlCreateLabel("×", $aBtnSize[0] * ($_GUI_MAIN_BUTTON_COUNT - 1), 0, $aBtnSize[0], $aBtnSize[1], $SS_CENTER)
+		_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Title", "LblBotClose", "Close"))
 		GUICtrlSetFont(-1, 10)
 		GUICtrlSetBkColor(-1, 0xFF4040)
 		GUICtrlSetColor(-1, 0xF8F8F8)
 
-		$g_hFrmBotLogoUrlSmall = _GUICreate("My Bot URL", 290, 13, 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
+		$g_hFrmBotLogoUrlSmall = GUICreate("My Bot URL", 290, 13, 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
 		;WinSetTrans($g_hFrmBotLogoUrlSmall, "", 254) ; trick to hide buttons from Android Screen that is not always refreshing
 		$g_hFrmBot_URL_PIC2 = _GUICtrlCreatePic($g_sLogoUrlSmallPath, 0, 0, 290, 13)
 		GUICtrlSetCursor(-1, 0)
 
 		GUISwitch($g_hFrmBotEx)
 		; fill button space
-		GUICtrlCreateLabel("", $_GUI_MAIN_WIDTH - 3 * $aBtnSize[0], $aBtnSize[1], 3 * $aBtnSize[0], $_GUI_MAIN_TOP - $aBtnSize[1])
+		GUICtrlCreateLabel("", $_GUI_MAIN_WIDTH - $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_BUTTON_COUNT * $aBtnSize[0], $_GUI_MAIN_TOP - $aBtnSize[1])
 		GUICtrlSetOnEvent(-1, "BotMoveRequest")
 		GUICtrlSetBkColor(-1, $COLOR_WHITE)
 	EndIf
@@ -268,14 +276,11 @@ Func CreateMainGUIControls()
 	$g_hFrmBot_URL_PIC = _GUICtrlCreatePic($g_sLogoUrlPath, 0, $_GUI_MAIN_TOP + 67, $_GUI_MAIN_WIDTH, 13)
 	GUICtrlSetCursor(-1, 0)
 
-	$g_hToolTip = _GUIToolTip_Create($g_hFrmBot) ; tool tips for URL links etc
-	_GUIToolTip_SetMaxTipWidth($g_hToolTip, $_GUI_MAIN_WIDTH) ; support multiple lines
-
 	GUISwitch($g_hFrmBot)
 	$g_hFrmBotEmbeddedShieldInput = GUICtrlCreateInput("", 0, 0, -1, -1, $WS_TABSTOP)
 	GUICtrlSetState($g_hFrmBotEmbeddedShieldInput, $GUI_HIDE)
 
-	$g_hFrmBotBottom = _GUICreate("My Bot Buttons", $_GUI_MAIN_WIDTH, $_GUI_BOTTOM_HEIGHT, 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, _
+	$g_hFrmBotBottom = GUICreate("My Bot Buttons", $_GUI_MAIN_WIDTH, $_GUI_BOTTOM_HEIGHT, 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, _
 			BitOR($WS_CHILD, $WS_TABSTOP), 0, $g_hFrmBot)
 
 ;~ ------------------------------------------------------

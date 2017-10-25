@@ -30,7 +30,7 @@ EndFunc   ;==>GetAndroidDisplayHWnD
 
 ; Syncronized _AndroidEmbed
 Func AndroidEmbed($Embed = True, $CallWinGetAndroidHandle = True, $bForceEmbed = False, $bNoAndroidScreenSizeCheck = False)
-	If $g_iGuiMode = 0 Then Return False
+	If $g_iGuiMode <> 1 Then Return False
 	If $g_bAndroidEmbed = False Then Return False
 	Return _AndroidEmbed($Embed, $CallWinGetAndroidHandle, $bForceEmbed, $bNoAndroidScreenSizeCheck)
 	#cs
@@ -947,7 +947,7 @@ Func _AndroidShield($sCaller, $Enable = Default, $CallWinGetAndroidHandle = True
 		#ce
 		If $bDetachedShield = False Then
 			If $g_hFrmBotEmbeddedShield = 0 Then
-				$g_hFrmBotEmbeddedShield = _GUICreate("", $aPosCtl[2], $aPosCtl[3], 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), ($bNoVisibleShield ? $WS_EX_TRANSPARENT : 0), $g_hFrmBot) ; Android Shield for mouse
+				$g_hFrmBotEmbeddedShield = GUICreate("", $aPosCtl[2], $aPosCtl[3], 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), ($bNoVisibleShield ? $WS_EX_TRANSPARENT : 0), $g_hFrmBot) ; Android Shield for mouse
 			Else
 				WinMove($g_hFrmBotEmbeddedShield, "", 0, 0, $aPosCtl[2], $aPosCtl[3]) ; $HWND_TOPMOST
 			EndIf
@@ -956,10 +956,10 @@ Func _AndroidShield($sCaller, $Enable = Default, $CallWinGetAndroidHandle = True
 			Local $bHasFocus = WinActive($g_hFrmBot) <> 0
 			Local $a = AndroidEmbed_HWnD_Position(True, $bDetachedShield)
 			If $g_hFrmBotEmbeddedShield = 0 Then
-				$g_hFrmBotEmbeddedShield = _GUICreate("", $aPosCtl[2], $aPosCtl[3], $a[0], $a[1], BitOR($WS_POPUP, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, $WS_EX_TRANSPARENT), $g_hFrmBot) ; Android Shield for mouse
+				$g_hFrmBotEmbeddedShield = GUICreate("", $aPosCtl[2], $aPosCtl[3], $a[0], $a[1], BitOR($WS_POPUP, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, $WS_EX_TRANSPARENT), $g_hFrmBot) ; Android Shield for mouse
 				_WinAPI_EnableWindow($g_hFrmBotEmbeddedShield, False)
 				GUISetOnEvent($GUI_EVENT_PRIMARYDOWN, "BotMoveRequest")
-				$g_hFrmBotEmbeddedMouse = _GUICreate("", $aPosCtl[2], $aPosCtl[3], 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), $WS_EX_TRANSPARENT, $g_hFrmBot) ; Android Mouse layer
+				$g_hFrmBotEmbeddedMouse = GUICreate("", $aPosCtl[2], $aPosCtl[3], 0, 0, BitOR($WS_CHILD, $WS_TABSTOP), $WS_EX_TRANSPARENT, $g_hFrmBot) ; Android Mouse layer
 			EndIf
 			If $g_bBotDockedShrinked And Not $bHasFocus Then WinMove2($g_hFrmBotButtons, "", -1, -1, -1, -1, $HWND_BOTTOM, 0, False)
 			WinMove2($g_hFrmBotEmbeddedShield, "", $a[0], $a[1], $aPosCtl[2], $aPosCtl[3], ($bHasFocus ? -1 : $HWND_BOTTOM), 0, False) ; $SWP_SHOWWINDOW
@@ -1028,7 +1028,7 @@ Func AndroidGraphicsGdiBegin()
 			$iL = $a[0]
 			$iT = $a[1]
 		EndIf
-		$g_hFrmBotEmbeddedGraphics = _GUICreate("", $iW, $iH, $iL, $iT, $WS_CHILD, BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, $WS_EX_LAYERED, $WS_EX_TOPMOST), $g_hFrmBot)
+		$g_hFrmBotEmbeddedGraphics = GUICreate("", $iW, $iH, $iL, $iT, $WS_CHILD, BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, $WS_EX_LAYERED, $WS_EX_TOPMOST), $g_hFrmBot)
 	EndIf
 	WinMove2($g_hFrmBotEmbeddedGraphics, "", $iW, $iH, $iL, $iT, $HWND_NOTOPMOST, 0, False)
 	GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotEmbeddedGraphics)

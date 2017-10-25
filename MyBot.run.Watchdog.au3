@@ -41,9 +41,10 @@ Global Const $COLOR_SUCCESS = 0x006600 ; Dark Green, Action, method, or process 
 Global Const $COLOR_DEBUG = $COLOR_PURPLE ; Purple, basic debug color
 
 ; Global Variables
+Global $g_WatchDogLogStatusBar = False
 Global $g_WatchOnlyClientPID = Default
 Global $g_bRunState = True
-Global $frmBot = 0 ; Dummy form for messages
+Global $g_hFrmBot = 0 ; Dummy form for messages
 Global $g_iGlobalActiveBotsAllowed = 0 ; Dummy
 Global $g_hMutextOrSemaphoreGlobalActiveBots = 0 ; Dummy
 Global $g_hStatusBar = 0 ; Dummy
@@ -52,7 +53,7 @@ Global $hStarted = 0 ; Timer handle watchdog started
 Global $bCloseWhenAllBotsUnregistered = True ; Automatically close watchdog when all bots closed
 Global $iTimeoutBroadcast = 15000 ; Milliseconds of sending broadcast messages to bots
 Global $iTimeoutCheckBot = 5000 ; Milliseconds bots are checked if restart required
-Global $iTimeoutRestartBot = 120000 ; Milliseconds un-responsive bot is launched again
+Global $iTimeoutRestartBot = 240000 ; Milliseconds un-responsive bot is launched again
 Global $iTimeoutAutoClose = 60000 ; Milliseconds watchdog automatically closed when no bot available, -1 = disabled
 Global $hTimeoutAutoClose = 0 ; Timer Handle for $iTimeoutAutoClose
 Global $g_bBotLaunchOption_NoBotSlot = True
@@ -105,7 +106,11 @@ Func _SleepMilli($iMilliSec)
 	_SleepMicro(Int($iMilliSec * 1000))
 EndFunc   ;==>_SleepMilli
 
-Global $g_sBotTitle = "My Bot Watchdog " & $g_sBotVersion & " " ;~ Don't use any non file name supported characters like \ / : * ? " < > |
+Func UpdateManagedMyBot($aBotDetails)
+	Return True
+EndFunc   ;==>UpdateManagedMyBot
+
+Global $g_sBotTitle = "My Bot Watchdog " & $g_sBotVersion ;~ Don't use any non file name supported characters like \ / : * ? " < > |
 
 Opt("WinTitleMatchMode", 3) ; Window Title exact match mode
 
@@ -121,7 +126,7 @@ If $hMutex_BotTitle = 0 Then
 EndIf
 
 ; create dummy form for Window Messsaging
-$frmBot = GUICreate($g_sBotTitle, 32, 32)
+$g_hFrmBot = GUICreate($g_sBotTitle, 32, 32)
 $hStarted = __TimerInit() ; Timer handle watchdog started
 $hTimeoutAutoClose = $hStarted
 
@@ -130,7 +135,7 @@ Local $iActiveBots = 0
 While 1
 	$iActiveBots = UBound(GetManagedMyBotDetails())
 	SetDebugLog("Broadcast query bot state, registered bots: " & $iActiveBots)
-	_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API_1_0, $iActiveBots, $frmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
+	_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API, 0x0100 + $iActiveBots, $g_hFrmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
 
 	Local $hLoopTimer = __TimerInit()
 	Local $hCheckTimer = __TimerInit()
@@ -144,13 +149,13 @@ While 1
 	WEnd
 
 	; log active bots
-	$iActiveBots = GetActiveMyBotCount($iTimeoutBroadcast + 3000)
+	$iActiveBots = GetActiveMyBotCount($iTimeoutBroadcast * 2)
 	SetDebugLog("Active bots: " & $iActiveBots)
 
 	; automatically close watchdog when no bot available
 	If $iTimeoutAutoClose > -1 And __TimerDiff($hTimeoutAutoClose) > $iTimeoutAutoClose Then
 		If UBound(GetManagedMyBotDetails()) = 0 Then
-			SetLog("Closing " & $g_sBotTitle & "as no running bot found")
+			SetLog("Closing " & $g_sBotTitle & " as no running bot found")
 			$iExitCode = 1
 		EndIf
 		$hTimeoutAutoClose = __TimerInit() ; timeout starts again

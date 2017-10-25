@@ -316,6 +316,7 @@ EndFunc   ;==>InitializeAndroid
 ; Example .......: No
 ; ===============================================================================================================================
 Func SetupProfileFolder()
+	SetDebugLog("SetupProfileFolder: " & $g_sProfilePath & "\" & $g_sProfileCurrentName)
 	$g_sProfileConfigPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\config.ini"
 	$g_sProfileBuildingStatsPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\stats_buildings.ini"
 	$g_sProfileBuildingPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\building.ini"
@@ -534,17 +535,28 @@ Func FinalInitialization(Const $sAI)
 
 	LoadAmountOfResourcesImages()
 
+	; reset GUI to wait for remote GUI in no GUI mode
+	$g_iGuiPID = @AutoItPID
+
 	; Remember time in Milliseconds bot launched
 	$g_iBotLaunchTime = __TimerDiff($g_hBotLaunchTime)
 
 	; wait for remote GUI to show when no GUI in this process
 	If $g_iGuiMode = 0 Then
-		$g_iGuiPID = @AutoItPID
+		SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "Waiting_for_Remote_GUI", "Waiting for remote GUI..."))
+		SetDebugLog("Wait for GUI Process...")
+
 		Local $timer = __TimerInit()
-		While $g_iGuiPID = @AutoItPID And __TimerDiff($timer) < 15000
+		While $g_iGuiPID = @AutoItPID And __TimerDiff($timer) < 60000
 			; wait for GUI Process updating $g_iGuiPID
 			_Sleep(50)
 		WEnd
+		If $g_iGuiPID = @AutoItPID Then
+			SetDebugLog("GUI Process not received, close bot")
+			BotClose()
+		Else
+			SetDebugLog("Linked to GUI Process " & $g_iGuiPID)
+		EndIf
 	EndIf
 
 	; destroy splash screen here (so we witness the 100% ;)

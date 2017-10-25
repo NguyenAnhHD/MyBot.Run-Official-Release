@@ -245,8 +245,9 @@ Func updateBtnEmbed()
 	If $g_hBtnEmbed = 0 Then Return False
 	UpdateFrmBotStyle()
 	Local $state = GUICtrlGetState($g_hBtnEmbed)
-	If $g_hAndroidWindow = 0 Or $g_bAndroidBackgroundLaunched = True Or $g_bAndroidEmbed = False Then
+	If $g_hAndroidWindow = 0 Or $g_bAndroidBackgroundLaunched = True Or $g_bAndroidEmbed = False Or $g_iGuiMode <> 1 Then
 		If $state <> $GUI_DISABLE Then GUICtrlSetState($g_hBtnEmbed, $GUI_DISABLE)
+		updateBtnHideState()
 		Return False
 	EndIf
 

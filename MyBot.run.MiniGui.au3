@@ -80,7 +80,7 @@ Global $g_sBotTitle = "My Bot Mini " & $g_sBotVersion & " " ;~ Don't use any non
 Global $g_hFrmBot = 0
 Global $g_hFrmBotBackend = 0
 Global $g_bBotLaunched = False
-Global $g_iBotBackendFindTimeout = 3000;
+Global $g_iBotBackendFindTimeout = 3000
 
 Global $hStruct_SleepMicro = DllStructCreate("int64 time;")
 Global $pStruct_SleepMicro = DllStructGetPtr($hStruct_SleepMicro)
@@ -772,6 +772,10 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			btnHide()
 		Case $g_hBtnMakeScreenshot
 			btnMakeScreenshot()
+		Case $g_hPicTwoArrowShield
+			btnVillageStat()
+		Case $g_hPicArrowLeft, $g_hPicArrowRight
+			btnVillageStat()
 
 	EndSwitch
 	#cs mini
@@ -838,6 +842,21 @@ Func GUIControl_WM_MOVE($hWind, $iMsg, $wParam, $lParam)
 	Return $GUI_RUNDEFMSG
 EndFunc   ;==>GUIControl_WM_MOVE
 
+Func SetTime($bForceUpdate = False)
+	If $g_hTimerSinceStarted = 0 Then Return ; GIGO, no setTime when timer hasn't started yet
+	Local $day = 0, $hour = 0, $min = 0, $sec = 0
+	#cs mini
+		If GUICtrlRead($g_hGUI_STATS_TAB, 1) = $g_hGUI_STATS_TAB_ITEM2 Or $bForceUpdate = True Then
+		_TicksToDay(Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed), $day, $hour, $min, $sec)
+		GUICtrlSetData($g_hLblResultRuntime, $day > 0 ? StringFormat("%2u Day(s) %02i:%02i:%02i", $day, $hour, $min, $sec) : StringFormat("%02i:%02i:%02i", $hour, $min, $sec))
+		EndIf
+	#ce
+	If GUICtrlGetState($g_hLblResultGoldNow) <> $GUI_ENABLE + $GUI_SHOW Or $bForceUpdate = True Then
+		_TicksToTime(Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed), $hour, $min, $sec)
+		GUICtrlSetData($g_hLblResultRuntimeNow, StringFormat("%02i:%02i:%02i", $hour, $min, $sec))
+	EndIf
+EndFunc   ;==>SetTime
+
 Func TogglePause()
 	TogglePauseImpl("Mini")
 EndFunc   ;==>TogglePause
@@ -859,6 +878,62 @@ EndFunc   ;==>btnPause
 Func btnResume()
 	TogglePause()
 EndFunc   ;==>btnResume
+
+Func btnVillageStat($source = "")
+
+	If $g_iFirstRun = 0 And $g_bRunState And Not $g_bBotPaused Then SetTime(True)
+
+	If GUICtrlGetState($g_hLblResultGoldNow) = $GUI_ENABLE + $GUI_SHOW Then
+		;hide normal values
+		GUICtrlSetState($g_hLblResultGoldNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultElixirNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultDENow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultTrophyNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultBuilderNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultGemNow, $GUI_ENABLE + $GUI_HIDE)
+		;show stats values
+		GUICtrlSetState($g_hLblResultGoldHourNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hLblResultElixirHourNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hLblResultDEHourNow, $GUI_ENABLE + $GUI_SHOW)
+		If $g_iFirstRun = 0 Or $source = "UpdateStats" Then
+			GUICtrlSetState($g_hLblResultRuntimeNow, $GUI_ENABLE + $GUI_SHOW)
+			GUICtrlSetState($g_hLblResultAttackedHourNow, $GUI_ENABLE + $GUI_SHOW)
+			GUICtrlSetState($g_hLblResultSkippedHourNow, $GUI_ENABLE + $GUI_SHOW)
+		EndIf
+		; hide normal pics
+		GUICtrlSetState($g_hPicResultTrophyNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hPicResultBuilderNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hPicResultGemNow, $GUI_ENABLE + $GUI_HIDE)
+		;show stats pics
+		GUICtrlSetState($g_hPicResultRuntimeNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hPicResultAttackedHourNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hPicResultSkippedHourNow, $GUI_ENABLE + $GUI_SHOW)
+	Else
+		;show normal values
+		GUICtrlSetState($g_hLblResultGoldNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hLblResultElixirNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hLblResultDENow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hLblResultTrophyNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hLblResultBuilderNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hLblResultGemNow, $GUI_ENABLE + $GUI_SHOW)
+		;hide stats values
+		GUICtrlSetState($g_hLblResultGoldHourNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultElixirHourNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultDEHourNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultRuntimeNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultAttackedHourNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hLblResultSkippedHourNow, $GUI_ENABLE + $GUI_HIDE)
+		; show normal pics
+		GUICtrlSetState($g_hPicResultTrophyNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hPicResultBuilderNow, $GUI_ENABLE + $GUI_SHOW)
+		GUICtrlSetState($g_hPicResultGemNow, $GUI_ENABLE + $GUI_SHOW)
+		;hide stats pics
+		GUICtrlSetState($g_hPicResultRuntimeNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hPicResultAttackedHourNow, $GUI_ENABLE + $GUI_HIDE)
+		GUICtrlSetState($g_hPicResultSkippedHourNow, $GUI_ENABLE + $GUI_HIDE)
+	EndIf
+
+EndFunc   ;==>btnVillageStat
 
 Func btnHide()
 EndFunc   ;==>btnHide
@@ -911,8 +986,8 @@ EndFunc   ;==>tiExit
 Func BotStarted()
 	GUICtrlSetState($g_hBtnStart, $GUI_HIDE)
 	GUICtrlSetState($g_hBtnStop, $GUI_SHOW)
-	GUICtrlSetState($g_hBtnPause, $GUI_SHOW)
-	GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
+	GUICtrlSetState($g_hBtnPause, $g_bBotPaused ? $GUI_HIDE : $GUI_SHOW)
+	GUICtrlSetState($g_hBtnResume, $g_bBotPaused ? $GUI_SHOW : $GUI_HIDE)
 	GUICtrlSetState($g_hBtnSearchMode, $GUI_HIDE)
 	GUICtrlSetState($g_hChkBackgroundMode, $GUI_DISABLE)
 	TrayItemSetState($g_hTiStart, $TRAY_DISABLE)
@@ -949,26 +1024,47 @@ Func BotStopped()
 EndFunc   ;==>BotStopped
 
 Func UpdateManagedMyBot($aBotDetails)
-	If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[0])
-	Local $sTitle = $aBotDetails[3]
-	Local $bRunState = $aBotDetails[4]
-	Local $bPaused = $aBotDetails[5]
-	Local $bLaunched = $aBotDetails[6]
-	Local $tBotState = $aBotDetails[8]
-	Local $tOptionalStruct = $aBotDetails[9]
+	;Global Enum $g_eBotDetailsBotForm = 0, $g_eBotDetailsTimer, $g_eBotDetailsProfile, $g_eBotDetailsCommandLine, $g_eBotDetailsTitle, $g_eBotDetailsRunState, $g_eBotDetailsPaused, $g_eBotDetailsLaunched, $g_eBotDetailsVerifyCount, $g_eBotDetailsBotStateStruct, $g_eBotDetailsOptionalStruct, $g_eBotDetailsArraySize
+	If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[$g_eBotDetailsBotForm])
+	Local $sTitle = $aBotDetails[$g_eBotDetailsTitle]
+	Local $bRunState = $aBotDetails[$g_eBotDetailsRunState]
+	Local $bPaused = $aBotDetails[$g_eBotDetailsPaused]
+	Local $bLaunched = $aBotDetails[$g_eBotDetailsLaunched]
+	Local $tBotState = $aBotDetails[$g_eBotDetailsBotStateStruct]
+	Local $tOptionalStruct = $aBotDetails[$g_eBotDetailsOptionalStruct]
 	Local $sProfile = ""
 	Local $sEmulator = ""
 	Local $sInstance = ""
 	Local $eStructType = $g_eSTRUCT_NONE
 	Local $pStructPtr = 0
+	Local $hTimerSinceStarted = 0
+	Local $iTimePassed = 0
 	If $tBotState <> 0 Then
-		If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Update Sate: " & $aBotDetails[0])
+		If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Update Sate: " & $aBotDetails[$g_eBotDetailsBotForm])
 		$sProfile = DllStructGetData($tBotState, "Profile")
 		$sEmulator = DllStructGetData($tBotState, "AndroidEmulator")
 		$sInstance = DllStructGetData($tBotState, "AndroidInstance")
 		$eStructType = DllStructGetData($tBotState, "StructType")
 		$pStructPtr = DllStructGetData($tBotState, "StructPtr")
+		$hTimerSinceStarted = DllStructGetData($tBotState, "g_hTimerSinceStarted")
+		$iTimePassed = DllStructGetData($tBotState, "g_iTimePassed")
 	EndIf
+
+	Local $hFrmBotBackend = $g_hFrmBotBackend
+	Local $WatchOnlyClientPID = $g_WatchOnlyClientPID
+	If $hFrmBotBackend = 0 And $g_sAndroidEmulator = $sEmulator And $g_sAndroidInstance = $sInstance Then
+		; found backend bot
+		$hFrmBotBackend = $aBotDetails[$g_eBotDetailsBotForm]
+		$WatchOnlyClientPID = WinGetProcess($hFrmBotBackend)
+	EndIf
+
+	If $hFrmBotBackend = 0 Or $hFrmBotBackend <> $aBotDetails[$g_eBotDetailsBotForm] Then
+		; not managed bot
+		Return False
+	EndIf
+
+	$g_WatchOnlyClientPID = $WatchOnlyClientPID
+	$g_hFrmBotBackend = $hFrmBotBackend
 
 	Local $sStatusBar = Default
 	Local $AdditionalData
@@ -976,12 +1072,12 @@ Func UpdateManagedMyBot($aBotDetails)
 	If $pStructPtr Then
 		Switch $eStructType
 			Case $g_eSTRUCT_STATUS_BAR
-				If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Update Status Bar: " & $aBotDetails[0] & ", $pStructPtr=" & $pStructPtr)
+				If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Update Status Bar: " & $aBotDetails[$g_eBotDetailsBotForm] & ", $pStructPtr=" & $pStructPtr)
 				$sStatusBar = DllStructGetData($tOptionalStruct, "Text")
 				_GUICtrlStatusBar_SetTextEx($g_hStatusBar, $sStatusBar)
 				$AdditionalData = $sStatusBar
 			Case $g_eSTRUCT_UPDATE_STATS
-				If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Receive Update Stats: " & $aBotDetails[0] & ", $pStructPtr=" & $pStructPtr)
+				If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: Receive Update Stats: " & $aBotDetails[$g_eBotDetailsBotForm] & ", $pStructPtr=" & $pStructPtr)
 				_DllStructLoadData($tOptionalStruct, "g_aiCurrentLoot", $g_aiCurrentLoot)
 				_DllStructLoadData($tOptionalStruct, "g_iFreeBuilderCount", $g_iFreeBuilderCount)
 				_DllStructLoadData($tOptionalStruct, "g_iTotalBuilderCount", $g_iTotalBuilderCount)
@@ -989,27 +1085,27 @@ Func UpdateManagedMyBot($aBotDetails)
 				_DllStructLoadData($tOptionalStruct, "g_iStatsTotalGain", $g_iStatsTotalGain)
 				_DllStructLoadData($tOptionalStruct, "g_iStatsLastAttack", $g_iStatsLastAttack)
 				_DllStructLoadData($tOptionalStruct, "g_iStatsBonusLast", $g_iStatsBonusLast)
+				_DllStructLoadData($tOptionalStruct, "g_iFirstAttack", $g_iFirstAttack)
+				_DllStructLoadData($tOptionalStruct, "g_aiAttackedCount", $g_aiAttackedCount)
+				_DllStructLoadData($tOptionalStruct, "g_iSkippedVillageCount", $g_iSkippedVillageCount)
 				$g_iBotAction = $eBotUpdateStats
 		EndSwitch
 	EndIf
 
-	If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[0] & ", Profile: " & $sProfile & ", Android: " & $sEmulator & ", Instance: " & $sInstance & ", StructType: " & $eStructType & ", Ptr: " & $pStructPtr & ", Data:" & $AdditionalData)
-
-	If $g_hFrmBotBackend = 0 And $g_sAndroidEmulator = $sEmulator And $g_sAndroidInstance = $sInstance Then
-		; found already running backend bot
-		$g_hFrmBotBackend = $aBotDetails[0]
-		$g_WatchOnlyClientPID = WinGetProcess($g_hFrmBotBackend)
+	If $hTimerSinceStarted <> $g_hTimerSinceStarted Then
+		$g_hTimerSinceStarted = $hTimerSinceStarted
 	EndIf
 
-	If $g_hFrmBotBackend = 0 Or $g_hFrmBotBackend <> $aBotDetails[0] Then
-		; not managed bot
-		Return
+	If $iTimePassed <> $g_iTimePassed Then
+		$g_iTimePassed = $iTimePassed
 	EndIf
+
+	If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[$g_eBotDetailsBotForm] & ", Profile: " & $sProfile & ", Android: " & $sEmulator & ", Instance: " & $sInstance & ", StructType: " & $eStructType & ", Ptr: " & $pStructPtr & ", Data:" & $AdditionalData)
 
 	If $g_sProfileCurrentName <> $sProfile Then
 		$g_sProfileCurrentName = $sProfile
 		; Set the profile name on the village info group.
-		GUICtrlSetData($g_hGrpVillage, GetTranslatedFileIni("MBR Main GUI", "Tab_02", "Village") & ": " & $g_sProfileCurrentName)
+		GUICtrlSetData($g_hGrpVillage, GetTranslatedFileIni("MBR GUI Design Bottom", "GrpVillage", "Village") & ": " & $g_sProfileCurrentName)
 	EndIf
 	If $sEmulator <> "" Then $g_sAndroidEmulator = $sEmulator
 	If $sInstance <> "" Then $g_sAndroidInstance = $sInstance
@@ -1020,6 +1116,7 @@ Func UpdateManagedMyBot($aBotDetails)
 
 	; Check Start / Stop change
 	If $bRunState And (Not $g_bRunState Or $bStartStopInconsistent) Then
+		$g_bBotPaused = $bPaused ; update in case bot started and pause
 		BotStarted()
 	ElseIf Not $bRunState And ($g_bRunState = True Or $bStartStopInconsistent) Then
 		BotStopped()
@@ -1037,6 +1134,8 @@ Func UpdateManagedMyBot($aBotDetails)
 	$g_bRunState = $bRunState
 	$g_bBotPaused = $bPaused
 	$g_bBotLaunched = $bLaunched
+
+	Return True
 EndFunc   ;==>UpdateManagedMyBot
 
 Func LaunchBotBackend($bNoGUI = True)
@@ -1096,8 +1195,6 @@ Func LaunchBotBackend($bNoGUI = True)
 		If $g_bBotLaunched Then
 			If ProcessExists($g_WatchOnlyClientPID) Then
 				$pid = $g_WatchOnlyClientPID
-				; update GUI PID
-				_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1060, $g_hFrmBot)
 				ExitLoop
 			Else
 				; launch bot again
@@ -1110,7 +1207,7 @@ Func LaunchBotBackend($bNoGUI = True)
 			EndIf
 		EndIf
 
-		_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API_1_0, 0x01FF, $g_hFrmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
+		_WinAPI_BroadcastSystemMessage($WM_MYBOTRUN_API, 0x01FF, $g_hFrmBot, $BSF_POSTMESSAGE + $BSF_IGNORECURRENTTASK, $BSM_APPLICATIONS)
 
 		;Local $iActiveBots = GetActiveMyBotCount($iTimeoutBroadcast + 3000)
 		;SetDebugLog("Active bots: " & $iActiveBots)
@@ -1129,7 +1226,7 @@ Func BotStart()
 		If Not $g_bBotLaunched Then Return
 	EndIf
 	GUICtrlSetState($g_hBtnStart, $GUI_DISABLE)
-	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1000, $g_hFrmBot)
+	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x1000, $g_hFrmBot)
 EndFunc   ;==>BotStart
 
 Func BotStop()
@@ -1138,23 +1235,23 @@ Func BotStop()
 		If Not $g_bBotLaunched Then Return
 	EndIf
 	GUICtrlSetState($g_hBtnStop, $GUI_DISABLE)
-	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1010, $g_hFrmBot)
+	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x1010, $g_hFrmBot)
 EndFunc   ;==>BotStop
 
 Func btnMakeScreenshot()
-	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1050, $g_hFrmBot)
+	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x1050, $g_hFrmBot)
 EndFunc   ;==>btnMakeScreenshot
 
-Func TogglePauseImpl($Source)
+Func TogglePauseImpl($source)
 	If $g_bBotPaused Then
-		_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1020, $g_hFrmBot)
+		_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x1020, $g_hFrmBot)
 	Else
-		_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1030, $g_hFrmBot)
+		_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x1030, $g_hFrmBot)
 	EndIf
 EndFunc   ;==>TogglePauseImpl
 
 Func BotClose($SaveConfig = Default, $bExit = True)
-	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x1040, $g_hFrmBot)
+	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x1040, $g_hFrmBot)
 
 	$g_bRunState = False
 	$g_bBotPaused = False
@@ -1186,7 +1283,7 @@ EndFunc   ;==>ReferenceFunctions
 
 Func ReferenceGlobals()
 	If True Then Return
-EndFunc
+EndFunc   ;==>ReferenceGlobals
 
 ProcessCommandLine()
 
@@ -1194,7 +1291,8 @@ _Crypt_Startup()
 _GDIPlus_Startup() ; Start GDI+ Engine (incl. a new thread)
 
 $g_iGuiMode = 2
-Global $g_bGuiRemote = True ; GUI Remote flag
+$g_bGuiRemote = True ; GUI Remote flag
+$g_WatchDogLogStatusBar = True
 $g_iDebugSetlog = 1
 ;$g_iDebugWindowMessages = 1
 
@@ -1226,11 +1324,17 @@ LaunchBotBackend()
 
 If $g_bBotLaunched Then
 	; update stats
-	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x0200, $g_hFrmBot)
+	_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x0200, $g_hFrmBot)
 EndIf
+
+;UpdateMainGUI()
+GUICtrlSetState($g_hBtnStart, $GUI_ENABLE)
 
 ; Show main GUI
 ShowMainGUI()
+
+; update GUI PID
+_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x1060, $g_hFrmBot)
 
 ; GUI events and messages
 GUISetOnEvent($GUI_EVENT_CLOSE, "GUIEvents", $g_hFrmBot)
@@ -1244,10 +1348,7 @@ GUIRegisterMsg($WM_MOVE, "GUIControl_WM_MOVE")
 ;DllCall($g_hLibUser32DLL, "none", "DisableProcessWindowsGhosting")
 DllCall("user32.dll", "none", "DisableProcessWindowsGhosting")
 
-;UpdateMainGUI()
-GUICtrlSetState($g_hBtnStart, $GUI_ENABLE)
-
-Local $hStusUpdateTimer = 0
+Local $hStatusUpdateTimer = 0, $hTimeUpdateTimer = 0
 Local $iMainLoop = 1
 While 1
 	_Sleep(50, True, False)
@@ -1277,11 +1378,15 @@ While 1
 			UpdateStats()
 			$g_iBotAction = $eBotNoAction
 		Case Else
-			; update status
-			If $iMainLoop > 20 And ($hStusUpdateTimer = 0 Or __TimerDiff($hStusUpdateTimer) > 60000) Then
+			; update status (incl. stats)
+			If $iMainLoop > 20 And ($hStatusUpdateTimer = 0 Or __TimerDiff($hStatusUpdateTimer) > 60000) Then
 				$iMainLoop = 0
-				$hStusUpdateTimer = __TimerInit()
-				_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API_1_0, 0x0000, $g_hFrmBot)
+				$hStatusUpdateTimer = __TimerInit()
+				_WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x0200, $g_hFrmBot)
+			EndIf
+			If $hTimeUpdateTimer = 0 Or __TimerDiff($hTimeUpdateTimer) > 750 Then
+				SetTime()
+				$hTimeUpdateTimer = __TimerInit()
 			EndIf
 	EndSwitch
 
