@@ -321,7 +321,17 @@ Func ManagedMyBotHostsPostMessage($sExecutePrepare, $Value1 = Default, $Value2 =
 			Local $wParam = 0x0000
 			Local $lParam = $g_hFrmBot
 			Local $sExecute = $sExecutePrepare & "($hFrmHost, $iMsg, $wParam, $lParam" & $sAdditional & ")"
-			Local $bPostMessage = Execute($sExecute)
+			Local $bPostMessage
+			Switch $sExecutePrepare
+				Case "PrepareStatusBarManagedMyBotHost"
+					$bPostMessage = PrepareStatusBarManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam, $Value1)
+				Case "PrepareUpdateStatsManagedMyBotHost"
+					$bPostMessage = PrepareUpdateStatsManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam)
+				Case "PrepareUnregisterManagedMyBotHost"
+					$bPostMessage = PrepareUnregisterManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam)
+				Case Else
+					$bPostMessage = Execute($sExecute)
+			EndSwitch
 			If @error <> 0 And $bPostMessage = "" Then
 				SetDebugLog("ManagedMyBotHostsPostMessage: Error executing " & $sExecute)
 			ElseIf $bPostMessage = False Then
@@ -338,15 +348,3 @@ Func _GUICtrlStatusBar_SetTextEx($hWnd, $sText = "", $iPart = 0, $iUFlag = 0)
 	If $hWnd Then _GUICtrlStatusBar_SetText($hWnd, $sText, $iPart, $iUFlag)
 	StatusBarManagedMyBotHost($sText)
 EndFunc   ;==>_GUICtrlStatusBar_SetTextEx
-
-Func ReferenceApiClientFunctions()
-	If True Then Return
-	Local $hFrmHost = 0
-	Local $iMsg = 0
-	Local $wParam = 0
-	Local $lParam = 0
-	PrepareStatusBarManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam, "")
-	PrepareUpdateStatsManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam)
-EndFunc   ;==>ReferenceApiClientFunctions
-
-ReferenceApiClientFunctions()

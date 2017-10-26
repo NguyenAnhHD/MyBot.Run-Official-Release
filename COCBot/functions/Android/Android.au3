@@ -2981,18 +2981,28 @@ Func GetAndroidProcessPID($sPackage = Default, $bForeground = True)
 	Return 0
 EndFunc   ;==>GetAndroidProcessPID
 
-Func HideAndroidWindow($bHide = True)
+Func AndroidToFront()
+	;SetDebugLog("AndroidToFront")
+	WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_TOPMOST, 0, False)
+	WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+EndFunc   ;==>AndroidToFront
+
+Func HideAndroidWindow($bHide = True, $bActivateWhenShow = True)
 	ResumeAndroid()
 	WinGetAndroidHandle() ; updates android position
 	WinGetPos($g_hAndroidWindow)
-	If @error <> 0 Then Return SetError(0, 0, 0)
+	If @error <> 0 Or AndroidEmbedded() Then Return SetError(0, 0, 0)
 
 	Execute("Hide" & $g_sAndroidEmulator & "Window($bHide)")
 	If $bHide = True Then
 		WinMove($g_hAndroidWindow, "", -32000, -32000)
 	ElseIf $bHide = False Then
 		WinMove($g_hAndroidWindow, "", $g_iAndroidPosX, $g_iAndroidPosY)
-		WinActivate($g_hAndroidWindow)
+		If $bActivateWhenShow Then
+			WinActivate($g_hAndroidWindow)
+		Else
+			AndroidToFront()
+		EndIf
 	EndIf
 EndFunc   ;==>HideAndroidWindow
 

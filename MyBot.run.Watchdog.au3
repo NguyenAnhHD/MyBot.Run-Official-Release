@@ -53,7 +53,7 @@ Global $hStarted = 0 ; Timer handle watchdog started
 Global $bCloseWhenAllBotsUnregistered = True ; Automatically close watchdog when all bots closed
 Global $iTimeoutBroadcast = 15000 ; Milliseconds of sending broadcast messages to bots
 Global $iTimeoutCheckBot = 5000 ; Milliseconds bots are checked if restart required
-Global $iTimeoutRestartBot = 240000 ; Milliseconds un-responsive bot is launched again
+Global $iTimeoutRestartBot = 180000 ; Milliseconds un-responsive bot is launched again
 Global $iTimeoutAutoClose = 60000 ; Milliseconds watchdog automatically closed when no bot available, -1 = disabled
 Global $hTimeoutAutoClose = 0 ; Timer Handle for $iTimeoutAutoClose
 Global $g_bBotLaunchOption_NoBotSlot = True
@@ -122,7 +122,8 @@ Opt("WinTitleMatchMode", 3) ; Window Title exact match mode
 $hMutex_BotTitle = CreateMutex($sWatchdogMutex)
 If $hMutex_BotTitle = 0 Then
 	;MsgBox($MB_OK + $MB_ICONINFORMATION, $sBotTitle, "My Bot Watchdog is already running.")
-	Exit
+	SetLog($g_sBotTitle & " is already running")
+	Exit 2
 EndIf
 
 ; create dummy form for Window Messsaging
@@ -157,6 +158,7 @@ While 1
 		If UBound(GetManagedMyBotDetails()) = 0 Then
 			SetLog("Closing " & $g_sBotTitle & " as no running bot found")
 			$iExitCode = 1
+			ExitLoop
 		EndIf
 		$hTimeoutAutoClose = __TimerInit() ; timeout starts again
 	EndIf
@@ -166,3 +168,6 @@ WEnd
 ReleaseMutex($hMutex_BotTitle)
 DllClose("ntdll.dll")
 Exit ($iExitCode)
+
+; Reference function so stripper is not removing it
+UpdateManagedMyBot(True)

@@ -29,7 +29,7 @@ Func WM_MYBOTRUN_API_HOST($hWind, $iMsg, $wParam, $lParam)
 	Switch $wParamLo
 
 		; Post Message to Manage Farm App and consume message
-		Case 0x0000 To 0x00FF, 0x0100 To 0x01FF, 0x0200
+		Case 0x00FF, 0x01FF
 			; do not respond to any host query from other managers
 			$hWind = 0
 

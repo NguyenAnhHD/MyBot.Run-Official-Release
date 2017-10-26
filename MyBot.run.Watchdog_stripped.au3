@@ -477,7 +477,7 @@ Global $hStarted = 0
 Global $bCloseWhenAllBotsUnregistered = True
 Global $iTimeoutBroadcast = 15000
 Global $iTimeoutCheckBot = 5000
-Global $iTimeoutRestartBot = 240000
+Global $iTimeoutRestartBot = 180000
 Global $iTimeoutAutoClose = 60000
 Global $hTimeoutAutoClose = 0
 Global $g_iDebugWindowMessages = 0
@@ -508,6 +508,9 @@ DllCall($hNtDll, "dword", "ZwDelayExecution", "int", 0, "ptr", $pStruct_SleepMic
 EndFunc
 Func _SleepMilli($iMilliSec)
 _SleepMicro(Int($iMilliSec * 1000))
+EndFunc
+Func UpdateManagedMyBot($aBotDetails)
+Return True
 EndFunc
 Global $g_sBotTitle = "My Bot Watchdog " & $g_sBotVersion
 Opt("WinTitleMatchMode", 3)
@@ -581,7 +584,7 @@ $hWind = HWnd($lParam)
 Local $wParamHi = BitShift($wParam, 16)
 Local $wParamLo = BitAND($wParam, 0xFFFF)
 Switch $wParamLo
-Case 0x0000 To 0x00FF, 0x0100 To 0x01FF, 0x0200
+Case 0x00FF, 0x01FF
 $hWind = 0
 Case 0x1040 + 2
 $hWind = 0
@@ -1051,7 +1054,8 @@ Return $iCurrentTimeMSec - $iTimeMsec
 EndFunc
 $hMutex_BotTitle = CreateMutex($sWatchdogMutex)
 If $hMutex_BotTitle = 0 Then
-Exit
+SetLog($g_sBotTitle & " is already running")
+Exit 2
 EndIf
 $g_hFrmBot = GUICreate($g_sBotTitle, 32, 32)
 $hStarted = __TimerInit()
@@ -1077,6 +1081,7 @@ If $iTimeoutAutoClose > -1 And __TimerDiff($hTimeoutAutoClose) > $iTimeoutAutoCl
 If UBound(GetManagedMyBotDetails()) = 0 Then
 SetLog("Closing " & $g_sBotTitle & " as no running bot found")
 $iExitCode = 1
+ExitLoop
 EndIf
 $hTimeoutAutoClose = __TimerInit()
 EndIf
@@ -1084,3 +1089,4 @@ WEnd
 ReleaseMutex($hMutex_BotTitle)
 DllClose("ntdll.dll")
 Exit($iExitCode)
+UpdateManagedMyBot(True)

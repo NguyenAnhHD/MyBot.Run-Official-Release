@@ -9787,17 +9787,25 @@ Next
 SetDebugLog("Android process " & $sPackage & " not running")
 Return 0
 EndFunc
-Func HideAndroidWindow($bHide = True)
+Func AndroidToFront()
+WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_TOPMOST, 0, False)
+WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+EndFunc
+Func HideAndroidWindow($bHide = True, $bActivateWhenShow = True)
 ResumeAndroid()
 WinGetAndroidHandle()
 WinGetPos($g_hAndroidWindow)
-If @error <> 0 Then Return SetError(0, 0, 0)
+If @error <> 0 Or AndroidEmbedded() Then Return SetError(0, 0, 0)
 Execute("Hide" & $g_sAndroidEmulator & "Window($bHide)")
 If $bHide = True Then
 WinMove($g_hAndroidWindow, "", -32000, -32000)
 ElseIf $bHide = False Then
 WinMove($g_hAndroidWindow, "", $g_iAndroidPosX, $g_iAndroidPosY)
+If $bActivateWhenShow Then
 WinActivate($g_hAndroidWindow)
+Else
+AndroidToFront()
+EndIf
 EndIf
 EndFunc
 Func AndroidPicturePathAutoConfig($myPictures = Default, $subDir = Default, $bSetLog = Default)
@@ -24189,10 +24197,6 @@ Else
 GUISetAccelerators($aAccelKeys_DockedUnshieldedFocus, $g_hFrmBot)
 EndIf
 EndFunc
-Func AndroidToFront()
-WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_TOPMOST, 0, False)
-WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
-EndFunc
 Func DisableProcessWindowsGhosting()
 DllCall($g_hLibUser32DLL, "none", "DisableProcessWindowsGhosting")
 EndFunc
@@ -24879,6 +24883,8 @@ If $g_bAndroidEmbedded Then AndroidEmbed(False)
 Switch $g_iGuiMode
 Case 1
 SetLog("Switch to Mini GUI Mode")
+applyConfig(False, "Save")
+saveConfig()
 $g_iGuiMode = 2
 SetRedrawBotWindow(False, Default, Default, Default, "BotGuiModeToggle")
 $_GUI_MAIN_WIDTH = $_MINIGUI_MAIN_WIDTH
@@ -24929,7 +24935,10 @@ tabDONATE()
 tabSEARCH()
 tabAttack()
 tabVillage()
+InitializeMainGUI()
 DestroySplashScreen()
+applyConfig(False)
+If $g_bRunState Then DisableGuiControls()
 SetRedrawBotWindow(False, Default, Default, Default, "BotGuiModeToggle")
 EndSwitch
 WinMove2($g_hFrmBotBottom, "", 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, -1, -1, 0, 0, False)
@@ -25024,6 +25033,7 @@ _WinAPI_SetWindowLong($g_hFrmBot, $GWL_EXSTYLE, BitOR(_WinAPI_GetWindowLong($g_h
 EndIf
 WinSetState($g_hFrmBot, "", @SW_MINIMIZE)
 EndIf
+If Not $g_bIsHidden Then HideAndroidWindow(True)
 Return True
 EndIf
 If $siStayMinimizedMillis > 0 And __TimerDiff($shStayMinimizedTimer) < $siStayMinimizedMillis Then
@@ -25048,6 +25058,7 @@ If $g_bAndroidAdbScreencap = False And $g_bRunState = True And $g_bBotPaused = F
 WinMove2($g_hFrmBot, "", $botPosX, $botPosY, -1, -1, $HWND_TOP, $SWP_SHOWWINDOW)
 _WinAPI_SetActiveWindow($g_hFrmBot)
 _WinAPI_SetFocus($g_hFrmBot)
+If Not $g_bIsHidden Then HideAndroidWindow(False, False)
 If _CheckWindowVisibility($g_hFrmBot, $aPos) Then
 SetDebugLog("Bot Window '" & $g_sAndroidTitle & "' not visible, moving to position: " & $aPos[0] & ", " & $aPos[1])
 WinMove2($g_hFrmBot, "", $aPos[0], $aPos[1])
@@ -60189,6 +60200,11 @@ EndFunc
 Func UpdateStatsManagedMyBotHost()
 Return ManagedMyBotHostsPostMessage("PrepareUpdateStatsManagedMyBotHost")
 EndFunc
+Func PrepareUnregisterManagedMyBotHost($hFrmHost, ByRef $iMsg, ByRef $wParam, ByRef $lParam)
+$wParam = 0x1040 + 2
+SetDebugLog("Bot Host Window Handle un-registered: " & $hFrmHost)
+Return True
+EndFunc
 Func UnregisterManagedMyBotHost()
 Local $Result = ManagedMyBotHostsPostMessage("PrepareUnregisterManagedMyBotHost")
 ReDim $g_ahManagedMyBotHosts[0]
@@ -60220,7 +60236,17 @@ Local $iMsg = $WM_MYBOTRUN_API
 Local $wParam = 0x0000
 Local $lParam = $g_hFrmBot
 Local $sExecute = $sExecutePrepare & "($hFrmHost, $iMsg, $wParam, $lParam" & $sAdditional & ")"
-Local $bPostMessage = Execute($sExecute)
+Local $bPostMessage
+Switch $sExecutePrepare
+Case "PrepareStatusBarManagedMyBotHost"
+$bPostMessage = PrepareStatusBarManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam, $Value1)
+Case "PrepareUpdateStatsManagedMyBotHost"
+$bPostMessage = PrepareUpdateStatsManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam)
+Case "PrepareUnregisterManagedMyBotHost"
+$bPostMessage = PrepareUnregisterManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam)
+Case Else
+$bPostMessage = Execute($sExecute)
+EndSwitch
 If @error <> 0 And $bPostMessage = "" Then
 SetDebugLog("ManagedMyBotHostsPostMessage: Error executing " & $sExecute)
 ElseIf $bPostMessage = False Then
@@ -60236,16 +60262,6 @@ Func _GUICtrlStatusBar_SetTextEx($hWnd, $sText = "", $iPart = 0, $iUFlag = 0)
 If $hWnd Then _GUICtrlStatusBar_SetText($hWnd, $sText, $iPart, $iUFlag)
 StatusBarManagedMyBotHost($sText)
 EndFunc
-Func ReferenceApiClientFunctions()
-If True Then Return
-Local $hFrmHost = 0
-Local $iMsg = 0
-Local $wParam = 0
-Local $lParam = 0
-PrepareStatusBarManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam, "")
-PrepareUpdateStatsManagedMyBotHost($hFrmHost, $iMsg, $wParam, $lParam)
-EndFunc
-ReferenceApiClientFunctions()
 Func GetTranslatedParsedText($sText, $var1 = Default, $var2 = Default, $var3 = Default)
 Local $s = StringReplace(StringReplace($sText, "\r\n", @CRLF), "\n", @CRLF)
 If $var1 = Default Then Return $s

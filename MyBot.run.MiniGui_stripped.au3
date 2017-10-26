@@ -3179,7 +3179,7 @@ $hWind = HWnd($lParam)
 Local $wParamHi = BitShift($wParam, 16)
 Local $wParamLo = BitAND($wParam, 0xFFFF)
 Switch $wParamLo
-Case 0x0000 To 0x00FF, 0x0100 To 0x01FF, 0x0200
+Case 0x00FF, 0x01FF
 $hWind = 0
 Case 0x1040 + 2
 $hWind = 0
