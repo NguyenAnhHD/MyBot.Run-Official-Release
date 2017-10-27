@@ -586,12 +586,12 @@ EndFunc   ;==>CompareCCSpellWithGUI
 Func GetCurCCSpell($iSpellSlot = 1)
 	If Not $g_bRunState Then Return
 	Local $directory = @ScriptDir & "\imgxml\ArmySpells"
-	Local $x1 = 508, $x2 = 587, $y1 = 500, $y2 = 570
+	Local $x1 = 508, $x2 = 615, $y1 = 500, $y2 = 570
 
 	If $iSpellSlot = 1 Then
 		;Nothing
 	ElseIf $iSpellSlot = 2 Then
-		$x1 = 587
+		$x1 = 600
 		$x2 = 660
 	Else
 		If $g_bDebugSetlog Then SetLog("GetCurCCSpell() called with the wrong argument!", $COLOR_ERROR)

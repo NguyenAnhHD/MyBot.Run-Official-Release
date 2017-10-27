@@ -3,12 +3,11 @@
  * Add Clash Of Magic support, https://www.clashofmagic.net/
    Server 3: http://download825.mediafireuserdownload.com/g29mv74piaqg/jeab7w484b77n86/Magic-CoC_S3-9.105-R1.apk
    http://www.tomzpot.com/android-games/clash-of-magic-9-105-10-private-server-september-2017/
- * Add MyBot.run.MiniGui super light GUI controlling bot backend process (fixes 10 bot run limitation)
-   Mini GUI mode for normal Mybot.run app can be also enabled with command line option /minigui or /mg
+ * Add Mini GUI mode to run launch more 10 bots (can be also enabled with command line option /minigui or /mg)
    New title bar icon to switch between normal and mini GUI mode
  * Add automatic Android reboot after configured run-time hours (default is 24) to prevent severy Android issues like memory leak, graphics error etc.
- * Add showing/hiding Android when not docked and bot is activated/minimized or losing focus
  * Fix wall upgrade not saving resources for enabled non-repeated building upgrades when a builder is available
+ * Fix Wait For Clan Castle Spell not getting detected sometimes
  * Fix Log Messages when Heroes are not enabled to auto Upgrade
  * Fix Balloon Donation Issues
  * Fix Wall Upgrade Ignoring Auto Warden Upgrade when checking if enough Elixir is available
@@ -21,6 +20,9 @@
  * Improve watchdog process restarting unresponsive bots after 3 Minutes (was 2 Minutes) and Bot API window communication
  * Improve ADB Click&Drag for input drag mode (when not accurate Click&Drag script is used)
  * Update ProfileReport Code & OCR
+ * Show bot window when Android Window activated (both ways)
+ * Bot start/stop/pause and resume added to tray menu
+ * New MyBot.run.MiniGui "reference app for modders/devs" controlling bot backend process using Window Messages
 
 * **V7.2.5**
  * Add Inferno Lvl 5 to Weak Base Images/GUI settings, add Lvl 4 tile and lowered tolerance

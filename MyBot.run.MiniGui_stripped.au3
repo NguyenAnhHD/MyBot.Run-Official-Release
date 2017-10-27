@@ -2063,6 +2063,8 @@ Global $g_hMutextOrSemaphoreGlobalActiveBots = 0
 Global $g_hStatusBar = 0
 Global $hMutex_BotTitle = 0
 Global $bCloseWhenAllBotsUnregistered = True
+Global $iTimeoutBroadcast = 30000
+Global $g_iMainLoopSleep = 50
 Global $g_sBotTitle = "My Bot Mini " & $g_sBotVersion & " "
 Global $g_hFrmBot = 0
 Global $g_hFrmBotBackend = 0
@@ -3979,7 +3981,7 @@ Global $g_hFrmBotButtons, $g_hFrmBotLogoUrlSmall, $g_hFrmBotEx = 0, $g_hLblBotTi
 Global $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmBotEmbeddedGraphics = 0
 Global $g_hFrmBot_MAIN_PIC = 0, $g_hFrmBot_URL_PIC = 0, $g_hFrmBot_URL_PIC2 = 0
 Global $g_hStatusBar = 0
-Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiStart = 0, $g_hTiStop = 0, $g_hTiPause = 0, $g_hTiExit = 0
+Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiStartStop = 0, $g_hTiPause = 0, $g_hTiExit = 0
 Global $g_aFrmBotPosInit[8] = [0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_bFrmBotMinimized = False
 Global $g_oCtrlIconData = ObjCreate("Scripting.Dictionary")
@@ -4124,6 +4126,14 @@ UpdateBotTitle()
 _WindowAppId($g_hFrmBot, "MyBot.run")
 $g_hTiShow = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_01", "Show bot"))
 TrayItemSetOnEvent(-1, "tiShow")
+$g_hTiStartStop = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
+GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot")
+TrayItemSetOnEvent(-1, "tiStartStop")
+$g_hTiPause = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
+GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Resume", "Resume bot")
+TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
+TrayItemSetOnEvent(-1, "btnPause")
+TrayCreateItem("")
 $g_hTiHide = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_02", "Hide when minimized"))
 TrayItemSetOnEvent(-1, "tiHide")
 TrayCreateItem("")
@@ -4131,15 +4141,6 @@ $g_hTiDonate = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "
 TrayItemSetOnEvent(-1, "tiDonate")
 $g_hTiAbout = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_04", "About"))
 TrayItemSetOnEvent(-1, "tiAbout")
-TrayCreateItem("")
-$g_hTiStart = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
-TrayItemSetOnEvent(-1, "btnStart")
-$g_hTiStop = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot"))
-TrayItemSetState($g_hTiStop, $TRAY_DISABLE)
-TrayItemSetOnEvent(-1, "btnStop")
-$g_hTiPause = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
-TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
-TrayItemSetOnEvent(-1, "btnPause")
 TrayCreateItem("")
 $g_hTiExit = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_05", "Exit"))
 TrayItemSetOnEvent(-1, "tiExit")
@@ -6033,6 +6034,13 @@ Func btnEmbed()
 EndFunc
 Func chkBackground()
 EndFunc
+Func tiStartStop()
+If $g_bRunState Then
+btnStop()
+Else
+btnStart()
+EndIf
+EndFunc
 Func tiShow()
 BotRestore("tiShow")
 EndFunc
@@ -6058,19 +6066,21 @@ Func tiExit()
 BotCloseRequest()
 EndFunc
 Func BotStarted()
+SetDebugLog("Bot started")
 GUICtrlSetState($g_hBtnStart, $GUI_HIDE)
 GUICtrlSetState($g_hBtnStop, $GUI_SHOW)
 GUICtrlSetState($g_hBtnPause, $g_bBotPaused ? $GUI_HIDE : $GUI_SHOW)
 GUICtrlSetState($g_hBtnResume, $g_bBotPaused ? $GUI_SHOW : $GUI_HIDE)
 GUICtrlSetState($g_hBtnSearchMode, $GUI_HIDE)
 GUICtrlSetState($g_hChkBackgroundMode, $GUI_DISABLE)
-TrayItemSetState($g_hTiStart, $TRAY_DISABLE)
-TrayItemSetState($g_hTiStop, $TRAY_ENABLE)
-TrayItemSetState($g_hTiPause, $TRAY_ENABLE)
 GUICtrlSetState($g_hBtnStart, $GUI_ENABLE)
 GUICtrlSetState($g_hBtnStop, $GUI_ENABLE)
+TrayItemSetText($g_hTiStartStop, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot"))
+TrayItemSetState($g_hTiPause, $TRAY_ENABLE)
+TrayItemSetText($g_hTiPause, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
 EndFunc
 Func BotStopped()
+SetDebugLog("Bot stopped")
 GUICtrlSetState($g_hChkBackgroundMode, $GUI_ENABLE)
 GUICtrlSetState($g_hBtnStart, $GUI_SHOW)
 GUICtrlSetState($g_hBtnStop, $GUI_HIDE)
@@ -6079,9 +6089,20 @@ GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
 GUICtrlSetState($g_hBtnSearchMode, $GUI_SHOW)
 GUICtrlSetState($g_hBtnStart, $GUI_ENABLE)
 GUICtrlSetState($g_hBtnStop, $GUI_ENABLE)
-TrayItemSetState($g_hTiStart, $TRAY_ENABLE)
-TrayItemSetState($g_hTiStop, $TRAY_DISABLE)
+TrayItemSetText($g_hTiStartStop, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
 TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
+EndFunc
+Func BotPaused()
+SetDebugLog("Bot paused")
+GUICtrlSetState($g_hBtnPause, $GUI_HIDE)
+GUICtrlSetState($g_hBtnResume, $GUI_SHOW)
+TrayItemSetText($g_hTiPause, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Resume", "Resume bot"))
+EndFunc
+Func BotResumed()
+SetDebugLog("Bot resumed")
+GUICtrlSetState($g_hBtnPause, $GUI_SHOW)
+GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
+TrayItemSetText($g_hTiPause, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
 EndFunc
 Func UpdateManagedMyBot($aBotDetails)
 If $g_iDebugWindowMessages Then SetDebugLog("UpdateManagedMyBot: " & $aBotDetails[$g_eBotDetailsBotForm])
@@ -6165,11 +6186,9 @@ ElseIf Not $bRunState And($g_bRunState = True Or $bStartStopInconsistent) Then
 BotStopped()
 Else
 If $bPaused And Not $g_bBotPaused Then
-GUICtrlSetState($g_hBtnPause, $GUI_HIDE)
-GUICtrlSetState($g_hBtnResume, $GUI_SHOW)
+BotPaused()
 ElseIf Not $bPaused And $g_bBotPaused Then
-GUICtrlSetState($g_hBtnPause, $GUI_SHOW)
-GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
+BotResumed()
 EndIf
 EndIf
 $g_bRunState = $bRunState
@@ -6320,7 +6339,7 @@ DllCall("user32.dll", "none", "DisableProcessWindowsGhosting")
 Local $hStatusUpdateTimer = 0, $hTimeUpdateTimer = 0
 Local $iMainLoop = 1
 While 1
-_Sleep(50, True, False)
+_Sleep($g_iMainLoopSleep, True, False)
 Switch $g_iBotAction
 Case $eBotClose
 BotClose()
@@ -6328,7 +6347,7 @@ Case $eBotUpdateStats
 UpdateStats()
 $g_iBotAction = $eBotNoAction
 Case Else
-If $iMainLoop > 20 And($hStatusUpdateTimer = 0 Or __TimerDiff($hStatusUpdateTimer) > 60000) Then
+If $iMainLoop > 20 And($hStatusUpdateTimer = 0 Or __TimerDiff($hStatusUpdateTimer) > $iTimeoutBroadcast) Then
 $iMainLoop = 0
 $hStatusUpdateTimer = __TimerInit()
 _WinAPI_PostMessage($g_hFrmBotBackend, $WM_MYBOTRUN_API, 0x0200, $g_hFrmBot)

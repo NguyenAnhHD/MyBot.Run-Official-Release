@@ -2987,10 +2987,14 @@ Func AndroidToFront()
 	WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
 EndFunc   ;==>AndroidToFront
 
-Func HideAndroidWindow($bHide = True, $bActivateWhenShow = True)
+Func HideAndroidWindow($bHide = True, $bActivateWhenShow = True, $bFastCheck = True)
 	ResumeAndroid()
-	WinGetAndroidHandle() ; updates android position
-	WinGetPos($g_hAndroidWindow)
+	If $bFastCheck Then
+		If Not IsHWnd($g_hAndroidWindow) Then SetError(1)
+	Else
+		WinGetAndroidHandle() ; updates android position
+		WinGetPos($g_hAndroidWindow)
+	EndIf
 	If @error <> 0 Or AndroidEmbedded() Then Return SetError(0, 0, 0)
 
 	Execute("Hide" & $g_sAndroidEmulator & "Window($bHide)")

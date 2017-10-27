@@ -106,7 +106,7 @@ Global $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmB
 Global $g_hFrmBot_MAIN_PIC = 0, $g_hFrmBot_URL_PIC = 0, $g_hFrmBot_URL_PIC2 = 0
 Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabAbout = 0
 Global $g_hStatusBar = 0
-Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiStart = 0, $g_hTiStop = 0, $g_hTiPause = 0, $g_hTiExit = 0
+Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiStartStop = 0, $g_hTiPause = 0, $g_hTiExit = 0
 Global $g_aFrmBotPosInit[8] = [0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hFirstControlToHide = 0, $g_hLastControlToHide = 0, $g_aiControlPrevState[1]
 Global $g_bFrmBotMinimized = False ; prevents bot flickering
@@ -164,6 +164,14 @@ Func CreateMainGUI()
 	; Create tray icon menu
 	$g_hTiShow = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_01", "Show bot"))
 	TrayItemSetOnEvent(-1, "tiShow")
+	$g_hTiStartStop = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
+	GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot") ; gets renamed also to Stop bot
+	TrayItemSetOnEvent(-1, "tiStartStop")
+	$g_hTiPause = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
+	GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Resume", "Resume bot") ; gets renamed also to Resume bot
+	TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
+	TrayItemSetOnEvent(-1, "btnPause")
+	TrayCreateItem("")
 	$g_hTiHide = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_02", "Hide when minimized"))
 	TrayItemSetOnEvent(-1, "tiHide")
 	TrayCreateItem("")
@@ -171,15 +179,6 @@ Func CreateMainGUI()
 	TrayItemSetOnEvent(-1, "tiDonate")
 	$g_hTiAbout = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_04", "About"))
 	TrayItemSetOnEvent(-1, "tiAbout")
-	TrayCreateItem("")
-	$g_hTiStart = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
-	TrayItemSetOnEvent(-1, "btnStart")
-	$g_hTiStop = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot"))
-	TrayItemSetState($g_hTiStop, $TRAY_DISABLE)
-	TrayItemSetOnEvent(-1, "btnStop")
-	$g_hTiPause = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
-	TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
-	TrayItemSetOnEvent(-1, "btnPause")
 	TrayCreateItem("")
 	$g_hTiExit = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_05", "Exit"))
 	TrayItemSetOnEvent(-1, "tiExit")

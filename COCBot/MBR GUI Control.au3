@@ -48,11 +48,11 @@ Global $g_hFrmBot_WNDPROC_ptr = 0
 #include "GUI\MBR GUI Control Android.au3"
 #include "MBR GUI Action.au3"
 
-Func InitializeMainGUI()
+Func InitializeMainGUI($bGuiModeUpdate = False)
 	InitializeControlVariables()
 
 	; Initialize attack log
-	AtkLogHead()
+	If Not $bGuiModeUpdate Then AtkLogHead()
 
 	; Show Default Tab
 	tabMain()
@@ -106,6 +106,9 @@ Func InitializeMainGUI()
 	GUIRegisterMsg($WM_KILLFOCUS, "GUIControl_WM_FOCUS")
 	GUIRegisterMsg($WM_ACTIVATEAPP, "GUIControl_WM_ACTIVATEAPP")
 	GUIRegisterMsg($WM_MOVE, "GUIControl_WM_MOVE")
+
+	GUIRegisterMsg(_WinAPI_RegisterWindowMessage('SHELLHOOK'), 'GUIControl_WM_SHELLHOOK')
+	_WinAPI_RegisterShellHookWindow($g_hFrmBot)
 	;GUIRegisterMsg($WM_PAINT, "GUIControl_WM_MPAINT")
 
 	#cs
@@ -184,6 +187,21 @@ EndFunc   ;==>SetAccelerators
 Func DisableProcessWindowsGhosting()
 	DllCall($g_hLibUser32DLL, "none", "DisableProcessWindowsGhosting")
 EndFunc   ;==>DisableProcessWindowsGhosting
+
+; Check for any activated window to show bot when Android activated
+Func GUIControl_WM_SHELLHOOK($hWin, $iMsg, $wParam, $lParam)
+	If $hWin = $g_hFrmBot And $lParam And BitAND($wParam, $HSHELL_WINDOWACTIVATED) And Not AndroidEmbedded() Then
+		Select
+			Case $lParam = $g_hAndroidWindow
+				; show bot without activating
+				BotToFront()
+			Case $lParam = $g_hFrmBot
+				; show Android
+				If Not $g_bIsHidden Then HideAndroidWindow(False, False)
+				;AndroidToFront()
+		EndSelect
+	EndIf
+EndFunc   ;==>GUIControl_WM_SHELLHOOK
 
 Func GUIControl_WM_ACTIVATEAPP($hWin, $iMsg, $wParam, $lParam)
 	; bot activated/deactivated
@@ -757,6 +775,11 @@ Func BotMinimizeRequest()
 	BotMinimize("MinimizeButton", False, 500)
 EndFunc   ;==>BotMinimizeRequest
 
+Func BotToFront()
+	WinMove2($g_hFrmBot, "", -1, -1, -1, -1, $HWND_TOPMOST, 0, False)
+	WinMove2($g_hFrmBot, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+EndFunc   ;==>BotToFront
+
 Func CheckBotZOrder($bCheckOnly = False, $bForceZOrder = False)
 	If $g_iAndroidEmbedMode = 1 And $g_bBotDockedShrinked Then
 		; check if order is (front to bottom): URL -> buttons -> graphics -> shield -> bot, to URL is top...
@@ -1015,6 +1038,9 @@ Func BotGuiModeToggle()
 
 	If $g_bAndroidEmbedded Then AndroidEmbed(False)
 
+	Local $_GUI_MAIN_WIDTH_OLD = $_GUI_MAIN_WIDTH
+	Local $_GUI_MAIN_HEIGHT_OLD = $_GUI_MAIN_HEIGHT
+
 	Switch $g_iGuiMode
 
 		Case 1
@@ -1034,6 +1060,14 @@ Func BotGuiModeToggle()
 			$_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
 
 			; destroy GUI Controls
+			; but keep Bot and Attack Log though (park them in main form, restore again in CreateLogTab())
+			_WinAPI_SetParent($g_hTxtLog, $g_hFrmBotEx)
+			_WinAPI_SetParent($g_hTxtAtkLog, $g_hFrmBotEx)
+			_WinAPI_SetWindowLong($g_hTxtLog, $GWL_HWNDPARENT, $g_hFrmBotEx)
+			_WinAPI_SetWindowLong($g_hTxtAtkLog, $GWL_HWNDPARENT, $g_hFrmBotEx)
+			WinSetState($g_hTxtLog, "", @SW_MINIMIZE)
+			WinSetState($g_hTxtAtkLog, "", @SW_MINIMIZE)
+
 			GUICtrlDelete($g_hTabMain)
 			GUICtrlDelete($g_hTabLog)
 			GUICtrlDelete($g_hTabVillage)
@@ -1096,7 +1130,7 @@ Func BotGuiModeToggle()
 			tabAttack()
 			tabVillage()
 
-			InitializeMainGUI()
+			InitializeMainGUI(True)
 
 			DestroySplashScreen()
 
@@ -1115,8 +1149,10 @@ Func BotGuiModeToggle()
 	;WinSetTrans($g_hFrmBotBottom, "", 255)
 
 	; resize windows
+	Local $xComp = $g_aFrmBotPosInit[2] - $_GUI_MAIN_WIDTH_OLD
+	Local $yComp = $g_aFrmBotPosInit[3] + $g_aFrmBotPosInit[7] - $_GUI_MAIN_HEIGHT_OLD
 	WinMove2($g_hFrmBotEx, "", -1, -1, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, False)
-	WinMove2($g_hFrmBot, "", -1, -1, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT, 0, 0, False)
+	WinMove2($g_hFrmBot, "", -1, -1, $_GUI_MAIN_WIDTH + $xComp, $_GUI_MAIN_HEIGHT + $yComp, 0, 0, False)
 
 	; update buttons
 	GUICtrlSetState($g_hLblBotNormalGUI, (($g_iGuiMode = 1) ? ($GUI_HIDE) : ($GUI_SHOW)))
@@ -1200,7 +1236,8 @@ Func BotClose($SaveConfig = Default, $bExit = True)
 	_GUICtrlRichEdit_Destroy($g_hTxtLog)
 	_GUICtrlRichEdit_Destroy($g_hTxtAtkLog)
 
-	If $g_hAndroidWindow <> 0 Then ControlFocus($g_hAndroidWindow, "", $g_hAndroidWindow) ; show bot in taskbar again
+	_WinAPI_DeregisterShellHookWindow($g_hFrmBot)
+	If $g_hAndroidWindow <> 0 Then ControlFocus($g_hAndroidWindow, "", $g_hAndroidWindow) ; show Android in taskbar again
 	GUIDelete($g_hFrmBot)
 
 	; Global DllStuctCreate
@@ -1281,8 +1318,6 @@ Func BotMinimizeRestore($bMinimize, $sCaller, $iForceUpdatingWhenMinimized = Fal
 	WinMove2($g_hFrmBot, "", $botPosX, $botPosY, -1, -1, $HWND_TOP, $SWP_SHOWWINDOW)
 	_WinAPI_SetActiveWindow($g_hFrmBot)
 	_WinAPI_SetFocus($g_hFrmBot)
-	; If bot is not docked and Android running, show it now
-	If Not $g_bIsHidden Then HideAndroidWindow(False, False)
 	If _CheckWindowVisibility($g_hFrmBot, $aPos) Then
 		SetDebugLog("Bot Window '" & $g_sAndroidTitle & "' not visible, moving to position: " & $aPos[0] & ", " & $aPos[1])
 		WinMove2($g_hFrmBot, "", $aPos[0], $aPos[1])
@@ -1316,6 +1351,14 @@ EndFunc   ;==>BotWindowCheck
 ;---------------------------------------------------
 ; Tray Item Functions
 ;---------------------------------------------------
+Func tiStartStop()
+	If $g_bRunState Then
+		btnStop()
+	Else
+		btnStart()
+	EndIf
+EndFunc   ;==>tiStartStop
+
 Func tiShow()
 	BotRestore("tiShow")
 EndFunc   ;==>tiShow

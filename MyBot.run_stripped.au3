@@ -870,6 +870,7 @@ Return $aResult[0]
 EndFunc
 Global Const $HANDLE_FLAG_INHERIT = 0x00000001
 Global Const $MAPVK_VK_TO_CHAR = 2
+Global Const $HSHELL_WINDOWACTIVATED = 4
 Global $__g_vEnum, $__g_vExt = 0
 Global $__g_hHeap = 0, $__g_iRGBMode = 1
 Global Const $tagOSVERSIONINFO = 'struct;dword OSVersionInfoSize;dword MajorVersion;dword MinorVersion;dword BuildNumber;dword PlatformId;wchar CSDVersion[128];endstruct'
@@ -1073,6 +1074,11 @@ Local $aRet = DllCall('kernel32.dll', 'bool', 'GetVersionExW', 'struct*', $tOSVI
 If @error Or Not $aRet[0] Then Return SetError(@error, @extended, 0)
 Return BitOR(BitShift(DllStructGetData($tOSVI, 2), -8), DllStructGetData($tOSVI, 3))
 EndFunc
+Func _WinAPI_DeregisterShellHookWindow($hWnd)
+Local $aRet = DllCall('user32.dll', 'bool', 'DeregisterShellHookWindow', 'hwnd', $hWnd)
+If @error Then Return SetError(@error, @extended, False)
+Return $aRet[0]
+EndFunc
 Func _WinAPI_GetActiveWindow()
 Local $aRet = DllCall('user32.dll', 'hwnd', 'GetActiveWindow')
 If @error Then Return SetError(@error, @extended, 0)
@@ -1100,6 +1106,11 @@ Func _WinAPI_QueryPerformanceFrequency()
 Local $aRet = DllCall('kernel32.dll', 'bool', 'QueryPerformanceFrequency', 'int64*', 0)
 If @error Or Not $aRet[0] Then Return SetError(@error + 10, @extended, 0)
 Return $aRet[1]
+EndFunc
+Func _WinAPI_RegisterShellHookWindow($hWnd)
+Local $aRet = DllCall('user32.dll', 'bool', 'RegisterShellHookWindow', 'hwnd', $hWnd)
+If @error Then Return SetError(@error, @extended, False)
+Return $aRet[0]
 EndFunc
 Func _WinAPI_SetActiveWindow($hWnd)
 Local $aRet = DllCall('user32.dll', 'int', 'SetActiveWindow', 'hwnd', $hWnd)
@@ -4673,6 +4684,8 @@ Return $iReturn
 EndFunc
 Global Const $TRAY_CHECKED = 1
 Global Const $TRAY_UNCHECKED = 4
+Global Const $TRAY_ENABLE = 64
+Global Const $TRAY_DISABLE = 128
 Global Const $TIP_ICONASTERISK = 1
 Global Const $TIP_ICONEXCLAMATION = 2
 Global Const $TIP_NOSOUND = 16
@@ -9791,10 +9804,14 @@ Func AndroidToFront()
 WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_TOPMOST, 0, False)
 WinMove2(GetAndroidDisplayHWnD(), "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
 EndFunc
-Func HideAndroidWindow($bHide = True, $bActivateWhenShow = True)
+Func HideAndroidWindow($bHide = True, $bActivateWhenShow = True, $bFastCheck = True)
 ResumeAndroid()
+If $bFastCheck Then
+If Not IsHWnd($g_hAndroidWindow) Then SetError(1)
+Else
 WinGetAndroidHandle()
 WinGetPos($g_hAndroidWindow)
+EndIf
 If @error <> 0 Or AndroidEmbedded() Then Return SetError(0, 0, 0)
 Execute("Hide" & $g_sAndroidEmulator & "Window($bHide)")
 If $bHide = True Then
@@ -10271,7 +10288,7 @@ Global $g_hFrmBotButtons, $g_hFrmBotLogoUrlSmall, $g_hFrmBotEx = 0, $g_hLblBotTi
 Global $g_hFrmBot_MAIN_PIC = 0, $g_hFrmBot_URL_PIC = 0, $g_hFrmBot_URL_PIC2 = 0
 Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabAbout = 0
 Global $g_hStatusBar = 0
-Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiStart = 0, $g_hTiStop = 0, $g_hTiPause = 0, $g_hTiExit = 0
+Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiStartStop = 0, $g_hTiPause = 0, $g_hTiExit = 0
 Global $g_aFrmBotPosInit[8] = [0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hFirstControlToHide = 0, $g_hLastControlToHide = 0, $g_aiControlPrevState[1]
 Global $g_bFrmBotMinimized = False
@@ -10397,22 +10414,44 @@ EndFunc
 Global $g_hGUI_LOG = 0
 Global $g_hTxtLog = 0, $g_hDivider = 0, $g_hTxtAtkLog = 0
 Global $g_hCmbLogDividerOption, $g_hBtnAtkLogClear, $g_hBtnAtkLogCopyClipboard
-Func CreateLogTab()
+Func CreateLogTab($hWHndLogsOnly = False)
 Local $x = 0, $y = 0
 Local $activeHWnD = WinGetHandle("")
+If $hWHndLogsOnly Then
+$g_hTxtLog = _GUICtrlRichEdit_Create($hWHndLogsOnly, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, $WS_HSCROLL, $ES_UPPERCASE, $ES_AUTOHSCROLL, $ES_AUTOVSCROLL, $ES_NUMBER, 0x200), $WS_EX_STATICEDGE)
+WinSetState($g_hTxtLog, "", @SW_MINIMIZE)
+$g_hTxtAtkLog = _GUICtrlRichEdit_Create($hWHndLogsOnly, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, 8908), $WS_EX_STATICEDGE)
+WinSetState($g_hTxtAtkLog, "", @SW_MINIMIZE)
+WinActivate($activeHWnD)
+Return
+EndIf
 $g_hGUI_LOG = _GUICreate("", $g_iSizeWGrpTab1, $g_iSizeHGrpTab1, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, 0), -1, $g_hFrmBotEx)
+If IsHWnd($g_hTxtLog) Then
+SetDebugLog("Re-use existing bot log control")
+_WinAPI_SetParent($g_hTxtLog, $g_hGUI_LOG)
+_WinAPI_SetWindowLong($g_hTxtLog, $GWL_HWNDPARENT, $g_hGUI_LOG)
+WinSetState($g_hTxtLog, "", @SW_RESTORE)
+Else
 $g_hTxtLog = _GUICtrlRichEdit_Create($g_hGUI_LOG, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, $WS_HSCROLL, $ES_UPPERCASE, $ES_AUTOHSCROLL, $ES_AUTOVSCROLL, $ES_NUMBER, 0x200), $WS_EX_STATICEDGE)
+EndIf
 $g_hDivider = GUICtrlCreateLabel("", 0, 0, 20, 20, $SS_SUNKEN + $SS_BLACKRECT)
 GUICtrlSetCursor(-1, 11)
+If IsHWnd($g_hTxtAtkLog) Then
+SetDebugLog("Re-use existing attack log control")
+_WinAPI_SetParent($g_hTxtAtkLog, $g_hGUI_LOG)
+_WinAPI_SetWindowLong($g_hTxtAtkLog, $GWL_HWNDPARENT, $g_hGUI_LOG)
+WinSetState($g_hTxtAtkLog, "", @SW_RESTORE)
+Else
 $g_hTxtAtkLog = _GUICtrlRichEdit_Create($g_hGUI_LOG, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, 8908), $WS_EX_STATICEDGE)
+EndIf
 WinActivate($activeHWnD)
 $y = 410
-GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Log", "LblLog_Style", "Log Style")&":", $x, $y + 5, -1, -1)
+GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Log", "LblLog_Style", "Log Style") & ":", $x, $y + 5, -1, -1)
 GUICtrlSetResizing(-1, $GUI_DOCKLEFT + $GUI_DOCKBOTTOM + $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT)
 $g_hCmbLogDividerOption = GUICtrlCreateCombo("", $x + 50, $y, 180, 25, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
 GUICtrlSetResizing(-1, $GUI_DOCKLEFT + $GUI_DOCKBOTTOM + $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Log", "LblLog_Style_Info_01", "Use these options to set the Log type."))
-GUICtrlSetData(-1, GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_01", "Use Divider to Resize Both Logs") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_02", "Bot and Attack Log Same Size") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_03", "Large Bot Log, Small Attack Log") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_04", "Small Bot Log, Large Attack Log") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_05", "Full Bot Log, Hide Attack Log") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_06", "Hide Bot Log, Full Attack Log") , GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_01", -1))
+GUICtrlSetData(-1, GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_01", "Use Divider to Resize Both Logs") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_02", "Bot and Attack Log Same Size") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_03", "Large Bot Log, Small Attack Log") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_04", "Small Bot Log, Large Attack Log") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_05", "Full Bot Log, Hide Attack Log") & "|" & GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_06", "Hide Bot Log, Full Attack Log"), GetTranslatedFileIni("MBR GUI Design Log", "CmbLogDividerOption_Item_01", -1))
 GUICtrlSetOnEvent(-1, "cmbLog")
 $g_hBtnAtkLogClear = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Log", "BtnAtkLogClear", "Clear Atk. Log"), $x + 270, $y - 1, 80, 23)
 GUICtrlSetResizing(-1, $GUI_DOCKLEFT + $GUI_DOCKBOTTOM + $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT)
@@ -18561,6 +18600,14 @@ UpdateBotTitle()
 _WindowAppId($g_hFrmBot, "MyBot.run")
 $g_hTiShow = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_01", "Show bot"))
 TrayItemSetOnEvent(-1, "tiShow")
+$g_hTiStartStop = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
+GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot")
+TrayItemSetOnEvent(-1, "tiStartStop")
+$g_hTiPause = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
+GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Resume", "Resume bot")
+TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
+TrayItemSetOnEvent(-1, "btnPause")
+TrayCreateItem("")
 $g_hTiHide = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_02", "Hide when minimized"))
 TrayItemSetOnEvent(-1, "tiHide")
 TrayCreateItem("")
@@ -18568,13 +18615,6 @@ $g_hTiDonate = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "
 TrayItemSetOnEvent(-1, "tiDonate")
 $g_hTiAbout = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_04", "About"))
 TrayItemSetOnEvent(-1, "tiAbout")
-TrayCreateItem("")
-$g_hTiStart = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
-TrayItemSetOnEvent(-1, "btnStart")
-$g_hTiStop = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot"))
-TrayItemSetOnEvent(-1, "btnStop")
-$g_hTiPause = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
-TrayItemSetOnEvent(-1, "btnPause")
 TrayCreateItem("")
 $g_hTiExit = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_05", "Exit"))
 TrayItemSetOnEvent(-1, "tiExit")
@@ -18676,6 +18716,7 @@ Else
 GUISwitch($g_hFrmBotEx)
 EndIf
 If $g_iGuiMode = 2 Then
+CreateLogTab($g_hFrmBotEx)
 Return
 EndIf
 $g_hFirstControlToHide = GUICtrlCreateDummy()
@@ -23995,6 +24036,9 @@ GUICtrlSetState($g_hBtnPause, $GUI_SHOW)
 GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
 GUICtrlSetState($g_hBtnSearchMode, $GUI_HIDE)
 GUICtrlSetState($g_hChkBackgroundMode, $GUI_DISABLE)
+TrayItemSetText($g_hTiStartStop, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Stop", "Stop bot"))
+TrayItemSetState($g_hTiPause, $TRAY_ENABLE)
+TrayItemSetText($g_hTiPause, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
 EnableControls($g_hFrmBotBottom, Default, $g_aFrmBotBottomCtrlState)
 DisableGuiControls()
 SetRedrawBotWindow(True, Default, Default, Default, "BotStart")
@@ -24066,6 +24110,8 @@ GUICtrlSetState($g_hBtnAttackNowLB, $GUI_HIDE)
 GUICtrlSetState($g_hBtnAttackNowTS, $GUI_HIDE)
 GUICtrlSetState($g_hPicTwoArrowShield, $GUI_SHOW)
 GUICtrlSetState($g_hLblVersion, $GUI_SHOW)
+TrayItemSetText($g_hTiStartStop, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Start", "Start bot"))
+TrayItemSetState($g_hTiPause, $TRAY_DISABLE)
 SetLogCentered(" Bot Stop ", Default, $COLOR_ACTION)
 If Not $g_bSearchMode Then
 If Not $g_bBotPaused Then $g_iTimePassed += Int(__TimerDiff($g_hTimerSinceStarted))
@@ -24108,9 +24154,9 @@ Setlog("Your Army is not prepared, check the Attack/train options")
 EndIf
 btnStop()
 EndFunc
-Func InitializeMainGUI()
+Func InitializeMainGUI($bGuiModeUpdate = False)
 InitializeControlVariables()
-AtkLogHead()
+If Not $bGuiModeUpdate Then AtkLogHead()
 tabMain()
 If FileExists($g_sProfileConfigPath) = 0 And $g_asCmdLine[0] > 0 Then
 createProfile()
@@ -24150,6 +24196,8 @@ GUIRegisterMsg($WM_SETFOCUS, "GUIControl_WM_FOCUS")
 GUIRegisterMsg($WM_KILLFOCUS, "GUIControl_WM_FOCUS")
 GUIRegisterMsg($WM_ACTIVATEAPP, "GUIControl_WM_ACTIVATEAPP")
 GUIRegisterMsg($WM_MOVE, "GUIControl_WM_MOVE")
+GUIRegisterMsg(_WinAPI_RegisterWindowMessage('SHELLHOOK'), 'GUIControl_WM_SHELLHOOK')
+_WinAPI_RegisterShellHookWindow($g_hFrmBot)
 $g_hFrmBot_WNDPROC_ptr = DllCallbackGetPtr(DllCallbackRegister("frmBot_WNDPROC", "ptr", "hwnd;uint;long;ptr"))
 cmbDBAlgorithm()
 cmbABAlgorithm()
@@ -24199,6 +24247,16 @@ EndIf
 EndFunc
 Func DisableProcessWindowsGhosting()
 DllCall($g_hLibUser32DLL, "none", "DisableProcessWindowsGhosting")
+EndFunc
+Func GUIControl_WM_SHELLHOOK($hWin, $iMsg, $wParam, $lParam)
+If $hWin = $g_hFrmBot And $lParam And BitAND($wParam, $HSHELL_WINDOWACTIVATED) And Not AndroidEmbedded() Then
+Select
+Case $lParam = $g_hAndroidWindow
+BotToFront()
+Case $lParam = $g_hFrmBot
+If Not $g_bIsHidden Then HideAndroidWindow(False, False)
+EndSelect
+EndIf
 EndFunc
 Func GUIControl_WM_ACTIVATEAPP($hWin, $iMsg, $wParam, $lParam)
 If $g_iDebugWindowMessages Then SetDebugLog("GUIControl_WM_ACTIVATEAPP: $hWin=" & $hWin & ", $wParam=" & $wParam & ", $lParam=" & $lParam & ", Active=" & _WinAPI_GetActiveWindow(), Default, True)
@@ -24656,6 +24714,10 @@ EndFunc
 Func BotMinimizeRequest()
 BotMinimize("MinimizeButton", False, 500)
 EndFunc
+Func BotToFront()
+WinMove2($g_hFrmBot, "", -1, -1, -1, -1, $HWND_TOPMOST, 0, False)
+WinMove2($g_hFrmBot, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+EndFunc
 Func CheckBotZOrder($bCheckOnly = False, $bForceZOrder = False)
 If $g_iAndroidEmbedMode = 1 And $g_bBotDockedShrinked Then
 Local $hWinBehindButtons =($g_hFrmBotEmbeddedGraphics ? $g_hFrmBotEmbeddedGraphics :($g_hFrmBotEmbeddedShield ? $g_hFrmBotEmbeddedShield : $g_hFrmBot))
@@ -24880,6 +24942,8 @@ Func BotGuiModeToggle()
 If $g_iGuiMode = 0 Then Return False
 If $g_iBotAction = $eBotClose Then Return False
 If $g_bAndroidEmbedded Then AndroidEmbed(False)
+Local $_GUI_MAIN_WIDTH_OLD = $_GUI_MAIN_WIDTH
+Local $_GUI_MAIN_HEIGHT_OLD = $_GUI_MAIN_HEIGHT
 Switch $g_iGuiMode
 Case 1
 SetLog("Switch to Mini GUI Mode")
@@ -24889,6 +24953,12 @@ $g_iGuiMode = 2
 SetRedrawBotWindow(False, Default, Default, Default, "BotGuiModeToggle")
 $_GUI_MAIN_WIDTH = $_MINIGUI_MAIN_WIDTH
 $_GUI_MAIN_HEIGHT = $_MINIGUI_MAIN_HEIGHT
+_WinAPI_SetParent($g_hTxtLog, $g_hFrmBotEx)
+_WinAPI_SetParent($g_hTxtAtkLog, $g_hFrmBotEx)
+_WinAPI_SetWindowLong($g_hTxtLog, $GWL_HWNDPARENT, $g_hFrmBotEx)
+_WinAPI_SetWindowLong($g_hTxtAtkLog, $GWL_HWNDPARENT, $g_hFrmBotEx)
+WinSetState($g_hTxtLog, "", @SW_MINIMIZE)
+WinSetState($g_hTxtAtkLog, "", @SW_MINIMIZE)
 GUICtrlDelete($g_hTabMain)
 GUICtrlDelete($g_hTabLog)
 GUICtrlDelete($g_hTabVillage)
@@ -24935,15 +25005,17 @@ tabDONATE()
 tabSEARCH()
 tabAttack()
 tabVillage()
-InitializeMainGUI()
+InitializeMainGUI(True)
 DestroySplashScreen()
 applyConfig(False)
 If $g_bRunState Then DisableGuiControls()
 SetRedrawBotWindow(False, Default, Default, Default, "BotGuiModeToggle")
 EndSwitch
 WinMove2($g_hFrmBotBottom, "", 0, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, -1, -1, 0, 0, False)
+Local $xComp = $g_aFrmBotPosInit[2] - $_GUI_MAIN_WIDTH_OLD
+Local $yComp = $g_aFrmBotPosInit[3] + $g_aFrmBotPosInit[7] - $_GUI_MAIN_HEIGHT_OLD
 WinMove2($g_hFrmBotEx, "", -1, -1, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT - $_GUI_BOTTOM_HEIGHT + $_GUI_MAIN_TOP, 0, 0, False)
-WinMove2($g_hFrmBot, "", -1, -1, $_GUI_MAIN_WIDTH, $_GUI_MAIN_HEIGHT, 0, 0, False)
+WinMove2($g_hFrmBot, "", -1, -1, $_GUI_MAIN_WIDTH + $xComp, $_GUI_MAIN_HEIGHT + $yComp, 0, 0, False)
 GUICtrlSetState($g_hLblBotNormalGUI,(($g_iGuiMode = 1) ?($GUI_HIDE) :($GUI_SHOW)))
 GUICtrlSetState($g_hLblBotMiniGUI,(($g_iGuiMode = 2) ?($GUI_HIDE) :($GUI_SHOW)))
 updateBtnEmbed()
@@ -24998,6 +25070,7 @@ __GDIPlus_Shutdown()
 _Crypt_Shutdown()
 _GUICtrlRichEdit_Destroy($g_hTxtLog)
 _GUICtrlRichEdit_Destroy($g_hTxtAtkLog)
+_WinAPI_DeregisterShellHookWindow($g_hFrmBot)
 If $g_hAndroidWindow <> 0 Then ControlFocus($g_hAndroidWindow, "", $g_hAndroidWindow)
 GUIDelete($g_hFrmBot)
 $g_aiAndroidAdbScreencapBuffer = 0
@@ -25058,7 +25131,6 @@ If $g_bAndroidAdbScreencap = False And $g_bRunState = True And $g_bBotPaused = F
 WinMove2($g_hFrmBot, "", $botPosX, $botPosY, -1, -1, $HWND_TOP, $SWP_SHOWWINDOW)
 _WinAPI_SetActiveWindow($g_hFrmBot)
 _WinAPI_SetFocus($g_hFrmBot)
-If Not $g_bIsHidden Then HideAndroidWindow(False, False)
 If _CheckWindowVisibility($g_hFrmBot, $aPos) Then
 SetDebugLog("Bot Window '" & $g_sAndroidTitle & "' not visible, moving to position: " & $aPos[0] & ", " & $aPos[1])
 WinMove2($g_hFrmBot, "", $aPos[0], $aPos[1])
@@ -25081,6 +25153,13 @@ Return True
 EndIf
 EndIf
 Return False
+EndFunc
+Func tiStartStop()
+If $g_bRunState Then
+btnStop()
+Else
+btnStart()
+EndIf
 EndFunc
 Func tiShow()
 BotRestore("tiShow")
@@ -38960,10 +39039,10 @@ EndFunc
 Func GetCurCCSpell($iSpellSlot = 1)
 If Not $g_bRunState Then Return
 Local $directory = @ScriptDir & "\imgxml\ArmySpells"
-Local $x1 = 508, $x2 = 587, $y1 = 500, $y2 = 570
+Local $x1 = 508, $x2 = 615, $y1 = 500, $y2 = 570
 If $iSpellSlot = 1 Then
 ElseIf $iSpellSlot = 2 Then
-$x1 = 587
+$x1 = 600
 $x2 = 660
 Else
 If $g_bDebugSetlog Then SetLog("GetCurCCSpell() called with the wrong argument!", $COLOR_ERROR)
@@ -48305,6 +48384,7 @@ EndIf
 PushMsg("Pause", $Source)
 GUICtrlSetState($g_hBtnPause, $GUI_HIDE)
 GUICtrlSetState($g_hBtnResume, $GUI_SHOW)
+TrayItemSetText($g_hTiPause, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Resume", "Resume bot"))
 Else
 AndroidShield("TogglePauseImpl resumed")
 TrayTip($g_sBotTitle, "", 1)
@@ -48316,6 +48396,7 @@ EndIf
 PushMsg("Resume", $Source)
 GUICtrlSetState($g_hBtnPause, $GUI_SHOW)
 GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
+TrayItemSetText($g_hTiPause, GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_Pause", "Pause bot"))
 EndIf
 SetRedrawBotWindow(True, Default, Default, Default, "TogglePauseUpdateState")
 EndFunc
