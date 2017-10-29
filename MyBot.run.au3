@@ -142,7 +142,7 @@ Func InitializeBot()
 	CreateSplashScreen() ; Create splash window
 
 	; Ensure watchdog is launched (requires Bot Window for messaging)
-	If $g_bBotLaunchOption_NoWatchdog = False Then LaunchWatchdog()
+	If Not $g_bBotLaunchOption_NoWatchdog Then LaunchWatchdog()
 
 	InitializeMBR($sAndroidInfo, $bConfigRead)
 

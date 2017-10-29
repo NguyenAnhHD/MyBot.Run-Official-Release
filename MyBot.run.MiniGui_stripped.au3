@@ -2,7 +2,7 @@
 #RequireAdmin
 #pragma compile(ProductName, My Bot Mini Gui)
 #pragma compile(Out, MyBot.run.MiniGui.exe) ; Required
-Global $g_sBotVersion = "v7.2.6"
+Global $g_sBotVersion = "v7.3"
 Opt("MustDeclareVars", 1)
 Global $g_sBotTitle = ""
 Global $g_hFrmBot = 0

@@ -2,7 +2,7 @@
 #RequireAdmin
 #pragma compile(ProductName, My Bot)
 #pragma compile(Out, MyBot.run.exe) ; Required
-Global $g_sBotVersion = "v7.2.6"
+Global $g_sBotVersion = "v7.3"
 Opt("MustDeclareVars", 1)
 Global $g_sBotTitle = ""
 Global $g_hFrmBot = 0
@@ -10927,8 +10927,8 @@ SetDebugLog("Re-use existing bot log control")
 _WinAPI_SetParent($g_hTxtLog, $g_hGUI_LOG)
 _WinAPI_SetWindowLong($g_hTxtLog, $GWL_HWNDPARENT, $g_hGUI_LOG)
 WinSetState($g_hTxtLog, "", @SW_RESTORE)
+_GUICtrlRichEdit_SetSel($g_hTxtLog, 0, 0)
 _GUICtrlRichEdit_SetSel($g_hTxtLog, -1, -1)
-_WinAPI_RedrawWindow($g_hTxtLog, 0, 0, $RDW_INVALIDATE)
 Else
 $g_hTxtLog = _GUICtrlRichEdit_Create($g_hGUI_LOG, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, $WS_HSCROLL, $ES_UPPERCASE, $ES_AUTOHSCROLL, $ES_AUTOVSCROLL, $ES_NUMBER, 0x200), $WS_EX_STATICEDGE)
 EndIf
@@ -10939,8 +10939,8 @@ SetDebugLog("Re-use existing attack log control")
 _WinAPI_SetParent($g_hTxtAtkLog, $g_hGUI_LOG)
 _WinAPI_SetWindowLong($g_hTxtAtkLog, $GWL_HWNDPARENT, $g_hGUI_LOG)
 WinSetState($g_hTxtAtkLog, "", @SW_RESTORE)
+_GUICtrlRichEdit_SetSel($g_hTxtAtkLog, 0, 0)
 _GUICtrlRichEdit_SetSel($g_hTxtAtkLog, -1, -1)
-_WinAPI_RedrawWindow($g_hTxtAtkLog, 0, 0, $RDW_INVALIDATE)
 Else
 $g_hTxtAtkLog = _GUICtrlRichEdit_Create($g_hGUI_LOG, "", 0, 0, 20, 20, BitOR($ES_MULTILINE, $ES_READONLY, $WS_VSCROLL, 8908), $WS_EX_STATICEDGE)
 EndIf
@@ -63330,7 +63330,7 @@ $bConfigRead = True
 EndIf
 CreateMainGUI()
 CreateSplashScreen()
-If $g_bBotLaunchOption_NoWatchdog = False Then LaunchWatchdog()
+If Not $g_bBotLaunchOption_NoWatchdog Then LaunchWatchdog()
 InitializeMBR($sAndroidInfo, $bConfigRead)
 CreateMainGUIControls()
 InitializeMainGUI()

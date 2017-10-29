@@ -3,7 +3,7 @@
 #pragma compile(Console, true)
 #pragma compile(ProductName, My Bot Watchdog)
 #pragma compile(Out, MyBot.run.Watchdog.exe) ; Required
-Global $g_sBotVersion = "v7.2.6"
+Global $g_sBotVersion = "v7.3"
 Opt("MustDeclareVars", 1)
 Global Const $WAIT_TIMEOUT = 258
 Global Const $STDERR_MERGED = 8
