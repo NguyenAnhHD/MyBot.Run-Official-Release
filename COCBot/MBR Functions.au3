@@ -17,12 +17,6 @@
 ;#include "functions\Other\Synchronization.au3" ; now included in LaunchConsole.au3
 #include "functions\Other\OnAutoItErrorRegisterBot.au3"
 
-#include "functions\Config\profileFunctions.au3"
-#include "functions\Config\_Ini_Table.au3"
-#include "functions\Config\applyConfig.au3"
-#include "functions\Config\readConfig.au3"
-#include "functions\Config\saveConfig.au3"
-
 #include "functions\Attack\AttackReport.au3"
 #include "functions\Attack\BuildingSide.au3"
 #include "functions\Attack\GoldElixirChangeThSnipes.au3"
@@ -129,7 +123,7 @@
 #include "functions\Image Search\imglocCheckWall.au3"
 #include "functions\Image Search\imglocTHSearch.au3"
 #include "functions\Image Search\imglocAttackBar.au3"
-
+#include "functions\Image Search\QuickMIS.au3"
 
 #include "functions\Main Screen\checkMainScreen.au3"
 #include "functions\Main Screen\checkObstacles.au3"
@@ -257,6 +251,7 @@
 #include "functions\Village\RequestCC.au3"
 #include "functions\Village\VillageReport.au3"
 #include "functions\Village\UpgradeBuilding.au3"
+#include "functions\Village\Auto Upgrade.au3"
 #include "functions\Village\UpgradeWall.au3"
 #include "functions\Village\Notify.au3"
 #include "functions\Village\Laboratory.au3"
@@ -274,6 +269,15 @@
 
 #include "functions\Village\BuilderBase\Collect.au3"
 #include "functions\Village\BuilderBase\StartClockTowerBoost.au3"
+#include "functions\Village\BuilderBase\BuilderBaseReport.au3"
+#include "functions\Village\BuilderBase\SuggestedUpgrades.au3"
 
 #include "functions\Other\Api.au3"
 #include "functions\Other\ApiClient.au3"
+
+; moved to the end to avoid any global declare issues
+#include "functions\Config\profileFunctions.au3"
+#include "functions\Config\_Ini_Table.au3"
+#include "functions\Config\applyConfig.au3"
+#include "functions\Config\readConfig.au3"
+#include "functions\Config\saveConfig.au3"

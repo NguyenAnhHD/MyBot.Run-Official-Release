@@ -190,15 +190,18 @@ EndFunc   ;==>DisableProcessWindowsGhosting
 
 ; Check for any activated window to show bot when Android activated
 Func GUIControl_WM_SHELLHOOK($hWin, $iMsg, $wParam, $lParam)
+	If $g_iDebugWindowMessages Then SetDebugLog("GUIControl_WM_SHELLHOOK: $hWin=" & $hWin & ", $wParam=" & $wParam & ", $lParam=" & $lParam & ", Active=" & _WinAPI_GetActiveWindow(), Default, True)
 	If $hWin = $g_hFrmBot And $lParam And BitAND($wParam, $HSHELL_WINDOWACTIVATED) And Not AndroidEmbedded() Then
 		Select
 			Case $lParam = $g_hAndroidWindow
 				; show bot without activating
 				BotToFront()
-			Case $lParam = $g_hFrmBot
-				; show Android
-				If Not $g_bIsHidden Then HideAndroidWindow(False, False)
+			#cs moved to GUIControl_WM_ACTIVATEAPP as it enters here without activating the bot
+			Case Not $g_bIsHidden And $lParam = $g_hFrmBot ;And WinActive($g_hFrmBot)
+				; show Android without activating
+				HideAndroidWindow(False, False)
 				;AndroidToFront()
+			#ce
 		EndSelect
 	EndIf
 EndFunc   ;==>GUIControl_WM_SHELLHOOK
@@ -209,6 +212,8 @@ Func GUIControl_WM_ACTIVATEAPP($hWin, $iMsg, $wParam, $lParam)
 	If $wParam Then
 		; bot activated
 		;If BitAND($g_iBotDesignFlags, 2) And $g_bAndroidEmbedded And $g_bBotDockedShrinked Then BotShrinkExpandToggle() ; auto expand bot again
+		; show Android without activating
+		If Not $g_bIsHidden And Not AndroidEmbedded() Then HideAndroidWindow(False, False, Default, "GUIControl_WM_ACTIVATEAPP")
 	Else
 		; bot deactivated
 		If BitAND($g_iBotDesignFlags, 2) And $g_bAndroidEmbedded And Not $g_bBotDockedShrinked Then BotShrinkExpandToggle() ; auto shrink bot again ;
@@ -1287,7 +1292,7 @@ Func BotMinimizeRestore($bMinimize, $sCaller, $iForceUpdatingWhenMinimized = Fal
 			;WinSetState($g_hAndroidWindow, "", @SW_MINIMIZE)
 		EndIf
 		; Hide also Android
-		If Not $g_bIsHidden Then HideAndroidWindow(True)
+		If Not $g_bIsHidden Then HideAndroidWindow(True, Default, Default, "BotMinimizeRestore")
 		;ReleaseMutex($hMutex)
 		Return True
 	EndIf
@@ -1951,67 +1956,67 @@ Func Bind_ImageList($nCtrl, ByRef $hImageList)
 	Switch $nCtrl
 		Case $g_hTabMain
 			; the icons for main tab
-			Local $aIconIndex[5] = [$eIcnHourGlass, $eIcnTH11, $eIcnAttack, $eIcnGUI, $eIcnInfo]
+			Local $aIconIndex = [$eIcnHourGlass, $eIcnTH11, $eIcnAttack, $eIcnGUI, $eIcnInfo]
 
 		Case $g_hGUI_VILLAGE_TAB
 			; the icons for village tab
-			Local $aIconIndex[5] = [$eIcnTH1, $eIcnCC, $eIcnLaboratory, $eIcnAchievements, $eIcnPBNotify]
+			Local $aIconIndex = [$eIcnTH1, $eIcnCC, $eIcnLaboratory, $eIcnAchievements, $eIcnPBNotify]
 
 		Case $g_hGUI_TRAINARMY_TAB
 			; the icons for army tab
-			Local $aIconIndex[4] = [$eIcnTrain, $eIcnGem, $eIcnReOrder, $eIcnOptions]
+			Local $aIconIndex = [$eIcnTrain, $eIcnGem, $eIcnReOrder, $eIcnOptions]
 
 		Case $g_hGUI_MISC_TAB
-			Local $aIconIndex[2] = [$eIcnTH1, $eIcnBuilderHall]
+			Local $aIconIndex = [$eIcnTH1, $eIcnBuilderHall]
 
 		Case $g_hGUI_DONATE_TAB
 			; the icons for donate tab
-			Local $aIconIndex[3] = [$eIcnCCRequest, $eIcnCCDonate, $eIcnHourGlass]
+			Local $aIconIndex = [$eIcnCCRequest, $eIcnCCDonate, $eIcnHourGlass]
 
 		Case $g_hGUI_UPGRADE_TAB
 			; the icons for upgrade tab
-			Local $aIconIndex[4] = [$eIcnLaboratory, $eIcnHeroes, $eIcnMortar, $eIcnWall]
+			Local $aIconIndex = [$eIcnLaboratory, $eIcnHeroes, $eIcnMortar, $eIcnBuilder, $eIcnWall]
 
 		Case $g_hGUI_NOTIFY_TAB
 			; the icons for NOTIFY tab
-			Local $aIconIndex[2] = [$eIcnPBNotify, $eIcnHourGlass]
+			Local $aIconIndex = [$eIcnPBNotify, $eIcnHourGlass]
 
 		Case $g_hGUI_ATTACK_TAB
 			; the icons for attack tab
-			Local $aIconIndex[3] = [$eIcnTrain, $eIcnMagnifier, $eIcnStrategies]
+			Local $aIconIndex = [$eIcnTrain, $eIcnMagnifier, $eIcnStrategies]
 
 		Case $g_hGUI_SEARCH_TAB
 			; the icons for SEARCH tab
-			Local $aIconIndex[5] = [$eIcnCollector, $eIcnCC, $eIcnTH10, $eIcnTH1, $eIcnOptions]
+			Local $aIconIndex = [$eIcnCollector, $eIcnCC, $eIcnTH10, $eIcnTH1, $eIcnOptions]
 
 		Case $g_hGUI_DEADBASE_TAB
 			; the icons for deadbase tab
-			Local $aIconIndex[4] = [$eIcnMagnifier, $eIcnCamp, $eIcnSilverStar, $eIcnCollector]
+			Local $aIconIndex = [$eIcnMagnifier, $eIcnCamp, $eIcnSilverStar, $eIcnCollector]
 
 		Case $g_hGUI_ACTIVEBASE_TAB
 			; the icons for activebase tab
-			Local $aIconIndex[3] = [$eIcnMagnifier, $eIcnCamp, $eIcnSilverStar]
+			Local $aIconIndex = [$eIcnMagnifier, $eIcnCamp, $eIcnSilverStar]
 
 		Case $g_hGUI_THSNIPE_TAB
 			; the icons for thsnipe tab
-			Local $aIconIndex[3] = [$eIcnMagnifier, $eIcnCamp, $eIcnSilverStar]
+			Local $aIconIndex = [$eIcnMagnifier, $eIcnCamp, $eIcnSilverStar]
 
 		Case $g_hGUI_ATTACKOPTION_TAB
 			; the icons for Attack Options tab
-			Local $aIconIndex[5] = [$eIcnMagnifier, $eIcnCamp, $eIcnLightSpell, $eIcnSilverStar, $eIcnTrophy]
+			Local $aIconIndex = [$eIcnMagnifier, $eIcnCamp, $eIcnLightSpell, $eIcnSilverStar, $eIcnTrophy]
 
 		Case $g_hGUI_BOT_TAB
 			; the icons for Bot tab
-			Local $aIconIndex[5] = [$eIcnOptions, $eIcnAndroid, $eIcnProfile, $eIcnProfile, $eIcnGold]
+			Local $aIconIndex = [$eIcnOptions, $eIcnAndroid, $eIcnProfile, $eIcnProfile, $eIcnGold]
 			; The Android Robot is a Google Trademark and follows Creative Common Attribution 3.0
 
 		Case $g_hGUI_STRATEGIES_TAB
 			; the icons for strategies tab
-			Local $aIconIndex[2] = [$eIcnReload, $eIcnCopy]
+			Local $aIconIndex = [$eIcnReload, $eIcnCopy]
 
 		Case $g_hGUI_STATS_TAB
 			; the icons for stats tab
-			Local $aIconIndex[4] = [$eIcnGoldElixir, $eIcnOptions, $eIcnCamp, $eIcnCCRequest]
+			Local $aIconIndex = [$eIcnGoldElixir, $eIcnOptions, $eIcnCamp, $eIcnCCRequest]
 
 		Case Else
 			;do nothing

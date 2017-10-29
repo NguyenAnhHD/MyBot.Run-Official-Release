@@ -444,6 +444,7 @@ Global $g_bBotLaunchOption_NoWatchdog = False ; If true bot will not launch the 
 Global $g_bBotLaunchOption_ForceDpiAware = False ; If true bot will run in DPI Aware 100% scaling when possible
 Global $g_iBotLaunchOption_Dock = 0 ; If 1 bot will dock Android, 2 dock and slide/hide bot
 Global $g_bBotLaunchOption_NoBotSlot = False ; If True, bot slot Mutex are not used in function LockBotSlot
+Global $g_iBotLaunchOption_Help = False ; If specified, bot just shows command line options and exits
 Global $g_asCmdLine[1] = [0] ; Clone of $CmdLine without options, please use instead of $CmdLine
 Global Const $g_sWorkingDir = @WorkingDir ; Working Directory at bot launch
 
@@ -475,6 +476,10 @@ Global $g_hLibUser32DLL = DllOpen("user32.dll") ; handle to user32.dll, DllClose
 Global Const $g_sLibIconPath = $g_sLibPath & "\MBRBOT.dll" ; icon library
 Global Const $g_sTHSnipeAttacksPath = @ScriptDir & "\CSV\THSnipe"
 Global Const $g_sCSVAttacksPath = @ScriptDir & "\CSV\Attack"
+Global Const $g_sIcnMBisland = @ScriptDir & "\Images\bbico.png"
+Global Const $g_sIcnBldGold = @ScriptDir & "\Images\gold.png"
+Global Const $g_sIcnBldElixir = @ScriptDir & "\Images\elixir.png"
+Global Const $g_sIcnBldTrophy = @ScriptDir & "\Images\trophy.png"
 
 ; Improve GUI interactions by disabling bot window redraw
 Global $g_iRedrawBotWindowMode = 2 ; 0 = disabled, 1 = Redraw always entire bot window, 2 = Redraw only required bot window area (or entire bot if control not specified)
@@ -589,25 +594,25 @@ Global Const $g_aiTroopTrainTime[$eTroopCount] = [ _
 		36, 90, 180, 600, 360, 600, 120]
 ; Zero element contains number of levels, elements 1 thru n contain cost of that level troop
 Global Const $g_aiTroopCostPerLevel[$eTroopCount][9] = [ _
-		[7, 25, 40, 60, 100, 150, 200, 250], _ 				 ; Archer
-		[7, 50, 80, 120, 200, 300, 400, 500], _ 				 ;Barbarian
-		[8, 250, 750, 1250, 1750, 2250, 3000, 3500, 4000], _ ; Giant
-		[7, 25, 40, 60, 80, 100, 150, 200], _ 				 ; Goblin
-		[6, 1000, 1500, 2000, 2500, 3000, 3500], _ 			 ; WallBreaker
-		[7, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _ 	 ; Balloon
-		[7, 1500, 2000, 2500, 3000, 3500, 4000, 4500], _ 	 ; Wizard
-		[4, 5000, 6000, 8000, 10000], _						 ;Healer
-		[6, 25000, 29000, 33000, 37000, 42000, 46000], _ 	 ; Dragon
-		[5, 28000, 32000, 36000, 40000, 45000], _ 			 ; Pekka
-		[5, 15000, 16000, 17000, 18000, 19000], _ 			 ; BabyDragon
-		[4, 4200, 4800, 5400, 6000], _  						 ; Miner
-		[7, 6, 7, 8, 9, 10, 11, 12], _ 						 ; Minion
-		[7, 40, 45, 52, 58, 65, 90, 115], _					 ; HogRider
-		[5, 70, 100, 130, 160, 190], _ 						 ;Valkyrie
-		[6, 450, 525, 600, 675, 750, 825], _ 				 ; Golem
-		[3, 250, 350, 450], _ 								 ; Witch
-		[4, 390, 450, 510, 570], _  							 ;Lavahound
-		[3, 130, 150, 170]] ; Bowler
+		[7, 25, 40, 60, 100, 150, 200, 250], _ 					; Archer
+		[7, 50, 80, 120, 200, 300, 400, 500], _ 				; Barbarian
+		[8, 250, 750, 1250, 1750, 2250, 3000, 3500, 4000], _ 	; Giant
+		[7, 25, 40, 60, 80, 100, 150, 200], _ 				 	; Goblin
+		[7, 1000, 1500, 2000, 2500, 3000, 3500, 4000], _ 		; WallBreaker
+		[7, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _ 	 	; Balloon
+		[8, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _  ; Wizard
+		[5, 5000, 6000, 8000, 10000, 15000], _					; Healer
+		[6, 25000, 29000, 33000, 37000, 42000, 46000], _ 		; Dragon
+		[6, 28000, 32000, 36000, 40000, 45000, 50000], _ 		; Pekka
+		[5, 15000, 16000, 17000, 18000, 19000], _ 			 	; BabyDragon
+		[5, 4200, 4800, 5200, 5600, 6000], _  					; Miner
+		[7, 6, 7, 8, 9, 10, 11, 12], _ 							; Minion
+		[7, 40, 45, 52, 58, 65, 90, 115], _					 	; HogRider
+		[5, 70, 100, 130, 160, 190], _ 						 	; Valkyrie
+		[7, 450, 525, 600, 675, 750, 825, 900], _ 				; Golem
+		[3, 250, 350, 450], _ 								 	; Witch
+		[4, 390, 450, 510, 570], _  							; Lavahound
+		[3, 130, 150, 170]] 									; Bowler
 Global Const $g_aiTroopDonateXP[$eTroopCount] = [1, 1, 5, 1, 2, 5, 4, 14, 20, 25, 10, 5, 2, 5, 8, 30, 12, 30, 6]
 
 ; Spells
@@ -619,16 +624,16 @@ Global Const $g_aiSpellSpace[$eSpellCount] = [2, 2, 2, 2, 2, 4, 1, 1, 1, 1]
 Global Const $g_aiSpellTrainTime[$eSpellCount] = [360, 360, 360, 360, 360, 720, 180, 180, 180, 180]
 ; Zero element contains number of levels, elements 1 thru n contain cost of that level spell
 Global Const $g_aiSpellCostPerLevel[$eSpellCount][8] = [ _
-		[7, 15000, 16500, 18000, 20000, 22000, 24000, 26000], _ ;LightningSpell
-		[7, 15000, 16500, 18000, 19000, 21000, 23000, 25000], _ 	 ;HealSpell
-		[5, 23000, 25000, 27000, 30000, 33000], _     		 ;RageSpell
-		[3, 23000, 27000, 31000], _        					 ;JumpSpell
-		[6, 23000, 26000, 29000, 31000, 33000, 35000], _ ;FreezeSpell
-		[5, 38000, 39000, 41000, 43000, 45000], _					 ;CloneSpell
-		[5, 95, 110, 125, 140, 155], _         				 ;PoisonSpell
-		[4, 125, 140, 160, 180], _    						 ;EarthquakeSpell
-		[4, 80, 85, 60, 95], _								 ;HasteSpell
-		[4, 110, 120, 130, 140]] ;SkeletonSpell
+		[7, 15000, 16500, 18000, 20000, 22000, 24000, 26000], _  ;LightningSpell
+		[7, 15000, 16500, 18000, 19000, 21000, 23000, 25000], _  ;HealSpell
+		[5, 23000, 25000, 27000, 30000, 33000], _     			 ;RageSpell
+		[3, 23000, 27000, 31000], _        						 ;JumpSpell
+		[6, 23000, 26000, 29000, 31000, 33000, 35000], _ 		 ;FreezeSpell
+		[5, 38000, 39000, 41000, 43000, 45000], _				 ;CloneSpell
+		[5, 95, 110, 125, 140, 155], _         					 ;PoisonSpell
+		[4, 125, 140, 160, 180], _    							 ;EarthquakeSpell
+		[4, 80, 85, 90, 95], _									 ;HasteSpell
+		[4, 110, 120, 130, 140]] 								 ;SkeletonSpell
 Global Const $g_aiSpellDonateXP[$eSpellCount] = [10, 10, 10, 10, 10, 0, 5, 5, 5, 5]
 
 ; Hero Bitmaped Values
@@ -808,6 +813,30 @@ Global $g_iUpgradeWallMinGold = 0, $g_iUpgradeWallMinElixir = 0
 Global $g_iUpgradeWallLootType = 0, $g_bUpgradeWallSaveBuilder = False
 Global $g_iCmbUpgradeWallsLevel = 6
 Global $g_aiWallsCurrentCount[13] = [-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0] ; elements 0 to 3 are not referenced
+
+; Auto Upgrade
+Global $g_ichkAutoUpgrade = 0
+Global $g_ichkIgnoreTH = 0, $g_ichkIgnoreKing = 0, $g_ichkIgnoreQueen = 0, $g_ichkIgnoreWarden = 0, $g_ichkIgnoreCC = 0, $g_ichkIgnoreLab = 0
+Global $g_ichkIgnoreBarrack = 0, $g_ichkIgnoreDBarrack = 0, $g_ichkIgnoreFactory = 0, $g_ichkIgnoreDFactory = 0
+Global $g_ichkIgnoreGColl = 0, $g_ichkIgnoreEColl = 0, $g_ichkIgnoreDColl = 0
+Global $g_iSmartMinGold = 150000, $g_iSmartMinElixir = 150000, $g_iSmartMinDark = 1500
+Global $g_ichkUpgradesToIgnore[13] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ichkResourcesToIgnore[3] = [0, 0, 0]
+Global $g_iCurrentLineOffset = 0, $g_iNextLineOffset = 0
+Global $g_aUpgradeNameLevel ; [Nb of elements in Array, Name, Level]
+Global $g_aUpgradeResourceCostDuration[3] = ["", "", ""] ; Resource, Cost, Duration
+
+Global $g_sBldgText, $g_sBldgLevel
+Global $g_aUpgradeName[3] = ["", "", ""]
+Global $g_iUpgradeCost
+Global $g_sUpgradeResource = 0
+Global $g_sUpgradeDuration
+
+; Builder Base
+Global $g_ichkBBSuggestedUpgrades = 0, $g_ichkBBSuggestedUpgradesIgnoreGold = 0, $g_ichkBBSuggestedUpgradesIgnoreElixir = 0, $g_ichkBBSuggestedUpgradesIgnoreHall = 0
+Global $g_ichkPlacingNewBuildings = 0
+
+Global $g_iQuickMISX = 0, $g_iQuickMISY = 0
 
 ; <><><><> Village / Achievements <><><><>
 Global $g_iUnbrkMode = 0, $g_iUnbrkWait = 5
@@ -1539,5 +1568,6 @@ $g_oBldgImages.add($eBldgWizTower & "_" & "1", @ScriptDir & "\imgxml\Buildings\W
 $g_oBldgImages.add($eBldgMortar & "_" & "0", @ScriptDir & "\imgxml\Buildings\Mortars")
 $g_oBldgImages.add($eBldgAirDefense & "_" & "0", @ScriptDir & "\imgxml\Buildings\ADefense")
 
+; ================================================== BB FEATURES PART ================================================== ;
+Global $g_iGoldBB = 0, $g_iElixirBB = 0, $g_iTrophiesBB = 0, $g_aBuilder[2] = [0,0]
 ; EOF
-

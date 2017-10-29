@@ -183,6 +183,8 @@ Func ReadRegularConfig()
 	ReadConfig_600_15()
 	; <><><><> Village / Upgrade - Buildings <><><><>
 	ReadConfig_600_16()
+	; <><><><> Village / Upgrade - Auto Upgrade <><><><>
+	ReadConfig_auto()
 	; <><><><> Village / Upgrade - Walls <><><><>
 	ReadConfig_600_17()
 	; <><><><> Village / Notify <><><><>
@@ -371,6 +373,12 @@ Func ReadConfig_600_6()
 	IniReadS($g_bChkCollectBuilderBase, $g_sProfileConfigPath, "other", "ChkCollectBuildersBase", False, "Bool")
 	IniReadS($g_bChkStartClockTowerBoost, $g_sProfileConfigPath, "other", "ChkStartClockTowerBoost", False, "Bool")
 	IniReadS($g_bChkCTBoostBlderBz, $g_sProfileConfigPath, "other", "ChkCTBoostBlderBz", False, "Bool")
+	IniReadS($g_ichkBBSuggestedUpgrades, $g_sProfileConfigPath, "other", "g_chkBBSuggestedUpgrades", $g_ichkBBSuggestedUpgrades, "Int")
+	IniReadS($g_ichkBBSuggestedUpgradesIgnoreGold, $g_sProfileConfigPath, "other", "g_chkBBSuggestedUpgradesIgnoreGold", $g_ichkBBSuggestedUpgradesIgnoreGold, "Int")
+	IniReadS($g_ichkBBSuggestedUpgradesIgnoreElixir, $g_sProfileConfigPath, "other", "g_chkBBSuggestedUpgradesIgnoreElixir", $g_ichkBBSuggestedUpgradesIgnoreElixir, "Int")
+	IniReadS($g_ichkBBSuggestedUpgradesIgnoreHall, $g_sProfileConfigPath, "other", "g_chkBBSuggestedUpgradesIgnoreHall", $g_ichkBBSuggestedUpgradesIgnoreHall, "Int")
+
+	IniReadS($g_ichkPlacingNewBuildings, $g_sProfileConfigPath, "other", "g_chkPlacingNewBuildings", $g_ichkPlacingNewBuildings, "Int")
 EndFunc   ;==>ReadConfig_600_6
 
 Func ReadConfig_600_9()
@@ -564,6 +572,20 @@ Func ReadConfig_600_16()
 	IniReadS($g_iUpgradeMinDark, $g_sProfileConfigPath, "upgrade", "minupgrdark", 2000, "int")
 	; The other building settings are loaded in the ReadBuildingConfig() function
 EndFunc   ;==>ReadConfig_600_16
+
+Func ReadConfig_auto()
+; Auto Upgrade
+	IniReadS($g_ichkAutoUpgrade, $g_sProfileConfigPath, "Auto Upgrade", "chkAutoUpgrade", 0, "int")
+	For $i = 0 To 12
+		IniReadS($g_ichkUpgradesToIgnore[$i], $g_sProfileConfigPath, "Auto Upgrade", "chkUpgradesToIgnore[" & $i & "]", $g_ichkUpgradesToIgnore[$i], "int")
+	Next
+	For $i = 0 To 2
+		IniReadS($g_ichkResourcesToIgnore[$i], $g_sProfileConfigPath, "Auto Upgrade", "chkResourcesToIgnore[" & $i & "]", $g_ichkResourcesToIgnore[$i], "int")
+	Next
+	IniReadS($g_iSmartMinGold, $g_sProfileConfigPath, "Auto Upgrade", "SmartMinGold", 150000, "int")
+	IniReadS($g_iSmartMinElixir, $g_sProfileConfigPath, "Auto Upgrade", "SmartMinElixir", 150000, "int")
+	IniReadS($g_iSmartMinDark, $g_sProfileConfigPath, "Auto Upgrade", "SmartMinDark", 1500, "int")
+EndFunc   ;==>ReadConfig_auto
 
 Func ReadConfig_600_17()
 	; <><><><> Village / Upgrade - Walls <><><><>

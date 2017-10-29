@@ -90,6 +90,11 @@ Func InitializeBot()
 
 	SetupProfileFolder() ; Setup profile folders
 
+	If $g_iBotLaunchOption_Help Then
+		ShowCommandLineHelp()
+		Exit
+	EndIf
+
 	SetLogCentered(" BOT LOG ") ; Initial text for log
 
 	; Debug Output of launch parameter
@@ -201,12 +206,15 @@ Func ProcessCommandLine()
 					$g_iBotLaunchOption_Dock = 2
 				Case "/nobotslot", "/nbs", "-nobotslot", "-nbs"
 					$g_bBotLaunchOption_NoBotSlot = True
-				Case "/debug", "/debugmode", "/dev", "-debug", "-dev"
+				Case "/debug", "/debugmode", "/dev", "-debug", "-debugmode", "-dev"
 					$g_bDevMode = True
 				Case "/minigui", "/mg", "-minigui", "-mg"
 					$g_iGuiMode = 2
 				Case "/nogui", "/ng", "-nogui", "-ng"
 					$g_iGuiMode = 0
+				Case "/?", "/h", "/help", "-?", "-h", "-help"
+					; show command line help and exit
+					$g_iBotLaunchOption_Help = True
 				Case Else
 					If StringInStr($CmdLine[$i], "/guipid=") Then
 						Local $guidpid = Int(StringMid($CmdLine[$i], 9))
@@ -1113,10 +1121,14 @@ Func _RunFunction($action)
 		Case "UpgradeBuilding"
 			UpgradeBuilding()
 			_Sleep($DELAYRUNBOT3)
+ 			AutoUpgrade()
+			_Sleep($DELAYRUNBOT3)
 		Case "BuilderBase"
 			If isOnBuilderIsland() Or (($g_bChkCollectBuilderBase Or $g_bChkStartClockTowerBoost) And SwitchBetweenBases()) Then
 				CollectBuilderBase()
+				BuilderBaseReport()
 				StartClockTowerBoost()
+				MainSuggestedUpgradeCode()
 				; switch back to normal village
 				SwitchBetweenBases()
 			EndIf

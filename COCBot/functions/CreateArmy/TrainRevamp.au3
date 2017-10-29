@@ -897,6 +897,9 @@ Func IsGUICheckedForSpell($Spell, $Mode)
 		Case $eFSpell
 			$sSpell = "Freeze"
 			$aVal = $g_abAttackUseFreezeSpell
+		Case $eCSpell
+			$sSpell = "Clone"
+			$aVal = $g_abAttackUseCloneSpell
 		Case $ePSpell
 			$sSpell = "Poison"
 			$aVal = $g_abAttackUsePoisonSpell

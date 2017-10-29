@@ -160,6 +160,8 @@ Func SaveRegularConfig()
 	SaveConfig_600_15()
 	; <><><><> Village / Upgrade - Buildings <><><><>
 	SaveConfig_600_16()
+	; <><><><> Village / Upgrade - Auto Upgrade <><><><>
+	SaveConfig_auto()
 	; <><><><> Village / Upgrade - Walls <><><><>
 	SaveConfig_600_17()
 	; <><><><> Village / Notify <><><><>
@@ -315,6 +317,12 @@ Func SaveConfig_600_6()
 	_Ini_Add("other", "ChkCollectBuildersBase", $g_bChkCollectBuilderBase ? 1 : 0)
 	_Ini_Add("other", "ChkStartClockTowerBoost", $g_bChkStartClockTowerBoost ? 1 : 0)
 	_Ini_Add("other", "ChkCTBoostBlderBz", $g_bChkCTBoostBlderBz ? 1 : 0)
+	_Ini_Add("other", "g_chkBBSuggestedUpgrades", $g_ichkBBSuggestedUpgrades)
+	_Ini_Add("other", "g_chkBBSuggestedUpgradesIgnoreGold", $g_ichkBBSuggestedUpgradesIgnoreGold)
+	_Ini_Add("other", "g_chkBBSuggestedUpgradesIgnoreElixir", $g_ichkBBSuggestedUpgradesIgnoreElixir)
+	_Ini_Add("other", "g_chkBBSuggestedUpgradesIgnoreHall", $g_ichkBBSuggestedUpgradesIgnoreHall)
+
+	_Ini_Add("other", "g_chkPlacingNewBuildings", $g_ichkPlacingNewBuildings)
 EndFunc   ;==>SaveConfig_600_6
 
 Func SaveConfig_600_9()
@@ -419,6 +427,21 @@ Func SaveConfig_600_16()
 	_Ini_Add("upgrade", "minupgrelixir", $g_iUpgradeMinElixir)
 	_Ini_Add("upgrade", "minupgrdark", $g_iUpgradeMinDark)
 EndFunc   ;==>SaveConfig_600_16
+
+Func SaveConfig_auto()
+	ApplyConfig_auto(GetApplyConfigSaveAction())
+; Auto Upgrade
+	_Ini_Add("Auto Upgrade", "chkAutoUpgrade", $g_ichkAutoUpgrade)
+	For $i = 0 To 12
+		_Ini_Add("Auto Upgrade", "chkUpgradesToIgnore[" & $i & "]", $g_ichkUpgradesToIgnore[$i])
+	Next
+	For $i = 0 To 2
+		_Ini_Add("Auto Upgrade", "chkResourcesToIgnore[" & $i & "]", $g_ichkResourcesToIgnore[$i])
+	Next
+	_Ini_Add("Auto Upgrade", "SmartMinGold", GUICtrlRead($g_SmartMinGold))
+	_Ini_Add("Auto Upgrade", "SmartMinElixir", GUICtrlRead($g_SmartMinElixir))
+	_Ini_Add("Auto Upgrade", "SmartMinDark", GUICtrlRead($g_SmartMinDark))
+EndFunc   ;==>SaveConfig_auto
 
 Func SaveConfig_600_17()
 	; <><><><> Village / Upgrade - Walls <><><><>

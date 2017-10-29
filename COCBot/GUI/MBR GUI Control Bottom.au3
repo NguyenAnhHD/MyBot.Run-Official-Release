@@ -232,11 +232,11 @@ EndFunc   ;==>updateBtnHideState
 Func btnHide()
 	If Not $g_bIsHidden Then
 		GUICtrlSetData($g_hBtnHide, GetTranslatedFileIni("MBR GUI Control Bottom", "Func_btnHide_False", "Show"))
-		HideAndroidWindow(True)
+		HideAndroidWindow(True, Default, Default, "btnHide")
 		$g_bIsHidden = True
 	ElseIf $g_bIsHidden Then
 		GUICtrlSetData($g_hBtnHide, GetTranslatedFileIni("MBR GUI Control Bottom", "Func_btnHide_True", "Hide"))
-		HideAndroidWindow(False)
+		HideAndroidWindow(False, Default, Default, "btnHide")
 		$g_bIsHidden = False
 	EndIf
 EndFunc   ;==>btnHide

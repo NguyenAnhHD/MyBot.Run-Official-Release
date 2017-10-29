@@ -1,4 +1,5 @@
 * **V7.2.6**
+ * Add Auto Update for Normal and Builder Base and Builder Base Stats (thx to DocOC team and ViperZ)
  * Add MEmu 3.5.0.2 DirectX support
  * Add Clash Of Magic support, https://www.clashofmagic.net/
    Server 3: http://download825.mediafireuserdownload.com/g29mv74piaqg/jeab7w484b77n86/Magic-CoC_S3-9.105-R1.apk
@@ -6,11 +7,14 @@
  * Add Mini GUI mode to run launch more 10 bots (can be also enabled with command line option /minigui or /mg)
    New title bar icon to switch between normal and mini GUI mode
  * Add automatic Android reboot after configured run-time hours (default is 24) to prevent severy Android issues like memory leak, graphics error etc.
+ * Add /? command line option to show help on additonal command line paramter and options
  * Fix wall upgrade not saving resources for enabled non-repeated building upgrades when a builder is available
  * Fix Wait For Clan Castle Spell not getting detected sometimes
  * Fix Log Messages when Heroes are not enabled to auto Upgrade
  * Fix Balloon Donation Issues
  * Fix Wall Upgrade Ignoring Auto Warden Upgrade when checking if enough Elixir is available
+ * Fix Several Bugs and outdated values by @NguyenAnhHD
+ * Fix Clone Spell not getting brewed before going to Attack by @ViperZ
  * Improve Weak Base Eagle Lvl 2 Detection
  * Improve Dead Base Collector Lvl 11 Detection
  * Improve village measuring with secondary images to fix zoom out loop when village cannot be measured

@@ -2766,6 +2766,12 @@ Global $g_iUpgradeWallMinGold = 0, $g_iUpgradeWallMinElixir = 0
 Global $g_iUpgradeWallLootType = 0, $g_bUpgradeWallSaveBuilder = False
 Global $g_iCmbUpgradeWallsLevel = 6
 Global $g_aiWallsCurrentCount[13] = [-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ichkAutoUpgrade = 0
+Global $g_iSmartMinGold = 150000, $g_iSmartMinElixir = 150000, $g_iSmartMinDark = 1500
+Global $g_ichkUpgradesToIgnore[13] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Global $g_ichkResourcesToIgnore[3] = [0, 0, 0]
+Global $g_ichkBBSuggestedUpgrades = 0, $g_ichkBBSuggestedUpgradesIgnoreGold = 0, $g_ichkBBSuggestedUpgradesIgnoreElixir = 0, $g_ichkBBSuggestedUpgradesIgnoreHall = 0
+Global $g_ichkPlacingNewBuildings = 0
 Global $g_iUnbrkMode = 0, $g_iUnbrkWait = 5
 Global $g_iUnbrkMinGold = 50000, $g_iUnbrkMinElixir = 50000, $g_iUnbrkMaxGold = 600000, $g_iUnbrkMaxElixir = 600000, $g_iUnbrkMinDark = 5000, $g_iUnbrkMaxDark = 6000
 Global $g_bNotifyPBEnable = False, $g_sNotifyPBToken = ""
@@ -4382,6 +4388,7 @@ ReadConfig_600_13()
 ReadConfig_600_14()
 ReadConfig_600_15()
 ReadConfig_600_16()
+ReadConfig_auto()
 ReadConfig_600_17()
 ReadConfig_600_18()
 ReadConfig_600_19()
@@ -4493,6 +4500,11 @@ IniReadS($g_iTxtTreasuryDark, $g_sProfileConfigPath, "other", "minTreasurydark",
 IniReadS($g_bChkCollectBuilderBase, $g_sProfileConfigPath, "other", "ChkCollectBuildersBase", False, "Bool")
 IniReadS($g_bChkStartClockTowerBoost, $g_sProfileConfigPath, "other", "ChkStartClockTowerBoost", False, "Bool")
 IniReadS($g_bChkCTBoostBlderBz, $g_sProfileConfigPath, "other", "ChkCTBoostBlderBz", False, "Bool")
+IniReadS($g_ichkBBSuggestedUpgrades, $g_sProfileConfigPath, "other", "g_chkBBSuggestedUpgrades", $g_ichkBBSuggestedUpgrades, "Int")
+IniReadS($g_ichkBBSuggestedUpgradesIgnoreGold, $g_sProfileConfigPath, "other", "g_chkBBSuggestedUpgradesIgnoreGold", $g_ichkBBSuggestedUpgradesIgnoreGold, "Int")
+IniReadS($g_ichkBBSuggestedUpgradesIgnoreElixir, $g_sProfileConfigPath, "other", "g_chkBBSuggestedUpgradesIgnoreElixir", $g_ichkBBSuggestedUpgradesIgnoreElixir, "Int")
+IniReadS($g_ichkBBSuggestedUpgradesIgnoreHall, $g_sProfileConfigPath, "other", "g_chkBBSuggestedUpgradesIgnoreHall", $g_ichkBBSuggestedUpgradesIgnoreHall, "Int")
+IniReadS($g_ichkPlacingNewBuildings, $g_sProfileConfigPath, "other", "g_chkPlacingNewBuildings", $g_ichkPlacingNewBuildings, "Int")
 EndFunc
 Func ReadConfig_600_9()
 IniReadS($g_iUnbrkMode, $g_sProfileConfigPath, "Unbreakable", "chkUnbreakable", 0, "int")
@@ -4635,6 +4647,18 @@ Func ReadConfig_600_16()
 IniReadS($g_iUpgradeMinGold, $g_sProfileConfigPath, "upgrade", "minupgrgold", 100000, "int")
 IniReadS($g_iUpgradeMinElixir, $g_sProfileConfigPath, "upgrade", "minupgrelixir", 100000, "int")
 IniReadS($g_iUpgradeMinDark, $g_sProfileConfigPath, "upgrade", "minupgrdark", 2000, "int")
+EndFunc
+Func ReadConfig_auto()
+IniReadS($g_ichkAutoUpgrade, $g_sProfileConfigPath, "Auto Upgrade", "chkAutoUpgrade", 0, "int")
+For $i = 0 To 12
+IniReadS($g_ichkUpgradesToIgnore[$i], $g_sProfileConfigPath, "Auto Upgrade", "chkUpgradesToIgnore[" & $i & "]", $g_ichkUpgradesToIgnore[$i], "int")
+Next
+For $i = 0 To 2
+IniReadS($g_ichkResourcesToIgnore[$i], $g_sProfileConfigPath, "Auto Upgrade", "chkResourcesToIgnore[" & $i & "]", $g_ichkResourcesToIgnore[$i], "int")
+Next
+IniReadS($g_iSmartMinGold, $g_sProfileConfigPath, "Auto Upgrade", "SmartMinGold", 150000, "int")
+IniReadS($g_iSmartMinElixir, $g_sProfileConfigPath, "Auto Upgrade", "SmartMinElixir", 150000, "int")
+IniReadS($g_iSmartMinDark, $g_sProfileConfigPath, "Auto Upgrade", "SmartMinDark", 1500, "int")
 EndFunc
 Func ReadConfig_600_17()
 IniReadS($g_bAutoUpgradeWallsEnable, $g_sProfileConfigPath, "upgrade", "auto-wall", False, "Bool")
