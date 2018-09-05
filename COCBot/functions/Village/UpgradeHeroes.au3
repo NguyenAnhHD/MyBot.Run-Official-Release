@@ -429,7 +429,7 @@ Func ReservedBuildersForHeroes()
 		EndIf
 	EndIf
 	
-	Local $iFreeBuildersReservedForHeroes = _Max($g_iHeroReservedBuilder - $iUsedBuildersForHeroes, 0)
+	Local $iFreeBuildersReservedForHeroes = _Max(Number($g_iHeroReservedBuilder) - $iUsedBuildersForHeroes, 0)
 	If $iFreeBuildersReservedForHeroes = 1 Then 
 		SetLog($iFreeBuildersReservedForHeroes & " free builder is reserved for heroes.", $COLOR_INFO)
 	Else

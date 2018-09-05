@@ -33,7 +33,7 @@ Func Collect($bCheckTreasury = True)
 	Local $aResult = returnMultipleMatchesOwnVillage($g_sImgCollectRessources)
 
 	If UBound($aResult) > 1 Then ; we have an array with data of images found
-		For $i = 1 To UBound($aResult) - 1  ; loop through array rows
+		For $i = 1 To UBound($aResult) - 1 ; loop through array rows
 			$sFileName = $aResult[$i][1] ; Filename
 			$aCollectXY = $aResult[$i][5] ; Coords
 			If IsArray($aCollectXY) Then ; found array of locations
@@ -56,30 +56,30 @@ Func Collect($bCheckTreasury = True)
 	If UBound($aLootCart) > 1 Then
 		If isInsideDiamond($aLootCart) Then
 			If IsMainPage() Then ClickP($aLootCart, 1, 0, "#0330")
-					If _Sleep($DELAYCOLLECT1) Then Return
+			If _Sleep($DELAYCOLLECT1) Then Return
 
-					;Get LootCart info confirming the name
-					Local $sInfo = BuildingInfo(242, 520 + $g_iBottomOffsetY) ; 860x780
-					If @error Then SetError(0, 0, 0)
-					Local $CountGetInfo = 0
-					While IsArray($sInfo) = False
-						$sInfo = BuildingInfo(242, 520 + $g_iBottomOffsetY) ; 860x780
-						If @error Then SetError(0, 0, 0)
-						If _Sleep($DELAYCOLLECT1) Then Return
-						$CountGetInfo += 1
-						If $CountGetInfo >= 5 Then Return
-					WEnd
-					If $g_bDebugSetlog Then SetDebugLog(_ArrayToString($sInfo, " "), $COLOR_DEBUG)
-					If @error Then Return SetError(0, 0, 0)
-					If $sInfo[0] > 1 Or $sInfo[0] = "" Then
-						If StringInStr($sInfo[1], "Loot") = 0 Then
-							If $g_bDebugSetlog Then SetDebugLog("Bad Loot Cart location", $COLOR_ACTION)
-						Else
-							If IsMainPage() Then Click($aLootCartBtn[0], $aLootCartBtn[1], 1, 0, "#0331") ;Click loot cart button
-						EndIf
-					EndIf
+			;Get LootCart info confirming the name
+			Local $sInfo = BuildingInfo(242, 520 + $g_iBottomOffsetY) ; 860x780
+			If @error Then SetError(0, 0, 0)
+			Local $CountGetInfo = 0
+			While IsArray($sInfo) = False
+				$sInfo = BuildingInfo(242, 520 + $g_iBottomOffsetY) ; 860x780
+				If @error Then SetError(0, 0, 0)
+				If _Sleep($DELAYCOLLECT1) Then Return
+				$CountGetInfo += 1
+				If $CountGetInfo >= 5 Then Return
+			WEnd
+			If $g_bDebugSetlog Then SetDebugLog(_ArrayToString($sInfo, " "), $COLOR_DEBUG)
+			If @error Then Return SetError(0, 0, 0)
+			If $sInfo[0] > 1 Or $sInfo[0] = "" Then
+				If StringInStr($sInfo[1], "Loot") = 0 Then
+					If $g_bDebugSetlog Then SetDebugLog("Bad Loot Cart location", $COLOR_ACTION)
+				Else
+					If IsMainPage() Then Click($aLootCartBtn[0], $aLootCartBtn[1], 1, 0, "#0331") ;Click loot cart button
+				EndIf
+			EndIf
 		Else
-			SetLog("Error in Collect(): Loot Cart Coordinates are not inside the Village (X: " & $aLootCart[0] & " | Y: " & $aLootCart[1], $COLOR_ERROR)
+			SetLog("LootCart Coordinates are not inside the Village (X: " & $aLootCart[0] & " | Y: " & $aLootCart[1] & ")", $COLOR_INFO)
 		EndIf
 	Else
 		SetLog("No Loot Cart found on your Village", $COLOR_SUCCESS)

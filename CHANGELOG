@@ -1,3 +1,15 @@
+* **V7.6.2**
+* Fixed Bluestacks 4.x and CoC PB message , different font and place. 
+* Fixed Siege Build when queued empty and camp is full, making a double sieges.
+* Fixed Conflict with Balloons and siege on attack bar, reported by @Black-sTyle-Vii
+* Fixed Donate only - Switch account and a second train army reported by @hrishikesh
+* Added New method to get version from Github, using the github API.
+* Added Enable/Disable 'Show touch' on emulator under Android TAB
+* Improved BlueStacks newest versions Undocked and Docked
+* Improved using Siege to attack deadbase while DropTrophy
+* Changed MyBot icons
+* Removed 24 unnecessary ocr/bundle files
+
 * **V7.6.1**
 * Fixed Queen activation at scripted Attacks
 * Fixed Train Sieges on Quick Train , by @ChacalGyn

@@ -32,8 +32,14 @@ Func TrainSystem()
 		Return
 	EndIf
 
+	If $g_abDonateOnly[$g_iCurAccount] And ProfileSwitchAccountEnabled() And $g_bIsFullArmywithHeroesAndSpells Then
+		SetLog("Donate Only mode and your Army is prepared!", $COLOR_DEBUG) ;Debug
+		Return
+	Endif
+
 	If ProfileSwitchAccountEnabled() Then $g_bDoubleTrainDone = $g_abDoubleTrainDone[$g_iCurAccount]
 	If $g_bIsFullArmywithHeroesAndSpells And $g_bDoubleTrainDone Then $g_bDoubleTrainDone = False
+
 	If Not $g_bQuickTrainEnable Then
 		TrainCustomArmy()
 		DoubleTrain()

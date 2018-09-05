@@ -5,11 +5,11 @@
 #pragma compile(Icon, "Images\MyBot.ico")
 #pragma compile(FileDescription, Clash of Clans Bot - A Free Clash of Clans bot - https://mybot.run)
 #pragma compile(ProductVersion, 7.6)
-#pragma compile(FileVersion, 7.6.1)
+#pragma compile(FileVersion, 7.6.2)
 #pragma compile(LegalCopyright, © https://mybot.run)
 #Au3Stripper_Off
 #Au3Stripper_On
-Global $g_sBotVersion = "v7.6.1"
+Global $g_sBotVersion = "v7.6.2"
 Opt("MustDeclareVars", 1)
 Global $g_sBotTitle = ""
 Global $g_hFrmBot = 0
@@ -6693,7 +6693,6 @@ Global Const $DELAYWAITMAINSCREEN1 = 2000
 Global Const $DELAYZOOMOUT1 = 1500
 Global Const $DELAYZOOMOUT2 = 200
 Global Const $DELAYZOOMOUT3 = 1000
-Global Const $DELAYCHECKVERSIONHTML1 = 250
 Global Const $DELAYDOWNLOADLICENSE = 250
 Global Const $DELAYTOGGLEPAUSE1 = 100
 Global Const $DELAYTOGGLEPAUSE2 = 250
@@ -10925,7 +10924,7 @@ Local $NewVersion = ""
 Local $HelpLink = "Please visit MyBot Forum!"
 Switch $g_sAndroidEmulator
 Case "BlueStacks2"
-$NewVersion = GetVersionNormalized("3.50.0.0")
+$NewVersion = GetVersionNormalized("4.3.29.0")
 Case "MEmu"
 $NewVersion = GetVersionNormalized("5.2.3.0")
 Case "Nox"
@@ -14129,7 +14128,7 @@ Global $g_hChkNotifyAlertMatchFound = 0, $g_hChkNotifyAlertLastRaidIMG = 0, $g_h
 Global $g_hChkNotifyOnlyHours = 0, $g_hChkNotifyOnlyWeekDays = 0, $g_hChkNotifyhours[24] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], $g_hChkNotifyWeekdays[7] = [0, 0, 0, 0, 0, 0, 0]
 GLobal $g_hLblNotifyhour = 0, $g_ahLblNotifyhoursE = 0, $g_hChkNotifyhoursE1 = 0, $g_hChkNotifyhoursE2 = 0, $g_hLblNotifyhoursAM = 0, $g_hLblNotifyhoursPM = 0
 GLobal $g_hLblNotifyhours[12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Global $g_hLblNotifyWeekdays[7] = [0, 0, 0, 0, 0, 0, 0], $g_ahLblNotifyWeekdaysE = 0, $g_ahChkNotifyWeekdaysE = 0
+Global $g_hLblNotifyWeekdays[7] = [0, 0, 0, 0, 0, 0, 0], $g_ahLblNotifyWeekdaysE = 0, $g_ahChkNotifyWeekdaysE = 0 , $g_lblHepNotify = 0
 Func CreateVillageNotify()
 $g_hGUI_NOTIFY = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
 GUISwitch($g_hGUI_NOTIFY)
@@ -14284,8 +14283,8 @@ _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR Global GUI Design", "Clear_set_row_
 GUICtrlSetOnEvent(-1, "ChkNotifyWeekdaysE")
 $y += 15
 $x = 15
-GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Village - Notify", "LblNotifyHelp", "Help ?"), $x + 310, $y , 100, 24, $SS_RIGHT)
-GUICtrlSetOnEvent(-1, "ShowCommandLineHelp")
+$g_lblHepNotify = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Village - Notify", "LblNotifyHelp", "Help ?"), $x + 310, $y , 100, 24, $SS_RIGHT)
+GUICtrlSetOnEvent($g_lblHepNotify, "ShowCommandLineHelp")
 GUICtrlSetCursor(-1, 0)
 GUICtrlSetFont(-1, 8.5, $FW_BOLD)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Village - Notify", "LblNotifyHelp_Info_01", "Click here to get Help about Notify Remote commands to Telegram"))
@@ -15822,7 +15821,7 @@ $x = 10
 $g_hChkDBSpellsWait = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "ChkSpellsWait", "Wait for Spells to be Ready"), $x, $y, -1, -1)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "ChkSpellsWait_Info_01", "Stop searching for this attack type when Spells are not ready") & @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "ChkSpellsWait_Info_02", "Warning: Do not enable unless you have spell factory or bot will not attack!"))
 GUICtrlSetOnEvent(-1, "chkDBSpellsWait")
-$g_hChkDBWaitForCastle = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "ChkWaitForCastle", "Wait for Clan Castle to be full"), $x, $y + 20, -1, -1)
+$g_hChkDBWaitForCastle = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "ChkWaitForCastle", "Wait for Clan Castle"), $x, $y + 20, -1, -1)
 _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Search", "ChkWaitForCastle_Info_01", "Wait until your Clan Castle be Full"))
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 Local $x = 220, $y = 45
@@ -18651,7 +18650,7 @@ $g_hBtnExportData = GUICtrlCreateButton( GetTranslatedFileIni("MBR GUI Design Ch
 GUICtrlSetOnEvent(-1, "SQLiteExport")
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
-Global $g_hCmbCOCDistributors = 0, $g_hCmbAndroidBackgroundMode = 0, $g_hCmbSuspendAndroid = 0, $g_hChkAndroidAdbClickDragScript = 0, $g_hBtnAndroidAdbShell = 0, $g_hBtnAndroidHome = 0, $g_hBtnAndroidBack = 0, $g_hTxtAndroidRebootHours = 0, $g_hChkAndroidCloseWithBot = 0
+Global $g_hCmbCOCDistributors = 0, $g_hCmbAndroidBackgroundMode = 0, $g_hCmbSuspendAndroid = 0, $g_hChkAndroidAdbClickDragScript = 0, $g_hBtnAndroidAdbShell = 0, $g_hBtnAndroidHome = 0, $g_hBtnAndroidBack = 0, $g_hTxtAndroidRebootHours = 0, $g_hChkAndroidCloseWithBot = 0 , $g_hBtnAndroidEnableTouch = 0 , $g_hBtnAndroidDisableTouch = 0, $g_lblHelpBot = 0
 Func CreateBotAndroid()
 Local $x = 25, $y = 45, $y2, $w = 240, $h = 50, $sTxtTip
 GUICtrlCreateGroup(GetTranslatedFileIni("MBR Distributors", "Group_01", "Distributors"), $x - 20, $y - 20, $w, $h)
@@ -18703,7 +18702,7 @@ GUICtrlCreateGroup("", -99, -99, 1, 1)
 $y += $h + 5
 $y2 = $y
 $w = 240
-$h = 80
+$h = 120
 GUICtrlCreateGroup(GetTranslatedFileIni("Android Control", "Group_03", "Android Control"), $x - 20, $y - 20, $w, $h)
 $y -= 2
 $g_hBtnAndroidAdbShell = GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "BtnAndroidAdbShell", "Start ADB Shell in new Console Window"), $x - 8, $y, 220, 25)
@@ -18713,6 +18712,11 @@ $g_hBtnAndroidHome = GUICtrlCreateButton(GetTranslatedFileIni("Android Control",
 GUICtrlSetOnEvent(-1, "AndroidHomeButton")
 $g_hBtnAndroidBack = GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "BtnAndroidBack", "Send Back"), $x - 8 + 115, $y, 105, 25)
 GUICtrlSetOnEvent(-1, "AndroidBackButton")
+$y += 30
+$g_hBtnAndroidEnableTouch = GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "EnableShowTouchs", "Enable Touchs"), $x - 8, $y, 105, 25)
+GUICtrlSetOnEvent(-1, "EnableShowTouchs")
+$g_hBtnAndroidDisableTouch = GUICtrlCreateButton(GetTranslatedFileIni("Android Control", "DisableShowTouchs", "Disable Touchs"), $x - 8 + 115, $y, 105, 25)
+GUICtrlSetOnEvent(-1, "DisableShowTouchs")
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $x = 25 + 240 + 10 + 30
 $y = $y2
@@ -18728,8 +18732,8 @@ GUICtrlSetOnEvent(-1, "OpenPlayStoreNovaLauncher")
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $y += 130
 $x -= 60
-GUICtrlCreateLabel("Command line Help ?", $x - 20, $y - 20, 220, 24, $SS_RIGHT)
-GUICtrlSetOnEvent(-1, "ShowCommandLineHelp")
+$g_lblHelpBot = GUICtrlCreateLabel("Command line Help ?", $x - 20, $y - 20, 220, 24, $SS_RIGHT)
+GUICtrlSetOnEvent($g_lblHelpBot, "ShowCommandLineHelp")
 GUICtrlSetCursor(-1, 0)
 GUICtrlSetFont(-1, 8.5, $FW_BOLD)
 _GUICtrlSetTip(-1, "Click here to get help about command line and option for MyBot.run!")
@@ -20471,9 +20475,9 @@ Func ShowCommandLineHelp()
 SetDebugLog("Help File called from CrtlID: " & @GUI_CtrlId)
 Local $PathHelp = "CommandLineParameter"
 Switch @GUI_CtrlId
-Case 2620 to 2670
+Case $g_lblHelpBot
 $PathHelp = "CommandLineParameter"
-Case 1100 to 1150
+Case $g_lblHepNotify
 $PathHelp = "NotifyHelp"
 EndSwitch
 UpdateBotTitle()
@@ -26895,6 +26899,14 @@ EndFunc
 Func cmbAndroidBackgroundMode()
 $g_iAndroidBackgroundMode = _GUICtrlComboBox_GetCurSel($g_hCmbAndroidBackgroundMode)
 UpdateAndroidBackgroundMode()
+EndFunc
+func EnableShowTouchs()
+AndroidAdbSendShellCommand("content insert --uri content://settings/system --bind name:s:show_touches --bind value:i:1")
+SetDebugLog("EnableShowTouchs ON")
+EndFunc
+func DisableShowTouchs()
+AndroidAdbSendShellCommand("content insert --uri content://settings/system --bind name:s:show_touches --bind value:i:0")
+SetDebugLog("EnableShowTouchs OFF")
 EndFunc
 Func BotStart($bAutostartDelay = 0)
 FuncEnter(BotStart)
@@ -39171,6 +39183,10 @@ If $g_bFirstStart Then $g_bFirstStart = False
 DoubleTrain($g_bQuickTrainEnable)
 Return
 EndIf
+If $g_abDonateOnly[$g_iCurAccount] And ProfileSwitchAccountEnabled() And $g_bIsFullArmywithHeroesAndSpells Then
+SetLog("Donate Only mode and your Army is prepared!", $COLOR_DEBUG)
+Return
+Endif
 If ProfileSwitchAccountEnabled() Then $g_bDoubleTrainDone = $g_abDoubleTrainDone[$g_iCurAccount]
 If $g_bIsFullArmywithHeroesAndSpells And $g_bDoubleTrainDone Then $g_bDoubleTrainDone = False
 If Not $g_bQuickTrainEnable Then
@@ -42164,12 +42180,12 @@ Local $aTempSiegeArray, $aSiegeCoords
 Local $sSiegeName = ""
 Local $iSiegeIndex = -1
 Local $aCurrentTroopsEmpty[$eSiegeMachineCount] = [0, 0]
-$g_aiCurrentSiegeMachines = $aCurrentTroopsEmpty
 Local $sSiegeInfo = getArmyCampCap(758, 164, $bNeedCapture)
 If $g_bDebugSetlogTrain Then SetLog("OCR $sSiegeInfo = " & $sSiegeInfo, $COLOR_DEBUG)
 Local $aGetSiegeCap = StringSplit($sSiegeInfo, "#", $STR_NOCOUNT)
-If $bSetLog And Ubound($aGetSiegeCap) = 2 Then
-SetLog("Total Siege Workshop Capacity: " & $aGetSiegeCap[0] & "/" & $aGetSiegeCap[1])
+If Ubound($aGetSiegeCap) = 2 Then
+If $bSetLog Then SetLog("Total Siege Workshop Capacity: " & $aGetSiegeCap[0] & "/" & $aGetSiegeCap[1])
+$g_aiCurrentSiegeMachines = $aCurrentTroopsEmpty
 If Number($aGetSiegeCap[0]) = 0 then Return
 Else
 Return
@@ -44483,7 +44499,7 @@ If $g_bForceSinglePBLogoff Then $g_bGForcePBTUpdate = True
 checkObstacles_ResetSearch()
 Return True
 EndIf
-If UBound(decodeSingleCoord(FindImageInPlace("Break", $g_sImgPersonalBreak, "165,287,335,325", False))) > 1 Then
+If UBound(decodeSingleCoord(FindImageInPlace("Break", $g_sImgPersonalBreak, "165,287,335,335", False))) > 1 Then
 SetLog("Village must take a break, wait ...", $COLOR_ERROR)
 If TestCapture() Then Return "Village must take a break"
 PushMsg("TakeBreak")
@@ -46281,16 +46297,7 @@ Return False
 EndIf
 If $bInstalled And Not $bCheckOnly Then
 $__VBoxManage_Path = $__BlueStacks_Path & "BstkVMMgr.exe"
-Local $bs3 = GetVersionNormalized("2.50.0.0")
-Local $bs3WithFrame = GetVersionNormalized("2.56.75")
-local $bsNow = GetVersionNormalized($__BlueStacks_Version)
-If StringInStr($__BlueStacks_Version, "4.") = 1 Or(StringInStr($__BlueStacks_Version, "2.") = 1 And $bsNow >= $bs3 And $bsNow < $bs3WithFrame) Then
-Local $aOff = [0, 13]
-If $g_aiMouseOffsetWindowOnly[0] <> $aOff[0] Or $g_aiMouseOffsetWindowOnly[1] <> $aOff[1] Then
-$g_aiMouseOffsetWindowOnly = $aOff
-SetDebugLog("BlueStacks " & $__BlueStacks_Version & ": Adjust mouse clicks when running undocked by: " & $aOff[0] & ", " & $aOff[1])
-EndIf
-EndIf
+CheckBlueStacksVersionMod()
 Local $BstAdbPort = RegRead($g_sHKLM & "\SOFTWARE\BlueStacks\Guests\" & $g_sAndroidInstance & "\Config\", "BstAdbPort")
 If $BstAdbPort Then
 $g_sAndroidAdbDevice = "127.0.0.1:" & $BstAdbPort
@@ -46299,6 +46306,24 @@ $g_sAndroidAdbDevice = $g_avAndroidAppConfig[$__BS2_Idx][10]
 EndIf
 EndIf
 Return $bInstalled
+EndFunc
+Func CheckBlueStacksVersionMod()
+local $bsNow = GetVersionNormalized($__BlueStacks_Version)
+Local $aOff = [0, 13]
+Local $bs3 = GetVersionNormalized("2.50.0.0")
+Local $bs3WithFrame = GetVersionNormalized("2.56.75")
+Local $bs3NNoFrame = GetVersionNormalized("4.0.0.0")
+Local $bs3NWithFrame = GetVersionNormalized("4.3.28.0")
+If($bsNow >= $bs3 And $bsNow < $bs3WithFrame) Or($bsNow > $bs3NNoFrame And $bsNow < $bs3NWithFrame) Then
+If $g_aiMouseOffsetWindowOnly[0] <> $aOff[0] Or $g_aiMouseOffsetWindowOnly[1] <> $aOff[1] Then
+$g_aiMouseOffsetWindowOnly = $aOff
+SetDebugLog("BlueStacks " & $__BlueStacks_Version & ": Adjust mouse clicks when running undocked by: " & $aOff[0] & ", " & $aOff[1])
+EndIf
+EndIf
+If $bsNow >= $bs3NWithFrame Or($bsNow >= $bs3WithFrame And $bsNow < $bs3NNoFrame) Then
+SetDebugLog("BlueStacks " & $__BlueStacks_Version & " adjustment on ZoomOut")
+$__BlueStacks2Version_2_5_or_later = True
+EndIf
 EndFunc
 Func GetBlueStacksBackgroundMode()
 Return $g_iAndroidBackgroundModeDirectX
@@ -51871,122 +51896,57 @@ For $i = 0 To UBound($a) - 1
 $a[$i] = 0
 Next
 EndFunc
-Global $g_sLastVersion = ""
-Global $g_sLastMessage = ""
-Global $g_sOldVersionMessage = ""
 Func CheckVersion()
-If $g_bCheckVersion Then
-CheckVersionHTML()
-If $g_sLastVersion = "" Then
-SetLog("WE CANNOT OBTAIN PRODUCT VERSION AT THIS TIME", $COLOR_ACTION)
-ElseIf VersionNumFromVersionTXT($g_sBotVersion) < VersionNumFromVersionTXT($g_sLastVersion) Then
-SetLog("WARNING, YOUR BOT VERSION (" & $g_sBotVersion & ") IS OUT OF DATE.", $COLOR_ERROR)
-SetLog("PLEASE DOWNLOAD THE LATEST(" & $g_sLastVersion & ") FROM https://MyBot.run               ", $COLOR_ERROR)
-SetLog(" ")
-_PrintLogVersion($g_sOldVersionMessage)
+If not $g_bCheckVersion Then Return
+Local $g_sBotGitVersion = ""
+Local $GetdataGithub = "https://api.github.com/repos/MyBotRun/MyBot/releases/latest"
+Local $Temp = __HttpGet($GetdataGithub)
+If $Temp <> "" And Not @error Then
+Local $g_aBotVersionN = StringSplit($g_sBotVersion, " ", 2)
+If @error Then
+Local $g_iBotVersionN = StringReplace($g_sBotVersion, "v", "")
+Else
+Local $g_iBotVersionN = StringReplace($g_aBotVersionN[0], "v", "")
+EndIf
+Local $version = GetLastVersion($Temp)
+$g_sBotGitVersion = StringReplace($version[0], "MBR_v", "")
+SetDebugLog("Last GitHub version is " & $g_sBotGitVersion )
+SetDebugLog("Your version is " & $g_iBotVersionN )
+If _VersionCompare($g_iBotVersionN, $g_sBotGitVersion) = -1 Then
+SetLog("WARNING, YOUR VERSION (" & $g_iBotVersionN & ") IS OUT OF DATE.", $COLOR_INFO)
+Local $ChangelogTXT = GetLastChangeLog($Temp)
+Local $Changelog = StringSplit($ChangelogTXT[0], '\r\n', $STR_ENTIRESPLIT + $STR_NOCOUNT)
+For $i = 0 To UBound($Changelog) - 1
+SetLog($Changelog[$i] )
+Next
 PushMsg("Update")
-ElseIf VersionNumFromVersionTXT($g_sBotVersion) > VersionNumFromVersionTXT($g_sLastVersion) Then
-SetLog("YOU ARE USING A FUTURE VERSION OF MYBOT CHIEF!", $COLOR_SUCCESS)
-SetLog("YOUR VERSION: " & $g_sBotVersion, $COLOR_SUCCESS)
-SetLog("OFFICIAL VERSION: " & $g_sLastVersion, $COLOR_SUCCESS)
-SetLog(" ")
+ElseIf _VersionCompare($g_iBotVersionN, $g_sBotGitVersion) = 0 Then
+SetLog("WELCOME CHIEF, YOU HAVE THE LATEST MYBOT VERSION", $COLOR_SUCCESS)
 Else
-SetLog("WELCOME CHIEF, YOU HAVE THE LATEST VERSION OF THE BOT", $COLOR_SUCCESS)
-SetLog(" ")
-_PrintLogVersion($g_sLastMessage)
+SetLog("YOU ARE USING A FUTURE VERSION CHIEF!", $COLOR_ACTION)
 EndIf
+Else
+SetDebugLog($Temp)
 EndIf
 EndFunc
-Func CheckVersionHTML()
-Local $versionfile = @ScriptDir & "\LastVersion.txt"
-If FileExists(@ScriptDir & "\TestVersion.txt") Then
-FileCopy(@ScriptDir & "\TestVersion.txt", $versionfile, 1)
+Func __HttpGet($sURL, $sData = '')
+Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
+If IsObj($oHTTP) Then
+$oHTTP.Open("GET", $sURL & "?" & $sData, False)
+If(@error) Then Return SetError(1, 0, "__HttpGet/Get Error")
+$oHTTP.Send()
+If(@error) Then Return SetError(2, 0, "__HttpGet/Send Error")
+If($oHTTP.Status <> 200) Then Return SetError(3, 0, $oHTTP.Status)
+Return SetError(0, 0, $oHTTP.ResponseText)
 Else
-Local $hDownload = InetGet("https://raw.githubusercontent.com/MyBotRun/MyBot/master/LastVersion.txt", $versionfile, 0, 1)
-Local $i = 0
-Do
-Sleep($DELAYCHECKVERSIONHTML1)
-$i += 1
-Until InetGetInfo($hDownload, $INET_DOWNLOADCOMPLETE) Or $i > 25
-InetClose($hDownload)
-EndIf
-Local $line, $line2, $Casesense = 0, $chkvers = False, $chkmsg = False, $chkmsg2 = False, $i = 0
-$g_sLastVersion = ""
-If FileExists($versionfile) Then
-$g_sLastVersion = IniRead($versionfile, "general", "version", "")
-Local $versionfilelocalized = @ScriptDir & "\LastVersion_" & $g_sLanguage & ".txt"
-If FileExists(@ScriptDir & "\TestVersion_" & $g_sLanguage & ".txt") Then
-FileCopy(@ScriptDir & "\TestVersion_" & $g_sLanguage & ".txt", $versionfilelocalized, 1)
-Else
-$hDownload = InetGet("https://raw.githubusercontent.com/MyBotRun/MyBot/master/LastVersion_" & $g_sLanguage & ".txt", $versionfilelocalized, 0, 1)
-Local $i = 0
-Do
-Sleep($DELAYCHECKVERSIONHTML1)
-$i += 1
-Until InetGetInfo($hDownload, $INET_DOWNLOADCOMPLETE) Or $i > 25
-InetClose($hDownload)
-EndIf
-If FileExists($versionfilelocalized) Then
-$g_sLastMessage = IniRead($versionfilelocalized, "general", "messagenew", "")
-$g_sOldVersionMessage = IniRead($versionfilelocalized, "general", "messageold", "")
-FileDelete($versionfilelocalized)
-Else
-$g_sLastMessage = IniRead($versionfile, "general", "messagenew", "")
-$g_sOldVersionMessage = IniRead($versionfile, "general", "messageold", "")
-EndIf
-FileDelete($versionfile)
+Return SetError(1, 0, "__HttpGet/ObjCreation Error")
 EndIf
 EndFunc
-Func VersionNumFromVersionTXT($versionTXT)
-Local $versionTXT_clean
-If StringInStr($versionTXT, " ") Then
-$versionTXT_clean = StringLeft($versionTXT, StringInStr($versionTXT, " ") - 1)
-Else
-$versionTXT_clean = $versionTXT
-EndIf
-Local $resultnumber = 0
-If StringLeft($versionTXT_clean, 1) = "v" Then
-Local $versionTXT_Vector = StringSplit(StringMid($versionTXT_clean, 2, -1), ".")
-Local $multiplier = 1000000
-If UBound($versionTXT_Vector) > 0 Then
-For $i = 1 To UBound($versionTXT_Vector) - 1
-$resultnumber = $resultnumber + Number($versionTXT_Vector[$i]) * $multiplier
-$multiplier = $multiplier / 1000
-Next
-Else
-$resultnumber = Number($versionTXT_Vector) * $multiplier
-EndIf
-EndIf
-Return $resultnumber
+Func GetLastVersion($txt)
+Return _StringBetween($txt, '"tag_name":"', '","')
 EndFunc
-Func _PrintLogVersion($message)
-Local $messagevet = StringSplit($message, "\n", 1)
-If Not(IsArray($messagevet)) Then
-SetLog($message)
-Else
-For $i = 1 To $messagevet[0]
-If StringLen($messagevet[$i]) <= 53 Then
-SetLog($messagevet[$i], $COLOR_BLACK, "Lucida Console", 8.5)
-Else
-While StringLen($messagevet[$i]) > 53
-Local $sp = StringInStr(StringLeft($messagevet[$i], 53), " ", 0, -1)
-If $sp = 0 Then
-Local $sp = StringInStr($messagevet[$i], " ", 0)
-If $sp = 0 Then
-SetLog($messagevet[$i], $COLOR_BLACK, "Lucida Console", 8.5)
-Else
-SetLog(StringLeft($messagevet[$i], $sp), $COLOR_BLACK, "Lucida Console", 8.5)
-$messagevet[$i] = StringMid($messagevet[$i], $sp + 1, -1)
-EndIf
-Else
-SetLog(StringLeft($messagevet[$i], $sp), $COLOR_BLACK, "Lucida Console", 8.5)
-$messagevet[$i] = StringMid($messagevet[$i], $sp + 1, -1)
-EndIf
-WEnd
-If StringLen($messagevet[$i]) > 0 Then SetLog($messagevet[$i], $COLOR_BLACK, "Lucida Console", 8.5)
-EndIf
-Next
-EndIf
+Func GetLastChangeLog($txt)
+Return _StringBetween($txt, '"body":"', '"}')
 EndFunc
 Func GetVersionNormalized($VersionString, $Chars = 5)
 If StringLeft($VersionString, 1) = "v" Then $VersionString = StringMid($VersionString, 2)
@@ -53760,12 +53720,6 @@ EndFunc
 Func getTroopsSpellsLevel($x_start, $y_start)
 Return getOcrAndCapture("coc-spellslevel", $x_start, $y_start, 20, 14, True)
 EndFunc
-Func getArmyTroopQuantity($x_start, $y_start)
-Return getOcrAndCapture("coc-train-quant", $x_start, $y_start, 45, 12, True)
-EndFunc
-Func getArmyTroopKind($x_start, $y_start)
-Return getOcrAndCapture("coc-train-t-kind", $x_start, $y_start, 59, 11, True)
-EndFunc
 Func getArmyCampCap($x_start, $y_start, $bNeedCapture = True)
 Return getOcrAndCapture("coc-ms", $x_start, $y_start, 82, 16, True, False, $bNeedCapture)
 EndFunc
@@ -53781,34 +53735,8 @@ EndFunc
 Func getOcrLanguage($x_start, $y_start)
 Return getOcrAndCapture("coc-ms-testl", $x_start, $y_start, 93, 16, True)
 EndFunc
-Func getOcrSpellDetection($x_start, $y_start)
-Local $result = getOcrAndCapture("coc-t-spells2", $x_start, $y_start, 50, 30, True)
-Local $PositionSpecialCaracter = 0
-$PositionSpecialCaracter = StringInStr($result, "§")
-If $PositionSpecialCaracter > 0 Then
-Return StringLeft($result, $PositionSpecialCaracter - 1)
-Else
-Return $result
-EndIf
-EndFunc
-Func getOcrSpellQuantity($x_start, $y_start)
-Return getOcrAndCapture("coc-t-t", $x_start, $y_start, 25, 12, True)
-EndFunc
-Func getOcrClanLevel($x_start, $y_start)
-Return getOcrAndCapture("coc-clanlevel", $x_start, $y_start, 20, 19, True)
-EndFunc
 Func getOcrSpaceCastleDonate($x_start, $y_start)
 Return getOcrAndCapture("coc-totalreq", $x_start, $y_start, 45, 12, True)
-EndFunc
-Func getOcrDonationTroopsDetection($x_start, $y_start)
-Local $result = getOcrAndCapture("coc-donationtroop", $x_start, $y_start, 45, 30, True)
-Local $PositionSpecialCaracter = 0
-$PositionSpecialCaracter = StringInStr($result, "§")
-If $PositionSpecialCaracter > 0 Then
-Return StringLeft($result, $PositionSpecialCaracter - 1)
-Else
-Return $result
-EndIf
 EndFunc
 Func getOcrOverAllDamage($x_start, $y_start)
 Return getOcrAndCapture("coc-overalldamage", $x_start, $y_start, 50, 20, True)
@@ -53839,9 +53767,6 @@ Return getOcrAndCapture("coc-RemainLaboratory", $x_start, $y_start, 194, 25)
 EndFunc
 Func getRemainTHero($x_start, $y_start, $bNeedCapture = True)
 Return getOcrAndCapture("coc-remainhero", $x_start, $y_start, 55, 12, True, False, $bNeedCapture)
-EndFunc
-Func getHeroStatus($x_start, $y_start)
-Return getOcrAndCapture("coc-herostatus", $x_start, $y_start, 20, 20)
 EndFunc
 Func getRequestRemainTime($x_start, $y_start, $bNeedCapture = True)
 Return getOcrAndCapture("coc-CCremainTime", $x_start, $y_start, 30, 14, False, False, $bNeedCapture)
@@ -56629,7 +56554,7 @@ If IsMainPage() Then Click($aLootCartBtn[0], $aLootCartBtn[1], 1, 0, "#0331")
 EndIf
 EndIf
 Else
-SetLog("Error in Collect(): Loot Cart Coordinates are not inside the Village (X: " & $aLootCart[0] & " | Y: " & $aLootCart[1], $COLOR_ERROR)
+SetLog("LootCart Coordinates are not inside the Village (X: " & $aLootCart[0] & " | Y: " & $aLootCart[1] & ")", $COLOR_INFO)
 EndIf
 Else
 SetLog("No Loot Cart found on your Village", $COLOR_SUCCESS)
@@ -58017,16 +57942,13 @@ If $g_bOutOfGold Or $g_bRestart Then Return
 WaitForClouds()
 If $g_bRestart Then Return
 If _Sleep($DELAYDROPTROPHY4) Then ExitLoop
+$g_iSearchCount = 0
+GetResources(False, $DT)
+If $g_bRestart Then Return
 If $g_bDropTrophyAtkDead Then
 $g_iAimGold[$DB] = $g_aiFilterMinGold[$DB]
 $g_iAimElixir[$DB] = $g_aiFilterMinElixir[$DB]
 $g_iAimGoldPlusElixir[$DB] = $g_aiFilterMinGoldPlusElixir[$DB]
-$g_iSearchCount = 0
-GetResources(False, $DT)
-If $g_bRestart Then Return
-SetLog("Identification of your troops:", $COLOR_INFO)
-PrepareAttack($DT)
-If $g_bRestart Then Return
 Local $G =(Number($g_iSearchGold) >= Number($g_iAimGold[$DB]))
 Local $E =(Number($g_iSearchElixir) >= Number($g_iAimElixir[$DB]))
 Local $GPE =((Number($g_iSearchElixir) + Number($g_iSearchGold)) >= Number($g_iAimGoldPlusElixir[$DB]))
@@ -58037,6 +57959,9 @@ ForceCaptureRegion()
 _CaptureRegion2()
 If checkDeadBase() Then
 SetLog("      " & "Dead Base Found while dropping Trophies!", $COLOR_SUCCESS, "Lucida Console", 7.5)
+SetLog("Identification of your troops:", $COLOR_INFO)
+PrepareAttack($DB)
+If $g_bRestart Then Return
 Attack()
 $g_bFirstStart = True
 ReturnHome($g_bTakeLootSnapShot)
@@ -58049,14 +57974,10 @@ Else
 SetLog("      " & "Not a Dead Base, resuming Trophy Dropping.", $COLOR_BLACK, "Lucida Console", 7.5)
 EndIf
 EndIf
-Else
-$g_iSearchCount = 0
-GetResources(False, $DT)
-If $g_bRestart = True Then Return
+EndIf
 SetLog("Identification of your troops:", $COLOR_INFO)
 PrepareAttack($DT)
 If $g_bRestart Then Return
-EndIf
 If _Sleep($DELAYDROPTROPHY4) Then ExitLoop
 If $g_bDropTrophyUseHeroes Then
 $g_iKingSlot = -1
@@ -62118,7 +62039,7 @@ Else
 SetLog($iUsedBuildersForHeroes & " builders are upgrading your heroes.", $COLOR_INFO)
 EndIf
 EndIf
-Local $iFreeBuildersReservedForHeroes = _Max($g_iHeroReservedBuilder - $iUsedBuildersForHeroes, 0)
+Local $iFreeBuildersReservedForHeroes = _Max(Number($g_iHeroReservedBuilder) - $iUsedBuildersForHeroes, 0)
 If $iFreeBuildersReservedForHeroes = 1 Then
 SetLog($iFreeBuildersReservedForHeroes & " free builder is reserved for heroes.", $COLOR_INFO)
 Else
@@ -70255,15 +70176,8 @@ IsMainChatOpenPage()
 IsClanInfoPage()
 IsPixelColorGray(0)
 _MultiPixelSearch2(0, 0, 0, 0, 0, 0, 0, 0, 0)
-getArmyTroopQuantity(0, 0)
-getArmyTroopKind(0, 0)
 getBarracksTroopQuantity(0, 0)
-getOcrSpellDetection(0, 0)
-getOcrSpellQuantity(0, 0)
-getOcrClanLevel(0, 0)
-getOcrDonationTroopsDetection(0, 0)
 getOcrOverAllDamage(0, 0)
-getHeroStatus(0, 0)
 returnAllMatches(0)
 returnLowestLevelSingleMatch(0)
 updateGlobalVillageOffset(0, 0)
